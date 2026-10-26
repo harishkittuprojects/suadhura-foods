@@ -66,16 +66,21 @@ export const ProductCard = ({ product, showCategory = true }) => {
           </div>
         )}
 
+        {/* Swiggy Instamart-style morning delivery badge */}
+        <div className="absolute bottom-2 left-2 bg-neutral-950/85 backdrop-blur-sm text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded flex items-center gap-0.5">
+          <span>⚡ 7 AM</span>
+        </div>
+
         {/* Quick View overlay button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             openDetails();
           }}
-          className="absolute bottom-2.5 right-2.5 bg-white/90 hover:bg-neutral-900 hover:text-white text-neutral-800 p-2 rounded-xl shadow-md transition-all opacity-0 group-hover:opacity-100 transform translate-y-1 group-hover:translate-y-0"
+          className="absolute bottom-2 right-2 bg-white/90 hover:bg-neutral-900 hover:text-white text-neutral-800 p-1.5 rounded-lg shadow-md transition-all opacity-0 group-hover:opacity-100"
           title="Quick View"
         >
-          <Eye className="w-4 h-4" />
+          <Eye className="w-3.5 h-3.5" />
         </button>
       </div>
 

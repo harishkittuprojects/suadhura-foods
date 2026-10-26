@@ -9,6 +9,7 @@ import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { LocationModal } from './components/LocationModal';
 import { AuthModal } from './components/AuthModal';
+import { BottomNav } from './components/BottomNav';
 
 import { HomePage } from './pages/HomePage';
 import { CategoriesPage } from './pages/CategoriesPage';
@@ -79,6 +80,9 @@ function AppContent() {
       <LocationModal />
       <AuthModal />
       <Toast />
+
+      {/* Swiggy Mobile App Bottom Navigation Bar */}
+      <BottomNav />
     </div>
   );
 }

@@ -71,35 +71,77 @@ export const HomePage = () => {
 
       {/* 2. Popular Food Categories */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-500">
-              <Sparkles className="w-4 h-4 text-neutral-800" />
-              <span>Browse By Food Types</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
-              Explore Our Categories
+        
+        {/* SWIGGY-STYLE CIRCULAR CATEGORY RAIL ON MOBILE (< md) */}
+        <div className="md:hidden space-y-3">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-extrabold text-neutral-900 tracking-tight">
+              What's on your mind?
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-              Find authentic South & North Indian culinary essentials handcrafted fresh.
-            </p>
+            <button
+              onClick={() => navigateTo('categories')}
+              className="text-xs font-bold text-neutral-900 flex items-center gap-0.5"
+            >
+              <span>See All</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          <button
-            onClick={() => navigateTo('categories')}
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-neutral-900 hover:text-black border-b-2 border-neutral-900 pb-0.5 transition-all group"
-          >
-            <span>View All 16 Categories</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
+            {CATEGORIES.slice(0, 10).map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => navigateTo('categories', cat.slug)}
+                className="flex flex-col items-center gap-1.5 flex-shrink-0 group text-center"
+              >
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-100 border-2 border-neutral-200 group-active:border-neutral-900 transition-all shadow-sm">
+                  <img 
+                    src={cat.image} 
+                    alt={cat.name} 
+                    className="w-full h-full object-cover group-active:scale-110 transition-transform"
+                    loading="lazy"
+                  />
+                </div>
+                <span className="text-[11px] font-bold text-neutral-800 leading-tight truncate max-w-[68px]">
+                  {cat.name}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
-          {popularCategories.map((cat) => (
-            <CategoryCard key={cat.id} category={cat} />
-          ))}
+        {/* DESKTOP CATEGORIES GRID (md & up) */}
+        <div className="hidden md:block">
+          <div className="flex items-end justify-between gap-4 mb-8">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-500">
+                <Sparkles className="w-4 h-4 text-neutral-800" />
+                <span>Browse By Food Types</span>
+              </div>
+              <h2 className="text-3xl font-extrabold text-neutral-900 mt-1">
+                Explore Our Categories
+              </h2>
+              <p className="text-sm text-neutral-600 mt-1">
+                Find authentic South & North Indian culinary essentials handcrafted fresh.
+              </p>
+            </div>
+
+            <button
+              onClick={() => navigateTo('categories')}
+              className="flex items-center gap-1.5 text-sm font-bold text-neutral-900 hover:text-black border-b-2 border-neutral-900 pb-0.5 transition-all group"
+            >
+              <span>View All 16 Categories</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {popularCategories.map((cat) => (
+              <CategoryCard key={cat.id} category={cat} />
+            ))}
+          </div>
         </div>
+
       </section>
 
       {/* 3. Featured Bestsellers Grid */}
