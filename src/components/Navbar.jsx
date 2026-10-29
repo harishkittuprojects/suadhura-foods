@@ -65,7 +65,7 @@ export const Navbar = () => {
     'Search for "Organic Tomatoes"',
     'Search for "A2 Cow Ghee"',
     'Search for "Aged Basmati Rice"',
-    'Search for "Desi Ghee Dosa"'
+    'Search for "Kashmiri Ruby Pomegranate"'
   ];
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 

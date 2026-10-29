@@ -31,7 +31,8 @@ import {
   Utensils,
   Package,
   Grid3X3,
-  Flame
+  Flame,
+  Apple
 } from 'lucide-react';
 
 export const HomePage = () => {
@@ -106,13 +107,13 @@ export const HomePage = () => {
       image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80'
     },
     {
-      id: 'hot-meals',
-      name: 'Hot Kitchen & Meals',
-      shortTitle: 'Hot Meals',
-      category: 'Hot Kitchen & Meals',
-      emoji: '🍲',
-      badge: 'Piping Hot',
-      image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80'
+      id: 'organic-pulses',
+      name: 'Organic Pulses & Dals',
+      shortTitle: 'Pulses & Dals',
+      category: 'Groceries',
+      emoji: '🫘',
+      badge: 'Unpolished',
+      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80'
     },
     {
       id: 'munchies',
@@ -125,12 +126,12 @@ export const HomePage = () => {
     }
   ];
 
-  // Category Quick Pill Icons (Swiggy Instamart style)
+  // Category Quick Pill Icons
   const categoryPills = [
     { name: 'Dairy & Milk', icon: Milk, categoryName: 'Dairy Products', bg: 'bg-blue-50 text-blue-600 border-blue-200' },
     { name: 'Fresh Veggies', icon: Carrot, categoryName: 'Fresh Vegetables', bg: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+    { name: 'Fresh Fruits', icon: Apple, categoryName: 'Fresh Fruits', bg: 'bg-rose-50 text-rose-600 border-rose-200' },
     { name: 'Daily Groceries', icon: ShoppingBasket, categoryName: 'Rice, Atta and Dals', bg: 'bg-amber-50 text-amber-600 border-amber-200' },
-    { name: 'Hot Meals', icon: Utensils, categoryName: 'Hot Kitchen & Meals', bg: 'bg-rose-50 text-rose-600 border-rose-200' },
     { name: 'Atta & Flours', icon: Wheat, categoryName: 'Rice, Atta and Dals', bg: 'bg-orange-50 text-orange-600 border-orange-200' },
     { name: 'Cold Pressed Oils', icon: Droplet, categoryName: 'Oils and Ghee', bg: 'bg-sky-50 text-sky-600 border-sky-200' },
     { name: 'Spices & Masalas', icon: Flame, categoryName: 'Masalas and Dry Fruits', bg: 'bg-red-50 text-red-600 border-red-200' },
@@ -141,7 +142,6 @@ export const HomePage = () => {
   const dairyProducts = products.filter((p) => p.category === 'Dairy Products' && !p.name.toLowerCase().includes('egg') && !p.name.toLowerCase().includes('bread')).slice(0, 6);
   const vegetableProducts = products.filter((p) => p.aisles?.includes('fresh-veg')).slice(0, 6);
   const groceryProducts = products.filter((p) => p.aisles?.includes('rice-atta-dals')).slice(0, 6);
-  const hotMeals = products.filter((p) => p.aisles?.includes('hot-meals') || p.category === 'Hot Kitchen & Meals');
 
   // Popular products (first 6)
   const popularProducts = products.filter((p) => p.tags.includes('popular')).slice(0, 6);
@@ -159,8 +159,8 @@ export const HomePage = () => {
   const categoryIconMap = {
     Milk: Milk,
     Carrot: Carrot,
-    ShoppingBasket: ShoppingBasket,
-    Utensils: Utensils
+    Apple: Apple,
+    ShoppingBasket: ShoppingBasket
   };
 
   const serviceIconMap = {
@@ -208,8 +208,8 @@ export const HomePage = () => {
       {/* 1. Quick Category Pills Bar (Placed ABOVE the Hero Banner as requested) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2">
         <div
-          className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar touch-pan-x touch-pan-y"
-          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', overscrollBehaviorX: 'contain' }}
+          className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar touch-pan-x"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x', overscrollBehaviorX: 'contain' }}
         >
           {categoryPills.map((pill, idx) => {
             const Icon = pill.icon;
@@ -219,7 +219,7 @@ export const HomePage = () => {
                 type="button"
                 onClick={() => navigateTo('categories', pill.categoryName)}
                 className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
-                style={{ touchAction: 'pan-x pan-y' }}
+                style={{ touchAction: 'pan-x' }}
               >
                 <div
                   className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-md ${pill.bg}`}
@@ -303,7 +303,7 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 4. ⭐ SHOP BY CATEGORY: ALL STORE AISLES (Dairy, Vegetables, Groceries, Hot Kitchen) */}
+      {/* 4. ⭐ SHOP BY CATEGORY: ALL STORE AISLES (Dairy, Vegetables, Fresh Fruits, Groceries) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
           <div>
@@ -315,7 +315,7 @@ export const HomePage = () => {
               Shop by Category
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Explore all certified farm departments, fresh kitchen meals, and everyday kitchen essentials.
+              Explore all certified farm departments, fresh seasonal fruits, and everyday kitchen essentials.
             </p>
           </div>
           <button
@@ -546,47 +546,7 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 9. 🍲 CATEGORY SHELF 4: Swiggy Fresh Kitchen & Hot Meals */}
-      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-gradient-to-r from-orange-50 via-rose-50 to-amber-50 p-6 sm:p-8 rounded-3xl border border-orange-200/60 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center font-black shadow-md flex-shrink-0">
-                <Utensils className="w-6 h-6" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
-                  <span className="text-xs font-black text-rose-700 uppercase tracking-wider">
-                    HOT KITCHEN • MADE FRESH
-                  </span>
-                </div>
-                <h2 className="text-2xl font-black text-slate-900 mt-0.5">
-                  Steaming Hot Meals & Breakfast
-                </h2>
-                <p className="text-xs text-slate-600">
-                  Prepared with 100% pure Sumadhura cow ghee and farm fresh ingredients.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => navigateTo('categories', 'Hot Kitchen & Meals')}
-              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1 self-start sm:self-center transition-all"
-            >
-              <span>View Full Menu (15+)</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {hotMeals.map((meal) => (
-              <ProductCard key={meal.id} product={meal} priority={true} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 10. Best Selling Products with Filter Tabs */}
+      {/* 9. Best Selling Products with Filter Tabs */}
       <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
           <div>
@@ -600,7 +560,7 @@ export const HomePage = () => {
 
           {/* Category Filter Pills including all categories */}
           <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
-            {['All', 'Dairy Products', 'Vegetables', 'Fresh Fruits', 'Groceries', 'Hot Kitchen & Meals'].map((tab) => (
+            {['All', 'Dairy Products', 'Vegetables', 'Fresh Fruits', 'Groceries'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveBestSellerTab(tab)}

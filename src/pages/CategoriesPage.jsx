@@ -41,7 +41,7 @@ export const CategoriesPage = () => {
     'Fast Search all items (e.g. "Fresh Malai Paneer")...',
     'Fast Search all items (e.g. "Organic Hybrid Tomatoes")...',
     'Fast Search all items (e.g. "A2 Desi Cow Ghee")...',
-    'Fast Search all items (e.g. "Desi Ghee Masala Dosa")...',
+    'Fast Search all items (e.g. "Kashmiri Ruby Pomegranate")...',
     'Fast Search all items (e.g. "Aged Basmati Rice")...',
     'Fast Search all items (e.g. "Crunchy Banana Chips")...'
   ];
@@ -107,12 +107,6 @@ export const CategoriesPage = () => {
       aliases: ['Oils and Ghee', 'Oils & Ghee', 'Cold Pressed Oils', 'oils-ghee']
     },
     {
-      name: 'Hot Kitchen & Meals',
-      emoji: '🍲',
-      shortName: 'Hot Meals',
-      aliases: ['Hot Kitchen & Meals', 'Hot Meals', 'ready-to-eat', 'hot-meals']
-    },
-    {
       name: 'Munchies and Snacks',
       emoji: '🍿',
       shortName: 'Munchies',
@@ -170,11 +164,6 @@ export const CategoriesPage = () => {
     // Strict Oils and Ghee
     if (target === 'Oils and Ghee') {
       return prod.aisles?.includes('oils-ghee');
-    }
-
-    // Strict Hot Kitchen & Meals
-    if (target === 'Hot Kitchen & Meals') {
-      return prod.aisles?.includes('hot-meals') || prod.category === 'Hot Kitchen & Meals';
     }
 
     // Strict Munchies and Snacks
@@ -280,8 +269,8 @@ export const CategoriesPage = () => {
 
       {/* 2. Fast Horizontal Category Aisle Switcher Strip */}
       <div
-        className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar touch-pan-x touch-pan-y"
-        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', overscrollBehaviorX: 'contain' }}
+        className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar touch-pan-x"
+        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x', overscrollBehaviorX: 'contain' }}
       >
         {aisleOptions.map((opt) => {
           const isSelected =

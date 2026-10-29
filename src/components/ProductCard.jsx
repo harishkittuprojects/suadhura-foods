@@ -23,8 +23,6 @@ export const ProductCard = ({ product, priority = false }) => {
 
   return (
     <div
-      data-aos="fade-up"
-      data-aos-delay={priority ? '50' : '100'}
       className="group relative bg-white rounded-2xl border border-slate-200/90 shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1"
     >
       {/* Product Image Box */}
@@ -80,21 +78,21 @@ export const ProductCard = ({ product, priority = false }) => {
       </div>
 
       {/* Product Content Details */}
-      <div className="p-3.5 flex-1 flex flex-col justify-between">
+      <div className="p-2.5 sm:p-3.5 flex-1 flex flex-col justify-between">
         <div>
           {/* Green Veg Dot Indicator & Category */}
-          <div className="flex items-center justify-between text-xs mb-1">
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center justify-between gap-1 text-xs mb-1">
+            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
               {/* Indian Food Safety Green Veg Dot Square */}
-              <div className="w-3.5 h-3.5 border border-emerald-600 rounded-sm flex items-center justify-center p-0.5">
+              <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 border border-emerald-600 rounded-sm flex items-center justify-center p-0.5 flex-shrink-0">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
               </div>
-              <span className="text-[10px] font-extrabold text-blue-600 uppercase tracking-wider truncate max-w-[100px]">
+              <span className="text-[9px] sm:text-[10px] font-extrabold text-blue-600 uppercase tracking-wider truncate max-w-[65px] sm:max-w-[110px]">
                 {product.category}
               </span>
             </div>
 
-            <span className="text-slate-500 font-semibold text-[11px] bg-slate-100 px-1.5 py-0.2 rounded">
+            <span className="text-slate-500 font-semibold text-[10px] sm:text-[11px] bg-slate-100 px-1.5 py-0.5 rounded whitespace-nowrap flex-shrink-0">
               {product.unit}
             </span>
           </div>
@@ -119,13 +117,13 @@ export const ProductCard = ({ product, priority = false }) => {
         </div>
 
         {/* Pricing and ADD Button Section */}
-        <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+        <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
           {/* Price */}
-          <div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-base sm:text-lg font-black text-slate-900">₹{product.price}</span>
+          <div className="min-w-0">
+            <div className="flex items-baseline gap-1">
+              <span className="text-sm sm:text-base font-black text-slate-900">₹{product.price}</span>
               {product.originalPrice && (
-                <span className="text-[11px] text-slate-400 line-through">
+                <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
                   ₹{product.originalPrice}
                 </span>
               )}
@@ -134,31 +132,31 @@ export const ProductCard = ({ product, priority = false }) => {
 
           {/* Signature ADD Button or Quantity Stepper */}
           {quantityInCart > 0 ? (
-            <div className="flex items-center bg-blue-600 rounded-xl p-0.5 text-white shadow-md shadow-blue-500/20">
+            <div className="flex items-center bg-blue-600 rounded-lg sm:rounded-xl p-0.5 text-white shadow-sm flex-shrink-0">
               <button
                 onClick={() => updateQuantity(product.id, -1)}
-                className="w-6 h-6 rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
                 aria-label="Decrease quantity"
               >
-                <Minus className="w-3 h-3" />
+                <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               </button>
-              <span className="w-6 text-center font-black text-xs">{quantityInCart}</span>
+              <span className="w-5 sm:w-6 text-center font-black text-[11px] sm:text-xs">{quantityInCart}</span>
               <button
                 onClick={() => updateQuantity(product.id, 1)}
-                className="w-6 h-6 rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
                 aria-label="Increase quantity"
               >
-                <Plus className="w-3 h-3" />
+                <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               </button>
             </div>
           ) : (
             <button
               onClick={() => addToCart(product, 1)}
-              className="px-4 py-1.5 rounded-xl border-2 border-blue-600 hover:bg-blue-600 hover:text-white text-blue-600 bg-white font-extrabold text-xs shadow-sm hover:shadow-md transition-all duration-150 active:scale-95 flex items-center gap-1"
+              className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-blue-600 hover:bg-blue-600 hover:text-white text-blue-600 bg-white font-black text-[11px] sm:text-xs shadow-xs hover:shadow-sm transition-all duration-150 active:scale-95 flex items-center justify-center gap-1 flex-shrink-0"
               aria-label={`Add ${product.name} to Cart`}
             >
               <span>ADD</span>
-              <Plus className="w-3 h-3 stroke-[3]" />
+              <Plus className="w-3 h-3 stroke-[2.5]" />
             </button>
           )}
         </div>
