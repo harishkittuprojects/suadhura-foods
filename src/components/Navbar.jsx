@@ -170,10 +170,10 @@ export const Navbar = () => {
       </div>
 
       {/* 2. Main Header Bar: Address, Search, Actions */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2 sm:py-2.5">
-        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-6">
+      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 py-2 sm:py-2.5">
+        <div className="flex items-center justify-between gap-1.5 sm:gap-4 lg:gap-6 w-full">
           {/* Logo & Address Selector */}
-          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 flex-shrink">
+          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
             {/* Mobile Hamburger toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -188,11 +188,11 @@ export const Navbar = () => {
               onClick={() => navigateTo('home')}
               className="flex items-center gap-1.5 sm:gap-2 group text-left flex-shrink-0"
             >
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
                 <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
               </div>
               <div className="flex flex-col">
-                <span className="text-base sm:text-xl font-black tracking-tight text-blue-900 group-hover:text-blue-600 transition-colors whitespace-nowrap">
+                <span className="text-sm sm:text-lg lg:text-xl font-black tracking-tight text-blue-900 group-hover:text-blue-600 transition-colors whitespace-nowrap">
                   SUMADHURA<span className="text-blue-600 font-extrabold ml-0.5 sm:ml-1">FOODS</span>
                 </span>
               </div>
@@ -325,14 +325,14 @@ export const Navbar = () => {
             <div className="relative">
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="p-1.5 sm:p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors relative"
+                className="w-8 h-8 sm:w-9 sm:h-9 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors relative flex items-center justify-center flex-shrink-0"
                 aria-label="Notifications"
               >
                 <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-rose-500 rounded-full ring-2 ring-white"></span>
+                <span className="absolute top-1 right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-rose-500 rounded-full ring-2 ring-white"></span>
               </button>
               {notificationsOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-50 text-xs">
+                <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-50 text-xs">
                   <div className="font-bold text-slate-800 mb-2 flex items-center justify-between">
                     <span>Notifications</span>
                     <span className="text-[10px] text-blue-600 font-semibold cursor-pointer">
@@ -351,10 +351,10 @@ export const Navbar = () => {
               )}
             </div>
 
-            {/* Wishlist Link */}
+            {/* Wishlist Link (Desktop/Tablet - on mobile it is in MobileBottomNav) */}
             <button
               onClick={() => navigateTo('wishlist')}
-              className={`p-1.5 sm:p-2 rounded-full transition-colors relative ${activeTab === 'wishlist'
+              className={`hidden sm:flex p-1.5 sm:p-2 rounded-full transition-colors relative flex-shrink-0 ${activeTab === 'wishlist'
                   ? 'text-blue-600 bg-blue-50'
                   : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
                 }`}
@@ -369,16 +369,16 @@ export const Navbar = () => {
               )}
             </button>
 
-            {/* Cart Button: compact on mobile, full width on tablet/desktop */}
+            {/* Cart Button: compact icon on mobile, full width on tablet/desktop */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="p-1.5 sm:px-3.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 transition-all duration-200 active:scale-95 flex items-center gap-1.5 sm:gap-2 flex-shrink-0"
+              className="w-8 h-8 sm:w-auto p-1.5 sm:px-3.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 transition-all duration-200 active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0"
               aria-label="Cart"
             >
               <div className="relative flex items-center justify-center">
                 <ShoppingCart className="w-4 h-4" />
                 {totalCartCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-amber-400 text-slate-900 text-[9px] font-black rounded-full min-w-3.5 h-3.5 px-0.5 flex items-center justify-center ring-1 ring-white">
+                  <span className="absolute -top-2 -right-2 bg-amber-400 text-slate-900 text-[9px] font-black rounded-full min-w-3.5 h-3.5 px-0.5 flex items-center justify-center ring-1 ring-white">
                     {totalCartCount}
                   </span>
                 )}
@@ -390,13 +390,14 @@ export const Navbar = () => {
 
             {/* User Profile */}
             {user ? (
-              <div className="relative">
+              <div className="relative flex-shrink-0">
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-full border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-semibold bg-slate-50 transition-colors"
+                  className="flex items-center gap-1.5 p-1 sm:px-3 sm:py-1.5 rounded-full border border-slate-200 hover:border-blue-400 text-slate-700 text-xs font-semibold bg-slate-50 transition-colors"
+                  aria-label="User Account"
                 >
-                  <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
-                    {user?.name ? user.name.charAt(0) : 'U'}
+                  <div className="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                   </div>
                   <span className="hidden md:inline">{user?.name ? user.name.split(' ')[0] : 'Profile'}</span>
                   <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:inline" />
@@ -436,10 +437,10 @@ export const Navbar = () => {
                   setAuthModalTab('login');
                   setIsAuthModalOpen(true);
                 }}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-50 text-xs font-bold transition-colors"
+                className="flex items-center gap-1 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full border border-blue-600 text-blue-600 hover:bg-blue-50 text-xs font-bold transition-colors flex-shrink-0"
               >
                 <User className="w-3.5 h-3.5" />
-                <span>Sign In</span>
+                <span className="hidden sm:inline">Sign In</span>
               </button>
             )}
           </div>
