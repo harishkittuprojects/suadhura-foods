@@ -1,285 +1,397 @@
-import React from 'react';
-import { useCart } from '../context/CartContext';
-import { HeroSection } from '../components/HeroSection';
-import { CategoryCard } from '../components/CategoryCard';
+import React, { useState, useRef } from 'react';
+import { useShop } from '../context/ShopContext';
+import { categories, products, servicesList, customerTestimonials } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
-import { CATEGORIES, PRODUCTS, PURITY_PILLARS, TESTIMONIALS } from '../data/foodData';
-import { 
-  ArrowRight, 
-  ShieldCheck, 
-  Sparkles, 
-  Award, 
-  Truck, 
-  CheckCircle2, 
-  Clock, 
-  Star, 
-  ShoppingBag,
-  HeartHandshake
+import {
+  ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
+  Star,
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle2,
+  Clock,
+  Heart,
+  BadgePercent,
+  Milk,
+  Carrot,
+  ShoppingBasket,
+  Wheat,
+  Droplet,
+  Coffee,
+  Check,
+  MousePointerClick,
+  Zap,
+  Lock,
+  Layers,
+  Headphones,
+  Bike,
+  Utensils,
+  Package,
+  Grid3X3,
+  Flame
 } from 'lucide-react';
 
 export const HomePage = () => {
-  const { navigateTo } = useCart();
+  const {
+    navigateTo,
+    activeOrder,
+    setIsLiveTrackingOpen,
+    isOneMember,
+    toggleOneMember,
+    isSubscriptionModalOpen,
+    setIsSubscriptionModalOpen,
+    activeSubscription
+  } = useShop();
 
-  // Top popular categories (12 prominent for homepage)
-  const popularCategories = CATEGORIES.slice(0, 12);
+  const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
+  const [heroSlide, setHeroSlide] = useState(0);
 
-  // Featured products & Bestsellers
-  const bestsellers = PRODUCTS.filter(p => p.isBestseller).slice(0, 8);
-  const newArrivals = PRODUCTS.filter(p => p.isNew || !p.isBestseller).slice(0, 4);
+  // Grocery Aisles (2-Row Grid)
+  const groceryAisles = [
+    {
+      id: 'fresh-veg',
+      name: 'Fresh Vegetables',
+      shortTitle: 'Vegetables',
+      category: 'Vegetables',
+      emoji: '🥬',
+      badge: 'Farm Direct',
+      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=400&q=80'
+    },
+    {
+      id: 'fresh-fruits',
+      name: 'Fresh Fruits',
+      shortTitle: 'Fruits',
+      category: 'Fresh Fruits',
+      emoji: '🍎',
+      badge: 'Naturally Sweet',
+      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=400&q=80'
+    },
+    {
+      id: 'dairy-products',
+      name: 'Dairy Products',
+      shortTitle: 'Dairy',
+      category: 'Dairy Products',
+      emoji: '🥛',
+      badge: '100% Pure',
+      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=400&q=80'
+    },
+    {
+      id: 'rice-atta-dals',
+      name: 'Rice, Atta and Dals',
+      shortTitle: 'Rice & Atta',
+      category: 'Groceries',
+      emoji: '🌾',
+      badge: 'Kitchen Staples',
+      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=400&q=80'
+    },
+    {
+      id: 'masalas-dry-fruits',
+      name: 'Masalas and Dry Fruits',
+      shortTitle: 'Masalas & Nuts',
+      category: 'Groceries',
+      emoji: '🌶️',
+      badge: 'Aromatic & Premium',
+      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=400&q=80'
+    },
+    {
+      id: 'oils-ghee',
+      name: 'Oils and Ghee',
+      shortTitle: 'Oils & Ghee',
+      category: 'Groceries',
+      emoji: '🫒',
+      badge: 'Cold Pressed',
+      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=400&q=80'
+    },
+    {
+      id: 'hot-meals',
+      name: 'Hot Kitchen & Meals',
+      shortTitle: 'Hot Meals',
+      category: 'Hot Kitchen & Meals',
+      emoji: '🍲',
+      badge: 'Piping Hot',
+      image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80'
+    },
+    {
+      id: 'munchies',
+      name: 'Munchies and Snacks',
+      shortTitle: 'Munchies',
+      category: 'Groceries',
+      emoji: '🍿',
+      badge: 'Crispy & Light',
+      image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=400&q=80'
+    }
+  ];
+
+  // Category Quick Pill Icons (Swiggy Instamart style)
+  const categoryPills = [
+    { name: 'Dairy & Milk', icon: Milk, categoryName: 'Dairy Products', bg: 'bg-blue-50 text-blue-600 border-blue-200' },
+    { name: 'Fresh Veggies', icon: Carrot, categoryName: 'Fresh Vegetables', bg: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+    { name: 'Daily Groceries', icon: ShoppingBasket, categoryName: 'Rice, Atta and Dals', bg: 'bg-amber-50 text-amber-600 border-amber-200' },
+    { name: 'Hot Meals', icon: Utensils, categoryName: 'Hot Kitchen & Meals', bg: 'bg-rose-50 text-rose-600 border-rose-200' },
+    { name: 'Atta & Flours', icon: Wheat, categoryName: 'Rice, Atta and Dals', bg: 'bg-orange-50 text-orange-600 border-orange-200' },
+    { name: 'Cold Pressed Oils', icon: Droplet, categoryName: 'Oils and Ghee', bg: 'bg-sky-50 text-sky-600 border-sky-200' },
+    { name: 'Spices & Masalas', icon: Flame, categoryName: 'Masalas and Dry Fruits', bg: 'bg-red-50 text-red-600 border-red-200' },
+    { name: 'Dry Fruits & Nuts', icon: Sparkles, categoryName: 'Masalas and Dry Fruits', bg: 'bg-purple-50 text-purple-600 border-purple-200' },
+  ];
+
+  // Category-specific product shelves for Home Page
+  const dairyProducts = products.filter((p) => p.category === 'Dairy Products' && !p.name.toLowerCase().includes('egg') && !p.name.toLowerCase().includes('bread')).slice(0, 6);
+  const vegetableProducts = products.filter((p) => p.aisles?.includes('fresh-veg')).slice(0, 6);
+  const groceryProducts = products.filter((p) => p.aisles?.includes('rice-atta-dals')).slice(0, 6);
+  const hotMeals = products.filter((p) => p.aisles?.includes('hot-meals') || p.category === 'Hot Kitchen & Meals');
+
+  // Popular products (first 6)
+  const popularProducts = products.filter((p) => p.tags.includes('popular')).slice(0, 6);
+
+  // Best seller products filtered by tab
+  const bestSellers = products
+    .filter((p) => p.tags.includes('bestseller'))
+    .filter((p) => {
+      if (activeBestSellerTab === 'All') return true;
+      if (activeBestSellerTab === 'Vegetables') return p.aisles?.includes('fresh-veg');
+      if (activeBestSellerTab === 'Fresh Fruits') return p.aisles?.includes('fresh-fruits') || p.category === 'Fresh Fruits';
+      return p.category === activeBestSellerTab;
+    });
+
+  const categoryIconMap = {
+    Milk: Milk,
+    Carrot: Carrot,
+    ShoppingBasket: ShoppingBasket,
+    Utensils: Utensils
+  };
+
+  const serviceIconMap = {
+    ShieldCheck: ShieldCheck,
+    MousePointerClick: MousePointerClick,
+    Zap: Zap,
+    Lock: Lock,
+    Layers: Layers,
+    Headphones: Headphones
+  };
 
   return (
-    <div className="space-y-8 sm:space-y-20 pb-16">
-      
-      {/* 1. Hero Section */}
-      <HeroSection />
-
-      {/* Country Delight Style Daily Purity Strip */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-6 sm:p-8 shadow-subtle">
-          <div className="text-center max-w-2xl mx-auto mb-8">
-            <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-              The Sumadhura Promise
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
-              Food As Pure As It Was Meant To Be
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-2">
-              Like traditional village food, we prepare everything with time-honored methods, zero chemical preservatives, and daily morning delivery.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {PURITY_PILLARS.map((pillar, index) => (
-              <div 
-                key={pillar.title} 
-                className="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm flex flex-col justify-between"
-                data-aos="fade-up"
-                data-aos-delay={index * 100}
-              >
-                <div>
-                  <div className="w-10 h-10 rounded-xl bg-neutral-900 text-white flex items-center justify-center mb-3">
-                    <CheckCircle2 className="w-5 h-5 text-neutral-200" />
-                  </div>
-                  <h3 className="font-bold text-sm text-neutral-900 mb-1.5">{pillar.title}</h3>
-                  <p className="text-xs text-neutral-500 leading-relaxed">{pillar.desc}</p>
-                </div>
+    <div className="space-y-3.5 sm:space-y-6 lg:space-y-8 pb-12">
+      {/* Active Order Live Tracking Banner (Swiggy Signature) */}
+      {activeOrder && (
+        <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2">
+          <div
+            onClick={() => setIsLiveTrackingOpen(true)}
+            className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between cursor-pointer shadow-lg hover:shadow-xl transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center font-bold">
+                <Bike className="w-5 h-5 animate-bounce" />
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Popular Food Categories */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* SWIGGY-STYLE CIRCULAR CATEGORY RAIL ON MOBILE (< md) */}
-        <div className="md:hidden space-y-3">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-extrabold text-neutral-900 tracking-tight">
-              What's on your mind?
-            </h2>
-            <button
-              onClick={() => navigateTo('categories')}
-              className="text-xs font-bold text-neutral-900 flex items-center gap-0.5"
-            >
-              <span>See All</span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-xs sm:text-sm">Order #{activeOrder.id} is On The Way!</span>
+                  <span className="bg-amber-400 text-slate-900 text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.2 rounded-full">
+                    ⚡ 11 MINS
+                  </span>
+                </div>
+                <p className="text-[11px] sm:text-xs text-emerald-100">
+                  Ramesh Kumar is approaching your gate with your fresh groceries.
+                </p>
+              </div>
+            </div>
+            <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-emerald-800 font-extrabold text-[11px] sm:text-xs rounded-xl shadow-sm flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+              <span>Track on Map</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
+        </section>
+      )}
 
-          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4">
-            {CATEGORIES.slice(0, 10).map((cat) => (
+      {/* 1. Quick Category Pills Bar (Placed ABOVE the Hero Banner as requested) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2">
+        <div
+          className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar touch-pan-x touch-pan-y"
+          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x pan-y', overscrollBehaviorX: 'contain' }}
+        >
+          {categoryPills.map((pill, idx) => {
+            const Icon = pill.icon;
+            return (
               <button
-                key={cat.id}
-                onClick={() => navigateTo('categories', cat.slug)}
-                className="flex flex-col items-center gap-1.5 flex-shrink-0 group text-center"
+                key={idx}
+                type="button"
+                onClick={() => navigateTo('categories', pill.categoryName)}
+                className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
+                style={{ touchAction: 'pan-x pan-y' }}
               >
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-100 border-2 border-neutral-200 group-active:border-neutral-900 transition-all shadow-sm">
-                  <img 
-                    src={cat.image} 
-                    alt={cat.name} 
-                    className="w-full h-full object-cover group-active:scale-110 transition-transform"
-                    loading="lazy"
-                  />
+                <div
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-md ${pill.bg}`}
+                >
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" />
                 </div>
-                <span className="text-[11px] font-bold text-neutral-800 leading-tight truncate max-w-[68px]">
-                  {cat.name}
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-700 group-hover:text-blue-600 transition-colors whitespace-nowrap">
+                  {pill.name}
                 </span>
               </button>
-            ))}
-          </div>
+            );
+          })}
         </div>
-
-        {/* DESKTOP CATEGORIES GRID (md & up) */}
-        <div className="hidden md:block">
-          <div className="flex items-end justify-between gap-4 mb-8">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-500">
-                <Sparkles className="w-4 h-4 text-neutral-800" />
-                <span>Browse By Food Types</span>
-              </div>
-              <h2 className="text-3xl font-extrabold text-neutral-900 mt-1">
-                Explore Our Categories
-              </h2>
-              <p className="text-sm text-neutral-600 mt-1">
-                Find authentic South & North Indian culinary essentials handcrafted fresh.
-              </p>
-            </div>
-
-            <button
-              onClick={() => navigateTo('categories')}
-              className="flex items-center gap-1.5 text-sm font-bold text-neutral-900 hover:text-black border-b-2 border-neutral-900 pb-0.5 transition-all group"
-            >
-              <span>View All 16 Categories</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {popularCategories.map((cat) => (
-              <CategoryCard key={cat.id} category={cat} />
-            ))}
-          </div>
-        </div>
-
       </section>
 
-      {/* 3. Featured Bestsellers Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-500">
-              <Award className="w-4 h-4 text-neutral-800" />
-              <span>Customer Favorites</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
-              Popular Daily Bestsellers
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-              Every item made in small batches, delivered fresh to your door.
-            </p>
-          </div>
-
+      {/* 2. Shop Daily Groceries (Arranged UP and DOWN in 2 rows, not in a straight line) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="flex items-center justify-between mb-2 sm:mb-3">
+          <h2 className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+            Shop Daily Groceries
+          </h2>
           <button
             onClick={() => navigateTo('categories')}
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-neutral-900 hover:text-black border-b-2 border-neutral-900 pb-0.5 transition-all group"
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5 sm:gap-1"
           >
-            <span>Explore Entire Menu</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <span>See All</span>
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {bestsellers.map((product) => (
-            <ProductCard key={product.id} product={product} />
+        {/* 2-Row Grid: 4 items UP (Top row), 4 items DOWN (Bottom row) */}
+        <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3.5">
+          {groceryAisles.map((item) => (
+            <div
+              key={item.id}
+              onClick={() => navigateTo('categories', item.name)}
+              className="flex flex-col items-center cursor-pointer group text-center w-full focus:outline-none"
+            >
+              <div className="w-full aspect-square rounded-2xl p-1.5 sm:p-2.5 flex items-center justify-center overflow-hidden transition-all duration-200 bg-[#f2f4f7] hover:bg-[#eaedf2] border border-slate-100 group-hover:border-blue-400 group-hover:shadow-md">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover rounded-xl transform group-hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <span className="text-[10px] sm:text-xs mt-1 sm:mt-1.5 block leading-tight line-clamp-2 font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                {item.name}
+              </span>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Value Combo Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="fade-up">
-        <div className="relative rounded-3xl overflow-hidden bg-neutral-900 text-white p-8 sm:p-12 border border-neutral-800 shadow-2xl">
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            
-            <div className="lg:col-span-8 space-y-4">
-              <div className="inline-flex items-center gap-2 bg-neutral-800 border border-neutral-700 px-3 py-1 rounded-full text-xs font-bold text-neutral-300">
-                <span>Value Combo Offer • Save up to 25%</span>
-              </div>
-              <h3 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-                Monthly Pantry Staples & Breakfast Hamper
-              </h3>
-              <p className="text-sm sm:text-base text-neutral-300 max-w-xl">
-                Get our stone-ground Chakki Atta (5kg), Avakaya Mango Pickle (500g), Sambar Masala (200g), and Jumbo California Almonds (250g) bundled together with complimentary morning delivery.
-              </p>
-              <div className="flex items-baseline gap-3 pt-2">
-                <span className="text-3xl font-extrabold text-white">₹999</span>
-                <span className="text-base text-neutral-400 line-through">₹1,299</span>
-                <span className="bg-white text-neutral-950 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                  Save ₹300
+      {/* 3. Daily Morning Subscription Order Banner */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md text-amber-300 flex items-center justify-center font-black text-2xl shadow-md flex-shrink-0">
+              🥛
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-black text-base sm:text-lg">Daily Morning Subscription Order</h3>
+                <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full">
+                  6:00 AM DAILY
                 </span>
               </div>
-              <div className="pt-2">
-                <button
-                  onClick={() => navigateTo('categories', 'combo-packs')}
-                  className="bg-white hover:bg-neutral-200 text-neutral-950 font-bold text-sm px-6 py-3 rounded-xl transition-all shadow-md active:scale-95 flex items-center gap-2"
-                >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Order Pantry Combo Now</span>
-                </button>
-              </div>
+              <p className="text-xs font-semibold text-blue-100">
+                Fresh pure cow milk, curd, and handpicked farm vegetables delivered before 7:00 AM every morning. Pause or modify anytime.
+              </p>
             </div>
-
-            <div className="lg:col-span-4">
-              <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-neutral-800 border border-neutral-700 shadow-lg">
-                <img 
-                  src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80" 
-                  alt="Sumadhura Grocery Combo Pack"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
           </div>
+
+          <button
+            onClick={() => setIsSubscriptionModalOpen(true)}
+            className="px-6 py-3 rounded-2xl bg-white hover:bg-blue-50 text-blue-700 font-black text-xs shadow-md transition-all active:scale-95 flex-shrink-0 flex items-center gap-2"
+          >
+            <span>{activeSubscription ? 'Manage Subscription' : 'Set Up Subscription Order'}</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </section>
 
-      {/* 4. Why Choose Us (5 Core Pillars) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Uncompromising Excellence
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
-            Why Choose Sumadhura Foods?
-          </h2>
-          <p className="text-xs sm:text-sm text-neutral-600 mt-2">
-            Built on honesty, heritage recipes, and strict quality benchmarks.
-          </p>
+      {/* 4. ⭐ SHOP BY CATEGORY: ALL STORE AISLES (Dairy, Vegetables, Groceries, Hot Kitchen) */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 gap-3">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-xs font-black text-blue-600 uppercase tracking-wider mb-1">
+              <Grid3X3 className="w-4 h-4 text-blue-600" />
+              <span>ALL STORE AISLES • DELIVERED IN 10-15 MINS</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Shop by Category
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Explore all certified farm departments, fresh kitchen meals, and everyday kitchen essentials.
+            </p>
+          </div>
+          <button
+            onClick={() => navigateTo('categories')}
+            className="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors self-start sm:self-auto"
+          >
+            <span>View All Products in Store</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {[
-            {
-              title: "Quality Food",
-              desc: "Carefully sourced raw ingredients, 100% natural spices, and single-origin flours.",
-              icon: Award
-            },
-            {
-              title: "Fresh Products",
-              desc: "Prepared in small batches daily. Zero stale stock and zero artificial preservatives.",
-              icon: Sparkles
-            },
-            {
-              title: "Affordable Prices",
-              desc: "Direct farm-to-table supply chain eliminates middlemen markups for fair pricing.",
-              icon: ShoppingBag
-            },
-            {
-              title: "Fast Delivery",
-              desc: "Morning doorstep drops before 7:00 AM so your breakfast is never delayed.",
-              icon: Clock
-            },
-            {
-              title: "Customer Satisfaction",
-              desc: "Friendly toll-free support and 100% replacement guarantee if you are not delighted.",
-              icon: HeartHandshake
-            }
-          ].map((item, idx) => {
-            const Icon = item.icon;
+        {/* 4-Card Category Grid with High-Res Imagery & Subcategories */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {categories.map((cat) => {
+            const Icon = categoryIconMap[cat.icon] || ShoppingBasket;
             return (
-              <div 
-                key={item.title}
-                className="bg-neutral-50 border border-neutral-200 hover:border-neutral-900 rounded-2xl p-5 transition-all text-center flex flex-col items-center justify-between"
-                data-aos="fade-up"
-                data-aos-delay={idx * 80}
+              <div
+                key={cat.id}
+                onClick={() => navigateTo('categories', cat.name)}
+                className={`group relative rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between ${cat.cardBorder || 'hover:border-blue-500'}`}
               >
-                <div>
-                  <div className="w-12 h-12 rounded-2xl bg-neutral-900 text-white flex items-center justify-center mb-4 shadow-sm">
-                    <Icon className="w-6 h-6 text-neutral-200" />
+                {/* Image with Gradient Overlay */}
+                <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent" />
+
+                  {/* Delivery Time Badge */}
+                  <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-black text-slate-900 flex items-center gap-1 shadow-sm">
+                    <Clock className="w-3 h-3 text-blue-600" />
+                    <span>{cat.deliveryTime}</span>
                   </div>
-                  <h3 className="font-bold text-sm text-neutral-900 mb-2">{item.title}</h3>
-                  <p className="text-xs text-neutral-500 leading-relaxed">{item.desc}</p>
+
+                  {/* Items Count Badge */}
+                  <div className="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-black text-white shadow-sm">
+                    {cat.itemCount}
+                  </div>
+
+                  {/* Title & Icon on Image bottom */}
+                  <div className="absolute bottom-3 left-3 right-3 text-white flex items-center gap-2.5">
+                    <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 text-white border border-white/30">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-white leading-tight group-hover:text-amber-300 transition-colors">
+                        {cat.name}
+                      </h3>
+                      <span className="text-[11px] text-slate-300 font-medium line-clamp-1">
+                        {cat.description}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Subcategories tags & Action Footer */}
+                <div className="p-4 bg-white flex flex-col justify-between flex-1 space-y-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    {cat.subCategories?.map((sub, idx) => (
+                      <span
+                        key={idx}
+                        className="text-[10px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-lg border border-slate-200/60"
+                      >
+                        {sub}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:text-blue-700">
+                    <span>Shop {cat.name}</span>
+                    <div className="w-6 h-6 rounded-full bg-blue-50 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-all">
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
+                  </div>
                 </div>
               </div>
             );
@@ -287,113 +399,390 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* Fresh New Batches / Healthy Additions */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4 mb-8">
+      {/* 5. Popular Products Section (Swiggy Instant Grocery Bestsellers) */}
+      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex items-center justify-between mb-5">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-neutral-500">
-              <Sparkles className="w-4 h-4 text-neutral-800" />
-              <span>Fresh Off The Grinder</span>
+            <div className="inline-flex items-center gap-1 text-[11px] font-black text-blue-600 uppercase tracking-wider mb-0.5">
+              <Zap className="w-3.5 h-3.5 text-amber-500" /> TOP BESTSELLERS
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
-              New Batches & Health Staples
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Popular Products Delivered in 10 Mins
             </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-1">
-              Wild forest honey, roasted cashews, fresh batter and artisanal savories.
-            </p>
           </div>
-
           <button
             onClick={() => navigateTo('categories')}
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-neutral-900 hover:text-black border-b-2 border-neutral-900 pb-0.5 transition-all"
+            className="text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 transition-colors"
           >
-            <span>See All Products</span>
+            <span>See all items</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-          {newArrivals.map((product) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+          {popularProducts.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
-      {/* Customer Testimonials Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-neutral-50 border border-neutral-200 rounded-3xl p-8 sm:p-12">
-          <div className="text-center max-w-xl mx-auto mb-10">
-            <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-              Customer Love
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 mt-1">
-              Loved by Over 50,000+ Families
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-600 mt-2">
-              Read how authentic taste and genuine ingredients transformed everyday meals.
-            </p>
+      {/* 6. 🥛 CATEGORY SHELF 1: Farm-Fresh Dairy Products */}
+      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-blue-50/70 to-white border border-blue-100/80 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black shadow-md flex-shrink-0">
+                <Milk className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 uppercase tracking-wider">
+                    ⚡ 10-12 MIN DELIVERY • 100% PURE
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                  Farm-Fresh Dairy, Milk & Paneer
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Pure A2 milk, artisanal malai paneer, thick curd, and farm butter delivered fresh twice daily.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigateTo('categories', 'Dairy Products')}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-center"
+            >
+              <span>See All Dairy (18+)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t) => (
-              <div 
-                key={t.id} 
-                className="bg-white p-6 rounded-2xl border border-neutral-200 shadow-sm flex flex-col justify-between"
-                data-aos="fade-up"
-              >
-                <div>
-                  <div className="flex items-center gap-1 text-neutral-900 mb-3">
-                    {[...Array(t.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-neutral-900 text-neutral-900" />
-                    ))}
-                  </div>
-                  <p className="text-xs sm:text-sm text-neutral-700 leading-relaxed italic mb-4">
-                    "{t.comment}"
-                  </p>
-                </div>
-
-                <div className="pt-3 border-t border-neutral-100">
-                  <h4 className="font-bold text-xs text-neutral-900">{t.name}</h4>
-                  <p className="text-[11px] text-neutral-500">{t.location}</p>
-                  <p className="text-[10px] text-neutral-400 mt-0.5">{t.date}</p>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+            {dairyProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* 5. Call To Action Footer Banner */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="fade-up">
-        <div className="bg-neutral-900 text-white rounded-3xl p-8 sm:p-14 text-center space-y-6 border border-neutral-800 shadow-xl">
-          <span className="inline-block bg-neutral-800 text-neutral-300 text-xs font-semibold px-4 py-1.5 rounded-full border border-neutral-700">
-            Morning Delivery by 7:00 AM • Free Delivery Above ₹499
-          </span>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight max-w-2xl mx-auto leading-tight">
-            Bring Pure & Traditional Food to Your Kitchen Today
-          </h2>
-          <p className="text-sm sm:text-base text-neutral-300 max-w-xl mx-auto leading-relaxed">
-            Order before 10:00 PM tonight and receive your freshly batched pickles, stone-ground flours, and pure ghee sweets right at your doorstep before you wake up tomorrow morning.
-          </p>
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+      {/* 7. 🥬 CATEGORY SHELF 2: Crisp Farm Vegetables */}
+      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-emerald-50/70 to-white border border-emerald-100/80 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black shadow-md flex-shrink-0">
+                <Carrot className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wider">
+                    ⚡ 10-15 MIN DELIVERY • DAILY HARVEST
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                  Handpicked Farm-Fresh Vegetables
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Crisp greens, hydroponic salads, farm roots, and fresh curry leaves harvested at dawn.
+                </p>
+              </div>
+            </div>
+
             <button
-              onClick={() => navigateTo('categories')}
-              className="bg-white hover:bg-neutral-200 text-neutral-950 font-bold text-sm sm:text-base px-8 py-3.5 rounded-2xl transition-all shadow-lg active:scale-95 flex items-center gap-2"
+              onClick={() => navigateTo('categories', 'Fresh Vegetables')}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-center"
             >
-              <ShoppingBag className="w-5 h-5 text-neutral-950" />
-              <span>Shop All Products Now</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>See All Vegetables (8+)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
-            <button
-              onClick={() => navigateTo('services')}
-              className="bg-neutral-800 hover:bg-neutral-700 text-white font-semibold text-sm sm:text-base px-6 py-3.5 rounded-2xl border border-neutral-700 transition-colors"
-            >
-              Explore Services
-            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+            {vegetableProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
         </div>
       </section>
 
+      {/* 8. 🌾 CATEGORY SHELF 3: Daily Groceries & Kitchen Staples */}
+      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-amber-50/70 to-white border border-amber-100/80 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-amber-600 text-white flex items-center justify-center font-black shadow-md flex-shrink-0">
+                <ShoppingBasket className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 uppercase tracking-wider">
+                    ⚡ 12-15 MIN DELIVERY • AUTHENTIC TASTE
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                  Daily Groceries, Atta, Grains & Oils
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Stone ground MP Sharbati wheat, aged Daawat basmati, cold-pressed wood churned oils & dals.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigateTo('categories', 'Rice, Atta and Dals')}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-center"
+            >
+              <span>See All Groceries (45+)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 sm:gap-4">
+            {groceryProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 9. 🍲 CATEGORY SHELF 4: Swiggy Fresh Kitchen & Hot Meals */}
+      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="bg-gradient-to-r from-orange-50 via-rose-50 to-amber-50 p-6 sm:p-8 rounded-3xl border border-orange-200/60 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center font-black shadow-md flex-shrink-0">
+                <Utensils className="w-6 h-6" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+                  <span className="text-xs font-black text-rose-700 uppercase tracking-wider">
+                    HOT KITCHEN • MADE FRESH
+                  </span>
+                </div>
+                <h2 className="text-2xl font-black text-slate-900 mt-0.5">
+                  Steaming Hot Meals & Breakfast
+                </h2>
+                <p className="text-xs text-slate-600">
+                  Prepared with 100% pure Sumadhura cow ghee and farm fresh ingredients.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigateTo('categories', 'Hot Kitchen & Meals')}
+              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1 self-start sm:self-center transition-all"
+            >
+              <span>View Full Menu (15+)</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {hotMeals.map((meal) => (
+              <ProductCard key={meal.id} product={meal} priority={true} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 10. Best Selling Products with Filter Tabs */}
+      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
+          <div>
+            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block mb-0.5">
+              Customer Favorites
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Best Selling Products
+            </h2>
+          </div>
+
+          {/* Category Filter Pills including all categories */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 hide-scrollbar">
+            {['All', 'Dairy Products', 'Vegetables', 'Fresh Fruits', 'Groceries', 'Hot Kitchen & Meals'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveBestSellerTab(tab)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${activeBestSellerTab === tab
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                  }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-5">
+          {bestSellers.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+
+      {/* 8. Why Choose Sumadhura Foods */}
+      <section
+        data-aos="fade-up"
+        className="max-w-7xl mx-auto px-4 sm:px-6 bg-slate-50/70 rounded-3xl p-6 sm:p-10 border border-slate-100"
+      >
+        <div className="text-center max-w-2xl mx-auto mb-8">
+          <span className="text-xs font-extrabold uppercase text-blue-600 tracking-wider">
+            Our Quality Commitment
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+            Why Choose Sumadhura Foods?
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
+            We bridge the gap between conscientious local farmers and health-conscious families with complete transparency.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 text-center flex flex-col items-center">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-3">
+              <ShieldCheck className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm mb-1">100% Quality Checked</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Every dairy batch undergoes 3-stage lab testing for zero adulterants, urea, and preservatives.
+            </p>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 text-center flex flex-col items-center">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
+              <Zap className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm mb-1">10-15 Min Delivery</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Hyper-local cold-chain dark stores keep milk at 4°C and veggies crisp during transit.
+            </p>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 text-center flex flex-col items-center">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mb-3">
+              <BadgePercent className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm mb-1">Fair Farmer Prices</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              By removing middle agents, we pay dairy farmers 25% higher while offering you unbeatable prices.
+            </p>
+          </div>
+
+          <div className="bg-white p-5 rounded-2xl shadow-soft border border-slate-100 text-center flex flex-col items-center">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-3">
+              <RotateCcw className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-slate-900 text-sm mb-1">Instant Refunds</h3>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Not satisfied with any item's freshness? Immediate replacement or full refund credited in 15 mins.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. Customer Benefits & Testimonials */}
+      <section data-aos="fade-up" className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center max-w-xl mx-auto mb-8">
+          <span className="text-xs font-bold uppercase text-emerald-600 tracking-wider">
+            Real Customer Reviews
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+            Loved By Over 70,000+ Families
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {customerTestimonials.map((review) => (
+            <div
+              key={review.id}
+              className="bg-white p-6 rounded-3xl border border-slate-100 shadow-soft flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center gap-1 text-amber-400 mb-2.5">
+                  {[...Array(review.rating)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-xs sm:text-sm text-slate-600 italic leading-relaxed mb-5">
+                  "{review.comment}"
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
+                <img
+                  src={review.avatar}
+                  alt={review.name}
+                  className="w-9 h-9 rounded-full object-cover border border-slate-200"
+                />
+                <div>
+                  <h4 className="font-bold text-slate-900 text-xs">{review.name}</h4>
+                  <span className="text-[11px] text-slate-400 block">{review.role} • {review.location}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Pre-Footer Banner: Fresh Food, Better Living (Placed right above the footer as requested) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2 pb-2">
+        <div
+          data-aos="fade-up"
+          className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 text-white flex items-center"
+        >
+          {/* Background Decorative Rings */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 -mb-20 w-60 h-60 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 p-5 sm:p-8 lg:p-10 w-full max-w-3xl space-y-3 sm:space-y-5">
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+              Fresh Food, <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-emerald-300 to-sky-300">
+                Better Living
+              </span>
+            </h2>
+
+            <p className="text-xs sm:text-sm lg:text-base text-slate-200 max-w-xl leading-relaxed">
+              Shop fresh dairy products, vegetables and essential groceries at Sumadhura Foods.
+              Harvested daily and delivered to your doorstep in 10-15 minutes.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
+              <button
+                onClick={() => navigateTo('categories')}
+                className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 transition-all"
+              >
+                <span>Order in 10 Mins</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              <button
+                onClick={() => setIsSubscriptionModalOpen(true)}
+                className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2"
+              >
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Daily Milk Subscription</span>
+              </button>
+            </div>
+
+            {/* Trust Micro-Badges */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-6 pt-1 text-[11px] sm:text-xs text-slate-300">
+              <span className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" /> 100% Purity
+              </span>
+              <span className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" /> 10-15 Min Delivery
+              </span>
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 flex-shrink-0" /> ₹0 Adulteration
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

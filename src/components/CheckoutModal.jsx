@@ -1,295 +1,414 @@
 import React, { useState } from 'react';
-import { useCart } from '../context/CartContext';
-import { 
-  X, 
-  MapPin, 
-  Clock, 
-  CreditCard, 
-  Banknote, 
-  CheckCircle2, 
-  ShoppingBag,
-  ArrowRight,
-  ShieldCheck
+import { useShop } from '../context/ShopContext';
+import confetti from 'canvas-confetti';
+import {
+  X,
+  CheckCircle,
+  Truck,
+  CreditCard,
+  Banknote,
+  Smartphone,
+  ShieldCheck,
+  Sparkles,
+  MapPin,
+  Clock,
+  Bike,
+  ArrowRight
 } from 'lucide-react';
 
 export const CheckoutModal = () => {
-  const { 
-    isCheckoutModalOpen, 
-    setIsCheckoutModalOpen, 
-    cart, 
-    subtotal, 
-    deliveryFee, 
-    discountAmount, 
-    totalAmount, 
-    deliveryLocation, 
-    user, 
-    placeOrder 
-  } = useCart();
+  const {
+    cart,
+    cartSubtotal,
+    deliveryFee,
+    platformFee,
+    appliedPromo,
+    discountAmount,
+    deliveryPartnerTip,
+    cartTotal,
+    clearCart,
+    isCheckoutModalOpen,
+    setIsCheckoutModalOpen,
+    user,
+    selectedAddress,
+    savedAddresses,
+    setSelectedAddress,
+    setActiveOrder,
+    setIsLiveTrackingOpen,
+    navigateTo
+  } = useShop();
 
-  const [formData, setFormData] = useState({
-    fullName: user ? user.name : "Ramesh Rao",
-    phone: user ? user.phone : "+91 98490 12345",
-    email: user ? user.email : "ramesh.rao@example.com",
-    addressLine: "Flat 402, Sai Residency, Road No. 36",
-    area: deliveryLocation.area,
-    city: deliveryLocation.city,
-    pincode: deliveryLocation.pincode,
-    deliverySlot: "Tomorrow Morning 6:00 AM - 7:30 AM",
-    paymentMode: "Cash on Delivery",
-    specialInstructions: "Please ring the bell and leave at door step."
-  });
-
+  const [step, setStep] = useState(1); // 1: Address & Tip, 2: Payment, 3: Success Confirmation
+  const [paymentMethod, setPaymentMethod] = useState('upi');
+  const [orderSummary, setOrderSummary] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!isCheckoutModalOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handlePlaceOrder = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     setTimeout(() => {
+      const placedOrder = {
+        id: `SMD-${Math.floor(100000 + Math.random() * 900000)}`,
+        items: [...cart],
+        subtotal: cartSubtotal,
+        deliveryFee,
+        platformFee,
+        tip: deliveryPartnerTip,
+        discount: discountAmount,
+        total: cartTotal,
+        date: new Date().toLocaleDateString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        address: `${selectedAddress.title}, ${selectedAddress.area}`,
+        slot: 'Instant 10-15 Min Express Delivery',
+        paymentMethod: paymentMethod.toUpperCase(),
+        partner: 'Ramesh Kumar (★ 4.9)'
+      };
+
+      setOrderSummary(placedOrder);
+      setActiveOrder(placedOrder);
+      clearCart();
       setIsSubmitting(false);
-      placeOrder({
-        address: `${formData.addressLine}, ${formData.area}, ${formData.city} - ${formData.pincode}`,
-        paymentMode: formData.paymentMode,
-        deliverySlot: formData.deliverySlot
-      });
-    }, 1000);
+      setStep(3);
+
+      // Trigger Confetti!
+      try {
+        confetti({
+          particleCount: 140,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }, 1200);
+  };
+
+  const closeAndReset = () => {
+    setIsCheckoutModalOpen(false);
+    setStep(1);
+    setOrderSummary(null);
+  };
+
+  const handleTrackLive = () => {
+    closeAndReset();
+    setIsLiveTrackingOpen(true);
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-neutral-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 animate-fade-in">
-      <div 
-        className="relative bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-neutral-200 my-6 flex flex-col max-h-[92vh]"
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div
+        className="relative bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-200 bg-neutral-50 sticky top-0 z-20">
-          <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-neutral-900" />
-            <div>
-              <h2 className="text-base font-bold text-neutral-900">Checkout & Order Placement</h2>
-              <p className="text-xs text-neutral-500">Sumadhura Foods Morning Delivery</p>
+        <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-black bg-blue-600 text-white px-2 py-0.5 rounded-full uppercase">
+                Sumadhura Express Checkout
+              </span>
             </div>
+            <h2 className="font-extrabold text-slate-900 text-base sm:text-lg mt-1">
+              {step === 3 ? '🎉 Order Placed!' : 'Deliver to ' + selectedAddress.tag}
+            </h2>
           </div>
-
           <button
-            onClick={() => setIsCheckoutModalOpen(false)}
-            className="w-8 h-8 rounded-full bg-white hover:bg-neutral-200 text-neutral-600 flex items-center justify-center transition-colors border border-neutral-200"
+            onClick={closeAndReset}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="overflow-y-auto p-6 sm:p-8 space-y-6 flex-1">
-          
-          {/* Order Summary Strip */}
-          <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-200">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-neutral-600">
-                Order Summary ({cart.length} items)
-              </span>
-              <span className="text-sm font-extrabold text-neutral-900">
-                Total: ₹{totalAmount}
-              </span>
-            </div>
-            <div className="text-xs text-neutral-600 space-y-1">
-              <div className="flex justify-between">
-                <span>Items Subtotal:</span>
-                <span>₹{subtotal}</span>
+        {/* Step 1: Address confirmation & Delivery Slot */}
+        {step === 1 && (
+          <div className="p-5 sm:p-6 space-y-4">
+            {/* Saved Addresses Selector */}
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-2">
+                Select Delivery Address
+              </label>
+              <div className="space-y-2">
+                {savedAddresses.map((addr) => {
+                  const isSelected = selectedAddress.id === addr.id;
+                  return (
+                    <div
+                      key={addr.id}
+                      onClick={() => setSelectedAddress(addr)}
+                      className={`p-3.5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${
+                        isSelected
+                          ? 'border-blue-600 bg-blue-50/70 text-blue-900'
+                          : 'border-slate-200 hover:border-slate-300 bg-white'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <MapPin className={`w-4 h-4 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                        <div>
+                          <div className="font-extrabold text-xs text-slate-900">
+                            {addr.tag} • {addr.title}
+                          </div>
+                          <div className="text-[11px] text-slate-500">{addr.area}</div>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-black bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                        10-15 mins
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-              {discountAmount > 0 && (
-                <div className="flex justify-between text-neutral-900 font-semibold">
-                  <span>Coupon Savings:</span>
+            </div>
+
+            {/* Delivery Promise Card */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 p-3.5 rounded-2xl flex items-center gap-3 text-xs text-blue-950">
+              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
+                <Bike className="w-4 h-4" />
+              </div>
+              <div>
+                <strong>Sumadhura On-Time Guarantee:</strong> Arriving in 10-15 mins from our nearest store.
+              </div>
+            </div>
+
+            {/* Bill Preview */}
+            <div className="bg-slate-50 p-3.5 rounded-2xl flex items-center justify-between text-xs border border-slate-100">
+              <span className="text-slate-600 font-medium">
+                To Pay ({cart.length} items):
+              </span>
+              <span className="text-base font-black text-blue-700">₹{cartTotal}</span>
+            </div>
+
+            <button
+              onClick={() => setStep(2)}
+              className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+            >
+              <span>Continue to Payment</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Step 2: Payment Options */}
+        {step === 2 && (
+          <form onSubmit={handlePlaceOrder} className="p-5 sm:p-6 space-y-4">
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Choose Payment Method
+            </label>
+
+            <div className="space-y-2.5">
+              {/* UPI */}
+              <label
+                className={`p-3.5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${
+                  paymentMethod === 'upi'
+                    ? 'border-blue-600 bg-blue-50/70 text-blue-900'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="upi"
+                    checked={paymentMethod === 'upi'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="text-blue-600"
+                  />
+                  <div>
+                    <span className="font-bold text-xs flex items-center gap-1.5">
+                      <Smartphone className="w-4 h-4 text-blue-600" /> UPI (GPay / PhonePe / Paytm / CRED)
+                    </span>
+                    <span className="text-[11px] text-slate-500 block">
+                      Fastest & recommended for 10-min orders
+                    </span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                  1-Tap Pay
+                </span>
+              </label>
+
+              {/* Cards */}
+              <label
+                className={`p-3.5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${
+                  paymentMethod === 'card'
+                    ? 'border-blue-600 bg-blue-50/70 text-blue-900'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="card"
+                    checked={paymentMethod === 'card'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="text-blue-600"
+                  />
+                  <div>
+                    <span className="font-bold text-xs flex items-center gap-1.5">
+                      <CreditCard className="w-4 h-4 text-blue-600" /> Credit / Debit Card
+                    </span>
+                    <span className="text-[11px] text-slate-500 block">
+                      Visa, Mastercard, RuPay, Amex
+                    </span>
+                  </div>
+                </div>
+              </label>
+
+              {/* COD */}
+              <label
+                className={`p-3.5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${
+                  paymentMethod === 'cod'
+                    ? 'border-blue-600 bg-blue-50/70 text-blue-900'
+                    : 'border-slate-200 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    value="cod"
+                    checked={paymentMethod === 'cod'}
+                    onChange={(e) => setPaymentMethod(e.target.value)}
+                    className="text-blue-600"
+                  />
+                  <div>
+                    <span className="font-bold text-xs flex items-center gap-1.5">
+                      <Banknote className="w-4 h-4 text-blue-600" /> Pay on Delivery (Cash / UPI)
+                    </span>
+                    <span className="text-[11px] text-slate-500 block">
+                      Scan QR or pay cash when partner arrives
+                    </span>
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            {/* Bill Summary */}
+            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-1.5 text-xs text-slate-600">
+              <div className="flex justify-between">
+                <span>Item Total</span>
+                <span>₹{cartSubtotal}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Delivery Partner Fee</span>
+                <span>{deliveryFee === 0 ? <strong className="text-emerald-600">FREE</strong> : `₹${deliveryFee}`}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Platform Fee</span>
+                <span>₹{platformFee}</span>
+              </div>
+              {deliveryPartnerTip > 0 && (
+                <div className="flex justify-between text-blue-700">
+                  <span>Partner Tip</span>
+                  <span>₹{deliveryPartnerTip}</span>
+                </div>
+              )}
+              {appliedPromo && (
+                <div className="flex justify-between text-emerald-600 font-bold">
+                  <span>Coupon ({appliedPromo.code})</span>
                   <span>-₹{discountAmount}</span>
                 </div>
               )}
-              <div className="flex justify-between">
-                <span>Delivery:</span>
-                <span className="text-emerald-700 font-semibold">
-                  {deliveryFee === 0 ? "FREE" : `₹${deliveryFee}`}
+              <div className="flex justify-between text-base font-black text-slate-900 pt-2 border-t border-slate-200">
+                <span>Total Amount</span>
+                <span className="text-blue-700">₹{cartTotal}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="w-1/3 py-3 rounded-2xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-100 transition-colors"
+              >
+                Back
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1 py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <span>Securing Order...</span>
+                ) : (
+                  <>
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Pay ₹{cartTotal} & Place Order</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Step 3: Success Confirmation with Live Tracking Button */}
+        {step === 3 && orderSummary && (
+          <div className="p-6 text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+              <CheckCircle className="w-10 h-10" />
+            </div>
+
+            <div>
+              <span className="text-[10px] font-black bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full uppercase">
+                Order Confirmed
+              </span>
+              <h3 className="text-xl font-black text-slate-900 mt-1">
+                Order #{orderSummary.id}
+              </h3>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Being packed right now at Sumadhura Dark Store
+              </p>
+            </div>
+
+            {/* Delivery Partner Assigned Card */}
+            <div className="bg-blue-50/70 border border-blue-200 p-4 rounded-2xl text-left text-xs space-y-2">
+              <div className="flex items-center justify-between font-bold text-blue-900">
+                <span className="flex items-center gap-1.5">
+                  <Bike className="w-4 h-4 text-blue-600" /> Driver Assigned: {orderSummary.partner}
+                </span>
+                <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                  ⚡ 11 Mins
                 </span>
               </div>
-            </div>
-          </div>
-
-          {/* Delivery Address Section */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm font-bold text-neutral-900">
-              <MapPin className="w-4 h-4 text-neutral-700" />
-              <span>Delivery Address</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div>
-                <label className="block text-neutral-600 font-medium mb-1">Full Name</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.fullName}
-                  onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-                  className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 focus:outline-none focus:border-neutral-900"
-                />
+              <div className="text-slate-600">
+                <strong>Delivering to:</strong> {orderSummary.address}
               </div>
-
-              <div>
-                <label className="block text-neutral-600 font-medium mb-1">Contact Phone</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 focus:outline-none focus:border-neutral-900"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-neutral-600 font-medium mb-1">Flat / House No. & Apartment / Street</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.addressLine}
-                  onChange={(e) => setFormData({...formData, addressLine: e.target.value})}
-                  className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 focus:outline-none focus:border-neutral-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-neutral-600 font-medium mb-1">Locality / Area</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.area}
-                  onChange={(e) => setFormData({...formData, area: e.target.value})}
-                  className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 focus:outline-none focus:border-neutral-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-neutral-600 font-medium mb-1">City & Pincode</label>
-                <input
-                  type="text"
-                  required
-                  value={`${formData.city} - ${formData.pincode}`}
-                  onChange={(e) => setFormData({...formData, pincode: e.target.value})}
-                  className="w-full bg-neutral-50 border border-neutral-300 rounded-xl px-3 py-2 text-neutral-900 focus:outline-none focus:border-neutral-900"
-                />
+              <div className="text-slate-600 flex justify-between border-t border-blue-100 pt-2 font-medium">
+                <span>Total Paid:</span>
+                <span className="font-bold text-slate-900">₹{orderSummary.total}</span>
               </div>
             </div>
-          </div>
 
-          {/* Delivery Slot Selection */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm font-bold text-neutral-900">
-              <Clock className="w-4 h-4 text-neutral-700" />
-              <span>Choose Delivery Slot</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <label 
-                className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                  formData.deliverySlot.includes('Morning')
-                    ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900'
-                    : 'border-neutral-200 hover:border-neutral-400'
-                }`}
+            {/* Action buttons */}
+            <div className="space-y-2 pt-2">
+              <button
+                onClick={handleTrackLive}
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all"
               >
-                <input 
-                  type="radio" 
-                  name="deliverySlot" 
-                  checked={formData.deliverySlot.includes('Morning')}
-                  onChange={() => setFormData({...formData, deliverySlot: "Tomorrow Morning 6:00 AM - 7:30 AM"})}
-                  className="mt-0.5 text-neutral-900"
-                />
-                <div>
-                  <span className="font-bold text-neutral-900 block">Morning 6:00 AM - 7:30 AM</span>
-                  <span className="text-neutral-500 text-[11px]">Recommended • Fresh before breakfast</span>
-                </div>
-              </label>
+                <Bike className="w-4 h-4 animate-bounce" />
+                <span>Track Live Order on Map (11 Mins)</span>
+              </button>
 
-              <label 
-                className={`flex items-start gap-3 p-3.5 rounded-2xl border cursor-pointer transition-all ${
-                  formData.deliverySlot.includes('Evening')
-                    ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900'
-                    : 'border-neutral-200 hover:border-neutral-400'
-                }`}
+              <button
+                onClick={() => {
+                  closeAndReset();
+                  navigateTo('home');
+                }}
+                className="w-full py-2.5 text-slate-600 hover:text-slate-900 font-bold text-xs"
               >
-                <input 
-                  type="radio" 
-                  name="deliverySlot" 
-                  checked={formData.deliverySlot.includes('Evening')}
-                  onChange={() => setFormData({...formData, deliverySlot: "Tomorrow Evening 5:00 PM - 7:00 PM"})}
-                  className="mt-0.5 text-neutral-900"
-                />
-                <div>
-                  <span className="font-bold text-neutral-900 block">Evening 5:00 PM - 7:00 PM</span>
-                  <span className="text-neutral-500 text-[11px]">Standard express evening slot</span>
-                </div>
-              </label>
+                Back to Shopping
+              </button>
             </div>
           </div>
-
-          {/* Payment Method */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-sm font-bold text-neutral-900">
-              <CreditCard className="w-4 h-4 text-neutral-700" />
-              <span>Select Payment Method</span>
-            </div>
-
-            <div className="space-y-2 text-xs">
-              {[
-                { id: "Cash on Delivery", label: "Cash on Delivery (Pay upon arrival)", sub: "Pay cash or scan QR when doorstep delivery arrives" },
-                { id: "UPI / Google Pay / PhonePe", label: "UPI / QR Code", sub: "Instant & zero transaction fee" },
-                { id: "Debit / Credit Card", label: "Credit or Debit Card", sub: "Visa, Mastercard, RuPay & Amex" }
-              ].map((method) => (
-                <label 
-                  key={method.id}
-                  className={`flex items-start gap-3 p-3 rounded-2xl border cursor-pointer transition-all ${
-                    formData.paymentMode === method.id
-                      ? 'border-neutral-900 bg-neutral-50 ring-1 ring-neutral-900'
-                      : 'border-neutral-200 hover:border-neutral-400'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMode"
-                    value={method.id}
-                    checked={formData.paymentMode === method.id}
-                    onChange={(e) => setFormData({...formData, paymentMode: e.target.value})}
-                    className="mt-0.5 text-neutral-900"
-                  />
-                  <div>
-                    <span className="font-bold text-neutral-900 block">{method.label}</span>
-                    <span className="text-neutral-500 text-[11px]">{method.sub}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Submit CTA */}
-          <div className="pt-4 border-t border-neutral-200">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-400 text-white font-bold py-4 px-6 rounded-2xl text-base shadow-lg transition-all active:scale-95"
-            >
-              {isSubmitting ? (
-                <span>Confirming Order...</span>
-              ) : (
-                <>
-                  <span>Place Order • ₹{totalAmount}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-            <p className="text-center text-[11px] text-neutral-400 mt-2 flex items-center justify-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" />
-              100% Secure Checkout with Sumadhura Purity Guarantee
-            </p>
-          </div>
-
-        </form>
+        )}
       </div>
     </div>
   );

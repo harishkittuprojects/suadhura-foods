@@ -1,194 +1,208 @@
 import React, { useState } from 'react';
-import { useCart } from '../context/CartContext';
-import { PRODUCTS } from '../data/foodData';
-import { ProductCard } from '../components/ProductCard';
-import { 
-  ShoppingBag, 
-  Trash2, 
-  Plus, 
-  Minus, 
-  ArrowRight, 
-  ArrowLeft, 
-  Tag, 
-  Truck, 
-  ShieldCheck, 
-  CheckCircle2, 
-  Sparkles 
+import { useShop } from '../context/ShopContext';
+import {
+  ShoppingCart,
+  Plus,
+  Minus,
+  Trash2,
+  ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  Tag,
+  Zap,
+  ArrowLeft,
+  BellOff,
+  PhoneOff,
+  Home,
+  Check,
+  Bike
 } from 'lucide-react';
 
 export const CartPage = () => {
-  const { 
-    cart, 
-    totalItemsCount, 
-    subtotal, 
-    discountAmount, 
-    deliveryFee, 
-    totalAmount, 
-    isFreeDelivery, 
-    amountToFreeDelivery, 
-    updateQuantity, 
-    removeFromCart, 
-    clearCart, 
-    appliedCoupon, 
-    applyCoupon, 
-    removeCoupon, 
-    setIsCheckoutModalOpen, 
-    navigateTo, 
-    deliveryLocation 
-  } = useCart();
+  const {
+    cart,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    cartSubtotal,
+    platformFee,
+    deliveryFee,
+    appliedPromo,
+    discountAmount,
+    cartTotal,
+    applyPromoCode,
+    removePromoCode,
+    promoError,
+    deliveryPartnerTip,
+    setDeliveryPartnerTip,
+    noContactDelivery,
+    setNoContactDelivery,
+    deliveryInstructions,
+    toggleDeliveryInstruction,
+    isOneMember,
+    setIsCheckoutModalOpen,
+    selectedAddress,
+    navigateTo
+  } = useShop();
 
-  const [inputCoupon, setInputCoupon] = useState('');
+  const [couponInput, setCouponInput] = useState('');
 
-  const handleApply = (e) => {
+  const tipOptions = [0, 20, 30, 50];
+
+  const instructionChips = [
+    { id: 'dont-ring-bell', label: "Don't ring bell", icon: BellOff },
+    { id: 'avoid-calling', label: 'Avoid calling', icon: PhoneOff },
+    { id: 'leave-at-door', label: 'Leave at door', icon: Home },
+    { id: 'leave-with-guard', label: 'Leave with security', icon: ShieldCheck }
+  ];
+
+  const handleApplyCoupon = (e) => {
     e.preventDefault();
-    if (inputCoupon.trim()) {
-      applyCoupon(inputCoupon);
-      setInputCoupon('');
+    if (!couponInput) return;
+    if (applyPromoCode(couponInput)) {
+      setCouponInput('');
     }
   };
 
-  // Recommended quick add-ons (snacks / sweets / pickles not currently in cart)
-  const quickAddons = PRODUCTS.filter(p => !cart.some(c => c.id === p.id)).slice(0, 4);
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 space-y-12">
-      
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-neutral-200">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+      {/* Page Header */}
+      <div
+        data-aos="fade-down"
+        className="rounded-3xl bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 text-white p-8 sm:p-10 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-            Sumadhura Checkout Hub
-          </span>
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-neutral-900 mt-1">
-            Shopping Cart ({totalItemsCount} {totalItemsCount === 1 ? 'item' : 'items'})
-          </h1>
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm mb-2">
+            <Zap className="w-3.5 h-3.5 text-amber-300" />
+            <span>Sumadhura Express • 10-15 Min Delivery</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Shopping Cart</h1>
+          <p className="text-xs sm:text-sm text-blue-100">
+            {cart.length} items • Delivering to <strong>{selectedAddress.tag}</strong> ({selectedAddress.area})
+          </p>
         </div>
 
-        <button
-          onClick={() => navigateTo('categories')}
-          className="flex items-center gap-2 text-xs font-bold text-neutral-800 hover:text-black py-2 px-4 rounded-xl bg-neutral-100 hover:bg-neutral-200 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Continue Shopping</span>
-        </button>
+        {cart.length > 0 && (
+          <button
+            onClick={clearCart}
+            className="text-xs text-rose-300 hover:text-white font-semibold underline self-start sm:self-center"
+          >
+            Clear All Items
+          </button>
+        )}
       </div>
 
       {cart.length === 0 ? (
-        /* Empty Cart State */
-        <div className="bg-neutral-50 rounded-3xl p-12 sm:p-20 border border-neutral-200 text-center space-y-6 max-w-2xl mx-auto">
-          <div className="w-20 h-20 rounded-full bg-white border border-neutral-200 flex items-center justify-center mx-auto text-neutral-400 shadow-sm">
-            <ShoppingBag className="w-10 h-10" />
+        <div className="bg-white rounded-3xl border border-dashed border-slate-200 p-12 sm:p-16 text-center space-y-4">
+          <div className="w-20 h-20 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-sm">
+            <ShoppingCart className="w-10 h-10 stroke-[1.5]" />
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-neutral-900">Your basket is currently empty</h2>
-            <p className="text-xs sm:text-sm text-neutral-500 mt-2 max-w-md mx-auto leading-relaxed">
-              Looks like you haven't added anything yet. Discover our fresh batches of heirloom mango pickles, pure desi cow ghee laddus, and cold-stone ground flours.
-            </p>
+          <h2 className="text-xl font-bold text-slate-800">Your shopping cart is empty</h2>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            You haven't added any fresh groceries yet. Explore our farm fresh dairy, crisp vegetables, and pantry staples!
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={() => navigateTo('categories')}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all inline-flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Explore 10-Min Groceries</span>
+            </button>
           </div>
-          <button
-            onClick={() => navigateTo('categories')}
-            className="bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-sm px-8 py-3.5 rounded-2xl transition-all shadow-md active:scale-95 inline-flex items-center gap-2"
-          >
-            <ShoppingBag className="w-4 h-4" />
-            <span>Start Shopping Foods</span>
-          </button>
         </div>
       ) : (
-        /* Active Cart Layout */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column: Cart Items List */}
-          <div className="lg:col-span-8 space-y-6">
-            
-            {/* Free Delivery Bar */}
-            <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-200">
-              {isFreeDelivery ? (
-                <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-neutral-900">
-                  <Truck className="w-5 h-5 text-emerald-600" />
-                  <span>Congratulations! Your order qualifies for FREE Morning Delivery.</span>
-                </div>
-              ) : (
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between items-center font-semibold text-neutral-800">
-                    <span>Add ₹{amountToFreeDelivery} more to enjoy FREE Delivery</span>
-                    <span>Goal: ₹499</span>
-                  </div>
-                  <div className="w-full bg-neutral-200 h-2 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-neutral-900 h-full rounded-full transition-all duration-300"
-                      style={{ width: `${Math.min(100, (subtotal / 499) * 100)}%` }}
-                    />
+          <div className="lg:col-span-8 space-y-5">
+            {/* VIP Banner */}
+            {isOneMember ? (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 p-4 rounded-2xl flex items-center justify-between text-xs text-amber-950">
+                <div className="flex items-center gap-2.5">
+                  <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                  <div>
+                    <span className="font-black text-sm block">Sumadhura VIP Benefits Applied</span>
+                    <span className="text-[11px] text-amber-800">
+                      You unlocked FREE Express Delivery (Saved ₹25) and extra member pricing!
+                    </span>
                   </div>
                 </div>
-              )}
-            </div>
+                <span className="font-black text-xs bg-amber-400 text-slate-950 px-2.5 py-1 rounded-full">
+                  FREE DELIVERY
+                </span>
+              </div>
+            ) : (
+              <div className="bg-blue-50 border border-blue-200 p-4 rounded-2xl flex items-center justify-between text-xs text-blue-900">
+                <span>Free delivery available on orders above ₹99 with Sumadhura VIP</span>
+                <span className="font-bold underline cursor-pointer">Activate VIP</span>
+              </div>
+            )}
 
-            {/* Items Table / Cards */}
-            <div className="bg-white rounded-3xl border border-neutral-200 shadow-sm overflow-hidden divide-y divide-neutral-100">
+            {/* Items Table */}
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden divide-y divide-slate-100">
               {cart.map((item) => (
-                <div 
-                  key={item.cartItemId}
-                  className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-neutral-50/50 transition-colors"
+                <div
+                  key={item.id}
+                  className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
                 >
-                  {/* Image & Title */}
-                  <div className="flex items-center gap-4 min-w-0">
-                    <div className="w-20 h-20 rounded-2xl bg-neutral-100 overflow-hidden flex-shrink-0 border border-neutral-200">
-                      <img 
-                        src={item.image} 
-                        alt={item.name} 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-
-                    <div className="min-w-0">
-                      <span className="text-[10px] uppercase font-bold tracking-wider text-neutral-400">
-                        {item.categoryName || item.category}
-                      </span>
-                      <h3 className="font-bold text-sm sm:text-base text-neutral-900 leading-snug truncate">
-                        {item.name}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="bg-neutral-100 text-neutral-700 text-xs font-semibold px-2 py-0.5 rounded">
-                          {item.selectedWeight || item.weight}
-                        </span>
-                        <span className="text-xs text-neutral-400">
-                          ₹{item.price} each
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-100 flex-shrink-0"
+                    />
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <div className="w-3.5 h-3.5 border border-emerald-600 rounded-sm flex items-center justify-center p-0.5">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                        </div>
+                        <span className="text-[10px] font-bold text-blue-600 uppercase">
+                          {item.category}
                         </span>
                       </div>
+
+                      <h3 className="font-bold text-slate-900 text-sm sm:text-base leading-snug">
+                        {item.name}
+                      </h3>
+                      <span className="text-xs text-slate-400 block mt-0.5">
+                        {item.unit} • <strong className="text-blue-600">{item.deliveryTime || '10 mins'}</strong>
+                      </span>
                     </div>
                   </div>
 
-                  {/* Quantity Stepper & Price */}
-                  <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-0 border-neutral-100">
-                    <div className="flex items-center border border-neutral-300 rounded-xl bg-white shadow-sm overflow-hidden">
+                  <div className="flex items-center justify-between sm:justify-end gap-6 pt-2 sm:pt-0 border-t sm:border-0 border-slate-50">
+                    {/* Quantity stepper */}
+                    <div className="flex items-center bg-blue-600 rounded-xl p-0.5 text-white shadow-sm">
                       <button
-                        onClick={() => updateQuantity(item.cartItemId, -1)}
-                        className="p-2 text-neutral-600 hover:text-black hover:bg-neutral-100 transition-colors"
+                        onClick={() => updateQuantity(item.id, -1)}
+                        className="w-7 h-7 rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
                         aria-label="Decrease quantity"
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="px-3 text-xs font-bold text-neutral-900 min-w-[28px] text-center">
+                      <span className="w-8 text-center text-xs font-black">
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(item.cartItemId, 1)}
-                        className="p-2 text-neutral-600 hover:text-black hover:bg-neutral-100 transition-colors"
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="w-7 h-7 rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
                         aria-label="Increase quantity"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    <div className="text-right min-w-[80px]">
-                      <span className="text-base sm:text-lg font-extrabold text-neutral-900">
+                    {/* Subtotal */}
+                    <div className="text-right min-w-[70px]">
+                      <span className="text-base font-black text-slate-900 block">
                         ₹{item.price * item.quantity}
                       </span>
                     </div>
 
+                    {/* Remove button */}
                     <button
-                      onClick={() => removeFromCart(item.cartItemId)}
-                      className="text-neutral-400 hover:text-red-600 p-2 rounded-xl hover:bg-red-50 transition-colors"
+                      onClick={() => removeFromCart(item.id)}
+                      className="p-2 text-slate-300 hover:text-rose-500 rounded-lg transition-colors"
                       title="Remove product"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -198,162 +212,200 @@ export const CartPage = () => {
               ))}
             </div>
 
-            {/* Clear Cart Button */}
-            <div className="flex justify-between items-center text-xs">
-              <button
-                onClick={() => navigateTo('categories')}
-                className="text-neutral-600 hover:text-black font-semibold underline underline-offset-4"
-              >
-                ← Back to Food Catalog
-              </button>
-
-              <button
-                onClick={clearCart}
-                className="text-neutral-400 hover:text-red-600 font-semibold transition-colors"
-              >
-                Clear Entire Basket
-              </button>
+            {/* Delivery Instructions Card */}
+            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-soft">
+              <h4 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider mb-3">
+                Delivery Instructions
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {instructionChips.map((chip) => {
+                  const Icon = chip.icon;
+                  const isSelected = deliveryInstructions.includes(chip.id);
+                  return (
+                    <button
+                      key={chip.id}
+                      onClick={() => toggleDeliveryInstruction(chip.id)}
+                      className={`p-3 rounded-2xl border text-left text-xs font-semibold flex flex-col justify-between gap-2 transition-all ${
+                        isSelected
+                          ? 'border-blue-600 bg-blue-50 text-blue-900'
+                          : 'border-slate-200 text-slate-600 hover:border-slate-300'
+                      }`}
+                    >
+                      <Icon className={`w-4 h-4 ${isSelected ? 'text-blue-600' : 'text-slate-400'}`} />
+                      <span>{chip.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
+            {/* Delivery Partner Tip Section */}
+            <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-soft">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h4 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                    Tip Your Delivery Partner
+                  </h4>
+                  <p className="text-[11px] text-slate-500">
+                    Thank your delivery partner for bringing fresh food in 10-15 mins.
+                  </p>
+                </div>
+                <span className="text-xs font-bold text-blue-600">100% goes to partner</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2.5">
+                {tipOptions.map((tip) => (
+                  <button
+                    key={tip}
+                    onClick={() => setDeliveryPartnerTip(tip)}
+                    className={`py-2 rounded-xl text-xs font-bold transition-all ${
+                      deliveryPartnerTip === tip
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    {tip === 0 ? 'No Tip' : `₹${tip}`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* No Contact Checkbox */}
+            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-soft">
+              <label className="flex items-center gap-3 text-xs font-bold text-slate-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={noContactDelivery}
+                  onChange={(e) => setNoContactDelivery(e.target.checked)}
+                  className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4"
+                />
+                <div>
+                  <span className="block">No-Contact Delivery Option</span>
+                  <span className="text-[11px] text-slate-400 font-normal">
+                    Partner will leave package at your gate/door and ring phone once.
+                  </span>
+                </div>
+              </label>
+            </div>
           </div>
 
-          {/* Right Column: Order Summary & Checkout */}
-          <div className="lg:col-span-4 space-y-6 sticky top-28">
-            <div className="bg-neutral-50 rounded-3xl p-6 sm:p-8 border border-neutral-200 shadow-sm space-y-6">
-              <h2 className="text-lg font-bold text-neutral-900 pb-3 border-b border-neutral-200">
-                Order Summary
-              </h2>
+          {/* Right Column: Detailed Bill & Checkout */}
+          <div className="lg:col-span-4 space-y-4">
+            <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-soft space-y-5">
+              <h3 className="font-extrabold text-slate-900 text-base border-b border-slate-100 pb-3">
+                Bill Details
+              </h3>
 
-              {/* Promo Code Input */}
-              {appliedCoupon ? (
-                <div className="flex items-center justify-between bg-white border border-neutral-300 px-3.5 py-2.5 rounded-2xl text-xs">
+              {/* Coupon Code Section */}
+              {appliedPromo ? (
+                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between text-xs text-emerald-800">
                   <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-neutral-800" />
+                    <Tag className="w-4 h-4 text-emerald-600" />
                     <div>
-                      <span className="font-bold text-neutral-900 block">{appliedCoupon.code}</span>
-                      <span className="text-[11px] text-neutral-500">{appliedCoupon.discountPct}% Discount Applied</span>
+                      <span className="font-bold">{appliedPromo.code} applied</span>
+                      <span className="block text-[11px] text-emerald-600">
+                        Saved ₹{appliedPromo.discountAmount}
+                      </span>
                     </div>
                   </div>
-                  <button 
-                    onClick={removeCoupon}
-                    className="text-xs font-bold text-red-600 hover:text-red-700"
+                  <button
+                    onClick={removePromoCode}
+                    className="text-rose-600 font-bold hover:underline"
                   >
                     Remove
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleApply} className="space-y-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-neutral-700">
-                    Apply Promo Coupon:
-                  </label>
+                <form onSubmit={handleApplyCoupon} className="space-y-2">
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Use SUMADHURA10"
-                      value={inputCoupon}
-                      onChange={(e) => setInputCoupon(e.target.value)}
-                      className="flex-1 bg-white border border-neutral-300 rounded-xl px-3 py-2 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900 font-mono uppercase"
+                      placeholder="Coupon (SUMADHURA50)"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value)}
+                      className="flex-1 px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl uppercase tracking-wider font-semibold focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none"
                     />
                     <button
                       type="submit"
-                      className="bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+                      className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-colors"
                     >
                       Apply
                     </button>
                   </div>
+                  {promoError && (
+                    <span className="text-[11px] text-rose-500 font-semibold block">{promoError}</span>
+                  )}
+                  <span className="text-[10px] text-slate-400 block">
+                    Use <strong>SUMADHURA50</strong> for ₹50 off or <strong>SUMADHURAVIP</strong> for 15% off
+                  </span>
                 </form>
               )}
 
-              {/* Pricing Breakdown */}
-              <div className="space-y-2.5 text-xs text-neutral-600 pt-2 border-t border-neutral-200">
+              {/* Breakdown */}
+              <div className="space-y-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
                 <div className="flex justify-between">
-                  <span>Item Subtotal ({totalItemsCount} items)</span>
-                  <span className="font-bold text-neutral-900">₹{subtotal}</span>
+                  <span>Item Total</span>
+                  <span className="font-semibold text-slate-900">₹{cartSubtotal}</span>
                 </div>
-
-                {discountAmount > 0 && (
-                  <div className="flex justify-between text-neutral-900 font-semibold">
+                <div className="flex justify-between">
+                  <span>Delivery Partner Fee</span>
+                  <span>
+                    {deliveryFee === 0 ? (
+                      <span className="text-emerald-600 font-bold">FREE (One)</span>
+                    ) : (
+                      `₹${deliveryFee}`
+                    )}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Platform Fee</span>
+                  <span className="font-semibold">₹{platformFee}</span>
+                </div>
+                {deliveryPartnerTip > 0 && (
+                  <div className="flex justify-between text-blue-700">
+                    <span>Delivery Partner Tip</span>
+                    <span>₹{deliveryPartnerTip}</span>
+                  </div>
+                )}
+                {appliedPromo && (
+                  <div className="flex justify-between text-emerald-600 font-bold">
                     <span>Coupon Savings</span>
                     <span>-₹{discountAmount}</span>
                   </div>
                 )}
-
-                <div className="flex justify-between">
-                  <span>Morning 7 AM Delivery</span>
-                  {deliveryFee === 0 ? (
-                    <span className="text-emerald-700 font-bold uppercase">FREE</span>
-                  ) : (
-                    <span className="font-bold text-neutral-900">₹{deliveryFee}</span>
-                  )}
-                </div>
-
-                <div className="flex justify-between text-neutral-400 text-[11px]">
-                  <span>GST & Kitchen Packaging</span>
-                  <span>Included</span>
-                </div>
-
-                <div className="pt-3 border-t border-neutral-300 flex justify-between items-baseline text-base font-extrabold text-neutral-900">
-                  <span>Total Amount</span>
-                  <span className="text-2xl font-black">₹{totalAmount}</span>
+                <div className="flex justify-between text-base font-black text-slate-900 pt-3 border-t border-slate-200">
+                  <span>To Pay</span>
+                  <span className="text-blue-700">₹{cartTotal}</span>
                 </div>
               </div>
 
-              {/* Delivery Destination */}
-              <div className="text-xs text-neutral-600 bg-white p-3.5 rounded-2xl border border-neutral-200 space-y-1">
-                <div className="flex justify-between text-neutral-900 font-semibold">
-                  <span>Delivering to:</span>
-                  <span>{deliveryLocation.area}</span>
-                </div>
-                <p className="text-[11px] text-neutral-400">
-                  {deliveryLocation.city} - {deliveryLocation.pincode} • Morning 7 AM
-                </p>
-              </div>
-
-              {/* Checkout CTA */}
+              {/* Checkout Button */}
               <button
                 onClick={() => setIsCheckoutModalOpen(true)}
-                className="w-full flex items-center justify-center gap-2 bg-neutral-900 hover:bg-neutral-800 text-white font-bold py-4 px-6 rounded-2xl text-sm transition-all shadow-lg active:scale-95"
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-between px-5 transition-all"
               >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Proceed to Pay</span>
+                <div className="flex items-center gap-1 font-bold">
+                  <span>₹{cartTotal}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
               </button>
 
-              <div className="text-center text-[11px] text-neutral-400 flex items-center justify-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" />
-                <span>Zero Adulteration & 100% Purity Guarantee</span>
+              <div className="flex items-center justify-center gap-2 text-[11px] text-slate-400 text-center">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                <span>100% Secure Checkout with 256-Bit Encryption</span>
               </div>
             </div>
-          </div>
 
+            {/* Cancellation Guarantee Card */}
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-xs text-slate-500 space-y-1">
+              <strong className="text-slate-800 block">Review your order before paying</strong>
+              <p className="text-[11px]">
+                Orders are dispatched from Sumadhura Dark Store in 3 mins. Instant tracking available on map.
+              </p>
+            </div>
+          </div>
         </div>
       )}
-
-      {/* Suggested Food Items Section */}
-      <div className="pt-12 border-t border-neutral-200">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-              Frequently Bought Together
-            </span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-neutral-900 mt-0.5">
-              Popular Additions for Your Kitchen
-            </h2>
-          </div>
-          <button
-            onClick={() => navigateTo('categories')}
-            className="text-xs font-bold text-neutral-900 hover:underline"
-          >
-            Browse Catalog
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {quickAddons.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </div>
-
     </div>
   );
 };

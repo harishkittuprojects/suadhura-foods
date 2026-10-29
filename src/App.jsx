@@ -1,96 +1,84 @@
 import React, { useEffect } from 'react';
 import AOS from 'aos';
-import { CartProvider, useCart } from './context/CartContext';
+import { ShopProvider, useShop } from './context/ShopContext';
 import { Navbar } from './components/Navbar';
+import { MobileBottomNav } from './components/MobileBottomNav';
+import { FloatingCartBar } from './components/FloatingCartBar';
+import { LiveOrderTrackingModal } from './components/LiveOrderTrackingModal';
 import { Footer } from './components/Footer';
 import { Toast } from './components/Toast';
-import { ProductDetailsModal } from './components/ProductDetailsModal';
+import { ProductQuickViewModal } from './components/ProductQuickViewModal';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { LocationModal } from './components/LocationModal';
 import { AuthModal } from './components/AuthModal';
-import { BottomNav } from './components/BottomNav';
+import { SubscriptionModal } from './components/SubscriptionModal';
 
 import { HomePage } from './pages/HomePage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { ServicesPage } from './pages/ServicesPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
+import { WishlistPage } from './pages/WishlistPage';
 import { CartPage } from './pages/CartPage';
-import { ProfilePage } from './pages/ProfilePage';
+import { LoginPage } from './pages/LoginPage';
 
-function AppContent() {
-  const { currentPage } = useCart();
+const MainLayout = () => {
+  const { activeTab } = useShop();
 
   useEffect(() => {
     AOS.init({
       duration: 650,
-      once: true,
       easing: 'ease-out-cubic',
+      once: true,
       offset: 30,
-      disable: () => window.innerWidth < 768,
     });
   }, []);
 
-  // Refresh AOS on page change
+  // Refresh AOS animations when switching views
   useEffect(() => {
     AOS.refresh();
-    window.scrollTo(0, 0);
-  }, [currentPage]);
-
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <HomePage />;
-      case 'categories':
-        return <CategoriesPage />;
-      case 'services':
-        return <ServicesPage />;
-      case 'about':
-        return <AboutPage />;
-      case 'contact':
-        return <ContactPage />;
-      case 'cart':
-        return <CartPage />;
-      case 'profile':
-      case 'login':
-        return <ProfilePage />;
-      default:
-        return <HomePage />;
-    }
-  };
+  }, [activeTab]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-neutral-900 selection:bg-neutral-900 selection:text-white w-full max-w-full overflow-x-hidden">
-      {/* Sticky Responsive Header */}
+    <div className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-blue-600 selection:text-white overflow-x-clip w-full">
+      {/* Top Navigation */}
       <Navbar />
 
-      {/* Main Dynamic Page Content */}
-      <main className="flex-1 w-full max-w-full overflow-x-hidden">
-        {renderCurrentPage()}
+      {/* Main Page Content */}
+      <main className="flex-1 pb-24 sm:pb-28 lg:pb-8">
+        {activeTab === 'home' && <HomePage />}
+        {activeTab === 'categories' && <CategoriesPage />}
+        {activeTab === 'services' && <ServicesPage />}
+        {activeTab === 'wishlist' && <WishlistPage />}
+        {activeTab === 'cart' && <CartPage />}
+        {activeTab === 'login' && <LoginPage />}
       </main>
 
-      {/* Comprehensive Footer */}
+      {/* Sticky Floating Bottom Cart Bar */}
+      <FloatingCartBar />
+
+      {/* Footer */}
       <Footer />
 
-      {/* Global Modals & Drawers */}
+      {/* Mobile Sticky Bottom Navigation (App-like experience) */}
+      <MobileBottomNav />
+
+      {/* Modals, Drawers & Notifications */}
+      <LiveOrderTrackingModal />
+      <ProductQuickViewModal />
       <CartDrawer />
-      <ProductDetailsModal />
       <CheckoutModal />
       <LocationModal />
       <AuthModal />
+      <SubscriptionModal />
       <Toast />
-
-      {/* Swiggy Mobile App Bottom Navigation Bar */}
-      <BottomNav />
     </div>
   );
-}
+};
 
 export default function App() {
   return (
-    <CartProvider>
-      <AppContent />
-    </CartProvider>
+    <ShopProvider>
+      <MainLayout />
+    </ShopProvider>
   );
 }

@@ -1,26 +1,44 @@
 import React from 'react';
-import { useCart } from '../context/CartContext';
-import { CheckCircle2, Info, AlertCircle } from 'lucide-react';
+import { useShop } from '../context/ShopContext';
+import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
 export const Toast = () => {
-  const { toastMessage } = useCart();
+  const { toasts, removeToast } = useShop();
 
-  if (!toastMessage) return null;
-
-  const { message, type } = toastMessage;
+  if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-bounce-short">
-      <div className="flex items-center gap-3 bg-neutral-900 text-white px-5 py-3.5 rounded-xl shadow-2xl border border-neutral-700 max-w-md">
-        {type === 'error' ? (
-          <AlertCircle className="w-5 h-5 text-neutral-300 flex-shrink-0" />
-        ) : type === 'info' ? (
-          <Info className="w-5 h-5 text-neutral-300 flex-shrink-0" />
-        ) : (
-          <CheckCircle2 className="w-5 h-5 text-neutral-200 flex-shrink-0" />
-        )}
-        <p className="text-sm font-medium tracking-tight text-neutral-100">{message}</p>
-      </div>
+    <div className="fixed bottom-20 sm:bottom-6 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+      {toasts.map((toast) => (
+        <div
+          key={toast.id}
+          className={`pointer-events-auto flex items-center justify-between p-3.5 rounded-xl shadow-xl text-sm font-medium transition-all duration-300 transform translate-y-0 animate-in fade-in slide-in-from-bottom-3 ${
+            toast.type === 'error'
+              ? 'bg-rose-600 text-white'
+              : toast.type === 'info'
+              ? 'bg-slate-800 text-white'
+              : 'bg-blue-600 text-white shadow-blue-500/20'
+          }`}
+        >
+          <div className="flex items-center gap-2.5">
+            {toast.type === 'error' ? (
+              <AlertCircle className="w-5 h-5 flex-shrink-0 text-white" />
+            ) : toast.type === 'info' ? (
+              <Info className="w-5 h-5 flex-shrink-0 text-blue-300" />
+            ) : (
+              <CheckCircle2 className="w-5 h-5 flex-shrink-0 text-emerald-300" />
+            )}
+            <span>{toast.message}</span>
+          </div>
+          <button
+            onClick={() => removeToast(toast.id)}
+            className="p-1 hover:bg-white/20 rounded-lg transition-colors ml-2"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4 text-white/80" />
+          </button>
+        </div>
+      ))}
     </div>
   );
 };

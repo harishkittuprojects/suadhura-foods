@@ -1,269 +1,315 @@
 import React, { useState } from 'react';
-import { useCart } from '../context/CartContext';
-import { SERVICES } from '../data/foodData';
-import { 
-  ShoppingBag, 
-  ShieldCheck, 
-  Truck, 
-  PackageCheck, 
-  Sparkles, 
-  Headphones, 
-  ArrowRight, 
-  CheckCircle2, 
-  Clock, 
-  PhoneCall, 
+import { useShop } from '../context/ShopContext';
+import { servicesList } from '../data/products';
+import {
+  ShieldCheck,
+  MousePointerClick,
+  Zap,
+  Lock,
+  Layers,
+  Headphones,
+  CheckCircle2,
+  Clock,
+  Sparkles,
+  ArrowRight,
+  HelpCircle,
+  ChevronDown,
+  Mail,
   Send
 } from 'lucide-react';
 
-const iconMap = {
-  ShoppingBag,
-  ShieldCheck,
-  Truck,
-  PackageCheck,
-  Sparkles,
-  Headphones
-};
-
 export const ServicesPage = () => {
-  const { navigateTo, showToast } = useCart();
-  const [bulkForm, setBulkForm] = useState({
+  const { navigateTo, showToast } = useShop();
+
+  const [openFaq, setOpenFaq] = useState(0);
+  const [inquiryForm, setInquiryForm] = useState({
     name: '',
     phone: '',
-    category: 'Sweets & Snacks',
-    quantity: '50-100 kg / Boxes',
+    service: 'Daily Milk Delivery',
     message: ''
   });
-  const [bulkSubmitted, setBulkSubmitted] = useState(false);
+  const [formSent, setFormSent] = useState(false);
 
-  const handleBulkSubmit = (e) => {
+  const iconMap = {
+    ShieldCheck,
+    MousePointerClick,
+    Zap,
+    Lock,
+    Layers,
+    Headphones
+  };
+
+  const faqs = [
+    {
+      q: 'How does Sumadhura Foods guarantee dairy purity?',
+      a: 'Our milk is tested daily at collection centers for adulteration, urea, starch, and antibiotics. We maintain a cold chain temperature below 4°C from milking to your door.'
+    },
+    {
+      q: 'How fast is the 30-minute delivery service?',
+      a: 'We operate neighborhood micro-fulfillment hubs across Bengaluru and Hyderabad. Orders within a 4km radius are packed and dispatched within 7 minutes.'
+    },
+    {
+      q: 'Can I set up a daily recurring milk and vegetable delivery?',
+      a: 'Yes! You can choose our Morning Milk Subscription slot (6:30 AM to 8:30 AM) to receive fresh cow milk and vegetables automatically without daily ordering.'
+    },
+    {
+      q: 'What is your return and refund policy?',
+      a: 'If any product arrives damaged or not up to freshness expectations, simply notify us via WhatsApp or app within 24 hours. We offer instant refunds or free replacements.'
+    }
+  ];
+
+  const handleInquirySubmit = (e) => {
     e.preventDefault();
-    setBulkSubmitted(true);
-    showToast("Bulk inquiry received! Our catering & event manager will call you within 2 hours.");
+    setFormSent(true);
+    showToast('Inquiry submitted! Our customer team will contact you shortly.');
     setTimeout(() => {
-      setBulkForm({ name: '', phone: '', category: 'Sweets & Snacks', quantity: '50-100 kg / Boxes', message: '' });
-      setBulkSubmitted(false);
-    }, 4000);
+      setInquiryForm({ name: '', phone: '', service: 'Daily Milk Delivery', message: '' });
+      setFormSent(false);
+    }, 3000);
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 space-y-16">
-      
-      {/* Header */}
-      <div className="bg-neutral-50 rounded-3xl p-6 sm:p-12 border border-neutral-200 text-center max-w-4xl mx-auto">
-        <span className="text-xs font-bold uppercase tracking-widest text-neutral-500">
-          Tailored Food Logistics & Supply
-        </span>
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-neutral-900 mt-2 tracking-tight">
-          Our Services & Capabilities
-        </h1>
-        <p className="text-sm sm:text-base text-neutral-600 mt-3 max-w-2xl mx-auto leading-relaxed">
-          Sumadhura Foods delivers end-to-end culinary reliability—from daily doorstep grocery essentials to corporate gift hampers and large event catering batches.
-        </p>
-      </div>
-
-      {/* Services Grid (6 Core Services Required) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {SERVICES.map((service, index) => {
-          const Icon = iconMap[service.icon] || ShoppingBag;
-          return (
-            <div
-              key={service.id}
-              className="bg-white border border-neutral-200 hover:border-neutral-900 rounded-3xl p-7 transition-all duration-300 hover:shadow-subtle flex flex-col justify-between"
-              data-aos="fade-up"
-              data-aos-delay={index * 100}
-            >
-              <div>
-                <div className="w-12 h-12 rounded-2xl bg-neutral-900 text-white flex items-center justify-center mb-5 shadow-sm">
-                  <Icon className="w-6 h-6 text-neutral-200" />
-                </div>
-
-                <div className="text-[11px] font-bold uppercase tracking-wider text-neutral-400 mb-1">
-                  {service.tagline}
-                </div>
-
-                <h3 className="text-xl font-bold text-neutral-900 mb-2.5">
-                  {service.title}
-                </h3>
-
-                <p className="text-xs sm:text-sm text-neutral-600 leading-relaxed mb-6">
-                  {service.description}
-                </p>
-              </div>
-
-              <div>
-                <div className="border-t border-neutral-100 pt-4 space-y-2 mb-6">
-                  {service.highlights.map((h, i) => (
-                    <div key={i} className="flex items-center gap-2 text-xs text-neutral-700">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-neutral-900 flex-shrink-0" />
-                      <span>{h}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {service.id === 'online-shopping' ? (
-                  <button
-                    onClick={() => navigateTo('categories')}
-                    className="w-full bg-neutral-900 hover:bg-neutral-800 text-white font-bold text-xs py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <span>Browse Products</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                ) : service.id === 'bulk-orders' ? (
-                  <a
-                    href="#bulk-inquiry"
-                    className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-bold text-xs py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <span>Request Bulk Quote</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                ) : service.id === 'combo-packs' ? (
-                  <button
-                    onClick={() => navigateTo('categories', 'combo-packs')}
-                    className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-bold text-xs py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <span>Explore Combos</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => navigateTo('contact')}
-                    className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-900 font-bold text-xs py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-                  >
-                    <span>Get Details</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Bulk Orders Inquiry Section */}
-      <div id="bulk-inquiry" className="bg-neutral-900 text-white rounded-3xl p-8 sm:p-14 border border-neutral-800 shadow-2xl" data-aos="fade-up">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          
-          <div className="lg:col-span-6 space-y-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">
-              Wholesale & Event Gifting
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-              Planning a Wedding, Festival or Corporate Gifting?
-            </h2>
-            <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed">
-              Order customized boxes of Pure Desi Ghee Sweets, Sun-dried Pickles, Premium California Dry Fruit Jars, and authentic Regional Savories at tiered volume prices.
-            </p>
-            <div className="space-y-2.5 pt-2 text-xs text-neutral-300">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-white" />
-                <span>Custom brand printing on gift packaging boxes</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-white" />
-                <span>Guaranteed freshly batched 24 hours prior to dispatch</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-white" />
-                <span>Pan-India refrigerated and express delivery options</span>
-              </div>
-            </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-12 sm:space-y-16">
+      {/* Header Banner */}
+      <div
+        data-aos="fade-down"
+        className="rounded-3xl bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 text-white p-8 sm:p-12 shadow-xl relative overflow-hidden"
+      >
+        <div className="max-w-2xl relative z-10 space-y-3">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>Dedicated Customer Care</span>
           </div>
-
-          <div className="lg:col-span-6 bg-neutral-800/80 p-6 sm:p-8 rounded-3xl border border-neutral-700 backdrop-blur-sm">
-            <h3 className="text-lg font-bold text-white mb-4">
-              Request a Bulk Price Quote
-            </h3>
-
-            {bulkSubmitted ? (
-              <div className="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 text-center space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-white mx-auto" />
-                <h4 className="font-bold text-white text-base">Inquiry Submitted!</h4>
-                <p className="text-xs text-neutral-300">
-                  Our wholesale team will contact your provided number shortly with the catalog & discount rate card.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleBulkSubmit} className="space-y-3.5 text-xs">
-                <div>
-                  <label className="block text-neutral-300 font-medium mb-1">Your Name / Organization</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Anand Kumar / TechCorp India"
-                    value={bulkForm.name}
-                    onChange={(e) => setBulkForm({...bulkForm, name: e.target.value})}
-                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white placeholder-neutral-500 focus:outline-none focus:border-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-neutral-300 font-medium mb-1">Contact Phone Number</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="+91 98490 12345"
-                    value={bulkForm.phone}
-                    onChange={(e) => setBulkForm({...bulkForm, phone: e.target.value})}
-                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white placeholder-neutral-500 focus:outline-none focus:border-white"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-neutral-300 font-medium mb-1">Product Category</label>
-                    <select
-                      value={bulkForm.category}
-                      onChange={(e) => setBulkForm({...bulkForm, category: e.target.value})}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-white"
-                    >
-                      <option>Sweets & Laddus</option>
-                      <option>Traditional Pickles</option>
-                      <option>Dry Fruits Gift Boxes</option>
-                      <option>Stone Ground Flours</option>
-                      <option>Assorted Namkeen</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-neutral-300 font-medium mb-1">Estimated Quantity</label>
-                    <select
-                      value={bulkForm.quantity}
-                      onChange={(e) => setBulkForm({...bulkForm, quantity: e.target.value})}
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-white focus:outline-none focus:border-white"
-                    >
-                      <option>25 - 50 kg / Boxes</option>
-                      <option>50 - 100 kg / Boxes</option>
-                      <option>100 - 500 kg / Boxes</option>
-                      <option>500+ kg Wholesale</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-neutral-300 font-medium mb-1">Special Requirements (Optional)</label>
-                  <textarea
-                    rows={2}
-                    placeholder="Date required, custom packaging, specific dietary preferences..."
-                    value={bulkForm.message}
-                    onChange={(e) => setBulkForm({...bulkForm, message: e.target.value})}
-                    className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2 text-white placeholder-neutral-500 focus:outline-none focus:border-white resize-none"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-white hover:bg-neutral-200 text-neutral-950 font-bold py-3 px-4 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
-                >
-                  <Send className="w-4 h-4" />
-                  <span>Submit Wholesale Inquiry</span>
-                </button>
-              </form>
-            )}
-          </div>
-
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight">Our Services</h1>
+          <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+            From daily farm milking to doorstep delivery in 30 minutes, discover the end-to-end services
+            that make Sumadhura Foods the most reliable choice for food lovers.
+          </p>
         </div>
       </div>
 
+      {/* The 6 Core Services Grid */}
+      <section className="space-y-6">
+        <div className="text-center max-w-xl mx-auto">
+          <span className="text-xs font-extrabold uppercase text-blue-600 tracking-wider">
+            Built for Freshness & Convenience
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+            Everything You Need, Handled With Care
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {servicesList.map((service, idx) => {
+            const Icon = iconMap[service.icon] || ShieldCheck;
+            return (
+              <div
+                key={service.id}
+                data-aos="fade-up"
+                data-aos-delay={idx * 100}
+                className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
+              >
+                <div>
+                  <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200 shadow-sm">
+                    <Icon className="w-7 h-7" />
+                  </div>
+                  <span className="text-[11px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full mb-3 inline-block">
+                    {service.highlight}
+                  </span>
+                  <h3 className="text-lg font-extrabold text-slate-900 mb-2">{service.title}</h3>
+                  <p className="text-xs text-slate-600 leading-relaxed mb-4">{service.description}</p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-50 flex items-center justify-between text-xs font-bold text-blue-600">
+                  <span>Guaranteed Standards</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Express Delivery Breakdown Feature */}
+      <section
+        data-aos="fade-up"
+        className="bg-slate-50 rounded-3xl p-8 sm:p-12 border border-slate-100 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
+      >
+        <div className="space-y-4">
+          <span className="text-xs font-bold uppercase text-emerald-600 tracking-wider">
+            ⚡ 30-Minute Logistics
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 leading-tight">
+            How We Get Fresh Milk & Veggies to You in 30 Mins
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Unlike traditional e-commerce that ships from distant warehouses, our hyper-local fulfillment network
+            keeps organic perishables stored at optimal temperatures within minutes of your home.
+          </p>
+
+          <div className="space-y-3 pt-2 text-xs text-slate-700">
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                1
+              </div>
+              <div>
+                <strong>Harvest & Milking at 4:30 AM:</strong> Sourced from local farm cooperatives.
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                2
+              </div>
+              <div>
+                <strong>3-Step Quality Lab Check at 5:30 AM:</strong> Ensuring 0 pesticide residues & pure fat levels.
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">
+                3
+              </div>
+              <div>
+                <strong>Packaged in Chilled Thermal Crates:</strong> Sealed cold chain delivery directly to you.
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <button
+              onClick={() => navigateTo('categories')}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20"
+            >
+              Order For 30-Min Delivery
+            </button>
+          </div>
+        </div>
+
+        <div className="relative">
+          <img
+            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80"
+            alt="Cold-chain express delivery"
+            className="w-full h-80 object-cover rounded-3xl shadow-lg"
+          />
+          <div className="absolute -bottom-4 -left-4 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-3">
+            <Clock className="w-8 h-8 text-blue-600" />
+            <div>
+              <span className="text-xs font-black text-slate-900 block">Average Delivery Time</span>
+              <span className="text-sm font-extrabold text-blue-600">22 Minutes 40 Sec</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive FAQ & Contact Inquiry */}
+      <section data-aos="fade-up" className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left: FAQ accordion */}
+        <div className="lg:col-span-7 space-y-4">
+          <div className="mb-6">
+            <span className="text-xs font-bold uppercase text-blue-600 tracking-wider">
+              Frequently Asked Questions
+            </span>
+            <h2 className="text-2xl font-black text-slate-900 mt-1">Have Questions About Delivery?</h2>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-2xl border border-slate-100 shadow-soft overflow-hidden transition-colors"
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? -1 : index)}
+                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-bold text-slate-800 text-sm hover:text-blue-600"
+                >
+                  <span>{faq.q}</span>
+                  <ChevronDown
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ${
+                      openFaq === index ? 'rotate-180 text-blue-600' : ''
+                    }`}
+                  />
+                </button>
+                {openFaq === index && (
+                  <div className="px-5 pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-50 pt-3">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Special Order / Service Inquiry Form */}
+        <div className="lg:col-span-5 bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-soft">
+          <div className="mb-5">
+            <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block">
+              Direct Support & Inquiries
+            </span>
+            <h3 className="text-xl font-black text-slate-900 mt-0.5">Need a Special Bulk Order?</h3>
+            <p className="text-xs text-slate-500 mt-1">
+              Contact our service manager for custom recurring daily orders or event catering.
+            </p>
+          </div>
+
+          <form onSubmit={handleInquirySubmit} className="space-y-3.5">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Your Name</label>
+              <input
+                type="text"
+                required
+                placeholder="Full name"
+                value={inquiryForm.name}
+                onChange={(e) => setInquiryForm({ ...inquiryForm, name: e.target.value })}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Mobile Number</label>
+              <input
+                type="tel"
+                required
+                placeholder="+91 Mobile number"
+                value={inquiryForm.phone}
+                onChange={(e) => setInquiryForm({ ...inquiryForm, phone: e.target.value })}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Service Type</label>
+              <select
+                value={inquiryForm.service}
+                onChange={(e) => setInquiryForm({ ...inquiryForm, service: e.target.value })}
+                className="w-full px-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none"
+              >
+                <option value="Daily Milk Delivery">Daily Milk Delivery Subscription</option>
+                <option value="Weekly Vegetable Basket">Weekly Organic Veggie Basket</option>
+                <option value="Apartment Community Tie-up">Apartment Community Tie-up</option>
+                <option value="General Support">General Service Support</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Message</label>
+              <textarea
+                rows={3}
+                placeholder="Tell us what you need..."
+                value={inquiryForm.message}
+                onChange={(e) => setInquiryForm({ ...inquiryForm, message: e.target.value })}
+                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none"
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Submit Service Request</span>
+            </button>
+          </form>
+        </div>
+      </section>
     </div>
   );
 };
