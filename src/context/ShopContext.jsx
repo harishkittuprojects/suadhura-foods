@@ -309,12 +309,26 @@ export const ShopProvider = ({ children }) => {
   // User auth simulation
   const login = (userData) => {
     setUser(userData);
+    try {
+      localStorage.setItem('sumadhura_user', JSON.stringify(userData));
+    } catch (e) {
+      console.error(e);
+    }
     setIsAuthModalOpen(false);
-    showToast(`Welcome back, ${userData.name}! 🌟`);
+    showToast(
+      userData.isBusiness
+        ? `Welcome, ${userData.companyName || userData.name}! B2B Portal Active 🏢`
+        : `Welcome back, ${userData.name}! 🌟`
+    );
   };
 
   const logout = () => {
     setUser(null);
+    try {
+      localStorage.removeItem('sumadhura_user');
+    } catch (e) {
+      console.error(e);
+    }
     showToast('Logged out successfully', 'info');
   };
 
