@@ -283,3 +283,4 @@ export const CateringBookingModal = () => {
     </div>
   );
 };
+

@@ -82,8 +82,6 @@ export const HomePage = () => {
     { id: 'sweets', label: 'Sweets', icon: SweetsIcon, categoryFilter: 'Dairy Products' }
   ];
 
-  // 4 Popular Dishes from Reference Image (Chicken Biryani, Paneer Butter Masala, Veg Pulav, Idli Set)
-  const popularDishes = products.filter((p) => p.category === 'Popular Dishes').slice(0, 4);
 
   // Grocery Aisles (2-Row Grid)
   const groceryAisles = [
@@ -349,64 +347,6 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 4. "Popular Dishes" Section (Chicken Biryani, Paneer Butter Masala, Veg Pulav, Idli Set) */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base sm:text-xl font-black text-[#55070E] tracking-tight">
-            Popular Dishes
-          </h2>
-          <button
-            onClick={() => navigateTo('categories', 'Popular Dishes')}
-            className="text-xs font-bold text-[#7D0A14] hover:text-[#55070E] flex items-center gap-0.5 sm:gap-1 hover:underline"
-          >
-            <span>View All</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
-          {popularDishes.map((dish) => {
-            return (
-              <div
-                key={dish.id}
-                className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs hover:shadow-card hover:border-[#D5C2AC] transition-all duration-200 p-2 sm:p-2.5 flex flex-col justify-between group"
-              >
-                <div>
-                  <div
-                    onClick={() => setQuickViewProduct(dish)}
-                    className="aspect-4/3 w-full rounded-xl overflow-hidden bg-[#FAF5EC] cursor-pointer"
-                  >
-                    <img
-                      src={dish.image}
-                      alt={dish.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                  <h3
-                    onClick={() => setQuickViewProduct(dish)}
-                    className="font-bold text-xs sm:text-sm text-[#2E0B10] line-clamp-1 mt-2 cursor-pointer hover:text-[#7D0A14]"
-                    title={dish.name}
-                  >
-                    {dish.name}
-                  </h3>
-                </div>
-
-                <div className="mt-2 pt-1 flex items-center justify-between gap-1">
-                  <span className="font-black text-sm sm:text-base text-[#7D0A14]">
-                    ₹{dish.price}
-                  </span>
-                  <button
-                    onClick={() => addToCart(dish, 1)}
-                    className="px-2.5 py-1 rounded-lg bg-white border border-[#7D0A14] text-[#7D0A14] hover:bg-[#7D0A14] hover:text-white font-black text-[11px] shadow-xs active:scale-95 transition-all"
-                  >
-                    ADD +
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
       {/* 5. "Catering Packages" Section (Family Celebration, Birthday, Wedding) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">
