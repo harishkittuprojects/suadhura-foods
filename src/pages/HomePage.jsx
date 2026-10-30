@@ -31,8 +31,7 @@ import {
   Package,
   Grid3X3,
   Flame,
-  Apple,
-  Search
+  Apple
 } from 'lucide-react';
 
 export const HomePage = () => {
@@ -216,21 +215,8 @@ export const HomePage = () => {
   };
 
   return (
-    <div className="space-y-3.5 sm:space-y-6 lg:space-y-8 pb-12">
-      {/* 1. In-Page Top Search Bar (Matching Reference Screen) */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-1">
-        <div
-          onClick={() => navigateTo('categories')}
-          className="w-full pl-4 pr-4 py-2.5 sm:py-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-blue-500 transition-all flex items-center gap-2.5 cursor-pointer"
-        >
-          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
-          <span className="text-xs sm:text-sm text-slate-400 font-medium select-none truncate">
-            Search for "A2 Cow Ghee"
-          </span>
-        </div>
-      </section>
-
-      {/* 2. Top Category Pills Row: Pastel Squircles matching Reference Screen */}
+    <div className="space-y-3.5 sm:space-y-6 lg:space-y-8 pb-12 pt-2">
+      {/* 1. Top Category Pills Row: Pastel Squircles matching Reference Screen */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">
         <div className="flex items-center gap-2.5 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar">
           {categoryPills.map((pill) => {
