@@ -126,16 +126,53 @@ export const HomePage = () => {
     }
   ];
 
-  // Category Quick Pill Icons
+  // Category Quick Pill Icons with authentic real food photography
   const categoryPills = [
-    { name: 'Dairy & Milk', icon: Milk, categoryName: 'Dairy Products', bg: 'bg-blue-50 text-blue-600 border-blue-200' },
-    { name: 'Fresh Veggies', icon: Carrot, categoryName: 'Fresh Vegetables', bg: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
-    { name: 'Fresh Fruits', icon: Apple, categoryName: 'Fresh Fruits', bg: 'bg-rose-50 text-rose-600 border-rose-200' },
-    { name: 'Daily Groceries', icon: ShoppingBasket, categoryName: 'Rice, Atta and Dals', bg: 'bg-amber-50 text-amber-600 border-amber-200' },
-    { name: 'Atta & Flours', icon: Wheat, categoryName: 'Rice, Atta and Dals', bg: 'bg-orange-50 text-orange-600 border-orange-200' },
-    { name: 'Cold Pressed Oils', icon: Droplet, categoryName: 'Oils and Ghee', bg: 'bg-sky-50 text-sky-600 border-sky-200' },
-    { name: 'Spices & Masalas', icon: Flame, categoryName: 'Masalas and Dry Fruits', bg: 'bg-red-50 text-red-600 border-red-200' },
-    { name: 'Dry Fruits & Nuts', icon: Sparkles, categoryName: 'Masalas and Dry Fruits', bg: 'bg-purple-50 text-purple-600 border-purple-200' },
+    {
+      name: 'Dairy & Milk',
+      categoryName: 'Dairy Products',
+      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Fresh Veggies',
+      categoryName: 'Fresh Vegetables',
+      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Fresh Fruits',
+      categoryName: 'Fresh Fruits',
+      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Daily Groceries',
+      categoryName: 'Rice, Atta and Dals',
+      image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Atta & Flours',
+      categoryName: 'Rice, Atta and Dals',
+      image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Cold Pressed Oils',
+      categoryName: 'Oils and Ghee',
+      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Spices & Masalas',
+      categoryName: 'Masalas and Dry Fruits',
+      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Dry Fruits & Nuts',
+      categoryName: 'Masalas and Dry Fruits',
+      image: 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?auto=format&fit=crop&w=300&q=80'
+    },
+    {
+      name: 'Munchies & Snacks',
+      categoryName: 'Munchies and Snacks',
+      image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=300&q=80'
+    }
   ];
 
   // Category-specific product shelves for Home Page
@@ -205,33 +242,33 @@ export const HomePage = () => {
         </section>
       )}
 
-      {/* 1. Quick Category Pills Bar (Placed ABOVE the Hero Banner as requested) */}
+      {/* 1. Quick Category Pills Bar (Real Food Photography) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2">
         <div
-          className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar touch-pan-x"
+          className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-1.5 hide-scrollbar touch-pan-x"
           style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x', overscrollBehaviorX: 'contain' }}
         >
-          {categoryPills.map((pill, idx) => {
-            const Icon = pill.icon;
-            return (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => navigateTo('categories', pill.categoryName)}
-                className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
-                style={{ touchAction: 'pan-x' }}
-              >
-                <div
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-md ${pill.bg}`}
-                >
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-slate-700 group-hover:text-blue-600 transition-colors whitespace-nowrap">
-                  {pill.name}
-                </span>
-              </button>
-            );
-          })}
+          {categoryPills.map((pill, idx) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => navigateTo('categories', pill.categoryName)}
+              className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
+              style={{ touchAction: 'pan-x' }}
+            >
+              <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl p-1 bg-white border border-slate-200/90 shadow-2xs group-hover:border-blue-500 group-hover:shadow-md transition-all duration-200 flex items-center justify-center overflow-hidden group-hover:scale-105">
+                <img
+                  src={pill.image}
+                  alt={pill.name}
+                  loading="eager"
+                  className="w-full h-full object-cover rounded-xl transform group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <span className="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors whitespace-nowrap text-center">
+                {pill.name}
+              </span>
+            </button>
+          ))}
         </div>
       </section>
 
