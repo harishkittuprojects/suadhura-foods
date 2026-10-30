@@ -45,10 +45,10 @@ export const LocationModal = () => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
       <div
-        className="relative bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
+        className="relative bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-[#E8DDCF] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <div className="p-4 sm:p-5 border-b border-[#E8DDCF] flex items-center justify-between bg-[#FAF5EC]/80">
           <div>
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-rose-600" />

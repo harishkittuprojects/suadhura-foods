@@ -73,15 +73,15 @@ export const ServicesPage = () => {
       {/* Header Banner */}
       <div
         data-aos="fade-down"
-        className="rounded-3xl bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 text-white p-8 sm:p-12 shadow-xl relative overflow-hidden"
+        className="rounded-3xl bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] text-white p-8 sm:p-12 shadow-xl relative overflow-hidden border border-[#8B121C]"
       >
         <div className="max-w-2xl relative z-10 space-y-3">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Dedicated Customer Care</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight">Our Services</h1>
-          <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+          <p className="text-xs sm:text-sm text-amber-100/90 leading-relaxed">
             From daily farm milking to doorstep delivery in 30 minutes, discover the end-to-end services
             that make Sumadhura Foods the most reliable choice for food lovers.
           </p>
@@ -94,7 +94,7 @@ export const ServicesPage = () => {
           <span className="text-xs font-extrabold uppercase text-blue-600 tracking-wider">
             Built for Freshness & Convenience
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#3D040A] mt-1">
             Everything You Need, Handled With Care
           </h2>
         </div>
@@ -107,7 +107,7 @@ export const ServicesPage = () => {
                 key={service.id}
                 data-aos="fade-up"
                 data-aos-delay={idx * 100}
-                className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
+                className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E8DDCF] shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1"
               >
                 <div>
                   <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-200 shadow-sm">

@@ -64,25 +64,25 @@ export const AuthModal = () => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div
-        className="relative bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
+        className="relative bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-[#E8DDCF] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={() => setIsAuthModalOpen(false)}
-          className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          className="absolute top-4 right-4 z-10 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-[#FAF5EC] transition-colors"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Brand Banner */}
-        <div className="bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white text-center">
+        <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-6 text-white text-center border-b border-[#8B121C]">
           <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-3 shadow-inner">
-            <ShieldCheck className="w-6 h-6 text-white" />
+            <ShieldCheck className="w-6 h-6 text-amber-300" />
           </div>
           <h2 className="text-xl font-black">Sumadhura Foods</h2>
-          <p className="text-xs text-blue-100 mt-1">
+          <p className="text-xs text-amber-100/90 mt-1">
             Access fresh dairy, farm veggies, express delivery & exclusive discounts
           </p>
         </div>

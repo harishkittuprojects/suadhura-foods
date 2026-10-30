@@ -39,7 +39,7 @@ const MainLayout = () => {
   }, [activeTab]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-slate-900 selection:bg-blue-600 selection:text-white overflow-x-clip w-full">
+    <div className="min-h-screen flex flex-col bg-[#FAF5EC] text-slate-900 selection:bg-blue-600 selection:text-white overflow-x-clip w-full">
       {/* Top Navigation */}
       <Navbar />
 

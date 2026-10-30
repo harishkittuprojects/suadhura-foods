@@ -176,14 +176,14 @@ export const LoginPage = () => {
   // Login & Registration view
   return (
     <div className="max-w-md mx-auto px-4 py-8 space-y-6">
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+      <div className="bg-white rounded-3xl border border-[#E8DDCF] shadow-soft overflow-hidden">
         {/* Banner */}
-        <div className="bg-gradient-to-r from-blue-800 to-blue-600 p-6 text-white text-center">
+        <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-6 text-white text-center border-b border-[#8B121C]">
           <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-3">
-            <ShieldCheck className="w-6 h-6 text-white" />
+            <ShieldCheck className="w-6 h-6 text-amber-300" />
           </div>
           <h1 className="text-xl font-black">User Login</h1>
-          <p className="text-xs text-blue-100 mt-1">
+          <p className="text-xs text-amber-100/90 mt-1">
             Sign in to track orders, manage dairy subscriptions & save your favorites
           </p>
         </div>

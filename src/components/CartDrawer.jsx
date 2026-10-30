@@ -75,11 +75,11 @@ export const CartDrawer = () => {
       onClick={() => setIsCartOpen(false)}
     >
       <div
-        className="fixed inset-y-0 right-0 w-full sm:max-w-md bg-white shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-300"
+        className="fixed inset-y-0 right-0 w-full sm:max-w-md bg-[#FAF5EC] shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+          <div className="p-4 sm:p-5 border-b border-[#E8DDCF] flex items-center justify-between bg-white/70">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold">
                 <ShoppingCart className="w-4 h-4" />

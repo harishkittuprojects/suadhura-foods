@@ -150,20 +150,20 @@ export const SubscriptionModal = () => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header Banner */}
-        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 p-5 sm:p-6 text-white flex items-center justify-between">
+        <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-5 sm:p-6 text-white flex items-center justify-between border-b border-[#8B121C]">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-inner flex-shrink-0">
               <Sun className="w-6 h-6 text-amber-300" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black bg-amber-400 text-slate-900 px-2 py-0.2 rounded-full uppercase">
+                <span className="text-[10px] font-black bg-[#F5A623] text-[#3D040A] px-2 py-0.2 rounded-full uppercase">
                   Daily Morning Sourcing
                 </span>
-                <span className="text-xs text-blue-100">6:00 AM - 7:00 AM</span>
+                <span className="text-xs text-amber-100">6:00 AM - 7:00 AM</span>
               </div>
               <h3 className="text-xl font-black mt-0.5">Subscription Order</h3>
-              <p className="text-xs text-blue-100">
+              <p className="text-xs text-amber-100/90">
                 Fresh cow milk & vegetables at your doorstep daily. Pause anytime.
               </p>
             </div>

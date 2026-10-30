@@ -256,7 +256,7 @@ export const HomePage = () => {
               className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
               style={{ touchAction: 'pan-x' }}
             >
-              <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl p-1 bg-white border border-slate-200/90 shadow-2xs group-hover:border-blue-500 group-hover:shadow-md transition-all duration-200 flex items-center justify-center overflow-hidden group-hover:scale-105">
+              <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl p-1 bg-white border border-[#E8DDCF] shadow-2xs group-hover:border-blue-600 group-hover:shadow-md transition-all duration-200 flex items-center justify-center overflow-hidden group-hover:scale-105">
                 <img
                   src={pill.image}
                   alt={pill.name}
@@ -264,7 +264,7 @@ export const HomePage = () => {
                   className="w-full h-full object-cover rounded-xl transform group-hover:scale-110 transition-transform duration-300"
                 />
               </div>
-              <span className="text-[11px] sm:text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors whitespace-nowrap text-center">
+              <span className="text-[11px] sm:text-xs font-bold text-[#3D040A] group-hover:text-blue-600 transition-colors whitespace-nowrap text-center">
                 {pill.name}
               </span>
             </button>
@@ -275,7 +275,7 @@ export const HomePage = () => {
       {/* 2. Shop Daily Groceries (Arranged UP and DOWN in 2 rows, not in a straight line) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">
         <div className="flex items-center justify-between mb-2 sm:mb-3">
-          <h2 className="text-base sm:text-xl font-black text-slate-900 tracking-tight">
+          <h2 className="text-base sm:text-xl font-black text-[#3D040A] tracking-tight">
             Shop Daily Groceries
           </h2>
           <button
@@ -295,14 +295,14 @@ export const HomePage = () => {
               onClick={() => navigateTo('categories', item.name)}
               className="flex flex-col items-center cursor-pointer group text-center w-full focus:outline-none"
             >
-              <div className="w-full aspect-square rounded-2xl p-1.5 sm:p-2.5 flex items-center justify-center overflow-hidden transition-all duration-200 bg-[#f2f4f7] hover:bg-[#eaedf2] border border-slate-100 group-hover:border-blue-400 group-hover:shadow-md">
+              <div className="w-full aspect-square rounded-2xl p-1.5 sm:p-2.5 flex items-center justify-center overflow-hidden transition-all duration-200 bg-white hover:bg-[#FAF5EC] border border-[#E8DDCF] group-hover:border-blue-600 group-hover:shadow-md">
                 <img
                   src={item.image}
                   alt={item.name}
                   className="w-full h-full object-cover rounded-xl transform group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
-              <span className="text-[10px] sm:text-xs mt-1 sm:mt-1.5 block leading-tight line-clamp-2 font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+              <span className="text-[10px] sm:text-xs mt-1 sm:mt-1.5 block leading-tight line-clamp-2 font-bold text-[#3D040A] group-hover:text-blue-600 transition-colors">
                 {item.name}
               </span>
             </div>
@@ -312,7 +312,7 @@ export const HomePage = () => {
 
       {/* 3. Daily Morning Subscription Order Banner */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 text-white shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] text-white shadow-md border border-[#8B121C] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md text-amber-300 flex items-center justify-center font-black text-2xl shadow-md flex-shrink-0">
               🥛
@@ -320,11 +320,11 @@ export const HomePage = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-black text-base sm:text-lg">Daily Morning Subscription Order</h3>
-                <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full">
+                <span className="bg-[#F5A623] text-[#3D040A] text-[10px] font-black px-2 py-0.5 rounded-full">
                   6:00 AM DAILY
                 </span>
               </div>
-              <p className="text-xs font-semibold text-blue-100">
+              <p className="text-xs font-semibold text-amber-100/90">
                 Fresh pure cow milk, curd, and handpicked farm vegetables delivered before 7:00 AM every morning. Pause or modify anytime.
               </p>
             </div>
@@ -332,10 +332,10 @@ export const HomePage = () => {
 
           <button
             onClick={() => setIsSubscriptionModalOpen(true)}
-            className="px-6 py-3 rounded-2xl bg-white hover:bg-blue-50 text-blue-700 font-black text-xs shadow-md transition-all active:scale-95 flex-shrink-0 flex items-center gap-2"
+            className="px-6 py-3 rounded-2xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs shadow-md transition-all active:scale-95 flex-shrink-0 flex items-center gap-2"
           >
             <span>{activeSubscription ? 'Manage Subscription' : 'Set Up Subscription Order'}</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 text-[#3D040A]" />
           </button>
         </div>
       </section>
@@ -348,7 +348,7 @@ export const HomePage = () => {
               <Grid3X3 className="w-4 h-4 text-blue-600" />
               <span>ALL STORE AISLES • DELIVERED IN 10-15 MINS</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-[#3D040A] tracking-tight">
               Shop by Category
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
@@ -372,7 +372,7 @@ export const HomePage = () => {
               <div
                 key={cat.id}
                 onClick={() => navigateTo('categories', cat.name)}
-                className={`group relative rounded-3xl overflow-hidden bg-white border border-slate-200/90 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between ${cat.cardBorder || 'hover:border-blue-500'}`}
+                className={`group relative rounded-3xl overflow-hidden bg-white border border-[#E8DDCF] shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col justify-between ${cat.cardBorder || 'hover:border-blue-600'}`}
               >
                 {/* Image with Gradient Overlay */}
                 <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
@@ -443,7 +443,7 @@ export const HomePage = () => {
             <div className="inline-flex items-center gap-1 text-[11px] font-black text-blue-600 uppercase tracking-wider mb-0.5">
               <Zap className="w-3.5 h-3.5 text-amber-500" /> TOP BESTSELLERS
             </div>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-[#3D040A] tracking-tight">
               Popular Products Delivered in 10 Mins
             </h2>
           </div>
@@ -477,7 +477,7 @@ export const HomePage = () => {
                     ⚡ 10-12 MIN DELIVERY • 100% PURE
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                <h2 className="text-xl sm:text-2xl font-black text-[#3D040A] tracking-tight mt-0.5">
                   Farm-Fresh Dairy, Milk & Paneer
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -517,7 +517,7 @@ export const HomePage = () => {
                     ⚡ 10-15 MIN DELIVERY • DAILY HARVEST
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                <h2 className="text-xl sm:text-2xl font-black text-[#3D040A] tracking-tight mt-0.5">
                   Handpicked Farm-Fresh Vegetables
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -557,7 +557,7 @@ export const HomePage = () => {
                     ⚡ 12-15 MIN DELIVERY • AUTHENTIC TASTE
                   </span>
                 </div>
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight mt-0.5">
+                <h2 className="text-xl sm:text-2xl font-black text-[#3D040A] tracking-tight mt-0.5">
                   Daily Groceries, Atta, Grains & Oils
                 </h2>
                 <p className="text-xs text-slate-500">
@@ -590,7 +590,7 @@ export const HomePage = () => {
             <span className="text-[11px] font-bold text-emerald-600 uppercase tracking-wider block mb-0.5">
               Customer Favorites
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl font-black text-[#3D040A] tracking-tight">
               Best Selling Products
             </h2>
           </div>
@@ -622,13 +622,13 @@ export const HomePage = () => {
       {/* 8. Why Choose Sumadhura Foods */}
       <section
         data-aos="fade-up"
-        className="max-w-7xl mx-auto px-4 sm:px-6 bg-slate-50/70 rounded-3xl p-6 sm:p-10 border border-slate-100"
+        className="max-w-7xl mx-auto px-4 sm:px-6 bg-[#F5EFE3]/80 rounded-3xl p-6 sm:p-10 border border-[#E8DDCF]"
       >
         <div className="text-center max-w-2xl mx-auto mb-8">
           <span className="text-xs font-extrabold uppercase text-blue-600 tracking-wider">
             Our Quality Commitment
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#3D040A] mt-1">
             Why Choose Sumadhura Foods?
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-1.5">
@@ -685,7 +685,7 @@ export const HomePage = () => {
           <span className="text-xs font-bold uppercase text-emerald-600 tracking-wider">
             Real Customer Reviews
           </span>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-black text-[#3D040A] mt-1">
             Loved By Over 70,000+ Families
           </h2>
         </div>
@@ -727,21 +727,21 @@ export const HomePage = () => {
       <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2 pb-2">
         <div
           data-aos="fade-up"
-          className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 text-white flex items-center"
+          className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-[#3D040A] via-[#5C0810] to-[#7D0A14] text-white flex items-center border border-[#680811]"
         >
           {/* Background Decorative Rings */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-1/3 -mb-20 w-60 h-60 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 -mb-20 w-60 h-60 rounded-full bg-amber-400/10 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 p-5 sm:p-8 lg:p-10 w-full max-w-3xl space-y-3 sm:space-y-5">
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
               Fresh Food, <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-emerald-300 to-sky-300">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F8D166] via-[#F5A623] to-[#D98207]">
                 Better Living
               </span>
             </h2>
 
-            <p className="text-xs sm:text-sm lg:text-base text-slate-200 max-w-xl leading-relaxed">
+            <p className="text-xs sm:text-sm lg:text-base text-amber-100/90 max-w-xl leading-relaxed">
               Shop fresh dairy products, vegetables and essential groceries at Sumadhura Foods.
               Harvested daily and delivered to your doorstep in 10-15 minutes.
             </p>
@@ -750,10 +750,10 @@ export const HomePage = () => {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
               <button
                 onClick={() => navigateTo('categories')}
-                className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-blue-500 hover:bg-blue-600 active:scale-95 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30 transition-all"
+                className="w-full sm:w-auto px-5 sm:px-6 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl bg-[#F5A623] hover:bg-[#E09215] active:scale-95 text-[#3D040A] font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all"
               >
                 <span>Order in 10 Mins</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#3D040A]" />
               </button>
 
               <button

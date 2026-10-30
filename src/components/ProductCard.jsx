@@ -23,10 +23,10 @@ export const ProductCard = ({ product, priority = false }) => {
 
   return (
     <div
-      className="group relative bg-white rounded-2xl border border-slate-200/90 shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1"
+      className="group relative bg-white rounded-2xl border border-[#EDE1D1] shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1 hover:border-[#D5C2AC]"
     >
       {/* Product Image Box */}
-      <div className="relative aspect-square w-full bg-slate-50 overflow-hidden flex items-center justify-center p-2.5">
+      <div className="relative aspect-square w-full bg-[#FAF5EC]/60 overflow-hidden flex items-center justify-center p-2.5">
         {/* 10-Min Delivery Ribbon / Discount */}
         {discountPercent > 0 && (
           <span className="absolute top-2.5 left-2.5 z-10 bg-blue-700 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">
@@ -117,11 +117,11 @@ export const ProductCard = ({ product, priority = false }) => {
         </div>
 
         {/* Pricing and ADD Button Section */}
-        <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between gap-1.5">
+        <div className="mt-2.5 pt-2 border-t border-[#F2E8DC] flex items-center justify-between gap-1.5">
           {/* Price */}
           <div className="min-w-0">
             <div className="flex items-baseline gap-1">
-              <span className="text-sm sm:text-base font-black text-slate-900">₹{product.price}</span>
+              <span className="text-sm sm:text-base font-black text-[#52060E]">₹{product.price}</span>
               {product.originalPrice && (
                 <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
                   ₹{product.originalPrice}

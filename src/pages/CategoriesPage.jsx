@@ -236,7 +236,7 @@ export const CategoriesPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-5 space-y-3 sm:space-y-4">
       {/* 1. Header Bar: Back Button + Direct Category Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-blue-700 via-blue-800 to-slate-900 text-white p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl shadow-md">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] text-white p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl shadow-md border border-[#8B121C]">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigateTo('home')}
@@ -251,12 +251,12 @@ export const CategoriesPage = () => {
               <h1 className="text-base sm:text-xl font-black tracking-tight text-white leading-tight">
                 {currentOption.name}
               </h1>
-              <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Zap className="w-2.5 h-2.5 fill-slate-950" />
+              <span className="bg-[#F5A623] text-[#3D040A] text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Zap className="w-2.5 h-2.5 fill-[#3D040A]" />
                 10-15 MINS
               </span>
             </div>
-            <p className="text-[11px] sm:text-xs text-blue-100 mt-0.5 font-medium">
+            <p className="text-[11px] sm:text-xs text-amber-100/90 mt-0.5 font-medium">
               Showing {filtered.length} products • Farm fresh & delivered in 10-15 mins
             </p>
           </div>
@@ -266,7 +266,7 @@ export const CategoriesPage = () => {
           onClick={() => setSelectedCategoryFilter('All')}
           className={`self-start sm:self-auto px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
             activeCategory === 'All'
-              ? 'bg-white text-blue-800 shadow-sm'
+              ? 'bg-[#F5A623] text-[#3D040A] shadow-sm font-black'
               : 'bg-white/15 hover:bg-white/25 text-white'
           }`}
         >
@@ -291,7 +291,7 @@ export const CategoriesPage = () => {
               className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 flex-shrink-0 ${
                 isSelected
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]'
-                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200/80'
+                  : 'bg-white text-slate-700 hover:bg-[#FAF5EC] border border-[#E8DDCF]'
               }`}
             >
               {opt.image ? (
@@ -310,7 +310,7 @@ export const CategoriesPage = () => {
       </div>
 
       {/* 3. Fast Toolbar: Quick Search across all items, Sort, Organic Filter */}
-      <div className="bg-white p-2.5 sm:p-3.5 rounded-2xl border border-slate-200/80 shadow-2xs space-y-2.5">
+      <div className="bg-white p-2.5 sm:p-3.5 rounded-2xl border border-[#E8DDCF] shadow-2xs space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           {/* Fast Search Input */}
           <div className="relative flex-1 min-w-[200px]">
@@ -319,7 +319,7 @@ export const CategoriesPage = () => {
               placeholder={searchPlaceholders[placeholderIndex]}
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none font-medium text-slate-800 placeholder:text-slate-400 transition-all"
+              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-[#FAF5EC]/50 border border-[#E8DDCF] rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none font-medium text-slate-800 placeholder:text-slate-400 transition-all"
             />
             <Search className="w-4 h-4 text-blue-600 absolute left-3 top-1/2 -translate-y-1/2" />
             {searchFilter && (

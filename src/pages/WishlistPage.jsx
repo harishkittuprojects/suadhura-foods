@@ -30,15 +30,15 @@ export const WishlistPage = () => {
       {/* Page Header */}
       <div
         data-aos="fade-down"
-        className="rounded-3xl bg-gradient-to-r from-blue-800 via-blue-700 to-slate-900 text-white p-8 sm:p-10 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-6"
+        className="rounded-3xl bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] text-white p-8 sm:p-10 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-6 border border-[#8B121C]"
       >
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
             <Heart className="w-3.5 h-3.5 fill-rose-400 text-rose-400" />
             <span>Saved Favorites</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight">My Wishlist</h1>
-          <p className="text-xs sm:text-sm text-blue-100">
+          <p className="text-xs sm:text-sm text-amber-100/90">
             {savedProducts.length} {savedProducts.length === 1 ? 'product' : 'products'} saved to your wishlist.
           </p>
         </div>
@@ -46,7 +46,7 @@ export const WishlistPage = () => {
         {savedProducts.length > 0 && (
           <button
             onClick={handleMoveAllToCart}
-            className="px-6 py-3.5 rounded-2xl bg-white text-blue-700 hover:bg-blue-50 active:scale-95 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all flex-shrink-0"
+            className="px-6 py-3.5 rounded-2xl bg-[#F5A623] text-[#3D040A] hover:bg-[#E09215] active:scale-95 font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all flex-shrink-0"
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Add All to Cart</span>

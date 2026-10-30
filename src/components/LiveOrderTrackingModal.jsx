@@ -53,7 +53,7 @@ export const LiveOrderTrackingModal = () => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 p-5 text-white flex items-center justify-between">
+        <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-5 text-white flex items-center justify-between border-b border-[#8B121C]">
           <div>
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />

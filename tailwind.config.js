@@ -7,18 +7,65 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Royal Deep Maroon palette (matches Sumadhura Caterers brand reference)
+        blue: {
+          50: '#FDF7F2',
+          100: '#FBECE2',
+          200: '#F5D5C4',
+          300: '#EAB69C',
+          400: '#D9896A',
+          500: '#B83A2E',
+          600: '#7D0A14', // Primary Royal Maroon
+          700: '#680811', // Deep Maroon
+          800: '#52060E', // Dark Burgundy Maroon
+          900: '#3D040A', // Ultra Deep Wine Maroon
+          950: '#260206',
+        },
         brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb', // primary blue
-          700: '#1d4ed8', // dark primary blue
-          800: '#1e40af', // rich navy
-          900: '#1e3a8a',
-          950: '#0f172a',
+          50: '#FDF7F2',
+          100: '#FBECE2',
+          200: '#F5D5C4',
+          300: '#EAB69C',
+          400: '#D9896A',
+          500: '#B83A2E',
+          600: '#7D0A14',
+          700: '#680811',
+          800: '#52060E',
+          900: '#3D040A',
+          950: '#260206',
+        },
+        maroon: {
+          50: '#FDF7F2',
+          100: '#FBECE2',
+          200: '#F5D5C4',
+          300: '#EAB69C',
+          400: '#D9896A',
+          500: '#B83A2E',
+          600: '#7D0A14',
+          700: '#680811',
+          800: '#52060E',
+          900: '#3D040A',
+          950: '#260206',
+        },
+        gold: {
+          50: '#FFFDF5',
+          100: '#FEF9E7',
+          200: '#FDF0C5',
+          300: '#FCE49E',
+          400: '#F8D166',
+          500: '#F5A623', // Saffron Gold from reference
+          600: '#D98207',
+          700: '#B46205',
+          800: '#8E4809',
+          900: '#6B330B',
+        },
+        cream: {
+          50: '#FFFFFF',
+          100: '#FAF5EC', // Primary Warm Ivory App Background from reference
+          200: '#F5EFE3',
+          300: '#ECE3D3',
+          400: '#E2D5C0',
+          500: '#CFC0A8',
         },
         fresh: {
           50: '#f0fdf4',
@@ -30,9 +77,9 @@ export default {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
       },
       boxShadow: {
-        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
-        'card': '0 2px 12px rgba(15, 23, 42, 0.08)',
-        'card-hover': '0 12px 28px -4px rgba(37, 99, 235, 0.15)',
+        'soft': '0 4px 20px -2px rgba(125, 10, 20, 0.04)',
+        'card': '0 2px 12px rgba(90, 8, 16, 0.06)',
+        'card-hover': '0 12px 28px -4px rgba(125, 10, 20, 0.16)',
       }
     },
   },

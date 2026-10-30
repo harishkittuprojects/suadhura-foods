@@ -43,13 +43,13 @@ export const ProductQuickViewModal = () => {
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div
-        className="relative bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
+        className="relative bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-[#E8DDCF] animate-in fade-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={() => setQuickViewProduct(null)}
-          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/90 text-slate-500 hover:text-slate-800 hover:bg-slate-100 shadow-md transition-colors"
+          className="absolute top-4 right-4 z-20 p-2 rounded-full bg-white/90 text-slate-500 hover:text-slate-800 hover:bg-[#FAF5EC] shadow-md transition-colors"
           aria-label="Close"
         >
           <X className="w-5 h-5" />
@@ -57,7 +57,7 @@ export const ProductQuickViewModal = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2">
           {/* Image side */}
-          <div className="relative bg-slate-50 p-6 flex items-center justify-center">
+          <div className="relative bg-[#FAF5EC]/60 p-6 flex items-center justify-center">
             {discountPercent > 0 && (
               <span className="absolute top-4 left-4 z-10 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
                 {discountPercent}% OFF

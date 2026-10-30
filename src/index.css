@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply bg-white text-slate-900 font-sans;
+    @apply bg-[#FAF5EC] text-slate-900 font-sans;
     margin: 0;
     padding: 0;
     width: 100%;
@@ -17,6 +17,7 @@
   #root {
     width: 100%;
     min-height: 100vh;
+    background-color: #FAF5EC;
   }
 }
 
@@ -26,27 +27,27 @@
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #FAF5EC;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: #D9CBB7;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #BFAFA0;
 }
 
 /* Smooth badges and effects */
 .gradient-primary {
-  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%);
+  background: linear-gradient(135deg, #680811 0%, #7D0A14 50%, #9E1B26 100%);
 }
 
 .gradient-banner {
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #3D040A 0%, #680811 55%, #7D0A14 100%);
 }
 
 .glass-nav {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(250, 245, 236, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }

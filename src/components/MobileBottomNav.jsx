@@ -54,7 +54,7 @@ export const MobileBottomNav = () => {
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-2 py-1 shadow-[0_-4px_16px_rgba(0,0,0,0.06)]">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#FAF5EC]/95 backdrop-blur-md border-t border-[#E8DDCF] px-2 py-1 shadow-[0_-4px_16px_rgba(125,10,20,0.06)]">
       <div className="grid grid-cols-5 items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -64,13 +64,13 @@ export const MobileBottomNav = () => {
               key={item.id}
               onClick={item.action}
               className={`flex flex-col items-center justify-center py-1.5 px-1 relative transition-colors active:scale-95 ${
-                isActive ? 'text-blue-600 font-bold' : 'text-slate-500 hover:text-slate-800'
+                isActive ? 'text-blue-600 font-bold' : 'text-[#7A6B63] hover:text-[#52060E]'
               }`}
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 transition-transform duration-150 ${isActive ? 'scale-110 stroke-[2.2]' : ''}`} />
                 {item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-2 bg-rose-500 text-white text-[9px] font-black rounded-full min-w-4 h-4 px-1 flex items-center justify-center ring-2 ring-white">
+                  <span className="absolute -top-1.5 -right-2 bg-blue-600 text-white text-[9px] font-black rounded-full min-w-4 h-4 px-1 flex items-center justify-center ring-2 ring-[#FAF5EC]">
                     {item.badge}
                   </span>
                 )}

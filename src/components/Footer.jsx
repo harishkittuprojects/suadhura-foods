@@ -16,47 +16,47 @@ export const Footer = () => {
   const { navigateTo } = useShop();
 
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-16 pb-24 lg:pb-12 border-t border-slate-800">
+    <footer className="bg-[#260206] text-[#D8C7C0] pt-16 pb-24 lg:pb-12 border-t border-[#3D040A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Top Feature Badges Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-12 border-b border-slate-800">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-12 border-b border-[#3D040A]">
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-blue-600/20 text-blue-400 flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-[#7D0A14]/40 text-amber-300 flex items-center justify-center flex-shrink-0">
               <Truck className="w-6 h-6" />
             </div>
             <div>
               <h4 className="text-white font-bold text-sm">30-Min Fast Delivery</h4>
-              <p className="text-xs text-slate-400">Fresh at your doorstep</p>
+              <p className="text-xs text-[#A8968F]">Fresh at your doorstep</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-600/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-[#7D0A14]/40 text-amber-300 flex items-center justify-center flex-shrink-0">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
               <h4 className="text-white font-bold text-sm">100% Quality Checked</h4>
-              <p className="text-xs text-slate-400">Sourced from certified farms</p>
+              <p className="text-xs text-[#A8968F]">Sourced from certified farms</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-amber-600/20 text-amber-400 flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-[#7D0A14]/40 text-amber-300 flex items-center justify-center flex-shrink-0">
               <Phone className="w-6 h-6" />
             </div>
             <div>
               <h4 className="text-white font-bold text-sm">24/7 Customer Care</h4>
-              <p className="text-xs text-slate-400">Always here to assist you</p>
+              <p className="text-xs text-[#A8968F]">Always here to assist you</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-purple-600/20 text-purple-400 flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-[#7D0A14]/40 text-amber-300 flex items-center justify-center flex-shrink-0">
               <Heart className="w-6 h-6" />
             </div>
             <div>
               <h4 className="text-white font-bold text-sm">70,000+ Happy Families</h4>
-              <p className="text-xs text-slate-400">South India's trusted grocer</p>
+              <p className="text-xs text-[#A8968F]">South India's trusted grocer</p>
             </div>
           </div>
         </div>
@@ -70,17 +70,17 @@ export const Footer = () => {
                 <ShoppingBag className="w-5 h-5" />
               </div>
               <span className="text-2xl font-black tracking-tight text-white">
-                SUMADHURA<span className="text-blue-500 font-extrabold ml-1">FOODS</span>
+                SUMADHURA<span className="text-[#F5A623] font-extrabold ml-1">FOODS</span>
               </span>
             </div>
-            <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
+            <p className="text-xs text-[#A8968F] leading-relaxed max-w-sm">
               Sumadhura Foods is dedicated to bringing authentic, nutritious, farm-fresh dairy products,
               hand-harvested crisp vegetables, and purest grocery staples straight from trusted growers to your dinner table.
             </p>
             <div className="flex items-center gap-3 pt-2">
               <a
                 href="#facebook"
-                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-blue-600 hover:text-white flex items-center justify-center text-slate-400 transition-colors"
+                className="w-9 h-9 rounded-full bg-[#3D040A] hover:bg-blue-600 hover:text-white flex items-center justify-center text-[#D8C7C0] transition-colors"
                 aria-label="Facebook"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ export const Footer = () => {
               </a>
               <a
                 href="#instagram"
-                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-rose-600 hover:text-white flex items-center justify-center text-slate-400 transition-colors"
+                className="w-9 h-9 rounded-full bg-[#3D040A] hover:bg-rose-600 hover:text-white flex items-center justify-center text-[#D8C7C0] transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -98,7 +98,7 @@ export const Footer = () => {
               </a>
               <a
                 href="#twitter"
-                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-sky-500 hover:text-white flex items-center justify-center text-slate-400 transition-colors"
+                className="w-9 h-9 rounded-full bg-[#3D040A] hover:bg-sky-500 hover:text-white flex items-center justify-center text-[#D8C7C0] transition-colors"
                 aria-label="Twitter / X"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@ export const Footer = () => {
               </a>
               <a
                 href="#linkedin"
-                className="w-9 h-9 rounded-full bg-slate-800 hover:bg-blue-700 hover:text-white flex items-center justify-center text-slate-400 transition-colors"
+                className="w-9 h-9 rounded-full bg-[#3D040A] hover:bg-blue-700 hover:text-white flex items-center justify-center text-[#D8C7C0] transition-colors"
                 aria-label="LinkedIn"
               >
                 <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
@@ -124,7 +124,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('home')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   Home
                 </button>
@@ -132,7 +132,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('categories')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   All Categories
                 </button>
@@ -140,7 +140,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('services')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   Our Services
                 </button>
@@ -148,7 +148,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('wishlist')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   My Wishlist
                 </button>
@@ -156,7 +156,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('cart')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   Shopping Cart
                 </button>
@@ -171,7 +171,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('categories', 'Dairy Products')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   Dairy Products (Milk, Paneer, Ghee)
                 </button>
@@ -179,7 +179,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('categories', 'Fresh Vegetables')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   Farm Fresh Vegetables
                 </button>
@@ -187,7 +187,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('categories', 'Rice, Atta and Dals')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   Kitchen Groceries & Staples
                 </button>
@@ -195,7 +195,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('categories', 'Oils and Ghee')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   A2 Desi Cow Ghee
                 </button>
@@ -203,7 +203,7 @@ export const Footer = () => {
               <li>
                 <button
                   onClick={() => navigateTo('categories', 'Oils and Ghee')}
-                  className="hover:text-blue-400 transition-colors"
+                  className="hover:text-amber-300 transition-colors"
                 >
                   Cold Pressed Cooking Oils
                 </button>
@@ -214,21 +214,21 @@ export const Footer = () => {
           {/* Contact Details */}
           <div>
             <h5 className="text-white font-bold text-sm tracking-wide mb-4">Contact Information</h5>
-            <ul className="space-y-3 text-xs text-slate-400">
+            <ul className="space-y-3 text-xs text-[#D8C7C0]">
               <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-[#F5A623] flex-shrink-0 mt-0.5" />
                 <span>Sumadhura Tower, #42 100ft Road, Indiranagar, Bengaluru, KA 560038</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <Phone className="w-4 h-4 text-[#F5A623] flex-shrink-0" />
                 <span>+91 800-FOOD-SUM (+91 800-3663-786)</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <Mail className="w-4 h-4 text-[#F5A623] flex-shrink-0" />
                 <span>orders@sumadhurafoods.com</span>
               </li>
               <li className="flex items-center gap-2.5">
-                <Clock className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                <Clock className="w-4 h-4 text-[#F5A623] flex-shrink-0" />
                 <span>Daily Delivery: 6:00 AM – 10:30 PM</span>
               </li>
             </ul>
@@ -236,12 +236,12 @@ export const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 mt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+        <div className="pt-8 mt-8 border-t border-[#3D040A] flex flex-col sm:flex-row items-center justify-between text-xs text-[#9E8B85] gap-4">
           <p>© {new Date().getFullYear()} Sumadhura Foods Private Limited. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
-            <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
-            <span className="hover:text-slate-400 cursor-pointer">Shipping & Refund Policy</span>
+            <span className="hover:text-[#D8C7C0] cursor-pointer">Privacy Policy</span>
+            <span className="hover:text-[#D8C7C0] cursor-pointer">Terms of Service</span>
+            <span className="hover:text-[#D8C7C0] cursor-pointer">Shipping & Refund Policy</span>
           </div>
         </div>
       </div>

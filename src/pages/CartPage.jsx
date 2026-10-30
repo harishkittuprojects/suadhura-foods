@@ -69,15 +69,15 @@ export const CartPage = () => {
       {/* Page Header */}
       <div
         data-aos="fade-down"
-        className="rounded-3xl bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 text-white p-8 sm:p-10 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        className="rounded-3xl bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] text-white p-8 sm:p-10 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-[#8B121C]"
       >
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm mb-2">
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-200 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm mb-2">
             <Zap className="w-3.5 h-3.5 text-amber-300" />
             <span>Sumadhura Express • 10-15 Min Delivery</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight">Shopping Cart</h1>
-          <p className="text-xs sm:text-sm text-blue-100">
+          <p className="text-xs sm:text-sm text-amber-100/90">
             {cart.length} items • Delivering to <strong>{selectedAddress.tag}</strong> ({selectedAddress.area})
           </p>
         </div>
