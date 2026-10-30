@@ -281,7 +281,7 @@ export const HomePage = () => {
         >
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <span className="text-xs sm:text-sm text-slate-400 font-medium select-none truncate">
-            Search dishes, menus and packages
+            Search groceries, dairy and daily staples
           </span>
         </div>
       </section>
