@@ -1,6 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { Calendar, ShoppingCart, User } from 'lucide-react';
+import { Heart, ShoppingCart, User } from 'lucide-react';
 
 const HomeHutIcon = ({ className }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -22,9 +22,9 @@ export const MobileBottomNav = () => {
     activeTab,
     navigateTo,
     totalCartCount,
+    wishlist,
     user,
     setIsAuthModalOpen,
-    setIsCateringModalOpen,
   } = useShop();
 
   const navItems = [
@@ -41,16 +41,17 @@ export const MobileBottomNav = () => {
       action: () => navigateTo('categories')
     },
     {
-      id: 'bookings',
-      label: 'Bookings',
-      icon: Calendar,
-      action: () => setIsCateringModalOpen(true)
+      id: 'wishlist',
+      label: 'Wishlist',
+      icon: Heart,
+      badge: wishlist?.length || 0,
+      action: () => navigateTo('wishlist')
     },
     {
       id: 'cart',
       label: 'Cart',
       icon: ShoppingCart,
-      badge: totalCartCount > 0 ? totalCartCount : 1,
+      badge: totalCartCount > 0 ? totalCartCount : 0,
       action: () => navigateTo('cart')
     },
     {

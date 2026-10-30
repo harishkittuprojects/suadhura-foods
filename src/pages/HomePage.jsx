@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
-import { cateringPackages, categories, products, servicesList, customerTestimonials } from '../data/products';
+import { categories, products, servicesList, customerTestimonials } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import {
   ArrowRight,
@@ -34,7 +34,6 @@ import {
   Flame,
   Apple,
   Search,
-  Calendar,
   Leaf,
   Drumstick,
   ConciergeBell
@@ -64,7 +63,6 @@ export const HomePage = () => {
     isSubscriptionModalOpen,
     setIsSubscriptionModalOpen,
     activeSubscription,
-    setIsCateringModalOpen,
     addToCart,
     setQuickViewProduct
   } = useShop();
@@ -73,11 +71,11 @@ export const HomePage = () => {
   const [heroSlide, setHeroSlide] = useState(0);
 
   // 6 Reference Categories (Veg, Non-Veg, Breakfast, Lunch, Snacks, Sweets)
-  const cateringCategories = [
-    { id: 'veg', label: 'Veg', icon: Leaf, categoryFilter: 'Popular Dishes' },
-    { id: 'non-veg', label: 'Non-Veg', icon: Drumstick, categoryFilter: 'Popular Dishes' },
-    { id: 'breakfast', label: 'Breakfast', icon: Coffee, categoryFilter: 'Popular Dishes' },
-    { id: 'lunch', label: 'Lunch', icon: ConciergeBell, categoryFilter: 'Popular Dishes' },
+  const foodCategories = [
+    { id: 'veg', label: 'Veg', icon: Leaf, categoryFilter: 'Vegetables' },
+    { id: 'non-veg', label: 'Non-Veg', icon: Drumstick, categoryFilter: 'Groceries' },
+    { id: 'breakfast', label: 'Breakfast', icon: Coffee, categoryFilter: 'Dairy Products' },
+    { id: 'lunch', label: 'Lunch', icon: ConciergeBell, categoryFilter: 'Groceries' },
     { id: 'snacks', label: 'Snacks', icon: SamosaIcon, categoryFilter: 'Munchies and Snacks' },
     { id: 'sweets', label: 'Sweets', icon: SweetsIcon, categoryFilter: 'Dairy Products' }
   ];
@@ -291,7 +289,7 @@ export const HomePage = () => {
       {/* 2. Top Category Icons Row: 6 Golden Cream Badges (Veg, Non-Veg, Breakfast, Lunch, Snacks, Sweets) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">
         <div className="flex items-center justify-between gap-2.5 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar">
-          {cateringCategories.map((cat) => {
+          {foodCategories.map((cat) => {
             const Icon = cat.icon;
             return (
               <button
@@ -348,66 +346,7 @@ export const HomePage = () => {
       </section>
 
 
-      {/* 5. "Catering Packages" Section (Family Celebration, Birthday, Wedding) */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base sm:text-xl font-black text-[#55070E] tracking-tight">
-            Catering Packages
-          </h2>
-          <button
-            onClick={() => setIsCateringModalOpen(true)}
-            className="text-xs font-bold text-[#7D0A14] hover:text-[#55070E] flex items-center gap-0.5 sm:gap-1 hover:underline"
-          >
-            <span>View All</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          {cateringPackages.map((pkg) => (
-            <div
-              key={pkg.id}
-              onClick={() => setIsCateringModalOpen(true)}
-              className="group relative rounded-2xl overflow-hidden bg-white border border-[#EDE1D1] shadow-2xs hover:shadow-card cursor-pointer flex flex-col justify-between transition-all duration-200"
-            >
-              <div className="relative h-36 sm:h-44 overflow-hidden">
-                <img
-                  src={pkg.image}
-                  alt={pkg.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#60060E] via-[#60060E]/50 to-transparent" />
-                <div className="absolute bottom-2.5 left-3 right-3 text-white">
-                  <span className="text-[10px] uppercase font-bold text-amber-300 block">
-                    {pkg.badge}
-                  </span>
-                  <h3 className="text-sm sm:text-base font-black text-white leading-tight">
-                    {pkg.name}
-                  </h3>
-                  <span className="text-xs font-bold text-[#F5A623] mt-0.5 block">
-                    {pkg.priceText}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 6. Centered "Book Catering" CTA Button with Decorative Gold Lines */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-1 pb-1">
-        <div className="flex items-center justify-center gap-3 max-w-lg mx-auto">
-          <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent to-[#D4A562]" />
-          <button
-            onClick={() => setIsCateringModalOpen(true)}
-            className="px-8 py-3 bg-[#7D0A14] hover:bg-[#680811] active:scale-95 text-white font-extrabold text-xs sm:text-sm rounded-full shadow-lg shadow-[#7D0A14]/30 flex items-center gap-2 border border-[#9E1B26] transition-all"
-          >
-            <Calendar className="w-4 h-4 text-[#F5A623]" />
-            <span>Book Catering</span>
-          </button>
-          <div className="flex-1 h-0.5 bg-gradient-to-l from-transparent to-[#D4A562]" />
-        </div>
-      </section>
 
       {/* 2. Shop Daily Groceries (Arranged UP and DOWN in 2 rows, not in a straight line) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">

@@ -246,7 +246,7 @@ export const ServicesPage = () => {
             </span>
             <h3 className="text-xl font-black text-slate-900 mt-0.5">Need a Special Bulk Order?</h3>
             <p className="text-xs text-slate-500 mt-1">
-              Contact our service manager for custom recurring daily orders or event catering.
+              Contact our service manager for custom recurring daily orders or bulk family orders.
             </p>
           </div>
 

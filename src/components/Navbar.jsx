@@ -82,12 +82,12 @@ export const Navbar = () => {
 
   // Animated search query placeholders
   const searchPlaceholders = [
-    'Search dishes, menus and packages',
-    'Search for "Chicken Biryani"',
-    'Search for "Paneer Butter Masala"',
-    'Search for "Veg Pulav"',
-    'Search for "Wedding Catering"',
-    'Search for "Family Celebration"'
+    'Search groceries, dairy & staples',
+    'Search for "A2 Cow Ghee"',
+    'Search for "Farm Fresh Milk"',
+    'Search for "Organic Pulses"',
+    'Search for "Cold Pressed Oils"',
+    'Search for "Fresh Vegetables"'
   ];
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
@@ -359,10 +359,10 @@ export const Navbar = () => {
                   </div>
                   <div className="space-y-2.5">
                     <div className="p-2 bg-[#FAF5EC] rounded-xl text-[#3D040A]">
-                      <strong>🎉 Special Catering Offer:</strong> 15% off on Wedding & Birthday menus!
+                      <strong>🎉 Welcome Offer:</strong> Flat 20% off on your first grocery & daily essentials order!
                     </div>
                     <div className="p-2 bg-[#FAF5EC] rounded-xl text-[#3D040A]">
-                      <strong>⚡ Express Delivery:</strong> Hyderabadi Dum Biryani & meals available hot!
+                      <strong>⚡ Express Delivery:</strong> Farm fresh milk & veggies delivered before 7:00 AM!
                     </div>
                   </div>
                 </div>

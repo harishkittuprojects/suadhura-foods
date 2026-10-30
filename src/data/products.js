@@ -57,36 +57,6 @@ export const categories = [
   }
 ];
 
-export const cateringPackages = [
-  {
-    id: 'cat-pkg-1',
-    name: 'Family Celebration',
-    priceText: 'from ₹7,999',
-    guestCount: '25 - 50 Guests',
-    badge: 'Most Popular',
-    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=600&q=80',
-    description: 'Complete banquet buffet setup with welcome drinks, 2 starters, 3 curries, biryani, live rotis & South Indian traditional sweets.'
-  },
-  {
-    id: 'cat-pkg-2',
-    name: 'Birthday Catering',
-    priceText: 'from ₹4,999',
-    guestCount: '20 - 40 Guests',
-    badge: 'Kids & Family',
-    image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80',
-    description: 'Festive birthday party spread featuring live snack stations, chaats, paneer starters, mini dosas, celebratory desserts & drinks.'
-  },
-  {
-    id: 'cat-pkg-3',
-    name: 'Wedding Catering',
-    priceText: 'from ₹12,999',
-    guestCount: '100 - 500+ Guests',
-    badge: 'Grand Royal Feast',
-    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=80',
-    description: 'Grand royal wedding feast with traditional banana leaf or silver chafing setups, 18+ signature dishes, live halwa & jalebi counters.'
-  }
-];
-
 export const products = [
   // --- POPULAR DISHES (SUMADHURA CATERERS SPECIALS) ---
   {
@@ -106,7 +76,7 @@ export const products = [
     description: 'Authentic Hyderabadi dum chicken biryani cooked with aged basmati rice, aromatic spices, and succulent tender chicken. Served with mirchi ka salan and raita.',
     organic: true,
     inStock: true,
-    tags: ['popular', 'bestseller', 'catering', 'featured'],
+    tags: ['popular', 'bestseller', 'featured'],
     aisles: ['dishes', 'non-veg', 'lunch']
   },
   {
@@ -126,7 +96,7 @@ export const products = [
     description: 'Fresh artisanal malai paneer cubes simmered in a silky, rich makhani gravy enriched with pure cow butter, cashews, and aromatic spices.',
     organic: true,
     inStock: true,
-    tags: ['popular', 'bestseller', 'catering', 'featured'],
+    tags: ['popular', 'bestseller', 'featured'],
     aisles: ['dishes', 'veg', 'lunch']
   },
   {
@@ -146,7 +116,7 @@ export const products = [
     description: 'Fragrant aged basmati rice gently cooked with fresh green peas, carrots, french beans, whole spices, and pure desi cow ghee.',
     organic: true,
     inStock: true,
-    tags: ['popular', 'bestseller', 'catering', 'featured'],
+    tags: ['popular', 'bestseller', 'featured'],
     aisles: ['dishes', 'veg', 'lunch']
   },
   {

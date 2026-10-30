@@ -13,7 +13,6 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { LocationModal } from './components/LocationModal';
 import { AuthModal } from './components/AuthModal';
 import { SubscriptionModal } from './components/SubscriptionModal';
-import { CateringBookingModal } from './components/CateringBookingModal';
 
 import { HomePage } from './pages/HomePage';
 import { CategoriesPage } from './pages/CategoriesPage';
@@ -71,7 +70,6 @@ const MainLayout = () => {
       <LocationModal />
       <AuthModal />
       <SubscriptionModal />
-      <CateringBookingModal />
       <Toast />
     </div>
   );

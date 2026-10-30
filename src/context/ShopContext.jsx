@@ -78,7 +78,6 @@ export const ShopProvider = ({ children }) => {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
-  const [isCateringModalOpen, setIsCateringModalOpen] = useState(false);
   const [activeSubscription, setActiveSubscription] = useState(() => {
     try {
       const saved = localStorage.getItem('sumadhura_subscription');
@@ -379,8 +378,6 @@ export const ShopProvider = ({ children }) => {
         setIsCheckoutModalOpen,
         isSubscriptionModalOpen,
         setIsSubscriptionModalOpen,
-        isCateringModalOpen,
-        setIsCateringModalOpen,
         activeSubscription,
         setActiveSubscription,
         setSelectedAddress,
