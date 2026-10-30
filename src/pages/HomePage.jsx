@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
-import { categories, products, servicesList, customerTestimonials } from '../data/products';
+import { cateringPackages, categories, products, servicesList, customerTestimonials } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import {
   ArrowRight,
@@ -32,8 +32,27 @@ import {
   Package,
   Grid3X3,
   Flame,
-  Apple
+  Apple,
+  Search,
+  Calendar,
+  Leaf,
+  Drumstick,
+  ConciergeBell
 } from 'lucide-react';
+
+// Samosa Icon SVG for Snacks
+const SamosaIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2.5L2.5 19.5C2.5 20.3 3.2 21 4 21H20C20.8 21 21.5 20.3 21.5 19.5L12 2.5ZM12 6.8L18.2 18.2H5.8L12 6.8Z" />
+  </svg>
+);
+
+// Sweets Laddu / Dessert Bowl Icon SVG
+const SweetsIcon = ({ className = 'w-5 h-5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 2C9.5 2 7.5 3.5 7.5 5.5C7.5 6.2 7.8 6.9 8.3 7.5C6.4 8.2 5 10 5 12.2C5 14.8 7 17 9.5 17.4V19H7V21H17V19H14.5V17.4C17 17 19 14.8 19 12.2C19 10 17.6 8.2 15.7 7.5C16.2 6.9 16.5 6.2 16.5 5.5C16.5 3.5 14.5 2 12 2ZM12 4C13.1 4 14.5 4.7 14.5 5.5C14.5 6.3 13.1 7 12 7C10.9 7 9.5 6.3 9.5 5.5C9.5 4.7 10.9 4 12 4Z" />
+  </svg>
+);
 
 export const HomePage = () => {
   const {
@@ -44,11 +63,27 @@ export const HomePage = () => {
     toggleOneMember,
     isSubscriptionModalOpen,
     setIsSubscriptionModalOpen,
-    activeSubscription
+    activeSubscription,
+    setIsCateringModalOpen,
+    addToCart,
+    setQuickViewProduct
   } = useShop();
 
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
   const [heroSlide, setHeroSlide] = useState(0);
+
+  // 6 Reference Categories (Veg, Non-Veg, Breakfast, Lunch, Snacks, Sweets)
+  const cateringCategories = [
+    { id: 'veg', label: 'Veg', icon: Leaf, categoryFilter: 'Popular Dishes' },
+    { id: 'non-veg', label: 'Non-Veg', icon: Drumstick, categoryFilter: 'Popular Dishes' },
+    { id: 'breakfast', label: 'Breakfast', icon: Coffee, categoryFilter: 'Popular Dishes' },
+    { id: 'lunch', label: 'Lunch', icon: ConciergeBell, categoryFilter: 'Popular Dishes' },
+    { id: 'snacks', label: 'Snacks', icon: SamosaIcon, categoryFilter: 'Munchies and Snacks' },
+    { id: 'sweets', label: 'Sweets', icon: SweetsIcon, categoryFilter: 'Dairy Products' }
+  ];
+
+  // 4 Popular Dishes from Reference Image (Chicken Biryani, Paneer Butter Masala, Veg Pulav, Idli Set)
+  const popularDishes = products.filter((p) => p.category === 'Popular Dishes').slice(0, 4);
 
   // Grocery Aisles (2-Row Grid)
   const groceryAisles = [
@@ -242,33 +277,195 @@ export const HomePage = () => {
         </section>
       )}
 
-      {/* 1. Quick Category Pills Bar (Real Food Photography) */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2">
+      {/* 1. In-Page Top Search Bar (Matching Reference Screen) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-1">
         <div
-          className="flex items-center gap-3 sm:gap-4 overflow-x-auto pb-1.5 hide-scrollbar touch-pan-x"
-          style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x', overscrollBehaviorX: 'contain' }}
+          onClick={() => navigateTo('categories')}
+          className="w-full pl-4 pr-4 py-2.5 sm:py-3 rounded-full bg-white border border-[#EDE1D1] shadow-2xs hover:border-[#7D0A14] transition-all flex items-center gap-2.5 cursor-pointer"
         >
-          {categoryPills.map((pill, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => navigateTo('categories', pill.categoryName)}
-              className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
-              style={{ touchAction: 'pan-x' }}
-            >
-              <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl p-1 bg-white border border-[#E8DDCF] shadow-2xs group-hover:border-blue-600 group-hover:shadow-md transition-all duration-200 flex items-center justify-center overflow-hidden group-hover:scale-105">
-                <img
-                  src={pill.image}
-                  alt={pill.name}
-                  loading="eager"
-                  className="w-full h-full object-cover rounded-xl transform group-hover:scale-110 transition-transform duration-300"
-                />
-              </div>
-              <span className="text-[11px] sm:text-xs font-bold text-[#3D040A] group-hover:text-blue-600 transition-colors whitespace-nowrap text-center">
-                {pill.name}
+          <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
+          <span className="text-xs sm:text-sm text-slate-400 font-medium select-none truncate">
+            Search dishes, menus and packages
+          </span>
+        </div>
+      </section>
+
+      {/* 2. Top Category Icons Row: 6 Golden Cream Badges (Veg, Non-Veg, Breakfast, Lunch, Snacks, Sweets) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="flex items-center justify-between gap-2.5 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar">
+          {cateringCategories.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => navigateTo('categories', cat.categoryFilter)}
+                className="flex flex-col items-center gap-1.5 group flex-1 min-w-[56px] sm:min-w-[72px] cursor-pointer"
+              >
+                <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-full bg-[#FCE8D0] border border-[#F5D8B6] flex items-center justify-center text-[#7D0A14] shadow-xs group-hover:scale-110 group-hover:bg-[#FADBB9] group-hover:border-[#7D0A14] transition-all duration-200">
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#7D0A14]" />
+                </div>
+                <span className="text-[11px] sm:text-xs font-black text-[#680811] group-hover:text-[#7D0A14] tracking-tight">
+                  {cat.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 3. Hero Curved Banner ("Food Crafted with Love") */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-[#60060E] via-[#7D0A14] to-[#91131E] text-white p-5 sm:p-8 flex items-center justify-between border border-[#8B121C]">
+          {/* Left Text & CTA */}
+          <div className="relative z-10 max-w-[58%] sm:max-w-md space-y-2.5 sm:space-y-4">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight">
+              Food <br />
+              Crafted with{' '}
+              <span className="font-serif italic text-[#F8B62A] tracking-normal inline-flex items-center gap-1 font-bold">
+                Love <Heart className="w-4 h-4 sm:w-6 sm:h-6 fill-[#F8B62A] text-[#F8B62A] inline" />
               </span>
+            </h1>
+
+            <button
+              onClick={() => navigateTo('categories')}
+              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#F5A623] hover:bg-[#E09215] active:scale-95 text-[#55070E] font-black text-xs sm:text-sm shadow-md transition-all inline-flex items-center gap-1.5"
+            >
+              <span>Explore Menu</span>
+              <ArrowRight className="w-4 h-4 text-[#55070E]" />
             </button>
+          </div>
+
+          {/* Right Image: South Indian Feast Thali Platter framed by Golden Arc */}
+          <div className="relative flex-shrink-0 -mr-2 sm:mr-0">
+            <div className="w-36 h-36 sm:w-56 sm:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-[#F5A623]/80 shadow-2xl relative">
+              <img
+                src="https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80"
+                alt="Sumadhura Caterers Traditional Feast"
+                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. "Popular Dishes" Section (Chicken Biryani, Paneer Butter Masala, Veg Pulav, Idli Set) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base sm:text-xl font-black text-[#55070E] tracking-tight">
+            Popular Dishes
+          </h2>
+          <button
+            onClick={() => navigateTo('categories', 'Popular Dishes')}
+            className="text-xs font-bold text-[#7D0A14] hover:text-[#55070E] flex items-center gap-0.5 sm:gap-1 hover:underline"
+          >
+            <span>View All</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+          {popularDishes.map((dish) => {
+            return (
+              <div
+                key={dish.id}
+                className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs hover:shadow-card hover:border-[#D5C2AC] transition-all duration-200 p-2 sm:p-2.5 flex flex-col justify-between group"
+              >
+                <div>
+                  <div
+                    onClick={() => setQuickViewProduct(dish)}
+                    className="aspect-4/3 w-full rounded-xl overflow-hidden bg-[#FAF5EC] cursor-pointer"
+                  >
+                    <img
+                      src={dish.image}
+                      alt={dish.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <h3
+                    onClick={() => setQuickViewProduct(dish)}
+                    className="font-bold text-xs sm:text-sm text-[#2E0B10] line-clamp-1 mt-2 cursor-pointer hover:text-[#7D0A14]"
+                    title={dish.name}
+                  >
+                    {dish.name}
+                  </h3>
+                </div>
+
+                <div className="mt-2 pt-1 flex items-center justify-between gap-1">
+                  <span className="font-black text-sm sm:text-base text-[#7D0A14]">
+                    ₹{dish.price}
+                  </span>
+                  <button
+                    onClick={() => addToCart(dish, 1)}
+                    className="px-2.5 py-1 rounded-lg bg-white border border-[#7D0A14] text-[#7D0A14] hover:bg-[#7D0A14] hover:text-white font-black text-[11px] shadow-xs active:scale-95 transition-all"
+                  >
+                    ADD +
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* 5. "Catering Packages" Section (Family Celebration, Birthday, Wedding) */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base sm:text-xl font-black text-[#55070E] tracking-tight">
+            Catering Packages
+          </h2>
+          <button
+            onClick={() => setIsCateringModalOpen(true)}
+            className="text-xs font-bold text-[#7D0A14] hover:text-[#55070E] flex items-center gap-0.5 sm:gap-1 hover:underline"
+          >
+            <span>View All</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {cateringPackages.map((pkg) => (
+            <div
+              key={pkg.id}
+              onClick={() => setIsCateringModalOpen(true)}
+              className="group relative rounded-2xl overflow-hidden bg-white border border-[#EDE1D1] shadow-2xs hover:shadow-card cursor-pointer flex flex-col justify-between transition-all duration-200"
+            >
+              <div className="relative h-36 sm:h-44 overflow-hidden">
+                <img
+                  src={pkg.image}
+                  alt={pkg.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#60060E] via-[#60060E]/50 to-transparent" />
+                <div className="absolute bottom-2.5 left-3 right-3 text-white">
+                  <span className="text-[10px] uppercase font-bold text-amber-300 block">
+                    {pkg.badge}
+                  </span>
+                  <h3 className="text-sm sm:text-base font-black text-white leading-tight">
+                    {pkg.name}
+                  </h3>
+                  <span className="text-xs font-bold text-[#F5A623] mt-0.5 block">
+                    {pkg.priceText}
+                  </span>
+                </div>
+              </div>
+            </div>
           ))}
+        </div>
+      </section>
+
+      {/* 6. Centered "Book Catering" CTA Button with Decorative Gold Lines */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-1 pb-1">
+        <div className="flex items-center justify-center gap-3 max-w-lg mx-auto">
+          <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent to-[#D4A562]" />
+          <button
+            onClick={() => setIsCateringModalOpen(true)}
+            className="px-8 py-3 bg-[#7D0A14] hover:bg-[#680811] active:scale-95 text-white font-extrabold text-xs sm:text-sm rounded-full shadow-lg shadow-[#7D0A14]/30 flex items-center gap-2 border border-[#9E1B26] transition-all"
+          >
+            <Calendar className="w-4 h-4 text-[#F5A623]" />
+            <span>Book Catering</span>
+          </button>
+          <div className="flex-1 h-0.5 bg-gradient-to-l from-transparent to-[#D4A562]" />
         </div>
       </section>
 

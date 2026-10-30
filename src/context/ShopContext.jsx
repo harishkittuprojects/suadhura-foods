@@ -78,6 +78,7 @@ export const ShopProvider = ({ children }) => {
   const [quickViewProduct, setQuickViewProduct] = useState(null);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [isSubscriptionModalOpen, setIsSubscriptionModalOpen] = useState(false);
+  const [isCateringModalOpen, setIsCateringModalOpen] = useState(false);
   const [activeSubscription, setActiveSubscription] = useState(() => {
     try {
       const saved = localStorage.getItem('sumadhura_subscription');
@@ -87,15 +88,23 @@ export const ShopProvider = ({ children }) => {
     }
   });
 
-  // Saved Addresses (Home, Work, Other)
+  // Saved Addresses (Hyderabad default matching Sumadhura Caterers reference)
   const [savedAddresses, setSavedAddresses] = useState([
+    {
+      id: 'addr-hyd',
+      tag: 'Hyderabad',
+      title: 'Madhapur / Hitec City',
+      area: 'Hyderabad, Telangana',
+      pincode: '500081',
+      isDefault: true
+    },
     {
       id: 'addr-1',
       tag: 'Home',
       title: 'Flat 402, Green Meadows',
       area: '5th Block, Koramangala, Bengaluru',
       pincode: '560034',
-      isDefault: true
+      isDefault: false
     },
     {
       id: 'addr-2',
@@ -103,14 +112,6 @@ export const ShopProvider = ({ children }) => {
       title: 'Tower B, RMZ Ecoworld',
       area: 'Outer Ring Road, Bellandur, Bengaluru',
       pincode: '560103',
-      isDefault: false
-    },
-    {
-      id: 'addr-3',
-      tag: 'Other',
-      title: 'Plot 18, 12th Main',
-      area: 'HAL 2nd Stage, Indiranagar, Bengaluru',
-      pincode: '560038',
       isDefault: false
     }
   ]);
@@ -378,6 +379,8 @@ export const ShopProvider = ({ children }) => {
         setIsCheckoutModalOpen,
         isSubscriptionModalOpen,
         setIsSubscriptionModalOpen,
+        isCateringModalOpen,
+        setIsCateringModalOpen,
         activeSubscription,
         setActiveSubscription,
         setSelectedAddress,

@@ -71,6 +71,13 @@ export const CategoriesPage = () => {
   const aisleOptions = [
     { name: 'All', emoji: '🛒', shortName: 'All', aliases: ['All', 'all'] },
     {
+      name: 'Popular Dishes',
+      emoji: '🍛',
+      shortName: 'Popular Dishes',
+      image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=120&q=80',
+      aliases: ['Popular Dishes', 'Dishes', 'Biryani', 'Meals', 'dishes', 'hot-meals']
+    },
+    {
       name: 'Fresh Vegetables',
       emoji: '🥬',
       shortName: 'Vegetables',
@@ -134,6 +141,11 @@ export const CategoriesPage = () => {
     const target = canonical ? canonical.name : activeCategory;
 
     if (target === 'All') return true;
+
+    // Strict Popular Dishes (Biryani, Paneer, Pulav, Idli)
+    if (target === 'Popular Dishes' || activeCategory === 'Popular Dishes') {
+      return prod.category === 'Popular Dishes' || prod.aisles?.includes('dishes');
+    }
 
     // Strict Fresh Vegetables: only actual vegetables (fresh-veg aisle), never fruits
     if (target === 'Fresh Vegetables') {

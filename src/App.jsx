@@ -13,6 +13,7 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { LocationModal } from './components/LocationModal';
 import { AuthModal } from './components/AuthModal';
 import { SubscriptionModal } from './components/SubscriptionModal';
+import { CateringBookingModal } from './components/CateringBookingModal';
 
 import { HomePage } from './pages/HomePage';
 import { CategoriesPage } from './pages/CategoriesPage';
@@ -46,8 +47,8 @@ const MainLayout = () => {
       {/* Main Page Content */}
       <main className="flex-1 pb-24 sm:pb-28 lg:pb-8">
         {activeTab === 'home' && <HomePage />}
-        {activeTab === 'categories' && <CategoriesPage />}
-        {activeTab === 'services' && <ServicesPage />}
+        {(activeTab === 'categories' || activeTab === 'menu') && <CategoriesPage />}
+        {(activeTab === 'services' || activeTab === 'bookings') && <ServicesPage />}
         {activeTab === 'wishlist' && <WishlistPage />}
         {activeTab === 'cart' && <CartPage />}
         {activeTab === 'login' && <LoginPage />}
@@ -70,6 +71,7 @@ const MainLayout = () => {
       <LocationModal />
       <AuthModal />
       <SubscriptionModal />
+      <CateringBookingModal />
       <Toast />
     </div>
   );

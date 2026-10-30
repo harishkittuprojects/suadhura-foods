@@ -57,7 +57,118 @@ export const categories = [
   }
 ];
 
+export const cateringPackages = [
+  {
+    id: 'cat-pkg-1',
+    name: 'Family Celebration',
+    priceText: 'from ₹7,999',
+    guestCount: '25 - 50 Guests',
+    badge: 'Most Popular',
+    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=600&q=80',
+    description: 'Complete banquet buffet setup with welcome drinks, 2 starters, 3 curries, biryani, live rotis & South Indian traditional sweets.'
+  },
+  {
+    id: 'cat-pkg-2',
+    name: 'Birthday Catering',
+    priceText: 'from ₹4,999',
+    guestCount: '20 - 40 Guests',
+    badge: 'Kids & Family',
+    image: 'https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=600&q=80',
+    description: 'Festive birthday party spread featuring live snack stations, chaats, paneer starters, mini dosas, celebratory desserts & drinks.'
+  },
+  {
+    id: 'cat-pkg-3',
+    name: 'Wedding Catering',
+    priceText: 'from ₹12,999',
+    guestCount: '100 - 500+ Guests',
+    badge: 'Grand Royal Feast',
+    image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=600&q=80',
+    description: 'Grand royal wedding feast with traditional banana leaf or silver chafing setups, 18+ signature dishes, live halwa & jalebi counters.'
+  }
+];
+
 export const products = [
+  // --- POPULAR DISHES (SUMADHURA CATERERS SPECIALS) ---
+  {
+    id: 'dish-1',
+    name: 'Chicken Biryani',
+    category: 'Popular Dishes',
+    subCategory: 'Biryani & Rice',
+    price: 299,
+    originalPrice: 349,
+    unit: '1 Handi (Serves 1-2)',
+    rating: 4.9,
+    reviewsCount: 1840,
+    badge: 'Bestseller',
+    deliveryTime: '25 mins',
+    isVeg: false,
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80',
+    description: 'Authentic Hyderabadi dum chicken biryani cooked with aged basmati rice, aromatic spices, and succulent tender chicken. Served with mirchi ka salan and raita.',
+    organic: true,
+    inStock: true,
+    tags: ['popular', 'bestseller', 'catering', 'featured'],
+    aisles: ['dishes', 'non-veg', 'lunch']
+  },
+  {
+    id: 'dish-2',
+    name: 'Paneer Butter Masala',
+    category: 'Popular Dishes',
+    subCategory: 'Curries & Gravies',
+    price: 249,
+    originalPrice: 289,
+    unit: '1 Handi (450ml)',
+    rating: 4.8,
+    reviewsCount: 1290,
+    badge: 'Chef Special',
+    deliveryTime: '20 mins',
+    isVeg: true,
+    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=600&q=80',
+    description: 'Fresh artisanal malai paneer cubes simmered in a silky, rich makhani gravy enriched with pure cow butter, cashews, and aromatic spices.',
+    organic: true,
+    inStock: true,
+    tags: ['popular', 'bestseller', 'catering', 'featured'],
+    aisles: ['dishes', 'veg', 'lunch']
+  },
+  {
+    id: 'dish-3',
+    name: 'Veg Pulav',
+    category: 'Popular Dishes',
+    subCategory: 'Biryani & Rice',
+    price: 199,
+    originalPrice: 239,
+    unit: '1 Portion',
+    rating: 4.7,
+    reviewsCount: 880,
+    badge: 'Fresh Daily',
+    deliveryTime: '20 mins',
+    isVeg: true,
+    image: 'https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?auto=format&fit=crop&w=600&q=80',
+    description: 'Fragrant aged basmati rice gently cooked with fresh green peas, carrots, french beans, whole spices, and pure desi cow ghee.',
+    organic: true,
+    inStock: true,
+    tags: ['popular', 'bestseller', 'catering', 'featured'],
+    aisles: ['dishes', 'veg', 'lunch']
+  },
+  {
+    id: 'dish-4',
+    name: 'Idli Set',
+    category: 'Popular Dishes',
+    subCategory: 'South Indian Breakfast',
+    price: 149,
+    originalPrice: 179,
+    unit: '4 Pcs Set',
+    rating: 4.9,
+    reviewsCount: 2150,
+    badge: 'Morning Fresh',
+    deliveryTime: '15 mins',
+    isVeg: true,
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80',
+    description: 'Piping hot, pillowy soft steamed rice and urad dal idlis served with authentic drumstick sambar, fresh coconut chutney, and spicy tomato chutney.',
+    organic: true,
+    inStock: true,
+    tags: ['popular', 'bestseller', 'breakfast', 'featured'],
+    aisles: ['dishes', 'breakfast', 'veg']
+  },
   // --- DAIRY PRODUCTS ---
   {
     id: 'd1',

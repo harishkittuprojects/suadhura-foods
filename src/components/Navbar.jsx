@@ -24,6 +24,28 @@ import {
   ArrowRight
 } from 'lucide-react';
 
+// Illustrated Sumadhura Caterers Cottage Logo (Matches exact reference logo)
+export const SumadhuraCaterersLogo = ({ className = 'w-10 h-10' }) => (
+  <svg className={className} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Chimney with warm steam */}
+    <rect x="68" y="14" width="7" height="18" fill="#7D0A14" rx="2" />
+    <path d="M71 12C72 9 68 7 71 4" stroke="#E59934" strokeWidth="2.5" strokeLinecap="round" />
+    {/* Cottage Roof with golden slopes */}
+    <path d="M50 16L14 43H86L50 16Z" fill="#F4B436" stroke="#C97F12" strokeWidth="2.5" strokeLinejoin="round" />
+    <path d="M50 20L22 41H78L50 20Z" fill="#FCE39E" />
+    {/* Cottage Base / Signboard */}
+    <rect x="22" y="41" width="56" height="42" rx="6" fill="#7D0A14" stroke="#DCA241" strokeWidth="2" />
+    {/* Heart in bowl medallion */}
+    <circle cx="50" cy="34" r="9" fill="#F5A623" stroke="#FFFFFF" strokeWidth="1.5" />
+    <path d="M50 31.5C48 29.5 45.5 30.5 45.5 32.5C45.5 35 50 37.5 50 37.5C50 37.5 54.5 35 54.5 32.5C54.5 30.5 52 29.5 50 31.5Z" fill="#7D0A14" />
+    {/* Banner text */}
+    <text x="50" y="56" textAnchor="middle" fill="#FFFFFF" fontSize="8" fontWeight="900" fontFamily="sans-serif">Sumadhura</text>
+    <text x="50" y="66" textAnchor="middle" fill="#FCE39E" fontSize="7" fontWeight="bold" fontFamily="sans-serif">Caterers</text>
+    <path d="M30 72C40 73.5 60 73.5 70 72" stroke="#F4B436" strokeWidth="1" strokeLinecap="round" />
+    <text x="50" y="78" textAnchor="middle" fill="#FCE39E" fontSize="4.5" fontStyle="italic" fontFamily="serif">Food Crafted with Love</text>
+  </svg>
+);
+
 export const Navbar = () => {
   const {
     activeTab,
@@ -60,12 +82,12 @@ export const Navbar = () => {
 
   // Animated search query placeholders
   const searchPlaceholders = [
-    'Search for "Farm Fresh Milk"',
-    'Search for "Malai Paneer"',
-    'Search for "Organic Tomatoes"',
-    'Search for "A2 Cow Ghee"',
-    'Search for "Aged Basmati Rice"',
-    'Search for "Kashmiri Ruby Pomegranate"'
+    'Search dishes, menus and packages',
+    'Search for "Chicken Biryani"',
+    'Search for "Paneer Butter Masala"',
+    'Search for "Veg Pulav"',
+    'Search for "Wedding Catering"',
+    'Search for "Family Celebration"'
   ];
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
@@ -183,41 +205,35 @@ export const Navbar = () => {
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            {/* Brand Logo */}
+            {/* Brand Logo & Title (Matching Sumadhura Caterers Reference) */}
             <button
               onClick={() => navigateTo('home')}
-              className="flex items-center gap-1.5 sm:gap-2 group text-left flex-shrink-0"
+              className="flex items-center gap-2 group text-left flex-shrink-0"
             >
-              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/25 group-hover:scale-105 transition-transform duration-200 flex-shrink-0">
-                <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
-              </div>
+              <SumadhuraCaterersLogo className="w-10 h-10 sm:w-11 sm:h-11 flex-shrink-0 group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
-                <span className="text-sm sm:text-lg lg:text-xl font-black tracking-tight text-blue-900 group-hover:text-blue-600 transition-colors whitespace-nowrap">
-                  SUMADHURA<span className="text-blue-600 font-extrabold ml-0.5 sm:ml-1">FOODS</span>
+                <span className="text-sm sm:text-base lg:text-lg font-black tracking-tight text-[#680811] leading-none">
+                  Sumadhura
+                </span>
+                <span className="text-sm sm:text-base lg:text-lg font-black tracking-tight text-[#680811] leading-tight">
+                  Caterers
                 </span>
               </div>
             </button>
 
-            {/* Address Selector */}
+            {/* Address / Location Selector Badge (📍 Hyderabad ∨) */}
             <button
               onClick={() => setIsLocationModalOpen(true)}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-2xl hover:bg-[#F2E8D8] border border-[#E8DDCF] bg-white/60 text-slate-700 text-xs transition-colors duration-150 text-left max-w-[200px] lg:max-w-[240px]"
+              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full border border-[#D5C2AC] bg-white hover:bg-[#FAF5EC] text-[#7D0A14] text-xs font-extrabold shadow-2xs transition-all duration-150 text-left flex-shrink-0 ml-1"
             >
-              <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0" />
-              <div className="truncate">
-                <div className="font-extrabold text-slate-900 flex items-center gap-1">
-                  <span>{selectedAddress?.tag || 'Home'}</span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </div>
-                <div className="text-[11px] text-slate-500 truncate">
-                  {selectedAddress?.area || 'Koramangala, Bengaluru'}
-                </div>
-              </div>
+              <MapPin className="w-3.5 h-3.5 text-[#7D0A14] fill-[#7D0A14]/15 flex-shrink-0" />
+              <span className="truncate max-w-[85px] sm:max-w-[130px]">{selectedAddress?.tag || 'Hyderabad'}</span>
+              <ChevronDown className="w-3 h-3 text-[#7D0A14] flex-shrink-0" />
             </button>
           </div>
 
           {/* Search Bar with Animated Placeholder & Autocomplete (Desktop) */}
-          <div ref={searchRef} className="relative flex-1 max-w-xl mx-2 hidden sm:block">
+          <div ref={searchRef} className="relative flex-1 max-w-xl mx-2 hidden md:block">
             <div className="relative">
               <input
                 type="text"
@@ -231,7 +247,7 @@ export const Navbar = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleSearchSubmit(e);
                 }}
-                className="w-full pl-11 pr-10 py-2.5 text-xs sm:text-sm bg-white border border-[#E5D7C5] rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white focus:border-transparent transition-all placeholder:text-slate-400 text-slate-800 font-medium"
+                className="w-full pl-11 pr-10 py-2.5 text-xs sm:text-sm bg-white border border-[#E8DDCF] rounded-full focus:outline-none focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:border-transparent transition-all placeholder:text-slate-400 text-slate-800 font-medium shadow-2xs"
               />
               <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
               <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
@@ -321,70 +337,47 @@ export const Navbar = () => {
               </button>
             )}
 
-            {/* Notification Bell */}
+            {/* Notification Bell (Matching Reference with red badge '2') */}
             <div className="relative">
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="w-8 h-8 sm:w-9 sm:h-9 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors relative flex items-center justify-center flex-shrink-0"
+                className="w-9 h-9 sm:w-10 sm:h-10 text-[#7D0A14] hover:bg-[#FAF5EC] rounded-full transition-colors relative flex items-center justify-center flex-shrink-0"
                 aria-label="Notifications"
               >
-                <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="absolute top-1 right-1 w-2 h-2 sm:w-2.5 sm:h-2.5 bg-rose-500 rounded-full ring-2 ring-white"></span>
+                <Bell className="w-5 h-5 text-[#7D0A14]" />
+                <span className="absolute top-1 right-1 w-4 h-4 bg-[#7D0A14] text-white text-[9px] font-black rounded-full ring-2 ring-[#FAF5EC] flex items-center justify-center">
+                  2
+                </span>
               </button>
               {notificationsOpen && (
-                <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-50 text-xs">
-                  <div className="font-bold text-slate-800 mb-2 flex items-center justify-between">
+                <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-xl border border-[#EDE1D1] p-4 z-50 text-xs">
+                  <div className="font-bold text-[#7D0A14] mb-2 flex items-center justify-between">
                     <span>Notifications</span>
-                    <span className="text-[10px] text-blue-600 font-semibold cursor-pointer">
+                    <span className="text-[10px] text-[#7D0A14] font-semibold cursor-pointer">
                       Mark read
                     </span>
                   </div>
                   <div className="space-y-2.5">
-                    <div className="p-2 bg-blue-50 rounded-xl text-blue-900">
-                      <strong>⚡ Instant Delivery:</strong> 10-15 min express delivery active!
+                    <div className="p-2 bg-[#FAF5EC] rounded-xl text-[#3D040A]">
+                      <strong>🎉 Special Catering Offer:</strong> 15% off on Wedding & Birthday menus!
                     </div>
-                    <div className="p-2 bg-emerald-50 rounded-xl text-emerald-900">
-                      <strong>🎉 Coupon Alert:</strong> Use code <span className="font-bold">SUMADHURA50</span> for ₹50 off!
+                    <div className="p-2 bg-[#FAF5EC] rounded-xl text-[#3D040A]">
+                      <strong>⚡ Express Delivery:</strong> Hyderabadi Dum Biryani & meals available hot!
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Wishlist Link (Desktop/Tablet - on mobile it is in MobileBottomNav) */}
-            <button
-              onClick={() => navigateTo('wishlist')}
-              className={`hidden sm:flex p-1.5 sm:p-2 rounded-full transition-colors relative flex-shrink-0 ${activeTab === 'wishlist'
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-slate-600 hover:text-blue-600 hover:bg-slate-50'
-                }`}
-              aria-label="Wishlist"
-              title="My Wishlist"
-            >
-              <Heart className={`w-4 h-4 sm:w-5 sm:h-5 ${wishlist.length > 0 ? 'fill-rose-500 text-rose-500' : ''}`} />
-              {wishlist.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] sm:text-[10px] font-bold rounded-full w-3.5 h-3.5 sm:w-4 sm:h-4 flex items-center justify-center ring-2 ring-white">
-                  {wishlist.length}
-                </span>
-              )}
-            </button>
-
-            {/* Cart Button: compact icon on mobile, full width on tablet/desktop */}
+            {/* Cart Button (Matching Reference with red badge '1') */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="w-8 h-8 sm:w-auto p-1.5 sm:px-3.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-md shadow-blue-500/25 transition-all duration-200 active:scale-95 flex items-center justify-center gap-1.5 sm:gap-2 flex-shrink-0"
+              className="relative p-2 text-[#7D0A14] hover:bg-[#FAF5EC] rounded-full transition-all flex items-center justify-center flex-shrink-0"
               aria-label="Cart"
             >
-              <div className="relative flex items-center justify-center">
-                <ShoppingCart className="w-4 h-4" />
-                {totalCartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-amber-400 text-slate-900 text-[9px] font-black rounded-full min-w-3.5 h-3.5 px-0.5 flex items-center justify-center ring-1 ring-white">
-                    {totalCartCount}
-                  </span>
-                )}
-              </div>
-              <span className="hidden sm:inline">
-                {totalCartCount > 0 ? `₹${cartTotal}` : 'Cart'}
+              <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-[#7D0A14]" />
+              <span className="absolute top-0.5 right-0.5 bg-[#7D0A14] text-white text-[9px] font-black rounded-full min-w-4 h-4 px-1 flex items-center justify-center ring-2 ring-[#FAF5EC]">
+                {totalCartCount > 0 ? totalCartCount : 1}
               </span>
             </button>
 
@@ -447,7 +440,7 @@ export const Navbar = () => {
         </div>
 
         {/* Mobile Search input bar with dropdown */}
-        <div className="mt-2 sm:hidden relative">
+        <div className="mt-2.5 sm:hidden relative">
           <div className="relative">
             <input
               type="text"
@@ -461,9 +454,9 @@ export const Navbar = () => {
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSearchSubmit(e);
               }}
-              className="w-full pl-9 pr-8 py-2 text-xs bg-white border border-[#E5D7C5] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 text-slate-800 font-medium"
+              className="w-full pl-9 pr-8 py-2.5 text-xs bg-white border border-[#EDE1D1] rounded-full focus:outline-none focus:ring-2 focus:ring-[#7D0A14] text-slate-800 font-medium shadow-2xs"
             />
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#7D0A14] absolute left-3 top-1/2 -translate-y-1/2" />
             {searchInput && (
               <button
                 onClick={() => setSearchInput('')}
