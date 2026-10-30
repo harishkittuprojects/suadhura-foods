@@ -27,7 +27,6 @@ import {
   Lock,
   Layers,
   Headphones,
-  Bike,
   Utensils,
   Package,
   Grid3X3,
@@ -39,8 +38,6 @@ import {
 export const HomePage = () => {
   const {
     navigateTo,
-    activeOrder,
-    setIsLiveTrackingOpen,
     isOneMember,
     toggleOneMember,
     isSubscriptionModalOpen,
@@ -220,37 +217,6 @@ export const HomePage = () => {
 
   return (
     <div className="space-y-3.5 sm:space-y-6 lg:space-y-8 pb-12">
-      {/* Active Order Live Tracking Banner (Swiggy Signature) */}
-      {activeOrder && (
-        <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-2">
-          <div
-            onClick={() => setIsLiveTrackingOpen(true)}
-            className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white flex items-center justify-between cursor-pointer shadow-lg hover:shadow-xl transition-all"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center font-bold">
-                <Bike className="w-5 h-5 animate-bounce" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-black text-xs sm:text-sm">Order #{activeOrder.id} is On The Way!</span>
-                  <span className="bg-amber-400 text-slate-900 text-[9px] sm:text-[10px] font-black px-1.5 sm:px-2 py-0.2 rounded-full">
-                    ⚡ 11 MINS
-                  </span>
-                </div>
-                <p className="text-[11px] sm:text-xs text-emerald-100">
-                  Ramesh Kumar is approaching your gate with your fresh groceries.
-                </p>
-              </div>
-            </div>
-            <button className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white text-emerald-800 font-extrabold text-[11px] sm:text-xs rounded-xl shadow-sm flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-              <span>Track on Map</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </section>
-      )}
-
       {/* 1. In-Page Top Search Bar (Matching Reference Screen) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-1">
         <div
