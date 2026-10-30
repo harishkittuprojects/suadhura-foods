@@ -53,43 +53,56 @@ export const HomePage = () => {
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
   const [heroSlide, setHeroSlide] = useState(0);
 
-  // Real Picture Categories (Vegetables, Dairy Products, Groceries, Dry Fruits, Fresh Fruits, Oils & Ghee)
-  const foodCategories = [
-    {
-      id: 'vegetables',
-      label: 'Vegetables',
-      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80',
-      categoryFilter: 'Vegetables'
-    },
+  // Category Quick Pill Icons matching reference screen
+  const categoryPills = [
     {
       id: 'dairy',
-      label: 'Dairy Products',
-      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80',
-      categoryFilter: 'Dairy Products'
+      name: 'Dairy & Milk',
+      icon: Milk,
+      categoryFilter: 'Dairy Products',
+      bg: 'bg-[#EDF5FF] text-[#2563EB] border-[#DBEAFE]'
     },
     {
-      id: 'groceries',
-      label: 'Groceries',
-      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80',
-      categoryFilter: 'Groceries'
-    },
-    {
-      id: 'dry-fruits',
-      label: 'Dry Fruits',
-      image: 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?auto=format&fit=crop&w=300&q=80',
-      categoryFilter: 'Dry Fruits'
+      id: 'veggies',
+      name: 'Fresh Veggies',
+      icon: Carrot,
+      categoryFilter: 'Vegetables',
+      bg: 'bg-[#ECFDF5] text-[#059669] border-[#D1FAE5]'
     },
     {
       id: 'fruits',
-      label: 'Fresh Fruits',
-      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80',
-      categoryFilter: 'Fresh Fruits'
+      name: 'Fresh Fruits',
+      icon: Apple,
+      categoryFilter: 'Fresh Fruits',
+      bg: 'bg-[#FFF1F2] text-[#E11D48] border-[#FFE4E6]'
+    },
+    {
+      id: 'groceries',
+      name: 'Daily Groceries',
+      icon: ShoppingBasket,
+      categoryFilter: 'Groceries',
+      bg: 'bg-[#FFFBEB] text-[#D97706] border-[#FEF3C7]'
+    },
+    {
+      id: 'atta',
+      name: 'Atta & Flours',
+      icon: Wheat,
+      categoryFilter: 'Rice, Atta and Dals',
+      bg: 'bg-[#FFF7ED] text-[#EA580C] border-[#FFEDD5]'
+    },
+    {
+      id: 'dry-fruits',
+      name: 'Dry Fruits',
+      icon: Sparkles,
+      categoryFilter: 'Masalas and Dry Fruits',
+      bg: 'bg-[#FAF5FF] text-[#9333EA] border-[#F3E8FF]'
     },
     {
       id: 'oils-ghee',
-      label: 'Oils & Ghee',
-      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80',
-      categoryFilter: 'Oils and Ghee'
+      name: 'Oils & Ghee',
+      icon: Droplet,
+      categoryFilter: 'Oils and Ghee',
+      bg: 'bg-[#F0F9FF] text-[#0284C7] border-[#E0F2FE]'
     }
   ];
 
@@ -170,54 +183,6 @@ export const HomePage = () => {
     }
   ];
 
-  // Category Quick Pill Icons with authentic real food photography
-  const categoryPills = [
-    {
-      name: 'Dairy & Milk',
-      categoryName: 'Dairy Products',
-      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Fresh Veggies',
-      categoryName: 'Fresh Vegetables',
-      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Fresh Fruits',
-      categoryName: 'Fresh Fruits',
-      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Daily Groceries',
-      categoryName: 'Rice, Atta and Dals',
-      image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Atta & Flours',
-      categoryName: 'Rice, Atta and Dals',
-      image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Cold Pressed Oils',
-      categoryName: 'Oils and Ghee',
-      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Spices & Masalas',
-      categoryName: 'Masalas and Dry Fruits',
-      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Dry Fruits & Nuts',
-      categoryName: 'Masalas and Dry Fruits',
-      image: 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      name: 'Munchies & Snacks',
-      categoryName: 'Munchies and Snacks',
-      image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=300&q=80'
-    }
-  ];
 
   // Category-specific product shelves for Home Page
   const dairyProducts = products.filter((p) => p.category === 'Dairy Products' && !p.name.toLowerCase().includes('egg') && !p.name.toLowerCase().includes('bread')).slice(0, 6);
@@ -290,38 +255,38 @@ export const HomePage = () => {
       <section className="max-w-7xl mx-auto px-3 sm:px-6 pt-1">
         <div
           onClick={() => navigateTo('categories')}
-          className="w-full pl-4 pr-4 py-2.5 sm:py-3 rounded-full bg-white border border-[#EDE1D1] shadow-2xs hover:border-[#7D0A14] transition-all flex items-center gap-2.5 cursor-pointer"
+          className="w-full pl-4 pr-4 py-2.5 sm:py-3 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-blue-500 transition-all flex items-center gap-2.5 cursor-pointer"
         >
           <Search className="w-4 h-4 text-slate-400 flex-shrink-0" />
           <span className="text-xs sm:text-sm text-slate-400 font-medium select-none truncate">
-            Search groceries, dairy and daily staples
+            Search for "A2 Cow Ghee"
           </span>
         </div>
       </section>
 
-      {/* 2. Top Category Row: Real Pictures (Vegetables, Dairy Products, Groceries, Dry Fruits, Fresh Fruits, Oils & Ghee) */}
+      {/* 2. Top Category Pills Row: Pastel Squircles matching Reference Screen */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">
-        <div className="flex items-center justify-between gap-2.5 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar">
-          {foodCategories.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => navigateTo('categories', cat.categoryFilter)}
-              className="flex flex-col items-center gap-1.5 group flex-1 min-w-[58px] sm:min-w-[76px] cursor-pointer"
-            >
-              <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-full overflow-hidden p-0.5 bg-gradient-to-br from-[#F5D8B6] to-[#FAF5EC] border-2 border-[#E8DDCF] group-hover:border-[#7D0A14] group-hover:scale-105 shadow-xs group-hover:shadow-md transition-all duration-200">
-                <img
-                  src={cat.image}
-                  alt={cat.label}
-                  className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-[11px] sm:text-xs font-black text-[#55070E] group-hover:text-[#7D0A14] tracking-tight text-center leading-tight">
-                {cat.label}
-              </span>
-            </button>
-          ))}
+        <div className="flex items-center gap-2.5 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar">
+          {categoryPills.map((pill) => {
+            const Icon = pill.icon;
+            return (
+              <button
+                key={pill.id}
+                type="button"
+                onClick={() => navigateTo('categories', pill.categoryFilter)}
+                className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
+              >
+                <div
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-sm ${pill.bg}`}
+                >
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" strokeWidth={1.8} />
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-slate-700 group-hover:text-blue-600 transition-colors whitespace-nowrap">
+                  {pill.name}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </section>
 
