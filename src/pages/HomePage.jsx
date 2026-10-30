@@ -49,56 +49,56 @@ export const HomePage = () => {
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
   const [heroSlide, setHeroSlide] = useState(0);
 
-  // Category Quick Pill Icons matching reference screen
+  // Category Quick Pill Cards with REAL FOOD IMAGES matching reference screen
   const categoryPills = [
     {
       id: 'dairy',
       name: 'Dairy & Milk',
-      icon: Milk,
+      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80',
       categoryFilter: 'Dairy Products',
-      bg: 'bg-[#EDF5FF] text-[#2563EB] border-[#DBEAFE]'
+      bg: 'bg-[#EDF5FF] border-[#DBEAFE]'
     },
     {
       id: 'veggies',
       name: 'Fresh Veggies',
-      icon: Carrot,
+      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80',
       categoryFilter: 'Vegetables',
-      bg: 'bg-[#ECFDF5] text-[#059669] border-[#D1FAE5]'
+      bg: 'bg-[#ECFDF5] border-[#D1FAE5]'
     },
     {
       id: 'fruits',
       name: 'Fresh Fruits',
-      icon: Apple,
+      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80',
       categoryFilter: 'Fresh Fruits',
-      bg: 'bg-[#FFF1F2] text-[#E11D48] border-[#FFE4E6]'
+      bg: 'bg-[#FFF1F2] border-[#FFE4E6]'
     },
     {
       id: 'groceries',
       name: 'Daily Groceries',
-      icon: ShoppingBasket,
+      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80',
       categoryFilter: 'Groceries',
-      bg: 'bg-[#FFFBEB] text-[#D97706] border-[#FEF3C7]'
+      bg: 'bg-[#FFFBEB] border-[#FEF3C7]'
     },
     {
       id: 'atta',
       name: 'Atta & Flours',
-      icon: Wheat,
+      image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=300&q=80',
       categoryFilter: 'Rice, Atta and Dals',
-      bg: 'bg-[#FFF7ED] text-[#EA580C] border-[#FFEDD5]'
+      bg: 'bg-[#FFF7ED] border-[#FFEDD5]'
     },
     {
       id: 'dry-fruits',
       name: 'Dry Fruits',
-      icon: Sparkles,
+      image: 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?auto=format&fit=crop&w=300&q=80',
       categoryFilter: 'Masalas and Dry Fruits',
-      bg: 'bg-[#FAF5FF] text-[#9333EA] border-[#F3E8FF]'
+      bg: 'bg-[#FAF5FF] border-[#F3E8FF]'
     },
     {
       id: 'oils-ghee',
       name: 'Oils & Ghee',
-      icon: Droplet,
+      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80',
       categoryFilter: 'Oils and Ghee',
-      bg: 'bg-[#F0F9FF] text-[#0284C7] border-[#E0F2FE]'
+      bg: 'bg-[#F0F9FF] border-[#E0F2FE]'
     }
   ];
 
@@ -216,29 +216,31 @@ export const HomePage = () => {
 
   return (
     <div className="space-y-3.5 sm:space-y-6 lg:space-y-8 pb-12 pt-2">
-      {/* 1. Top Category Pills Row: Pastel Squircles matching Reference Screen */}
+      {/* 1. Top Category Pills Row: Squircles with REAL FOOD IMAGES matching Reference Screen */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">
         <div className="flex items-center gap-2.5 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar">
-          {categoryPills.map((pill) => {
-            const Icon = pill.icon;
-            return (
-              <button
-                key={pill.id}
-                type="button"
-                onClick={() => navigateTo('categories', pill.categoryFilter)}
-                className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
+          {categoryPills.map((pill) => (
+            <button
+              key={pill.id}
+              type="button"
+              onClick={() => navigateTo('categories', pill.categoryFilter)}
+              className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
+            >
+              <div
+                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border p-1 overflow-hidden flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-md ${pill.bg}`}
               >
-                <div
-                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl border flex items-center justify-center transition-all duration-200 group-hover:scale-105 group-hover:shadow-sm ${pill.bg}`}
-                >
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" strokeWidth={1.8} />
-                </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-slate-700 group-hover:text-blue-600 transition-colors whitespace-nowrap">
-                  {pill.name}
-                </span>
-              </button>
-            );
-          })}
+                <img
+                  src={pill.image}
+                  alt={pill.name}
+                  className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-[11px] sm:text-xs font-semibold text-slate-700 group-hover:text-blue-600 transition-colors whitespace-nowrap">
+                {pill.name}
+              </span>
+            </button>
+          ))}
         </div>
       </section>
 
