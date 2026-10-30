@@ -103,14 +103,14 @@ export const CategoriesPage = () => {
       emoji: '🌾',
       shortName: 'Rice & Atta',
       image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Rice, Atta and Dals', 'Rice & Atta', 'Atta & Flours', 'Rice & Dals', 'rice-atta-dals']
+      aliases: ['Rice, Atta and Dals', 'Rice & Atta', 'Atta & Flours', 'Rice & Dals', 'rice-atta-dals', 'Groceries', 'groceries']
     },
     {
       name: 'Masalas and Dry Fruits',
       emoji: '🌶️',
       shortName: 'Masalas & Nuts',
       image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Masalas and Dry Fruits', 'Masalas & Nuts', 'Spices & Masalas', 'Dry Fruits & Nuts', 'masalas-dry-fruits']
+      aliases: ['Masalas and Dry Fruits', 'Masalas & Nuts', 'Spices & Masalas', 'Dry Fruits & Nuts', 'Dry Fruits', 'dry-fruits', 'masalas-dry-fruits']
     },
     {
       name: 'Oils and Ghee',

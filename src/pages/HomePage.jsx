@@ -33,25 +33,8 @@ import {
   Grid3X3,
   Flame,
   Apple,
-  Search,
-  Leaf,
-  Drumstick,
-  ConciergeBell
+  Search
 } from 'lucide-react';
-
-// Samosa Icon SVG for Snacks
-const SamosaIcon = ({ className = 'w-5 h-5' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2.5L2.5 19.5C2.5 20.3 3.2 21 4 21H20C20.8 21 21.5 20.3 21.5 19.5L12 2.5ZM12 6.8L18.2 18.2H5.8L12 6.8Z" />
-  </svg>
-);
-
-// Sweets Laddu / Dessert Bowl Icon SVG
-const SweetsIcon = ({ className = 'w-5 h-5' }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2C9.5 2 7.5 3.5 7.5 5.5C7.5 6.2 7.8 6.9 8.3 7.5C6.4 8.2 5 10 5 12.2C5 14.8 7 17 9.5 17.4V19H7V21H17V19H14.5V17.4C17 17 19 14.8 19 12.2C19 10 17.6 8.2 15.7 7.5C16.2 6.9 16.5 6.2 16.5 5.5C16.5 3.5 14.5 2 12 2ZM12 4C13.1 4 14.5 4.7 14.5 5.5C14.5 6.3 13.1 7 12 7C10.9 7 9.5 6.3 9.5 5.5C9.5 4.7 10.9 4 12 4Z" />
-  </svg>
-);
 
 export const HomePage = () => {
   const {
@@ -70,14 +53,44 @@ export const HomePage = () => {
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
   const [heroSlide, setHeroSlide] = useState(0);
 
-  // 6 Reference Categories (Veg, Non-Veg, Breakfast, Lunch, Snacks, Sweets)
+  // Real Picture Categories (Vegetables, Dairy Products, Groceries, Dry Fruits, Fresh Fruits, Oils & Ghee)
   const foodCategories = [
-    { id: 'veg', label: 'Veg', icon: Leaf, categoryFilter: 'Vegetables' },
-    { id: 'non-veg', label: 'Non-Veg', icon: Drumstick, categoryFilter: 'Groceries' },
-    { id: 'breakfast', label: 'Breakfast', icon: Coffee, categoryFilter: 'Dairy Products' },
-    { id: 'lunch', label: 'Lunch', icon: ConciergeBell, categoryFilter: 'Groceries' },
-    { id: 'snacks', label: 'Snacks', icon: SamosaIcon, categoryFilter: 'Munchies and Snacks' },
-    { id: 'sweets', label: 'Sweets', icon: SweetsIcon, categoryFilter: 'Dairy Products' }
+    {
+      id: 'vegetables',
+      label: 'Vegetables',
+      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=300&q=80',
+      categoryFilter: 'Vegetables'
+    },
+    {
+      id: 'dairy',
+      label: 'Dairy Products',
+      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80',
+      categoryFilter: 'Dairy Products'
+    },
+    {
+      id: 'groceries',
+      label: 'Groceries',
+      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80',
+      categoryFilter: 'Groceries'
+    },
+    {
+      id: 'dry-fruits',
+      label: 'Dry Fruits',
+      image: 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?auto=format&fit=crop&w=300&q=80',
+      categoryFilter: 'Dry Fruits'
+    },
+    {
+      id: 'fruits',
+      label: 'Fresh Fruits',
+      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=300&q=80',
+      categoryFilter: 'Fresh Fruits'
+    },
+    {
+      id: 'oils-ghee',
+      label: 'Oils & Ghee',
+      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80',
+      categoryFilter: 'Oils and Ghee'
+    }
   ];
 
 
@@ -286,27 +299,29 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 2. Top Category Icons Row: 6 Golden Cream Badges (Veg, Non-Veg, Breakfast, Lunch, Snacks, Sweets) */}
+      {/* 2. Top Category Row: Real Pictures (Vegetables, Dairy Products, Groceries, Dry Fruits, Fresh Fruits, Oils & Ghee) */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6">
         <div className="flex items-center justify-between gap-2.5 sm:gap-4 overflow-x-auto pb-1 hide-scrollbar">
-          {foodCategories.map((cat) => {
-            const Icon = cat.icon;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => navigateTo('categories', cat.categoryFilter)}
-                className="flex flex-col items-center gap-1.5 group flex-1 min-w-[56px] sm:min-w-[72px] cursor-pointer"
-              >
-                <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-full bg-[#FCE8D0] border border-[#F5D8B6] flex items-center justify-center text-[#7D0A14] shadow-xs group-hover:scale-110 group-hover:bg-[#FADBB9] group-hover:border-[#7D0A14] transition-all duration-200">
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-[#7D0A14]" />
-                </div>
-                <span className="text-[11px] sm:text-xs font-black text-[#680811] group-hover:text-[#7D0A14] tracking-tight">
-                  {cat.label}
-                </span>
-              </button>
-            );
-          })}
+          {foodCategories.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => navigateTo('categories', cat.categoryFilter)}
+              className="flex flex-col items-center gap-1.5 group flex-1 min-w-[58px] sm:min-w-[76px] cursor-pointer"
+            >
+              <div className="w-13 h-13 sm:w-16 sm:h-16 rounded-full overflow-hidden p-0.5 bg-gradient-to-br from-[#F5D8B6] to-[#FAF5EC] border-2 border-[#E8DDCF] group-hover:border-[#7D0A14] group-hover:scale-105 shadow-xs group-hover:shadow-md transition-all duration-200">
+                <img
+                  src={cat.image}
+                  alt={cat.label}
+                  className="w-full h-full object-cover rounded-full group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-[11px] sm:text-xs font-black text-[#55070E] group-hover:text-[#7D0A14] tracking-tight text-center leading-tight">
+                {cat.label}
+              </span>
+            </button>
+          ))}
         </div>
       </section>
 
