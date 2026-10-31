@@ -19,7 +19,9 @@ export const ProductQuickViewModal = () => {
     setQuickViewProduct,
     addToCart,
     toggleWishlist,
-    isInWishlist
+    isInWishlist,
+    pricingMode,
+    setPricingMode
   } = useShop();
 
   const [quantity, setQuantity] = useState(1);
@@ -97,19 +99,75 @@ export const ProductQuickViewModal = () => {
                 </span>
               </div>
 
-              {/* Price */}
-              <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-2xl font-black text-slate-900">
-                  ₹{quickViewProduct.price}
-                </span>
-                {quickViewProduct.originalPrice && (
-                  <span className="text-sm text-slate-400 line-through">
-                    ₹{quickViewProduct.originalPrice}
+              {/* Dual-Pricing Tier Box (Retail vs Wholesale / Whole Piece Rate) */}
+              <div className="mt-4 p-3 rounded-2xl bg-[#FAF5EC] border border-[#E8DDCF] space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                    Pricing Rates (B2C & B2B)
                   </span>
-                )}
-                <span className="text-xs text-emerald-600 font-bold ml-1">
-                  Save ₹{(quickViewProduct.originalPrice || quickViewProduct.price) - quickViewProduct.price}
-                </span>
+                  <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-[#EDE1D1] text-[10px] font-black">
+                    <button
+                      onClick={() => setPricingMode('retail')}
+                      className={`px-2 py-0.5 rounded ${
+                        pricingMode === 'retail' ? 'bg-blue-600 text-white' : 'text-slate-600'
+                      }`}
+                    >
+                      Retail
+                    </button>
+                    <button
+                      onClick={() => setPricingMode('wholesale')}
+                      className={`px-2 py-0.5 rounded ${
+                        pricingMode === 'wholesale' ? 'bg-[#7D0A14] text-white' : 'text-slate-600'
+                      }`}
+                    >
+                      Wholesale
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  {/* Retail Rate */}
+                  <div
+                    onClick={() => setPricingMode('retail')}
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                      pricingMode === 'retail'
+                        ? 'bg-white border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
+                        : 'bg-white/60 border-slate-200 opacity-80'
+                    }`}
+                  >
+                    <div className="text-[10px] font-bold text-slate-500 uppercase">Retail Rate (B2C)</div>
+                    <div className="text-xl font-black text-[#52060E]">₹{quickViewProduct.price}</div>
+                    <div className="text-[10px] text-slate-500 truncate">{quickViewProduct.unit}</div>
+                  </div>
+
+                  {/* Wholesale Rate */}
+                  <div
+                    onClick={() => setPricingMode('wholesale')}
+                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                      pricingMode === 'wholesale'
+                        ? 'bg-white border-[#7D0A14] ring-2 ring-[#7D0A14]/20 shadow-xs'
+                        : 'bg-white/60 border-slate-200 opacity-80'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-black text-[#7D0A14] uppercase">
+                      <span>Wholesale Rate</span>
+                      <span className="bg-amber-100 text-amber-900 px-1 rounded text-[9px]">
+                        {quickViewProduct.wholesaleSavings || 'Save 26%'}
+                      </span>
+                    </div>
+                    <div className="text-xl font-black text-[#7D0A14]">
+                      ₹{quickViewProduct.wholesalePrice || Math.round(quickViewProduct.price * 0.74)}
+                    </div>
+                    <div className="text-[10px] text-amber-900 font-bold truncate">
+                      {quickViewProduct.wholesaleUnit || 'Commercial Bulk Pack'}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-slate-500 flex items-center justify-between pt-1 border-t border-[#E8DDCF]/60">
+                  <span>MOQ: <strong>{quickViewProduct.wholesaleMoq || 'Commercial Bulk'}</strong></span>
+                  <span className="text-emerald-700 font-bold">100% GST ITC Invoice Eligible</span>
+                </div>
               </div>
 
               {/* Description */}

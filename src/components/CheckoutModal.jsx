@@ -35,7 +35,8 @@ export const CheckoutModal = () => {
     setSelectedAddress,
     setActiveOrder,
     setIsLiveTrackingOpen,
-    navigateTo
+    navigateTo,
+    pricingMode
   } = useShop();
 
   const [step, setStep] = useState(1); // 1: Address & Tip, 2: Payment, 3: Success Confirmation
@@ -50,8 +51,12 @@ export const CheckoutModal = () => {
     setIsSubmitting(true);
 
     setTimeout(() => {
+      const isB2bOrder = pricingMode === 'wholesale' || user?.isBusiness;
       const placedOrder = {
-        id: `SMD-${Math.floor(100000 + Math.random() * 900000)}`,
+        id: isB2bOrder
+          ? `B2B-${Math.floor(1000 + Math.random() * 9000)}`
+          : `SMD-${Math.floor(100000 + Math.random() * 900000)}`,
+        type: isB2bOrder ? 'b2b' : 'b2c',
         items: [...cart],
         subtotal: cartSubtotal,
         deliveryFee,
@@ -59,6 +64,7 @@ export const CheckoutModal = () => {
         tip: deliveryPartnerTip,
         discount: discountAmount,
         total: cartTotal,
+        gstin: user?.gstin || (isB2bOrder ? '36AABCU9603R1ZM' : null),
         date: new Date().toLocaleDateString('en-IN', {
           day: 'numeric',
           month: 'short',
@@ -67,7 +73,7 @@ export const CheckoutModal = () => {
           minute: '2-digit'
         }),
         address: `${selectedAddress.title}, ${selectedAddress.area}`,
-        slot: 'Instant 10-15 Min Express Delivery',
+        slot: isB2bOrder ? '5:00 AM Morning Loading Bay Dispatch' : 'Instant 10-15 Min Express Delivery',
         paymentMethod: paymentMethod.toUpperCase(),
         partner: 'Ramesh Kumar (★ 4.9)'
       };

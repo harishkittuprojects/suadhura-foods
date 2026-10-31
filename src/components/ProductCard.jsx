@@ -9,12 +9,22 @@ export const ProductCard = ({ product, priority = false }) => {
     updateQuantity,
     toggleWishlist,
     isInWishlist,
-    setQuickViewProduct
+    setQuickViewProduct,
+    pricingMode,
+    setPricingMode
   } = useShop();
 
   const isLiked = isInWishlist(product.id);
   const cartItem = cart.find((item) => item.id === product.id);
   const quantityInCart = cartItem ? cartItem.quantity : 0;
+
+  const isWholesale = pricingMode === 'wholesale';
+  const activePrice = isWholesale
+    ? product.wholesalePrice || Math.round(product.price * 0.74)
+    : product.price;
+  const activeUnit = isWholesale
+    ? product.wholesaleUnit || product.unit
+    : product.unit;
 
   // Calculate percentage discount
   const discountPercent = product.originalPrice
@@ -23,15 +33,25 @@ export const ProductCard = ({ product, priority = false }) => {
 
   return (
     <div
-      className="group relative bg-white rounded-2xl border border-[#EDE1D1] shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1 hover:border-[#D5C2AC]"
+      className={`group relative bg-white rounded-2xl border shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1 ${
+        isWholesale
+          ? 'border-[#E0CDB8] hover:border-[#7D0A14] ring-1 ring-[#7D0A14]/10'
+          : 'border-[#EDE1D1] hover:border-[#D5C2AC]'
+      }`}
     >
       {/* Product Image Box */}
       <div className="relative aspect-square w-full bg-[#FAF5EC]/60 overflow-hidden flex items-center justify-center p-2.5">
-        {/* 10-Min Delivery Ribbon / Discount */}
-        {discountPercent > 0 && (
-          <span className="absolute top-2.5 left-2.5 z-10 bg-blue-700 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">
-            {discountPercent}% OFF
+        {/* Top Badge: Wholesale Rate vs Retail Discount */}
+        {isWholesale ? (
+          <span className="absolute top-2.5 left-2.5 z-10 bg-[#7D0A14] text-amber-200 border border-amber-400/40 text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">
+            🏢 WHOLESALE • {product.wholesaleSavings || '25% OFF'}
           </span>
+        ) : (
+          discountPercent > 0 && (
+            <span className="absolute top-2.5 left-2.5 z-10 bg-blue-700 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">
+              {discountPercent}% OFF
+            </span>
+          )
         )}
 
         {/* Wishlist Button */}
@@ -92,15 +112,19 @@ export const ProductCard = ({ product, priority = false }) => {
               </span>
             </div>
 
-            <span className="text-slate-500 font-semibold text-[10px] sm:text-[11px] bg-slate-100 px-1.5 py-0.5 rounded whitespace-nowrap flex-shrink-0">
-              {product.unit}
+            <span className={`font-semibold text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded whitespace-nowrap flex-shrink-0 ${
+              isWholesale
+                ? 'bg-amber-100/80 text-[#7D0A14] font-black border border-amber-300/60'
+                : 'text-slate-500 bg-slate-100'
+            }`}>
+              {activeUnit}
             </span>
           </div>
 
           {/* Product Name */}
           <h3
             onClick={() => setQuickViewProduct(product)}
-            className="font-bold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-2 hover:text-blue-600 cursor-pointer transition-colors"
+            className="font-bold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-2 hover:text-[#7D0A14] cursor-pointer transition-colors"
             title={product.name}
           >
             {product.name}
@@ -120,22 +144,49 @@ export const ProductCard = ({ product, priority = false }) => {
         <div className="mt-2.5 pt-2 border-t border-[#F2E8DC] flex items-center justify-between gap-1.5">
           {/* Price */}
           <div className="min-w-0">
-            <div className="flex items-baseline gap-1">
-              <span className="text-sm sm:text-base font-black text-[#52060E]">₹{product.price}</span>
-              {product.originalPrice && (
-                <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
-                  ₹{product.originalPrice}
+            {isWholesale ? (
+              <div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-base sm:text-lg font-black text-[#7D0A14]">₹{activePrice}</span>
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
+                    ₹{product.price}
+                  </span>
+                </div>
+                <span className="text-[9px] font-extrabold text-amber-800 truncate block">
+                  MOQ: {product.wholesaleMoq || 'Bulk Pack'}
                 </span>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-sm sm:text-base font-black text-[#52060E]">₹{product.price}</span>
+                  {product.originalPrice && (
+                    <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
+                      ₹{product.originalPrice}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setPricingMode('wholesale')}
+                  className="text-[9px] text-[#7D0A14] hover:underline font-bold block truncate"
+                  title="Switch to wholesale rates"
+                >
+                  🏢 Wholesale: ₹{product.wholesalePrice}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Signature ADD Button or Quantity Stepper */}
           {quantityInCart > 0 ? (
-            <div className="flex items-center bg-blue-600 rounded-lg sm:rounded-xl p-0.5 text-white shadow-sm flex-shrink-0">
+            <div className={`flex items-center rounded-lg sm:rounded-xl p-0.5 text-white shadow-sm flex-shrink-0 ${
+              isWholesale ? 'bg-[#7D0A14]' : 'bg-blue-600'
+            }`}>
               <button
                 onClick={() => updateQuantity(product.id, -1)}
-                className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
+                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-colors ${
+                  isWholesale ? 'bg-[#5A070E] hover:bg-[#3D040A]' : 'bg-blue-700/80 hover:bg-blue-800'
+                }`}
                 aria-label="Decrease quantity"
               >
                 <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -143,7 +194,9 @@ export const ProductCard = ({ product, priority = false }) => {
               <span className="w-5 sm:w-6 text-center font-black text-[11px] sm:text-xs">{quantityInCart}</span>
               <button
                 onClick={() => updateQuantity(product.id, 1)}
-                className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg bg-blue-700/80 hover:bg-blue-800 flex items-center justify-center transition-colors"
+                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-colors ${
+                  isWholesale ? 'bg-[#5A070E] hover:bg-[#3D040A]' : 'bg-blue-700/80 hover:bg-blue-800'
+                }`}
                 aria-label="Increase quantity"
               >
                 <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -152,10 +205,14 @@ export const ProductCard = ({ product, priority = false }) => {
           ) : (
             <button
               onClick={() => addToCart(product, 1)}
-              className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-blue-600 hover:bg-blue-600 hover:text-white text-blue-600 bg-white font-black text-[11px] sm:text-xs shadow-xs hover:shadow-sm transition-all duration-150 active:scale-95 flex items-center justify-center gap-1 flex-shrink-0"
+              className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl font-black text-[11px] sm:text-xs shadow-xs hover:shadow-sm transition-all duration-150 active:scale-95 flex items-center justify-center gap-1 flex-shrink-0 ${
+                isWholesale
+                  ? 'bg-[#7D0A14] hover:bg-[#60060E] text-white border border-[#91131E]'
+                  : 'border border-blue-600 hover:bg-blue-600 hover:text-white text-blue-600 bg-white'
+              }`}
               aria-label={`Add ${product.name} to Cart`}
             >
-              <span>ADD</span>
+              <span>{isWholesale ? 'BULK ADD' : 'ADD'}</span>
               <Plus className="w-3 h-3 stroke-[2.5]" />
             </button>
           )}

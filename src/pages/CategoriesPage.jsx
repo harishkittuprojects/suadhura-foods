@@ -18,7 +18,10 @@ export const CategoriesPage = () => {
     setSelectedCategoryFilter,
     navigateTo,
     searchQuery,
-    setSearchQuery
+    setSearchQuery,
+    pricingMode,
+    setPricingMode,
+    togglePricingMode
   } = useShop();
 
   const [searchFilter, setSearchFilter] = useState(searchQuery || '');
@@ -339,6 +342,30 @@ export const CategoriesPage = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
+            {/* Store Rate Tier Pill */}
+            <div className="flex items-center bg-[#FAF5EC] p-0.5 rounded-xl border border-[#E8DDCF] text-xs font-bold">
+              <button
+                onClick={() => setPricingMode('retail')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
+                  pricingMode === 'retail'
+                    ? 'bg-blue-600 text-white shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                🛍️ Retail
+              </button>
+              <button
+                onClick={() => setPricingMode('wholesale')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
+                  pricingMode === 'wholesale'
+                    ? 'bg-[#7D0A14] text-white shadow-2xs'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                🏢 Wholesale Rate
+              </button>
+            </div>
+
             {/* Organic Only */}
             <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl hover:bg-slate-100">
               <input
@@ -422,6 +449,37 @@ export const CategoriesPage = () => {
           </div>
         )}
       </div>
+
+      {/* Active Wholesale Pricing Banner */}
+      {pricingMode === 'wholesale' && (
+        <div className="bg-gradient-to-r from-amber-500/15 via-[#FAF5EC] to-amber-500/10 border-2 border-[#7D0A14] p-3.5 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-200 flex items-center justify-center font-black flex-shrink-0">
+              🏢
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-xs sm:text-sm text-[#3D040A]">
+                  B2B Wholesale Commercial Rates Active
+                </span>
+                <span className="text-[9px] font-black uppercase px-1.5 py-0.2 rounded bg-[#7D0A14] text-white">
+                  Save 20–35%
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-600">
+                All prices shown are commercial bulk rates with wholesale units. Add to cart at wholesale rates.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setPricingMode('retail')}
+            className="text-xs font-bold text-[#7D0A14] hover:underline self-start sm:self-center"
+          >
+            Switch to Retail Rates 🛍️
+          </button>
+        </div>
+      )}
 
       {/* 4. DIRECT PRODUCTS GRID - SHOWN IMMEDIATELY AT TOP, NOT DOWN */}
       <div>

@@ -42,7 +42,10 @@ export const CartPage = () => {
     isOneMember,
     setIsCheckoutModalOpen,
     selectedAddress,
-    navigateTo
+    navigateTo,
+    pricingMode,
+    setPricingMode,
+    totalWholesaleSavings
   } = useShop();
 
   const [couponInput, setCouponInput] = useState('');
@@ -291,9 +294,28 @@ export const CartPage = () => {
           {/* Right Column: Detailed Bill & Checkout */}
           <div className="lg:col-span-4 space-y-4">
             <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-soft space-y-5">
-              <h3 className="font-extrabold text-slate-900 text-base border-b border-slate-100 pb-3">
-                Bill Details
-              </h3>
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="font-extrabold text-slate-900 text-base">
+                  Bill Details
+                </h3>
+                <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                  pricingMode === 'wholesale'
+                    ? 'bg-[#7D0A14] text-white'
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {pricingMode === 'wholesale' ? '🏢 Wholesale Tier' : '🛍️ Retail Tier'}
+                </span>
+              </div>
+
+              {/* Wholesale Savings Callout */}
+              {(pricingMode === 'wholesale' || totalWholesaleSavings > 0) && (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center justify-between text-xs text-amber-900 font-bold">
+                  <span>🏢 B2B Wholesale Savings:</span>
+                  <span className="text-emerald-700 font-black">
+                    Saved ₹{totalWholesaleSavings > 0 ? totalWholesaleSavings : Math.round(cartSubtotal * 0.28)}
+                  </span>
+                </div>
+              )}
 
               {/* Coupon Code Section */}
               {appliedPromo ? (

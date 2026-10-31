@@ -57,7 +57,7 @@ export const categories = [
   }
 ];
 
-export const products = [
+const rawProducts = [
   // --- POPULAR DISHES (SUMADHURA CATERERS SPECIALS) ---
   {
     id: 'dish-1',
@@ -1133,6 +1133,41 @@ export const products = [
     aisles: ['munchies', 'masalas-dry-fruits']
   }
 ];
+
+// Wholesale Overrides for specific staple commercial products & Whole Piece packs
+const wholesaleOverrides = {
+  'd1': { wholesalePrice: 26, wholesaleUnit: 'Whole 10L Can / 500ml', wholesaleMoq: '10 Litres', wholesaleSavings: '24% OFF' },
+  'd2': { wholesalePrice: 72, wholesaleUnit: 'Whole 1kg / 5kg Block', wholesaleMoq: '5 kg Block', wholesaleSavings: '27% OFF' },
+  'd3': { wholesalePrice: 420, wholesaleUnit: 'Whole 15kg Commercial Tin', wholesaleMoq: '15 kg Tin', wholesaleSavings: '28% OFF' },
+  'd4': { wholesalePrice: 28, wholesaleUnit: 'Whole 10kg Food-Grade Bucket', wholesaleMoq: '10 kg Bucket', wholesaleSavings: '33% OFF' },
+  'd5': { wholesalePrice: 85, wholesaleUnit: 'Whole 1kg Slab', wholesaleMoq: '5 Slabs', wholesaleSavings: '26% OFF' },
+  'd6': { wholesalePrice: 125, wholesaleUnit: 'Whole 1kg Commercial Block', wholesaleMoq: '3 Blocks', wholesaleSavings: '24% OFF' },
+  'd10': { wholesalePrice: 65, wholesaleUnit: 'Crate of 12 Bottles (1L)', wholesaleMoq: '12 Bottles', wholesaleSavings: '24% OFF' },
+  'v1': { wholesalePrice: 22, wholesaleUnit: 'Whole 25kg Crate / kg', wholesaleMoq: '25 kg Crate', wholesaleSavings: '39% OFF' },
+  'v2': { wholesalePrice: 24, wholesaleUnit: 'Whole 50kg Gunny Bag / kg', wholesaleMoq: '50 kg Bag', wholesaleSavings: '37% OFF' },
+  'v3': { wholesalePrice: 20, wholesaleUnit: 'Whole 50kg Sack / kg', wholesaleMoq: '50 kg Sack', wholesaleSavings: '38% OFF' },
+  'dish-1': { wholesalePrice: 219, wholesaleUnit: 'Catering Bulk Handi (Serves 10)', wholesaleMoq: 'Min 3 Handis', wholesaleSavings: '27% OFF' },
+  'dish-2': { wholesalePrice: 185, wholesaleUnit: 'Catering 1L Tub', wholesaleMoq: 'Min 3 Tubs', wholesaleSavings: '26% OFF' },
+  'dish-3': { wholesalePrice: 145, wholesaleUnit: 'Catering Bulk Handi', wholesaleMoq: 'Min 3 Handis', wholesaleSavings: '27% OFF' },
+  'dish-4': { wholesalePrice: 99, wholesaleUnit: 'Catering Tray of 20 Pcs', wholesaleMoq: 'Min 2 Trays', wholesaleSavings: '34% OFF' },
+};
+
+// Map each product to guarantee wholesalePrice, wholesaleUnit, wholesaleMoq & wholesaleSavings
+export const products = rawProducts.map((p) => {
+  const custom = wholesaleOverrides[p.id];
+  const wholesalePrice = custom?.wholesalePrice || Math.round(p.price * 0.74);
+  const wholesaleUnit = custom?.wholesaleUnit || `Whole Bulk Pack (${p.unit})`;
+  const wholesaleMoq = custom?.wholesaleMoq || 'Commercial Bulk Pack';
+  const wholesaleSavings = custom?.wholesaleSavings || `${Math.round(((p.price - wholesalePrice) / p.price) * 100)}% OFF`;
+
+  return {
+    ...p,
+    wholesalePrice,
+    wholesaleUnit,
+    wholesaleMoq,
+    wholesaleSavings
+  };
+});
 
 export const servicesList = [
   {

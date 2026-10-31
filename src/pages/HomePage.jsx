@@ -44,7 +44,9 @@ export const HomePage = () => {
     setIsSubscriptionModalOpen,
     activeSubscription,
     addToCart,
-    setQuickViewProduct
+    setQuickViewProduct,
+    pricingMode,
+    setPricingMode
   } = useShop();
 
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
@@ -557,22 +559,66 @@ export const HomePage = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-2.5 flex-shrink-0 relative z-10 w-full sm:w-auto">
+            {pricingMode !== 'wholesale' ? (
+              <button
+                onClick={() => setPricingMode('wholesale')}
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+                title="Switch whole website to Wholesale Rates"
+              >
+                <span>View Wholesale Rates (Save 35%)</span>
+                <ArrowRight className="w-4 h-4 text-[#3D040A]" />
+              </button>
+            ) : (
+              <button
+                onClick={() => setPricingMode('retail')}
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white text-[#7D0A14] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                <span>Switch to Retail Rates 🛍️</span>
+              </button>
+            )}
+
             <button
               onClick={() => navigateTo('b2b')}
-              className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
-            >
-              <span>Explore B2B Wholesale</span>
-              <ArrowRight className="w-4 h-4 text-[#3D040A]" />
-            </button>
-            <button
-              onClick={() => navigateTo('login')}
               className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/20 transition-all flex items-center justify-center gap-1.5"
             >
-              <span>Business Login</span>
+              <span>Wholesale Portal & RFPs</span>
             </button>
           </div>
         </div>
       </section>
+
+      {/* 3.6 Active Wholesale Mode Status Notice */}
+      {pricingMode === 'wholesale' && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="bg-gradient-to-r from-amber-500/15 via-[#FAF5EC] to-amber-500/10 border-2 border-[#7D0A14] p-4 sm:p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-in fade-in duration-200">
+            <div className="flex items-center gap-3">
+              <span className="w-10 h-10 rounded-2xl bg-[#7D0A14] text-white flex items-center justify-center text-lg font-black flex-shrink-0">
+                🏢
+              </span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-black text-sm sm:text-base text-[#3D040A]">
+                    Wholesale Price Mode Active across Store
+                  </h4>
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-[#7D0A14] text-amber-200">
+                    Bulk Whole Piece Rates
+                  </span>
+                </div>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  Showing discounted commercial rates, whole piece packaging & bulk MOQs. Eligible for 100% GST Input Tax Credit (ITC).
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setPricingMode('retail')}
+              className="px-4 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-800 text-xs font-bold border border-slate-300 shadow-2xs self-start sm:self-center flex-shrink-0"
+            >
+              Switch to Retail Rates
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* 4. ⭐ SHOP BY CATEGORY: ALL STORE AISLES (Dairy, Vegetables, Fresh Fruits, Groceries) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">

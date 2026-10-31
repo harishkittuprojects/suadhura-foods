@@ -45,7 +45,9 @@ export const CartDrawer = () => {
     isOneMember,
     setIsCheckoutModalOpen,
     selectedAddress,
-    navigateTo
+    navigateTo,
+    pricingMode,
+    totalWholesaleSavings
   } = useShop();
 
   const [couponInput, setCouponInput] = useState('');
@@ -293,12 +295,31 @@ export const CartDrawer = () => {
                 </form>
               )}
 
+              {/* Wholesale Savings Callout */}
+              {(pricingMode === 'wholesale' || totalWholesaleSavings > 0) && (
+                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 font-bold flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <span>🏢</span>
+                    <span>B2B Wholesale Savings Applied:</span>
+                  </span>
+                  <span className="text-emerald-700 font-black">
+                    Saved ₹{totalWholesaleSavings > 0 ? totalWholesaleSavings : Math.round(cartSubtotal * 0.28)}
+                  </span>
+                </div>
+              )}
+
               {/* Detailed Bill */}
               <div className="space-y-1.5 text-xs text-slate-600">
                 <div className="flex justify-between">
-                  <span>Item Total</span>
+                  <span>{pricingMode === 'wholesale' ? 'Wholesale Subtotal' : 'Item Total'}</span>
                   <span className="font-semibold text-slate-900">₹{cartSubtotal}</span>
                 </div>
+                {pricingMode === 'wholesale' && (
+                  <div className="flex justify-between text-[11px] text-slate-500">
+                    <span>Est. CGST + SGST (5% ITC Claimable)</span>
+                    <span>₹{Math.round(cartSubtotal * 0.048)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span>Delivery Partner Fee</span>
                   <span>

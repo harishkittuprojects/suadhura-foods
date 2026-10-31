@@ -71,7 +71,10 @@ export const Navbar = () => {
     activeSubscription,
     searchQuery,
     setSearchQuery,
-    setSelectedCategoryFilter
+    setSelectedCategoryFilter,
+    pricingMode,
+    setPricingMode,
+    togglePricingMode
   } = useShop();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -161,8 +164,35 @@ export const Navbar = () => {
             <span className="text-amber-100 hidden md:inline">Free delivery above ₹99</span>
           </div>
 
-          {/* VIP Toggle & Subscription Order */}
+          {/* Rate Switcher (Retail vs Wholesale Rates) & Subscription Order */}
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            {/* Wholesale vs Retail Rate Switcher */}
+            <div className="flex items-center bg-[#290306] p-0.5 rounded-full border border-amber-400/40 text-[10px] sm:text-[11px] font-black">
+              <button
+                onClick={() => setPricingMode('retail')}
+                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all flex items-center gap-1 ${
+                  pricingMode === 'retail'
+                    ? 'bg-[#FAF5EC] text-[#3D040A] shadow-xs'
+                    : 'text-amber-200/70 hover:text-white'
+                }`}
+                title="Switch to standard B2C retail rates"
+              >
+                <span>🛍️ Retail Rate</span>
+              </button>
+              <button
+                onClick={() => setPricingMode('wholesale')}
+                className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all flex items-center gap-1 ${
+                  pricingMode === 'wholesale'
+                    ? 'bg-[#F5A623] text-[#3D040A] shadow-xs'
+                    : 'text-amber-200/70 hover:text-white'
+                }`}
+                title="Switch to commercial B2B wholesale rates"
+              >
+                <span>🏢 Wholesale Rate</span>
+                <span className="hidden lg:inline text-[9px] bg-[#7D0A14] text-white px-1 rounded-sm">Save 35%</span>
+              </button>
+            </div>
+
             <button
               onClick={() => setIsSubscriptionModalOpen(true)}
               className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-extrabold transition-all ${
@@ -595,6 +625,42 @@ export const Navbar = () => {
                   <div className="text-[11px] text-slate-500 truncate">{selectedAddress.area}</div>
                 </div>
               </button>
+
+              {/* Pricing Rate Tier Switcher (Mobile) */}
+              <div className="mt-3 p-2 bg-[#FAF5EC] rounded-xl border border-[#E8DDCF]">
+                <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-600 mb-1 px-1">
+                  <span>Store Rate Tier</span>
+                  <span className="text-amber-800 font-bold">{pricingMode === 'wholesale' ? 'Wholesale Active' : 'Retail Active'}</span>
+                </div>
+                <div className="grid grid-cols-2 gap-1 text-xs font-bold text-center">
+                  <button
+                    onClick={() => {
+                      setPricingMode('retail');
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`py-1.5 rounded-lg transition-all ${
+                      pricingMode === 'retail'
+                        ? 'bg-blue-600 text-white font-black shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    🛍️ Retail Rate
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPricingMode('wholesale');
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`py-1.5 rounded-lg transition-all ${
+                      pricingMode === 'wholesale'
+                        ? 'bg-[#7D0A14] text-white font-black shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    🏢 Wholesale Rate
+                  </button>
+                </div>
+              </div>
 
               {/* Nav links */}
               <div className="mt-6 space-y-1">

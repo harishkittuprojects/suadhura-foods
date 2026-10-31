@@ -45,6 +45,49 @@ export const ShopProvider = ({ children }) => {
   // Service Mode: 'grocery' (10-15m grocery) | 'food' (kitchen meals) | 'genie' (custom courier)
   const [serviceMode, setServiceMode] = useState('grocery');
 
+  // Pricing Mode: 'retail' (B2C) | 'wholesale' (B2B Commercial / Whole Piece rates)
+  const [pricingMode, setPricingModeState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_pricing_mode');
+      if (saved === 'wholesale' || saved === 'retail') return saved;
+      const savedUser = localStorage.getItem('sumadhura_user');
+      if (savedUser && JSON.parse(savedUser)?.isBusiness) return 'wholesale';
+    } catch {}
+    return 'retail';
+  });
+
+  const setPricingMode = (mode) => {
+    setPricingModeState(mode);
+    try {
+      localStorage.setItem('sumadhura_pricing_mode', mode);
+    } catch {}
+
+    // Dynamically update existing cart item prices to match selected pricing rate
+    setCart((prevCart) =>
+      prevCart.map((item) => {
+        const prod = products.find((p) => p.id === item.id) || item;
+        const newPrice = mode === 'wholesale' ? prod.wholesalePrice : prod.price;
+        const newUnit = mode === 'wholesale' ? prod.wholesaleUnit : prod.unit;
+        return {
+          ...item,
+          price: newPrice,
+          unit: newUnit,
+          isWholesale: mode === 'wholesale'
+        };
+      })
+    );
+
+    showToast(
+      mode === 'wholesale'
+        ? '🏢 B2B Wholesale Rates Active! Up to 35% bulk savings applied across all products'
+        : '🛍️ B2C Retail Rates Active'
+    );
+  };
+
+  const togglePricingMode = () => {
+    setPricingMode(pricingMode === 'wholesale' ? 'retail' : 'wholesale');
+  };
+
   // Sumadhura VIP Membership
   const [isOneMember, setIsOneMember] = useState(() => {
     try {
@@ -200,18 +243,41 @@ export const ShopProvider = ({ children }) => {
 
   // Cart operations
   const addToCart = (product, quantity = 1) => {
+    const isWholesale = pricingMode === 'wholesale';
+    const activePrice = isWholesale
+      ? product.wholesalePrice || Math.round(product.price * 0.74)
+      : product.price;
+    const activeUnit = isWholesale
+      ? product.wholesaleUnit || product.unit
+      : product.unit;
+
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.id === product.id);
       if (existing) {
         return prevCart.map((item) =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
+            ? { ...item, price: activePrice, unit: activeUnit, quantity: item.quantity + quantity }
             : item
         );
       }
-      return [...prevCart, { ...product, quantity }];
+      return [
+        ...prevCart,
+        {
+          ...product,
+          price: activePrice,
+          unit: activeUnit,
+          retailPrice: product.price,
+          wholesalePrice: product.wholesalePrice || Math.round(product.price * 0.74),
+          isWholesale,
+          quantity
+        }
+      ];
     });
-    showToast(`Added ${product.name} to cart!`);
+    showToast(
+      isWholesale
+        ? `Added ${product.name} at Wholesale Rate (₹${activePrice})!`
+        : `Added ${product.name} to cart!`
+    );
   };
 
   const updateQuantity = (productId, delta) => {
@@ -292,6 +358,11 @@ export const ShopProvider = ({ children }) => {
 
   // Bill Calculations
   const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalWholesaleSavings = cart.reduce((sum, item) => {
+    const retailP = item.retailPrice || (item.wholesalePrice ? Math.round(item.wholesalePrice / 0.74) : item.price);
+    const saved = Math.max(0, retailP - item.price);
+    return sum + Math.round(saved * item.quantity);
+  }, 0);
   const platformFee = cart.length > 0 ? 5 : 0; // Standard packaging & handling fee
   
   // Free delivery logic: If VIP Member & subtotal >= 99 -> FREE! Else standard rules
@@ -314,10 +385,13 @@ export const ShopProvider = ({ children }) => {
     } catch (e) {
       console.error(e);
     }
+    if (userData.isBusiness) {
+      setPricingMode('wholesale');
+    }
     setIsAuthModalOpen(false);
     showToast(
       userData.isBusiness
-        ? `Welcome, ${userData.companyName || userData.name}! B2B Portal Active 🏢`
+        ? `Welcome, ${userData.companyName || userData.name}! B2B Wholesale Portal Active 🏢`
         : `Welcome back, ${userData.name}! 🌟`
     );
   };
@@ -373,7 +447,11 @@ export const ShopProvider = ({ children }) => {
         discountAmount,
         cartTotal,
         totalCartCount,
+        pricingMode,
+        totalWholesaleSavings,
         // actions
+        setPricingMode,
+        togglePricingMode,
         setActiveTab,
         setSelectedCategoryFilter,
         setSearchQuery,
