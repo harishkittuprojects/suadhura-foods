@@ -31,6 +31,7 @@ import {
   Check,
   Percent,
   HelpCircle,
+  Receipt,
   Store
 } from 'lucide-react';
 
@@ -1464,3 +1465,4 @@ export const AdminPage = () => {
     </div>
   );
 };
+
