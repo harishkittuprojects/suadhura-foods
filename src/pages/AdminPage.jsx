@@ -32,7 +32,13 @@ import {
   Percent,
   HelpCircle,
   Receipt,
-  Store
+  Store,
+  Menu,
+  LogOut,
+  Home,
+  Bell,
+  ExternalLink,
+  ChevronRight
 } from 'lucide-react';
 
 export const AdminPage = () => {
@@ -42,6 +48,9 @@ export const AdminPage = () => {
   const [adminMode, setAdminMode] = useState('unified');
   // Tabs: 'overview' | 'orders' | 'subscriptions' | 'b2b-quotes' | 'inventory' | 'invoices'
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Mobile sidebar open state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Search & Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -373,7 +382,7 @@ export const AdminPage = () => {
   ];
 
   // -------------------------------------------------------------------
-  // INTERACTIVE DEMO SIMULATORS
+  // SIMULATORS
   // -------------------------------------------------------------------
   const simulateNewB2COrder = () => {
     const newId = `SMD-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -463,14 +472,10 @@ export const AdminPage = () => {
   // FILTERING LOGIC
   // -------------------------------------------------------------------
   const filteredOrders = orders.filter((o) => {
-    // Mode Filter
     if (adminMode === 'b2c' && o.type !== 'b2c') return false;
     if (adminMode === 'b2b' && o.type !== 'b2b') return false;
-
-    // Status Filter
     if (statusFilter !== 'All' && o.status !== statusFilter) return false;
 
-    // Search Query
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
@@ -482,7 +487,6 @@ export const AdminPage = () => {
     return true;
   });
 
-  // Calculate Aggregates
   const b2cOrdersCount = orders.filter((o) => o.type === 'b2c').length;
   const b2bOrdersCount = orders.filter((o) => o.type === 'b2b').length;
   const b2cRevenue = orders
@@ -492,869 +496,962 @@ export const AdminPage = () => {
     .filter((o) => o.type === 'b2b')
     .reduce((sum, o) => sum + o.total, 0);
 
+  const sidebarLinks = [
+    { id: 'overview', label: 'Dashboard Overview', icon: Layers, badge: null },
+    { id: 'orders', label: 'Live Orders Dispatch', icon: Package, badge: orders.length },
+    { id: 'subscriptions', label: 'Morning Subscriptions', icon: Clock, badge: subscriptions.length },
+    { id: 'b2b-quotes', label: 'Wholesale RFPs & Quotes', icon: Building2, badge: b2bQuotes.length },
+    { id: 'inventory', label: 'Catalog & Dual-Pricing', icon: Percent, badge: null },
+    { id: 'invoices', label: 'GST Tax Invoices', icon: Receipt, badge: invoices.length }
+  ];
+
   return (
-    <div className="bg-[#FAF5EC] min-h-screen pb-16">
-      {/* 1. Admin Top Brand Bar */}
-      <div className="bg-[#3D040A] text-white border-b border-[#52060E] sticky top-0 z-30 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-400 text-[#3D040A] font-black flex items-center justify-center shadow-md">
-              <Store className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-black text-sm sm:text-base tracking-tight text-white">
-                  Sumadhura Command Center
-                </h1>
-                <span className="bg-emerald-500/20 text-emerald-300 text-[10px] font-black px-2 py-0.5 rounded-full border border-emerald-400/30">
-                  LIVE DEMO
-                </span>
+    <div className="flex h-screen w-full bg-[#0F141C] text-slate-100 overflow-hidden font-sans">
+      {/* ============================================================= */}
+      {/* 1. STANDALONE LEFT SIDEBAR                                     */}
+      {/* ============================================================= */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#171D27] border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col h-full">
+          {/* Sidebar Brand Header */}
+          <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-[#F5A623] text-[#3D040A] flex items-center justify-center font-black text-xl shadow-lg shadow-amber-500/20">
+                <Store className="w-5 h-5 text-[#3D040A]" />
               </div>
-              <p className="text-[10px] text-amber-200/80">
-                Unified Operations for B2C Retail & B2B Wholesale
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-black text-sm text-white tracking-tight">Sumadhura Ops</h2>
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    HQ v2.4
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400">Enterprise Operations Portal</p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Mode Switcher Segmented Control */}
+          <div className="p-4 border-b border-slate-800">
+            <div className="text-[10px] font-black uppercase tracking-wider text-slate-500 mb-2">
+              Operational Scope
+            </div>
+            <div className="grid grid-cols-3 gap-1 bg-[#0F141C] p-1 rounded-xl border border-slate-800 text-[11px] font-extrabold text-center">
+              <button
+                onClick={() => setAdminMode('unified')}
+                className={`py-1.5 rounded-lg transition-all ${
+                  adminMode === 'unified'
+                    ? 'bg-amber-400 text-slate-950 font-black shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Unified
+              </button>
+              <button
+                onClick={() => setAdminMode('b2c')}
+                className={`py-1.5 rounded-lg transition-all ${
+                  adminMode === 'b2c'
+                    ? 'bg-blue-600 text-white font-black shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                B2C Retail
+              </button>
+              <button
+                onClick={() => setAdminMode('b2b')}
+                className={`py-1.5 rounded-lg transition-all ${
+                  adminMode === 'b2b'
+                    ? 'bg-[#7D0A14] text-white font-black shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                B2B Bulk
+              </button>
             </div>
           </div>
 
-          {/* Quick Simulation Trigger Buttons */}
-          <div className="flex items-center gap-2">
+          {/* Navigation Links */}
+          <div className="p-3 flex-1 overflow-y-auto space-y-1">
+            <div className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 py-1">
+              Management Modules
+            </div>
+            {sidebarLinks.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    setSidebarOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                    isActive
+                      ? 'bg-gradient-to-r from-amber-400/20 to-amber-500/10 text-amber-300 border border-amber-400/30'
+                      : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge !== null && (
+                    <span
+                      className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                        isActive
+                          ? 'bg-amber-400 text-slate-950'
+                          : 'bg-slate-800 text-slate-400'
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Bottom Card: Back to Live Storefront */}
+          <div className="p-4 border-t border-slate-800 space-y-3">
+            <div className="p-3 rounded-2xl bg-[#0F141C] border border-slate-800 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="font-extrabold text-white text-[11px]">Dark Store Hub: Bengaluru South</span>
+              </div>
+              <div className="text-[10px] text-slate-400 mt-1">Logged in as Operations Supervisor</div>
+            </div>
+
+            <button
+              onClick={() => navigateTo('home')}
+              className="w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-all flex items-center justify-center gap-2 shadow-md active:scale-95"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Back to Customer Store</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Backdrop for Mobile Sidebar */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden"
+        />
+      )}
+
+      {/* ============================================================= */}
+      {/* 2. MAIN ADMIN CANVAS (HEADER + SCROLLABLE CONTENT)            */}
+      {/* ============================================================= */}
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0A0D14]">
+        {/* Standalone Admin Header Bar */}
+        <header className="h-16 bg-[#121721] border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between flex-shrink-0 z-20">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+                <span>Operations</span>
+                <ChevronRight className="w-3 h-3 text-slate-600" />
+                <span className="text-amber-300 capitalize">{activeTab.replace('-', ' ')}</span>
+              </div>
+              <h1 className="text-sm sm:text-base font-black text-white capitalize">
+                {activeTab === 'overview'
+                  ? 'Operations Command Dashboard'
+                  : activeTab === 'b2b-quotes'
+                  ? 'Wholesale RFPs & Quotations Desk'
+                  : activeTab.replace('-', ' ')}
+              </h1>
+            </div>
+          </div>
+
+          {/* Quick Simulators & Storefront Jump */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-[11px] text-slate-300 font-medium">
+              <span className="text-amber-300 font-bold">❄️ 3.8°C</span>
+              <span>Cold-Chain OK</span>
+            </div>
+
             <button
               onClick={simulateNewB2COrder}
-              className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-[11px] flex items-center gap-1 shadow-sm active:scale-95 transition-all"
-              title="Simulate incoming retail app customer order"
+              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+              title="Simulate a real-time incoming B2C retail order"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>+ Simulate B2C Order</span>
+              <span className="hidden sm:inline">Simulate B2C Order</span>
+              <span className="sm:hidden">B2C</span>
             </button>
+
             <button
               onClick={simulateNewB2BQuote}
-              className="px-2.5 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-[11px] flex items-center gap-1 shadow-sm active:scale-95 transition-all"
+              className="px-3 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
               title="Simulate incoming wholesale hotel quote"
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>+ Simulate B2B RFP</span>
+              <span className="hidden sm:inline">Simulate B2B RFP</span>
+              <span className="sm:hidden">B2B</span>
             </button>
+
             <button
               onClick={() => navigateTo('home')}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-[11px] transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-colors"
             >
-              Exit to Store
+              <Store className="w-3.5 h-3.5" />
+              <span>Storefront</span>
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* 2. Dual-Mode Switcher Bar (Unified vs B2C vs B2B) */}
-        <div className="bg-[#4D060D] border-t border-white/10 px-4 sm:px-6 py-2">
-          <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-            {/* Mode Switcher Pills */}
-            <div className="inline-flex bg-black/40 p-1 rounded-2xl border border-white/10">
-              <button
-                onClick={() => setAdminMode('unified')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
-                  adminMode === 'unified'
-                    ? 'bg-amber-400 text-[#3D040A] shadow-md'
-                    : 'text-amber-100 hover:text-white'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Unified View</span>
-              </button>
-
-              <button
-                onClick={() => setAdminMode('b2c')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
-                  adminMode === 'b2c'
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-amber-100 hover:text-white'
-                }`}
-              >
-                <User className="w-3.5 h-3.5" />
-                <span>B2C Retail Operations</span>
-              </button>
-
-              <button
-                onClick={() => setAdminMode('b2b')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
-                  adminMode === 'b2b'
-                    ? 'bg-[#7D0A14] text-white ring-1 ring-amber-400/50 shadow-md'
-                    : 'text-amber-100 hover:text-white'
-                }`}
-              >
-                <Building2 className="w-3.5 h-3.5" />
-                <span>B2B Wholesale & Supply</span>
-              </button>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="flex items-center gap-1 overflow-x-auto hide-scrollbar text-xs">
-              {[
-                { id: 'overview', label: '📊 Dashboard' },
-                { id: 'orders', label: `📦 Orders (${orders.length})` },
-                { id: 'subscriptions', label: `🥛 Subscriptions (${subscriptions.length})` },
-                { id: 'b2b-quotes', label: `🏢 Wholesale Quotes (${b2bQuotes.length})` },
-                { id: 'inventory', label: '🏷️ Pricing & Stock' },
-                { id: 'invoices', label: '🧾 GST Invoices' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition-all ${
-                    activeTab === tab.id
-                      ? 'bg-white text-[#3D040A] shadow-sm font-black'
-                      : 'text-amber-100/80 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Body */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        {/* ========================================================= */}
-        {/* TAB 1: DASHBOARD OVERVIEW                                 */}
-        {/* ========================================================= */}
-        {activeTab === 'overview' && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {/* Top KPI Metric Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* B2C Retail Today */}
-              <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                  <span>Today's B2C Retail</span>
-                  <span className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
-                    <User className="w-4 h-4" />
-                  </span>
-                </div>
-                <div className="text-2xl font-black text-[#3D040A]">
-                  ₹{b2cRevenue.toLocaleString()}
-                </div>
-                <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>{b2cOrdersCount} orders • 11.2m avg delivery</span>
-                </div>
-              </div>
-
-              {/* B2B Wholesale Volume */}
-              <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                  <span>B2B Wholesale Dispatched</span>
-                  <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
-                    <Building2 className="w-4 h-4" />
-                  </span>
-                </div>
-                <div className="text-2xl font-black text-[#7D0A14]">
-                  ₹{b2bRevenue.toLocaleString()}
-                </div>
-                <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                  <TrendingUp className="w-3.5 h-3.5" />
-                  <span>{b2bOrdersCount} bulk commercial shipments</span>
-                </div>
-              </div>
-
-              {/* Active Morning Subscriptions */}
-              <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                  <span>Morning Milk Subscribers</span>
-                  <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
-                    <Clock className="w-4 h-4" />
-                  </span>
-                </div>
-                <div className="text-2xl font-black text-[#3D040A]">
-                  520 <span className="text-xs text-slate-400 font-normal">Homes</span>
-                </div>
-                <div className="text-[11px] text-slate-500 font-medium">
-                  Delivered 6:00 AM daily • 100% On Time
-                </div>
-              </div>
-
-              {/* Total Pending B2B RFPs */}
-              <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                  <span>Wholesale RFPs & Quotes</span>
-                  <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
-                    <FileText className="w-4 h-4" />
-                  </span>
-                </div>
-                <div className="text-2xl font-black text-[#3D040A]">
-                  {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Hotels</span>
-                </div>
-                <div className="text-[11px] text-amber-600 font-bold">
-                  Est. ₹5.8 Lakhs pipeline value
-                </div>
-              </div>
-            </div>
-
-            {/* Live Operational Dispatch Flow */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left 2 Cols: Live Orders Stream */}
-              <div className="lg:col-span-2 bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-4 shadow-xs">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-black text-base text-[#3D040A]">Live Dispatch Activity</h3>
-                    <p className="text-xs text-slate-500">Real-time status of retail deliveries & bulk morning shipments</p>
+        {/* Scrollable Workspace */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+          {/* ========================================================= */}
+          {/* 1. DASHBOARD OVERVIEW                                     */}
+          {/* ========================================================= */}
+          {activeTab === 'overview' && (
+            <div className="space-y-6 animate-in fade-in duration-200">
+              {/* Metric Cards Grid */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Card 1: B2C Retail Today */}
+                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                    <span>Today's B2C Retail</span>
+                    <span className="p-1.5 rounded-xl bg-blue-500/10 text-blue-400">
+                      <User className="w-4 h-4" />
+                    </span>
                   </div>
-                  <button
-                    onClick={() => setActiveTab('orders')}
-                    className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1"
-                  >
-                    <span>View all orders</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="text-2xl sm:text-3xl font-black text-white">
+                    ₹{b2cRevenue.toLocaleString()}
+                  </div>
+                  <div className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5" />
+                    <span>{b2cOrdersCount} orders • 11.2m avg delivery</span>
+                  </div>
                 </div>
 
-                <div className="divide-y divide-slate-100">
-                  {orders.slice(0, 4).map((order) => (
-                    <div key={order.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs flex-shrink-0 ${
-                            order.type === 'b2b'
-                              ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                              : 'bg-blue-100 text-blue-900 border border-blue-200'
-                          }`}
-                        >
-                          {order.type === 'b2b' ? 'B2B' : 'B2C'}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-extrabold text-sm text-slate-900">{order.id}</span>
-                            <span className="text-xs text-slate-500">• {order.customer}</span>
-                          </div>
-                          <div className="text-xs text-slate-500 line-clamp-1">
-                            {order.items.map((i) => `${i.name} (x${i.qty})`).join(', ')}
-                          </div>
-                          <div className="text-[10px] text-slate-400 mt-0.5">
-                            {order.deliverySlot} • {order.timestamp}
-                          </div>
-                        </div>
-                      </div>
+                {/* Card 2: B2B Wholesale Dispatched */}
+                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                    <span>B2B Wholesale Dispatched</span>
+                    <span className="p-1.5 rounded-xl bg-amber-500/10 text-amber-400">
+                      <Building2 className="w-4 h-4" />
+                    </span>
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-amber-300">
+                    ₹{b2bRevenue.toLocaleString()}
+                  </div>
+                  <div className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5" />
+                    <span>{b2bOrdersCount} bulk commercial shipments</span>
+                  </div>
+                </div>
 
-                      <div className="flex items-center justify-between sm:justify-end gap-3 self-end sm:self-center">
-                        <span className="font-black text-sm text-[#3D040A]">₹{order.total.toLocaleString()}</span>
-                        <span
-                          className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
-                            order.status === 'Delivered'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : order.status === 'Dispatched'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {order.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                {/* Card 3: Morning Milk Subscribers */}
+                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                    <span>Morning Milk Subscribers</span>
+                    <span className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-400">
+                      <Clock className="w-4 h-4" />
+                    </span>
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-white">
+                    520 <span className="text-xs text-slate-400 font-normal">Homes</span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 font-medium">
+                    Delivered 6:00 AM daily • 100% On Time
+                  </div>
+                </div>
+
+                {/* Card 4: Wholesale RFPs & Pipeline */}
+                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                    <span>Commercial RFPs & Quotes</span>
+                    <span className="p-1.5 rounded-xl bg-purple-500/10 text-purple-400">
+                      <FileText className="w-4 h-4" />
+                    </span>
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-black text-white">
+                    {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Hotels</span>
+                  </div>
+                  <div className="text-[11px] text-amber-400 font-bold">
+                    Est. ₹5.8 Lakhs pipeline value
+                  </div>
                 </div>
               </div>
 
-              {/* Right 1 Col: Quick Wholesale Actions & Cold Chain Stats */}
-              <div className="space-y-4">
-                <div className="bg-gradient-to-br from-[#4A060C] to-[#7D0A14] text-white p-6 rounded-3xl shadow-md border border-[#8B121C] space-y-4">
+              {/* Two Column Section: Live Dispatch + Operations Info */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left 2 Cols: Live Orders Dispatch Stream */}
+                <div className="lg:col-span-2 bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-black uppercase text-amber-300">Warehouse Cold-Chain</span>
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <div>
+                      <h3 className="font-black text-base text-white">Live Dispatch Activity</h3>
+                      <p className="text-xs text-slate-400">Real-time status of retail deliveries & bulk morning shipments</p>
+                    </div>
+                    <button
+                      onClick={() => setActiveTab('orders')}
+                      className="text-xs font-bold text-amber-300 hover:underline flex items-center gap-1"
+                    >
+                      <span>View all {orders.length} orders</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div>
-                    <div className="text-3xl font-black text-white">3.8°C</div>
-                    <p className="text-xs text-amber-100/80">Optimal dairy storage temperature</p>
-                  </div>
-                  <div className="pt-2 border-t border-white/10 space-y-2 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-amber-200/80">Milk Tanker 1:</span>
-                      <strong className="text-white">100% Tested Pure</strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-amber-200/80">Vegetable Mandi Arrival:</span>
-                      <strong className="text-white">4:15 AM Handpicked</strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-amber-200/80">On-Time Dispatch Rate:</span>
-                      <strong className="text-emerald-300">99.4%</strong>
-                    </div>
+
+                  <div className="divide-y divide-slate-800">
+                    {orders.slice(0, 4).map((order) => (
+                      <div key={order.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs flex-shrink-0 ${
+                              order.type === 'b2b'
+                                ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30'
+                                : 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
+                            }`}
+                          >
+                            {order.type === 'b2b' ? 'B2B' : 'B2C'}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-extrabold text-sm text-white">{order.id}</span>
+                              <span className="text-xs text-slate-400">• {order.customer}</span>
+                            </div>
+                            <div className="text-xs text-slate-400 line-clamp-1">
+                              {order.items.map((i) => `${i.name} (x${i.qty})`).join(', ')}
+                            </div>
+                            <div className="text-[10px] text-slate-500 mt-0.5">
+                              {order.deliverySlot} • {order.timestamp}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between sm:justify-end gap-3 self-end sm:self-center">
+                          <span className="font-black text-sm text-white">₹{order.total.toLocaleString()}</span>
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
+                              order.status === 'Delivered'
+                                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                : order.status === 'Dispatched'
+                                ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                                : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                            }`}
+                          >
+                            {order.status}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-3">
-                  <h4 className="font-extrabold text-xs text-[#3D040A] uppercase tracking-wider">
-                    Quick Operations Shortcuts
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <button
-                      onClick={() => setActiveTab('b2b-quotes')}
-                      className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between"
-                    >
-                      <Building2 className="w-4 h-4 mb-1" />
-                      <span>Review Wholesale RFPs</span>
-                    </button>
-                    <button
-                      onClick={() => setActiveTab('subscriptions')}
-                      className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between"
-                    >
-                      <Clock className="w-4 h-4 mb-1 text-emerald-600" />
-                      <span>Milk Run-Sheet</span>
-                    </button>
-                    <button
-                      onClick={() => setActiveTab('invoices')}
-                      className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between"
-                    >
-                      <Receipt className="w-4 h-4 mb-1 text-blue-600" />
-                      <span>Download GST Invoices</span>
-                    </button>
-                    <button
-                      onClick={() => setActiveTab('inventory')}
-                      className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between"
-                    >
-                      <Percent className="w-4 h-4 mb-1 text-amber-600" />
-                      <span>Wholesale Pricing</span>
-                    </button>
+                {/* Right 1 Col: Cold-Chain & Quick Action Cards */}
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-br from-[#2A0407] to-[#45070D] text-white p-6 rounded-3xl border border-[#680811] space-y-4 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase text-amber-300">Warehouse Cold-Chain</span>
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="text-3xl font-black text-white">3.8°C</div>
+                      <p className="text-xs text-amber-100/80">Optimal dairy storage temperature</p>
+                    </div>
+                    <div className="pt-2 border-t border-white/10 space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-amber-200/80">Milk Tanker 1:</span>
+                        <strong className="text-white">100% Tested Pure</strong>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-amber-200/80">Mandi Veggie Arrival:</span>
+                        <strong className="text-white">4:15 AM Handpicked</strong>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-amber-200/80">On-Time Dispatch Rate:</span>
+                        <strong className="text-emerald-300">99.4%</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 space-y-3">
+                    <h4 className="font-extrabold text-xs text-slate-300 uppercase tracking-wider">
+                      Operations Shortcuts
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <button
+                        onClick={() => setActiveTab('b2b-quotes')}
+                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-amber-300 text-left transition-colors flex flex-col justify-between"
+                      >
+                        <Building2 className="w-4 h-4 mb-1" />
+                        <span>Review B2B RFPs</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('subscriptions')}
+                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-slate-200 text-left transition-colors flex flex-col justify-between"
+                      >
+                        <Clock className="w-4 h-4 mb-1 text-emerald-400" />
+                        <span>Milk Run-Sheet</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('invoices')}
+                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-slate-200 text-left transition-colors flex flex-col justify-between"
+                      >
+                        <Receipt className="w-4 h-4 mb-1 text-blue-400" />
+                        <span>GST Invoices</span>
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('inventory')}
+                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-slate-200 text-left transition-colors flex flex-col justify-between"
+                      >
+                        <Percent className="w-4 h-4 mb-1 text-yellow-400" />
+                        <span>Dual-Pricing</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ========================================================= */}
-        {/* TAB 2: ORDER MANAGEMENT (B2C & B2B)                       */}
-        {/* ========================================================= */}
-        {activeTab === 'orders' && (
-          <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-300">
-            {/* Header, Search & Filters */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="text-xl font-black text-[#3D040A]">Order Management Console</h3>
-                <p className="text-xs text-slate-500">Live order fulfillment for B2C retail & B2B wholesale dispatches</p>
-              </div>
-
-              {/* Filters */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search order ID, hotel or client..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-8 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#7D0A14] w-48 sm:w-60"
-                  />
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+          {/* ========================================================= */}
+          {/* 2. ORDER MANAGEMENT CONSOLE                               */}
+          {/* ========================================================= */}
+          {activeTab === 'orders' && (
+            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-white">Order Management Console</h3>
+                  <p className="text-xs text-slate-400">Live order fulfillment for B2C retail & B2B wholesale dispatches</p>
                 </div>
 
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-1.5 text-xs rounded-xl border border-slate-200 bg-white font-medium focus:outline-none"
-                >
-                  <option value="All">All Statuses</option>
-                  <option value="Packing">Packing</option>
-                  <option value="Dispatched">Dispatched</option>
-                  <option value="Delivered">Delivered</option>
-                </select>
-              </div>
-            </div>
+                {/* Filters */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search order ID, hotel or client..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-400 w-48 sm:w-60"
+                    />
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  </div>
 
-            {/* Orders Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="bg-[#FAF5EC] text-slate-600 font-extrabold border-b border-[#EDE1D1]">
-                    <th className="p-3 rounded-l-xl">Order ID & Type</th>
-                    <th className="p-3">Customer / Enterprise</th>
-                    <th className="p-3">Items & Packaging</th>
-                    <th className="p-3">Total Amount</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3 rounded-r-xl text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
-                  {filteredOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-slate-50/70 transition-colors">
-                      {/* ID & Type */}
-                      <td className="p-3">
-                        <div className="flex items-center gap-2">
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white font-medium focus:outline-none"
+                  >
+                    <option value="All">All Statuses</option>
+                    <option value="Packing">Packing</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Orders Table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="bg-slate-800/60 text-slate-400 font-extrabold border-b border-slate-800">
+                      <th className="p-3 rounded-l-xl">Order ID & Type</th>
+                      <th className="p-3">Customer / Enterprise</th>
+                      <th className="p-3">Items & Packaging</th>
+                      <th className="p-3">Total Amount</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 rounded-r-xl text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800 font-medium">
+                    {filteredOrders.map((order) => (
+                      <tr key={order.id} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="p-3">
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
                               order.type === 'b2b'
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                : 'bg-blue-100 text-blue-800 border border-blue-200'
+                                ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
                             }`}
                           >
                             {order.type === 'b2b' ? 'B2B Wholesale' : 'B2C Retail'}
                           </span>
-                        </div>
-                        <div className="font-extrabold text-slate-900 mt-1">{order.id}</div>
-                        <div className="text-[10px] text-slate-400">{order.timestamp}</div>
-                      </td>
+                          <div className="font-extrabold text-white mt-1">{order.id}</div>
+                          <div className="text-[10px] text-slate-500">{order.timestamp}</div>
+                        </td>
 
-                      {/* Customer / Hotel */}
-                      <td className="p-3">
-                        <div className="font-bold text-slate-900">{order.customer}</div>
-                        {order.gstin && (
-                          <div className="text-[10px] text-amber-700 font-mono font-bold">
-                            GSTIN: {order.gstin}
-                          </div>
-                        )}
-                        <div className="text-[10px] text-slate-500 line-clamp-1">{order.contact}</div>
-                      </td>
-
-                      {/* Items */}
-                      <td className="p-3 max-w-xs">
-                        <div className="space-y-0.5">
-                          {order.items.map((item, idx) => (
-                            <div key={idx} className="text-[11px] text-slate-700">
-                              <span className="font-bold">{item.qty}x</span> {item.name}
+                        <td className="p-3">
+                          <div className="font-bold text-white">{order.customer}</div>
+                          {order.gstin && (
+                            <div className="text-[10px] text-amber-400 font-mono font-bold">
+                              GSTIN: {order.gstin}
                             </div>
-                          ))}
-                        </div>
-                        <div className="text-[10px] text-blue-600 font-bold mt-1">
-                          Slot: {order.deliverySlot}
-                        </div>
-                      </td>
-
-                      {/* Total */}
-                      <td className="p-3">
-                        <div className="font-black text-sm text-[#7D0A14]">
-                          ₹{order.total.toLocaleString()}
-                        </div>
-                        <div className="text-[10px] text-emerald-600 font-bold">
-                          {order.paymentMethod}
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td className="p-3">
-                        <span
-                          className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black ${
-                            order.status === 'Delivered'
-                              ? 'bg-emerald-100 text-emerald-800'
-                              : order.status === 'Dispatched'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {order.status}
-                        </span>
-                      </td>
-
-                      {/* Action buttons */}
-                      <td className="p-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {order.status === 'Packing' && (
-                            <button
-                              onClick={() => updateOrderStatus(order.id, 'Dispatched')}
-                              className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black shadow-xs"
-                            >
-                              Dispatch
-                            </button>
                           )}
-                          {order.status === 'Dispatched' && (
-                            <button
-                              onClick={() => updateOrderStatus(order.id, 'Delivered')}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black shadow-xs"
-                            >
-                              Mark Delivered
-                            </button>
-                          )}
-                          {order.type === 'b2b' && (
-                            <button
-                              onClick={() => {
-                                const found = invoices.find((inv) => inv.orderId === order.id);
-                                if (found) setSelectedInvoice(found);
-                                else {
-                                  setSelectedInvoice({
-                                    invoiceNo: `INV-${order.id}`,
-                                    date: 'Today',
-                                    client: order.customer,
-                                    gstin: order.gstin || '36AABCU9603R1ZM',
-                                    orderId: order.id,
-                                    taxableAmount: (order.total * 0.952).toFixed(2),
-                                    cgst: (order.total * 0.024).toFixed(2),
-                                    sgst: (order.total * 0.024).toFixed(2),
-                                    totalAmount: order.total,
-                                    status: 'Generated',
-                                    dueDate: 'Net 15 Days'
-                                  });
-                                }
-                              }}
-                              className="px-2 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold"
-                              title="Print GST Invoice"
-                            >
-                              <FileText className="w-3.5 h-3.5 inline mr-1" />
-                              Invoice
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+                          <div className="text-[10px] text-slate-400 line-clamp-1">{order.contact}</div>
+                        </td>
 
-        {/* ========================================================= */}
-        {/* TAB 3: DAILY MORNING SUBSCRIPTIONS (B2C)                  */}
-        {/* ========================================================= */}
-        {activeTab === 'subscriptions' && (
-          <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="text-xl font-black text-[#3D040A]">
-                  Morning Milk & Veggie Subscriptions (B2C)
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Automated doorstep delivery before 7:00 AM every single morning.
-                </p>
+                        <td className="p-3 max-w-xs">
+                          <div className="space-y-0.5">
+                            {order.items.map((item, idx) => (
+                              <div key={idx} className="text-[11px] text-slate-300">
+                                <span className="font-bold text-white">{item.qty}x</span> {item.name}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="text-[10px] text-amber-300 font-bold mt-1">
+                            Slot: {order.deliverySlot}
+                          </div>
+                        </td>
+
+                        <td className="p-3">
+                          <div className="font-black text-sm text-white">
+                            ₹{order.total.toLocaleString()}
+                          </div>
+                          <div className="text-[10px] text-emerald-400 font-bold">
+                            {order.paymentMethod}
+                          </div>
+                        </td>
+
+                        <td className="p-3">
+                          <span
+                            className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black ${
+                              order.status === 'Delivered'
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                : order.status === 'Dispatched'
+                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            }`}
+                          >
+                            {order.status}
+                          </span>
+                        </td>
+
+                        <td className="p-3 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
+                            {order.status === 'Packing' && (
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'Dispatched')}
+                                className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black shadow-xs"
+                              >
+                                Dispatch
+                              </button>
+                            )}
+                            {order.status === 'Dispatched' && (
+                              <button
+                                onClick={() => updateOrderStatus(order.id, 'Delivered')}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black shadow-xs"
+                              >
+                                Mark Delivered
+                              </button>
+                            )}
+                            {order.type === 'b2b' && (
+                              <button
+                                onClick={() => {
+                                  const found = invoices.find((inv) => inv.orderId === order.id);
+                                  if (found) setSelectedInvoice(found);
+                                  else {
+                                    setSelectedInvoice({
+                                      invoiceNo: `INV-${order.id}`,
+                                      date: 'Today',
+                                      client: order.customer,
+                                      gstin: order.gstin || '36AABCU9603R1ZM',
+                                      orderId: order.id,
+                                      taxableAmount: (order.total * 0.952).toFixed(2),
+                                      cgst: (order.total * 0.024).toFixed(2),
+                                      sgst: (order.total * 0.024).toFixed(2),
+                                      totalAmount: order.total,
+                                      status: 'Generated',
+                                      dueDate: 'Net 15 Days'
+                                    });
+                                  }
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-[10px] font-bold border border-slate-700"
+                                title="Print GST Invoice"
+                              >
+                                <FileText className="w-3.5 h-3.5 inline mr-1" />
+                                Invoice
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-
-              <button
-                onClick={() => {
-                  window.print();
-                  showToast('Preparing printable morning delivery run-sheet...');
-                }}
-                className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
-              >
-                <Printer className="w-3.5 h-3.5 text-amber-300" />
-                <span>Print Route Run-Sheet</span>
-              </button>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {subscriptions.map((sub) => (
-                <div
-                  key={sub.id}
-                  className="bg-[#FAF5EC] p-4 sm:p-5 rounded-2xl border border-[#EDE1D1] space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-black text-xs text-[#7D0A14]">{sub.id}</span>
-                      <span className="font-extrabold text-sm text-slate-900">{sub.customer}</span>
-                    </div>
-                    <span
-                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
-                        sub.status === 'Active'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-amber-100 text-amber-800'
-                      }`}
-                    >
-                      {sub.status}
-                    </span>
-                  </div>
-
-                  <div className="text-xs text-slate-600 space-y-1">
-                    <div>
-                      <strong>Items:</strong> {sub.items}
-                    </div>
-                    <div>
-                      <strong>Address:</strong> {sub.apartment}
-                    </div>
-                    <div>
-                      <strong>Delivery Window:</strong> {sub.slot} ({sub.frequency})
-                    </div>
-                    <div className="text-[11px] text-slate-400">
-                      Subscribed Since: {sub.since} • Phone: {sub.phone}
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-[#E0D4C3] flex items-center justify-between">
-                    <button
-                      onClick={() => toggleSubscriptionStatus(sub.id)}
-                      className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
-                        sub.status === 'Active'
-                          ? 'bg-amber-200 text-amber-900 hover:bg-amber-300'
-                          : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                      }`}
-                    >
-                      {sub.status === 'Active' ? 'Pause Daily Dispatch' : 'Resume Daily Dispatch'}
-                    </button>
-
-                    <button
-                      onClick={() => showToast(`SMS dispatch reminder sent to ${sub.customer}`)}
-                      className="text-xs font-bold text-blue-600 hover:underline"
-                    >
-                      Send SMS Update
-                    </button>
-                  </div>
+          {/* ========================================================= */}
+          {/* 3. MORNING SUBSCRIPTIONS (B2C)                            */}
+          {/* ========================================================= */}
+          {activeTab === 'subscriptions' && (
+            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-white">
+                    Morning Milk & Veggie Subscriptions (B2C)
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Automated doorstep delivery before 7:00 AM every single morning.
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* ========================================================= */}
-        {/* TAB 4: B2B COMMERCIAL QUOTES & RFPs                       */}
-        {/* ========================================================= */}
-        {activeTab === 'b2b-quotes' && (
-          <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="text-xl font-black text-[#3D040A]">
-                  B2B Wholesale Quotes & RFP Inquiries
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Manage bulk price requests from Hotels, Cloud Kitchens, Caterers & Canteens
-                </p>
-              </div>
-
-              <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-                <Building2 className="w-4 h-4 text-amber-700" />
-                <span>{b2bQuotes.length} Commercial Leads Active</span>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {b2bQuotes.map((quote) => (
-                <div
-                  key={quote.id}
-                  className="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs hover:border-[#7D0A14] transition-all space-y-3"
+                <button
+                  onClick={() => {
+                    window.print();
+                    showToast('Preparing printable morning delivery run-sheet...');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-xs text-[#7D0A14] bg-amber-50 px-2 py-0.5 rounded">
-                          {quote.id}
-                        </span>
-                        <h4 className="font-black text-base text-slate-900">{quote.company}</h4>
-                      </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
-                        {quote.contactPerson} • {quote.businessType}
-                      </div>
-                    </div>
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Route Run-Sheet</span>
+                </button>
+              </div>
 
-                    <div className="flex items-center gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {subscriptions.map((sub) => (
+                  <div
+                    key={sub.id}
+                    className="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-black text-xs text-amber-400">{sub.id}</span>
+                        <span className="font-extrabold text-sm text-white">{sub.customer}</span>
+                      </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-black ${
-                          quote.status === 'Contract Approved'
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : quote.status === 'Quote Sent'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-amber-100 text-amber-800'
+                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                          sub.status === 'Active'
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                         }`}
                       >
-                        {quote.status}
+                        {sub.status}
                       </span>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                    <div>
-                      <span className="text-slate-400 font-bold uppercase text-[10px] block">
-                        Estimated Volume
-                      </span>
-                      <strong className="text-slate-800">{quote.monthlyVolume}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 font-bold uppercase text-[10px] block">
-                        Contact Info
-                      </span>
-                      <div className="text-slate-700">{quote.phone}</div>
-                      <div className="text-slate-500 text-[11px]">{quote.email}</div>
-                    </div>
-                    <div>
-                      <span className="text-slate-400 font-bold uppercase text-[10px] block">
-                        Requested Categories
-                      </span>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {quote.categories.map((c, i) => (
-                          <span
-                            key={i}
-                            className="bg-[#FAF5EC] text-[#7D0A14] px-2 py-0.5 rounded text-[10px] font-bold"
-                          >
-                            {c}
-                          </span>
-                        ))}
+                    <div className="text-xs text-slate-300 space-y-1">
+                      <div>
+                        <strong className="text-white">Items:</strong> {sub.items}
+                      </div>
+                      <div>
+                        <strong className="text-white">Address:</strong> {sub.apartment}
+                      </div>
+                      <div>
+                        <strong className="text-white">Delivery Window:</strong> {sub.slot} ({sub.frequency})
+                      </div>
+                      <div className="text-[11px] text-slate-500">
+                        Subscribed Since: {sub.since} • Phone: {sub.phone}
                       </div>
                     </div>
-                  </div>
 
-                  {quote.notes && (
-                    <div className="p-3 rounded-xl bg-slate-50 text-xs text-slate-700 italic border border-slate-100">
-                      "{quote.notes}"
-                    </div>
-                  )}
-
-                  {/* Actions */}
-                  <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
-                    <span className="text-[11px] text-slate-400">Received {quote.date}</span>
-                    <div className="flex items-center gap-2">
-                      <a
-                        href={`https://wa.me/${quote.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(
-                          quote.contactPerson
-                        )},%20this%20is%20Sumadhura%20Foods%20B2B%20Procurement%20Desk.`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
+                    <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+                      <button
+                        onClick={() => toggleSubscriptionStatus(sub.id)}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
+                          sub.status === 'Active'
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30'
+                            : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                        }`}
                       >
-                        <span>WhatsApp Quote</span>
-                      </a>
-                      {quote.status === 'New Inquiry' && (
-                        <button
-                          onClick={() => updateQuoteStatus(quote.id, 'Quote Sent')}
-                          className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
-                        >
-                          Mark Quote Sent
-                        </button>
-                      )}
-                      {quote.status === 'Quote Sent' && (
-                        <button
-                          onClick={() => updateQuoteStatus(quote.id, 'Contract Approved')}
-                          className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs"
-                        >
-                          Approve Wholesale Contract
-                        </button>
-                      )}
+                        {sub.status === 'Active' ? 'Pause Daily Dispatch' : 'Resume Daily Dispatch'}
+                      </button>
+
+                      <button
+                        onClick={() => showToast(`SMS dispatch reminder sent to ${sub.customer}`)}
+                        className="text-xs font-bold text-blue-400 hover:underline"
+                      >
+                        Send SMS Update
+                      </button>
                     </div>
                   </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* 4. B2B COMMERCIAL QUOTES & RFPs                           */}
+          {/* ========================================================= */}
+          {activeTab === 'b2b-quotes' && (
+            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-white">
+                    B2B Wholesale Quotes & RFP Inquiries
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Manage bulk price requests from Hotels, Cloud Kitchens, Caterers & Canteens
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* ========================================================= */}
-        {/* TAB 5: INVENTORY & PRICING (RETAIL vs WHOLESALE)          */}
-        {/* ========================================================= */}
-        {activeTab === 'inventory' && (
-          <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="text-xl font-black text-[#3D040A]">
-                  Dual-Tier Pricing & Inventory Management
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Side-by-side management of B2C Retail & B2B Wholesale price tiers and stock
-                </p>
+                <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-300 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/30">
+                  <Building2 className="w-4 h-4 text-amber-400" />
+                  <span>{b2bQuotes.length} Commercial Leads Active</span>
+                </div>
               </div>
 
-              <div className="text-xs text-slate-500 font-medium">
-                Showing {inventoryList.length} Core Essential SKUs
-              </div>
-            </div>
+              <div className="space-y-4">
+                {b2bQuotes.map((quote) => (
+                  <div
+                    key={quote.id}
+                    className="bg-slate-900/80 rounded-2xl p-5 border border-slate-800 hover:border-amber-400/50 transition-all space-y-3"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-black text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                            {quote.id}
+                          </span>
+                          <h4 className="font-black text-base text-white">{quote.company}</h4>
+                        </div>
+                        <div className="text-xs text-slate-400 mt-0.5">
+                          {quote.contactPerson} • {quote.businessType}
+                        </div>
+                      </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="bg-[#FAF5EC] text-slate-600 font-extrabold border-b border-[#EDE1D1]">
-                    <th className="p-3 rounded-l-xl">Product & Category</th>
-                    <th className="p-3">Current Stock</th>
-                    <th className="p-3">B2C Retail Price</th>
-                    <th className="p-3">B2B Wholesale Price</th>
-                    <th className="p-3">Wholesale MOQ</th>
-                    <th className="p-3 rounded-r-xl text-right">Stock Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 font-medium">
-                  {inventoryList.map((prod) => (
-                    <tr key={prod.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="p-3">
-                        <div className="font-bold text-slate-900">{prod.name}</div>
-                        <span className="text-[10px] text-slate-400">{prod.category}</span>
-                      </td>
-                      <td className="p-3 font-bold text-slate-800">{prod.stock}</td>
-                      <td className="p-3">
-                        <div className="font-extrabold text-blue-700">₹{prod.retailPrice}</div>
-                        <div className="text-[10px] text-slate-400">{prod.retailUnit}</div>
-                      </td>
-                      <td className="p-3">
-                        <div className="font-extrabold text-[#7D0A14]">₹{prod.wholesalePrice}</div>
-                        <div className="text-[10px] text-slate-500">{prod.wholesaleUnit}</div>
-                      </td>
-                      <td className="p-3 font-mono font-bold text-slate-700">{prod.moq}</td>
-                      <td className="p-3 text-right">
-                        <button
-                          onClick={() => toggleInventoryStock(prod.id)}
-                          className={`px-3 py-1 rounded-full text-[10px] font-black transition-colors ${
-                            prod.inStock
-                              ? 'bg-emerald-100 text-emerald-800 hover:bg-rose-100 hover:text-rose-800'
-                              : 'bg-rose-100 text-rose-800 hover:bg-emerald-100 hover:text-emerald-800'
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-black ${
+                            quote.status === 'Contract Approved'
+                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              : quote.status === 'Quote Sent'
+                              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                           }`}
                         >
-                          {prod.inStock ? 'In Stock (Active)' : 'Out of Stock'}
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {/* ========================================================= */}
-        {/* TAB 6: B2B GST TAX INVOICES & BILLING                     */}
-        {/* ========================================================= */}
-        {activeTab === 'invoices' && (
-          <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-300">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="text-xl font-black text-[#3D040A]">
-                  B2B Official GST Tax Invoices
-                </h3>
-                <p className="text-xs text-slate-500">
-                  Government compliant tax invoices for commercial client Input Tax Credit (ITC)
-                </p>
-              </div>
-
-              <div className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
-                All Invoices 100% ITC Eligible
-              </div>
-            </div>
-
-            <div className="divide-y divide-slate-100">
-              {invoices.map((inv) => (
-                <div
-                  key={inv.invoiceNo}
-                  className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-black text-sm text-[#7D0A14]">
-                        {inv.invoiceNo}
-                      </span>
-                      <span className="text-xs text-slate-400">• {inv.date}</span>
-                    </div>
-                    <div className="font-extrabold text-sm text-slate-900">{inv.client}</div>
-                    <div className="text-xs text-amber-800 font-mono">
-                      GSTIN: <strong>{inv.gstin}</strong>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between sm:justify-end gap-4">
-                    <div className="text-right">
-                      <div className="text-xs text-slate-400">Taxable: ₹{inv.taxableAmount.toLocaleString()}</div>
-                      <div className="font-black text-base text-[#3D040A]">
-                        ₹{inv.totalAmount.toLocaleString()}
+                          {quote.status}
+                        </span>
                       </div>
-                      <div className="text-[10px] text-slate-500">CGST + SGST: ₹{(inv.cgst * 2).toFixed(2)}</div>
                     </div>
 
-                    <button
-                      onClick={() => setSelectedInvoice(inv)}
-                      className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
-                    >
-                      <Eye className="w-3.5 h-3.5 text-amber-300" />
-                      <span>View & Print</span>
-                    </button>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                      <div>
+                        <span className="text-slate-500 font-bold uppercase text-[10px] block">
+                          Estimated Volume
+                        </span>
+                        <strong className="text-white">{quote.monthlyVolume}</strong>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 font-bold uppercase text-[10px] block">
+                          Contact Info
+                        </span>
+                        <div className="text-slate-300">{quote.phone}</div>
+                        <div className="text-slate-400 text-[11px]">{quote.email}</div>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 font-bold uppercase text-[10px] block">
+                          Requested Categories
+                        </span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {quote.categories.map((c, i) => (
+                            <span
+                              key={i}
+                              className="bg-slate-800 text-amber-300 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-bold"
+                            >
+                              {c}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {quote.notes && (
+                      <div className="p-3 rounded-xl bg-[#121721] text-xs text-slate-300 italic border border-slate-800">
+                        "{quote.notes}"
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-[11px] text-slate-500">Received {quote.date}</span>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`https://wa.me/${quote.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(
+                            quote.contactPerson
+                          )},%20this%20is%20Sumadhura%20Foods%20B2B%20Procurement%20Desk.`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
+                        >
+                          <span>WhatsApp Quote</span>
+                        </a>
+                        {quote.status === 'New Inquiry' && (
+                          <button
+                            onClick={() => updateQuoteStatus(quote.id, 'Quote Sent')}
+                            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs"
+                          >
+                            Mark Quote Sent
+                          </button>
+                        )}
+                        {quote.status === 'Quote Sent' && (
+                          <button
+                            onClick={() => updateQuoteStatus(quote.id, 'Contract Approved')}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs"
+                          >
+                            Approve Wholesale Contract
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+
+          {/* ========================================================= */}
+          {/* 5. INVENTORY & PRICING (RETAIL vs WHOLESALE)              */}
+          {/* ========================================================= */}
+          {activeTab === 'inventory' && (
+            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-white">
+                    Dual-Tier Pricing & Inventory Management
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Side-by-side management of B2C Retail & B2B Wholesale price tiers and stock
+                  </p>
+                </div>
+
+                <div className="text-xs text-slate-400 font-medium">
+                  Showing {inventoryList.length} Core Essential SKUs
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="bg-slate-800/60 text-slate-400 font-extrabold border-b border-slate-800">
+                      <th className="p-3 rounded-l-xl">Product & Category</th>
+                      <th className="p-3">Current Stock</th>
+                      <th className="p-3">B2C Retail Price</th>
+                      <th className="p-3">B2B Wholesale Price</th>
+                      <th className="p-3">Wholesale MOQ</th>
+                      <th className="p-3 rounded-r-xl text-right">Stock Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800 font-medium">
+                    {inventoryList.map((prod) => (
+                      <tr key={prod.id} className="hover:bg-slate-800/40 transition-colors">
+                        <td className="p-3">
+                          <div className="font-bold text-white">{prod.name}</div>
+                          <span className="text-[10px] text-slate-400">{prod.category}</span>
+                        </td>
+                        <td className="p-3 font-bold text-slate-200">{prod.stock}</td>
+                        <td className="p-3">
+                          <div className="font-extrabold text-blue-400">₹{prod.retailPrice}</div>
+                          <div className="text-[10px] text-slate-500">{prod.retailUnit}</div>
+                        </td>
+                        <td className="p-3">
+                          <div className="font-extrabold text-amber-300">₹{prod.wholesalePrice}</div>
+                          <div className="text-[10px] text-slate-400">{prod.wholesaleUnit}</div>
+                        </td>
+                        <td className="p-3 font-mono font-bold text-slate-300">{prod.moq}</td>
+                        <td className="p-3 text-right">
+                          <button
+                            onClick={() => toggleInventoryStock(prod.id)}
+                            className={`px-3 py-1 rounded-full text-[10px] font-black transition-colors ${
+                              prod.inStock
+                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-rose-500/20 hover:text-rose-400'
+                                : 'bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-emerald-500/20 hover:text-emerald-400'
+                            }`}
+                          >
+                            {prod.inStock ? 'In Stock (Active)' : 'Out of Stock'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* 6. B2B GST TAX INVOICES & BILLING                         */}
+          {/* ========================================================= */}
+          {activeTab === 'invoices' && (
+            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-white">
+                    B2B Official GST Tax Invoices
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Government compliant tax invoices for commercial client Input Tax Credit (ITC)
+                  </p>
+                </div>
+
+                <div className="text-xs font-bold text-emerald-400 bg-emerald-500/15 px-3 py-1 rounded-full border border-emerald-500/30">
+                  All Invoices 100% ITC Eligible
+                </div>
+              </div>
+
+              <div className="divide-y divide-slate-800">
+                {invoices.map((inv) => (
+                  <div
+                    key={inv.invoiceNo}
+                    className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-black text-sm text-amber-300">
+                          {inv.invoiceNo}
+                        </span>
+                        <span className="text-xs text-slate-500">• {inv.date}</span>
+                      </div>
+                      <div className="font-extrabold text-sm text-white">{inv.client}</div>
+                      <div className="text-xs text-amber-400 font-mono">
+                        GSTIN: <strong>{inv.gstin}</strong>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-4">
+                      <div className="text-right">
+                        <div className="text-xs text-slate-500">Taxable: ₹{inv.taxableAmount.toLocaleString()}</div>
+                        <div className="font-black text-base text-white">
+                          ₹{inv.totalAmount.toLocaleString()}
+                        </div>
+                        <div className="text-[10px] text-slate-400">CGST + SGST: ₹{(inv.cgst * 2).toFixed(2)}</div>
+                      </div>
+
+                      <button
+                        onClick={() => setSelectedInvoice(inv)}
+                        className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-slate-950" />
+                        <span>View & Print</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </main>
       </div>
 
       {/* ------------------------------------------------------------- */}
       {/* GST INVOICE MODAL (PRINTABLE LAYOUT)                          */}
       {/* ------------------------------------------------------------- */}
       {selectedInvoice && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div
-            className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-6"
+            className="bg-white text-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-6"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1465,4 +1562,3 @@ export const AdminPage = () => {
     </div>
   );
 };
-

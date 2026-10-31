@@ -161,21 +161,8 @@ export const Navbar = () => {
             <span className="text-amber-100 hidden md:inline">Free delivery above ₹99</span>
           </div>
 
-          {/* VIP Toggle & Subscription Order & Admin */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5 flex-shrink-0">
-            {/* Operations Admin Panel Demo link */}
-            <button
-              onClick={() => navigateTo('admin')}
-              className={`flex items-center gap-1 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black transition-all ${
-                activeTab === 'admin'
-                  ? 'bg-amber-400 text-[#3D040A] shadow-sm'
-                  : 'bg-white/10 hover:bg-white/20 text-amber-200 border border-amber-300/30'
-              }`}
-              title="Open Operations Admin Panel Demo (B2B & B2C)"
-            >
-              <span>⚙️ Admin Panel</span>
-            </button>
-
+          {/* VIP Toggle & Subscription Order */}
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
             <button
               onClick={() => setIsSubscriptionModalOpen(true)}
               className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-extrabold transition-all ${

@@ -24,7 +24,14 @@ import { B2BPage } from './pages/B2BPage';
 import { AdminPage } from './pages/AdminPage';
 
 const MainLayout = () => {
-  const { activeTab } = useShop();
+  const { activeTab, setActiveTab } = useShop();
+
+  // Detect #admin or /admin in URL
+  useEffect(() => {
+    if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
+      setActiveTab('admin');
+    }
+  }, [setActiveTab]);
 
   useEffect(() => {
     AOS.init({
@@ -40,6 +47,16 @@ const MainLayout = () => {
     AOS.refresh();
   }, [activeTab]);
 
+  // SEPARATE STANDALONE ADMIN PORTAL LAYOUT (No customer navbar, cart bar, or footer)
+  if (activeTab === 'admin') {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-400 selection:text-slate-950">
+        <AdminPage />
+        <Toast />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF5EC] text-slate-900 selection:bg-blue-600 selection:text-white overflow-x-clip w-full">
       {/* Top Navigation */}
@@ -54,7 +71,6 @@ const MainLayout = () => {
         {activeTab === 'wishlist' && <WishlistPage />}
         {activeTab === 'cart' && <CartPage />}
         {activeTab === 'login' && <LoginPage />}
-        {activeTab === 'admin' && <AdminPage />}
       </main>
 
       {/* Sticky Floating Bottom Cart Bar */}
