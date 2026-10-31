@@ -38,7 +38,8 @@ import {
   Home,
   Bell,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Zap
 } from 'lucide-react';
 
 export const AdminPage = () => {
@@ -498,11 +499,44 @@ export const AdminPage = () => {
 
   const sidebarLinks = [
     { id: 'overview', label: 'Dashboard Overview', icon: Layers, badge: null },
-    { id: 'orders', label: 'Live Orders Dispatch', icon: Package, badge: orders.length },
-    { id: 'subscriptions', label: 'Morning Subscriptions', icon: Clock, badge: subscriptions.length },
-    { id: 'b2b-quotes', label: 'Wholesale RFPs & Quotes', icon: Building2, badge: b2bQuotes.length },
+    {
+      id: 'orders',
+      label:
+        adminMode === 'b2c'
+          ? 'B2C Orders Dispatch'
+          : adminMode === 'b2b'
+          ? 'B2B Wholesale Orders'
+          : 'Live Orders Dispatch',
+      icon: Package,
+      badge:
+        adminMode === 'b2c'
+          ? b2cOrdersCount
+          : adminMode === 'b2b'
+          ? b2bOrdersCount
+          : orders.length
+    },
+    {
+      id: 'subscriptions',
+      label: 'Morning Subscriptions',
+      icon: Clock,
+      badge: subscriptions.length,
+      scopeTag: 'B2C'
+    },
+    {
+      id: 'b2b-quotes',
+      label: 'Wholesale RFPs & Quotes',
+      icon: Building2,
+      badge: b2bQuotes.length,
+      scopeTag: 'B2B'
+    },
     { id: 'inventory', label: 'Catalog & Dual-Pricing', icon: Percent, badge: null },
-    { id: 'invoices', label: 'GST Tax Invoices', icon: Receipt, badge: invoices.length }
+    {
+      id: 'invoices',
+      label: 'GST Tax Invoices',
+      icon: Receipt,
+      badge: invoices.length,
+      scopeTag: 'B2B'
+    }
   ];
 
   return (
@@ -543,12 +577,18 @@ export const AdminPage = () => {
 
           {/* Mode Switcher Segmented Control */}
           <div className="p-4 border-b border-[#52060E] bg-[#330308]">
-            <div className="text-[10px] font-black uppercase tracking-wider text-amber-300/80 mb-2">
-              Operational Scope
+            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-amber-300/80 mb-2">
+              <span>Operational Scope</span>
+              <span className="text-[9px] text-amber-400 font-bold lowercase">
+                {adminMode === 'b2c' ? 'retail only' : adminMode === 'b2b' ? 'wholesale only' : 'all operations'}
+              </span>
             </div>
             <div className="grid grid-cols-3 gap-1 bg-[#230206] p-1 rounded-xl border border-[#52060E] text-[11px] font-extrabold text-center">
               <button
-                onClick={() => setAdminMode('unified')}
+                onClick={() => {
+                  setAdminMode('unified');
+                  showToast('Switched to Unified View (B2C + B2B)');
+                }}
                 className={`py-1.5 rounded-lg transition-all ${
                   adminMode === 'unified'
                     ? 'bg-[#F5A623] text-[#3D040A] font-black shadow-sm'
@@ -558,7 +598,10 @@ export const AdminPage = () => {
                 Unified
               </button>
               <button
-                onClick={() => setAdminMode('b2c')}
+                onClick={() => {
+                  setAdminMode('b2c');
+                  showToast('Switched to B2C Retail Operations');
+                }}
                 className={`py-1.5 rounded-lg transition-all ${
                   adminMode === 'b2c'
                     ? 'bg-blue-600 text-white font-black shadow-sm'
@@ -568,14 +611,17 @@ export const AdminPage = () => {
                 B2C Retail
               </button>
               <button
-                onClick={() => setAdminMode('b2b')}
+                onClick={() => {
+                  setAdminMode('b2b');
+                  showToast('Switched to B2B Wholesale Portal');
+                }}
                 className={`py-1.5 rounded-lg transition-all ${
                   adminMode === 'b2b'
                     ? 'bg-[#7D0A14] text-white border border-amber-400/40 font-black shadow-sm'
                     : 'text-amber-100/70 hover:text-white'
                 }`}
               >
-                B2B Bulk
+                B2B Wholesale
               </button>
             </div>
           </div>
@@ -605,17 +651,30 @@ export const AdminPage = () => {
                     <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-amber-200/70'}`} />
                     <span>{item.label}</span>
                   </div>
-                  {item.badge !== null && (
-                    <span
-                      className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                        isActive
-                          ? 'bg-[#F5A623] text-[#3D040A]'
-                          : 'bg-black/30 text-amber-200'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {item.scopeTag && (
+                      <span
+                        className={`text-[9px] font-black px-1.5 py-0.2 rounded ${
+                          item.scopeTag === 'B2C'
+                            ? 'bg-blue-900/60 text-blue-200 border border-blue-500/30'
+                            : 'bg-amber-950/60 text-amber-200 border border-amber-500/30'
+                        }`}
+                      >
+                        {item.scopeTag}
+                      </span>
+                    )}
+                    {item.badge !== null && (
+                      <span
+                        className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                          isActive
+                            ? 'bg-[#F5A623] text-[#3D040A]'
+                            : 'bg-black/30 text-amber-200'
+                        }`}
+                      >
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
                 </button>
               );
             })}
@@ -655,7 +714,7 @@ export const AdminPage = () => {
       {/* ============================================================= */}
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF5EC]">
         {/* Header Bar */}
-        <header className="h-16 bg-white border-b border-[#E8DDCF] px-4 sm:px-6 flex items-center justify-between flex-shrink-0 z-20 shadow-xs">
+        <header className="min-h-16 bg-white border-b border-[#E8DDCF] px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 flex-shrink-0 z-20 shadow-xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -672,7 +731,11 @@ export const AdminPage = () => {
               </div>
               <h1 className="text-sm sm:text-base font-black text-[#3D040A] capitalize">
                 {activeTab === 'overview'
-                  ? 'Operations Command Dashboard'
+                  ? adminMode === 'b2c'
+                    ? 'B2C Retail Operations Dashboard'
+                    : adminMode === 'b2b'
+                    ? 'B2B Wholesale Commercial Dashboard'
+                    : 'Operations Command Dashboard'
                   : activeTab === 'b2b-quotes'
                   ? 'Wholesale RFPs & Quotations Desk'
                   : activeTab.replace('-', ' ')}
@@ -680,32 +743,84 @@ export const AdminPage = () => {
             </div>
           </div>
 
+          {/* Central Header Scope Switch Toggle (Switch between B2C and B2B instantly) */}
+          <div className="flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
+            <button
+              onClick={() => {
+                setAdminMode('b2c');
+                showToast('Switched to B2C Retail Operations');
+              }}
+              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                adminMode === 'b2c'
+                  ? 'bg-blue-600 text-white shadow-sm scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              <User className="w-3.5 h-3.5" />
+              <span>B2C Retail</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setAdminMode('b2b');
+                showToast('Switched to B2B Wholesale Portal');
+              }}
+              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                adminMode === 'b2b'
+                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>B2B Wholesale</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setAdminMode('unified');
+                showToast('Switched to Unified View (B2C + B2B)');
+              }}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
+                adminMode === 'unified'
+                  ? 'bg-[#F5A623] text-[#3D040A] shadow-sm scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Unified</span>
+            </button>
+          </div>
+
           {/* Quick Simulators & Storefront Jump */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
+            <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
               <span className="text-[#D98207]">❄️ 3.8°C</span>
               <span>Cold-Chain OK</span>
             </div>
 
-            <button
-              onClick={simulateNewB2COrder}
-              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-              title="Simulate a real-time incoming B2C retail order"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Simulate B2C Order</span>
-              <span className="sm:hidden">B2C</span>
-            </button>
+            {(adminMode === 'b2c' || adminMode === 'unified') && (
+              <button
+                onClick={simulateNewB2COrder}
+                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                title="Simulate a real-time incoming B2C retail order"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Simulate B2C Order</span>
+                <span className="sm:hidden">B2C</span>
+              </button>
+            )}
 
-            <button
-              onClick={simulateNewB2BQuote}
-              className="px-3 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-              title="Simulate incoming wholesale hotel quote"
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Simulate B2B RFP</span>
-              <span className="sm:hidden">B2B</span>
-            </button>
+            {(adminMode === 'b2b' || adminMode === 'unified') && (
+              <button
+                onClick={simulateNewB2BQuote}
+                className="px-3 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                title="Simulate incoming wholesale hotel quote"
+              >
+                <Building2 className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Simulate B2B RFP</span>
+                <span className="sm:hidden">B2B</span>
+              </button>
+            )}
 
             <button
               onClick={() => navigateTo('home')}
@@ -724,95 +839,371 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-in fade-in duration-200">
-              {/* Metric Cards Grid */}
+              {/* Active Mode Quick Switch Banner */}
+              <div
+                className={`p-4 rounded-3xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs transition-all ${
+                  adminMode === 'b2c'
+                    ? 'bg-gradient-to-r from-blue-50 via-white to-blue-50/60 border-blue-200'
+                    : adminMode === 'b2b'
+                    ? 'bg-gradient-to-r from-rose-50 via-white to-amber-50/60 border-rose-200'
+                    : 'bg-gradient-to-r from-amber-50 via-white to-[#FAF5EC] border-[#EDE1D1]'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black flex-shrink-0 ${
+                      adminMode === 'b2c'
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : adminMode === 'b2b'
+                        ? 'bg-[#7D0A14] text-white shadow-md'
+                        : 'bg-[#F5A623] text-[#3D040A] shadow-md'
+                    }`}
+                  >
+                    {adminMode === 'b2c' ? (
+                      <User className="w-5 h-5" />
+                    ) : adminMode === 'b2b' ? (
+                      <Building2 className="w-5 h-5" />
+                    ) : (
+                      <Layers className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-sm sm:text-base font-black text-[#3D040A]">
+                        {adminMode === 'b2c'
+                          ? 'B2C Retail Operations Dashboard'
+                          : adminMode === 'b2b'
+                          ? 'B2B Wholesale & Commercial Portal'
+                          : 'Unified Operations Command (B2C Retail + B2B Wholesale)'}
+                      </h2>
+                      <span
+                        className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
+                          adminMode === 'b2c'
+                            ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                            : adminMode === 'b2b'
+                            ? 'bg-rose-100 text-[#7D0A14] border border-rose-200'
+                            : 'bg-amber-100 text-amber-900 border border-amber-200'
+                        }`}
+                      >
+                        {adminMode === 'b2c'
+                          ? 'B2C Scope Active'
+                          : adminMode === 'b2b'
+                          ? 'B2B Scope Active'
+                          : 'Combined Scope Active'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {adminMode === 'b2c'
+                        ? 'Showing consumer retail orders, 10–15 min express delivery SLA & daily morning milk subscriptions.'
+                        : adminMode === 'b2b'
+                        ? 'Showing commercial hotel/kitchen bulk shipments, RFP quotation pipeline & GST tax invoicing.'
+                        : 'Consolidated overview showing both retail consumer streams and commercial wholesale dispatches.'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Instant 1-Click Toggle Button */}
+                <div className="flex items-center gap-2 self-start sm:self-center">
+                  {adminMode === 'b2c' && (
+                    <button
+                      onClick={() => {
+                        setAdminMode('b2b');
+                        showToast('Switched to B2B Wholesale Portal');
+                      }}
+                      className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                    >
+                      <Building2 className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Switch to B2B Wholesale</span>
+                      <ArrowRight className="w-3 h-3 ml-0.5" />
+                    </button>
+                  )}
+                  {adminMode === 'b2b' && (
+                    <button
+                      onClick={() => {
+                        setAdminMode('b2c');
+                        showToast('Switched to B2C Retail Operations');
+                      }}
+                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                    >
+                      <User className="w-3.5 h-3.5 text-blue-200" />
+                      <span>Switch to B2C Retail</span>
+                      <ArrowRight className="w-3 h-3 ml-0.5" />
+                    </button>
+                  )}
+                  {adminMode === 'unified' && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setAdminMode('b2c');
+                          showToast('Switched to B2C Retail Operations');
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black flex items-center gap-1 shadow-xs"
+                      >
+                        <User className="w-3 h-3" />
+                        <span>Filter B2C</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setAdminMode('b2b');
+                          showToast('Switched to B2B Wholesale Portal');
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1 shadow-xs"
+                      >
+                        <Building2 className="w-3 h-3" />
+                        <span>Filter B2B</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Dynamic Metric Cards Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Card 1: B2C Retail Today */}
-                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                    <span>Today's B2C Retail</span>
-                    <span className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
-                      <User className="w-4 h-4" />
-                    </span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                    ₹{b2cRevenue.toLocaleString()}
-                  </div>
-                  <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span>{b2cOrdersCount} orders • 11.2m avg delivery</span>
-                  </div>
-                </div>
+                {adminMode === 'b2c' ? (
+                  <>
+                    {/* B2C Card 1: Today's Retail Revenue */}
+                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Today's B2C Retail</span>
+                        <span className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
+                          <User className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        ₹{b2cRevenue.toLocaleString()}
+                      </div>
+                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        <span>{b2cOrdersCount} orders • 100% Prepaid UPI</span>
+                      </div>
+                    </div>
 
-                {/* Card 2: B2B Wholesale Dispatched */}
-                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                    <span>B2B Wholesale Dispatched</span>
-                    <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
-                      <Building2 className="w-4 h-4" />
-                    </span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
-                    ₹{b2bRevenue.toLocaleString()}
-                  </div>
-                  <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                    <TrendingUp className="w-3.5 h-3.5" />
-                    <span>{b2bOrdersCount} bulk commercial shipments</span>
-                  </div>
-                </div>
+                    {/* B2C Card 2: Express Delivery SLA */}
+                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Avg Express Delivery</span>
+                        <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
+                          <Zap className="w-4 h-4 text-amber-600" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-emerald-700">
+                        11.2 <span className="text-xs text-slate-400 font-normal">Mins</span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-medium">
+                        10–15 Min SLA • 100% On-Time Dispatch
+                      </div>
+                    </div>
 
-                {/* Card 3: Morning Milk Subscribers */}
-                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                    <span>Morning Milk Subscribers</span>
-                    <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
-                      <Clock className="w-4 h-4" />
-                    </span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                    520 <span className="text-xs text-slate-400 font-normal">Homes</span>
-                  </div>
-                  <div className="text-[11px] text-slate-500 font-medium">
-                    Delivered 6:00 AM daily • 100% On Time
-                  </div>
-                </div>
+                    {/* B2C Card 3: Morning Milk Subscribers */}
+                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Morning Milk Subscribers</span>
+                        <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
+                          <Clock className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        520 <span className="text-xs text-slate-400 font-normal">Homes</span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-medium">
+                        Delivered 6:00 AM daily • Doorstep Fresh
+                      </div>
+                    </div>
 
-                {/* Card 4: Wholesale RFPs & Pipeline */}
-                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                    <span>Commercial RFPs & Quotes</span>
-                    <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
-                      <FileText className="w-4 h-4" />
-                    </span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                    {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Hotels</span>
-                  </div>
-                  <div className="text-[11px] text-amber-700 font-bold">
-                    Est. ₹5.8 Lakhs pipeline value
-                  </div>
-                </div>
+                    {/* B2C Card 4: Retail Avg Order Value */}
+                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Retail Avg Order Value</span>
+                        <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
+                          <ShoppingBag className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        ₹{b2cOrdersCount ? Math.round(b2cRevenue / b2cOrdersCount) : 0}
+                      </div>
+                      <div className="text-[11px] text-emerald-600 font-bold">
+                        +18% repeat customer rate
+                      </div>
+                    </div>
+                  </>
+                ) : adminMode === 'b2b' ? (
+                  <>
+                    {/* B2B Card 1: Wholesale Revenue */}
+                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>B2B Wholesale Dispatched</span>
+                        <span className="p-1.5 rounded-xl bg-rose-50 text-[#7D0A14]">
+                          <Building2 className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
+                        ₹{b2bRevenue.toLocaleString()}
+                      </div>
+                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        <span>{b2bOrdersCount} bulk commercial shipments</span>
+                      </div>
+                    </div>
+
+                    {/* B2B Card 2: Commercial Hotel Accounts */}
+                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Active Commercial Accounts</span>
+                        <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
+                          <Store className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        48 <span className="text-xs text-slate-400 font-normal">Clients</span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-medium">
+                        Hotels, Banquets & Cloud Kitchens
+                      </div>
+                    </div>
+
+                    {/* B2B Card 3: Commercial RFPs & Pipeline */}
+                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Commercial RFPs & Quotes</span>
+                        <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
+                          <FileText className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Inquiries</span>
+                      </div>
+                      <div className="text-[11px] text-amber-700 font-bold">
+                        Est. ₹5.8 Lakhs pipeline value
+                      </div>
+                    </div>
+
+                    {/* B2B Card 4: Net Receivables */}
+                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Net 15 / 30 Receivables</span>
+                        <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
+                          <Receipt className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
+                        ₹32,450
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-medium">
+                        100% GST ITC Compliant Invoices
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Unified Card 1: B2C Retail Today */}
+                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Today's B2C Retail</span>
+                        <span className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
+                          <User className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        ₹{b2cRevenue.toLocaleString()}
+                      </div>
+                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        <span>{b2cOrdersCount} orders • 11.2m avg delivery</span>
+                      </div>
+                    </div>
+
+                    {/* Unified Card 2: B2B Wholesale Dispatched */}
+                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>B2B Wholesale Dispatched</span>
+                        <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
+                          <Building2 className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
+                        ₹{b2bRevenue.toLocaleString()}
+                      </div>
+                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" />
+                        <span>{b2bOrdersCount} bulk commercial shipments</span>
+                      </div>
+                    </div>
+
+                    {/* Unified Card 3: Morning Milk Subscribers */}
+                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Morning Milk Subscribers</span>
+                        <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
+                          <Clock className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        520 <span className="text-xs text-slate-400 font-normal">Homes</span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-medium">
+                        Delivered 6:00 AM daily • 100% On Time
+                      </div>
+                    </div>
+
+                    {/* Unified Card 4: Wholesale RFPs & Pipeline */}
+                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+                        <span>Commercial RFPs & Quotes</span>
+                        <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
+                          <FileText className="w-4 h-4" />
+                        </span>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
+                        {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Hotels</span>
+                      </div>
+                      <div className="text-[11px] text-amber-700 font-bold">
+                        Est. ₹5.8 Lakhs pipeline value
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Two Column Section: Live Dispatch + Operations Info */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left 2 Cols: Live Orders Dispatch Stream */}
+                {/* Left 2 Cols: Live Orders Dispatch Stream (Filtered based on adminMode) */}
                 <div className="lg:col-span-2 bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-4 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-black text-base text-[#3D040A]">Live Dispatch Activity</h3>
-                      <p className="text-xs text-slate-500">Real-time status of retail deliveries & bulk morning shipments</p>
+                      <h3 className="font-black text-base text-[#3D040A]">
+                        {adminMode === 'b2c'
+                          ? 'Live B2C Retail Dispatches (10–15 Min Express)'
+                          : adminMode === 'b2b'
+                          ? 'Live B2B Commercial Shipments (Bulk Kitchen Dispatch)'
+                          : 'Live Dispatch Activity (Retail & Bulk Shipments)'}
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        {adminMode === 'b2c'
+                          ? 'Real-time status of express consumer deliveries in transit'
+                          : adminMode === 'b2b'
+                          ? 'Real-time status of commercial bulk dispatches to hotels and restaurants'
+                          : 'Real-time status of retail deliveries & bulk morning shipments'}
+                      </p>
                     </div>
                     <button
                       onClick={() => setActiveTab('orders')}
                       className="text-xs font-bold text-[#7D0A14] hover:underline flex items-center gap-1"
                     >
-                      <span>View all {orders.length} orders</span>
+                      <span>
+                        View all{' '}
+                        {adminMode === 'b2c'
+                          ? `${b2cOrdersCount} B2C`
+                          : adminMode === 'b2b'
+                          ? `${b2bOrdersCount} B2B`
+                          : `${orders.length}`}{' '}
+                        orders
+                      </span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
                   <div className="divide-y divide-slate-100">
-                    {orders.slice(0, 4).map((order) => (
+                    {filteredOrders.slice(0, 5).map((order) => (
                       <div key={order.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-start gap-3">
                           <div
@@ -854,10 +1245,15 @@ export const AdminPage = () => {
                         </div>
                       </div>
                     ))}
+                    {filteredOrders.length === 0 && (
+                      <div className="py-8 text-center text-xs text-slate-500">
+                        No {adminMode === 'b2c' ? 'B2C retail' : adminMode === 'b2b' ? 'B2B wholesale' : ''} orders matching current view.
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* Right 1 Col: Cold-Chain & Quick Action Cards */}
+                {/* Right 1 Col: Cold-Chain & Contextual Shortcuts */}
                 <div className="space-y-4">
                   <div className="bg-gradient-to-r from-[#3D040A] via-[#5C0810] to-[#7D0A14] text-white p-6 rounded-3xl border border-[#8B121C] space-y-4 shadow-md">
                     <div className="flex items-center justify-between">
@@ -886,37 +1282,109 @@ export const AdminPage = () => {
 
                   <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] space-y-3 shadow-xs">
                     <h4 className="font-extrabold text-xs text-[#3D040A] uppercase tracking-wider">
-                      Operations Shortcuts
+                      Operations Shortcuts ({adminMode.toUpperCase()})
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <button
-                        onClick={() => setActiveTab('b2b-quotes')}
-                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                      >
-                        <Building2 className="w-4 h-4 mb-1" />
-                        <span>Review B2B RFPs</span>
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('subscriptions')}
-                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                      >
-                        <Clock className="w-4 h-4 mb-1 text-emerald-600" />
-                        <span>Milk Run-Sheet</span>
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('invoices')}
-                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                      >
-                        <Receipt className="w-4 h-4 mb-1 text-blue-600" />
-                        <span>GST Invoices</span>
-                      </button>
-                      <button
-                        onClick={() => setActiveTab('inventory')}
-                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                      >
-                        <Percent className="w-4 h-4 mb-1 text-amber-600" />
-                        <span>Dual-Pricing</span>
-                      </button>
+                      {adminMode === 'b2c' ? (
+                        <>
+                          <button
+                            onClick={() => setActiveTab('subscriptions')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Clock className="w-4 h-4 mb-1 text-emerald-600" />
+                            <span>Milk Run-Sheet</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('inventory')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Percent className="w-4 h-4 mb-1 text-blue-600" />
+                            <span>Retail Stock</span>
+                          </button>
+                          <button
+                            onClick={simulateNewB2COrder}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-blue-700 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Plus className="w-4 h-4 mb-1 text-blue-600" />
+                            <span>Simulate Order</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setAdminMode('b2b');
+                              showToast('Switched to B2B Wholesale Portal');
+                            }}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Building2 className="w-4 h-4 mb-1 text-[#7D0A14]" />
+                            <span>Switch to B2B</span>
+                          </button>
+                        </>
+                      ) : adminMode === 'b2b' ? (
+                        <>
+                          <button
+                            onClick={() => setActiveTab('b2b-quotes')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Building2 className="w-4 h-4 mb-1 text-[#7D0A14]" />
+                            <span>Review B2B RFPs</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('invoices')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Receipt className="w-4 h-4 mb-1 text-purple-600" />
+                            <span>GST Invoices</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('inventory')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Percent className="w-4 h-4 mb-1 text-amber-600" />
+                            <span>Bulk MOQ & Rates</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setAdminMode('b2c');
+                              showToast('Switched to B2C Retail Operations');
+                            }}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-blue-700 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <User className="w-4 h-4 mb-1 text-blue-600" />
+                            <span>Switch to B2C</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setActiveTab('b2b-quotes')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Building2 className="w-4 h-4 mb-1" />
+                            <span>Review B2B RFPs</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('subscriptions')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Clock className="w-4 h-4 mb-1 text-emerald-600" />
+                            <span>Milk Run-Sheet</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('invoices')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Receipt className="w-4 h-4 mb-1 text-blue-600" />
+                            <span>GST Invoices</span>
+                          </button>
+                          <button
+                            onClick={() => setActiveTab('inventory')}
+                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
+                          >
+                            <Percent className="w-4 h-4 mb-1 text-amber-600" />
+                            <span>Dual-Pricing</span>
+                          </button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -931,19 +1399,74 @@ export const AdminPage = () => {
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-xl font-black text-[#3D040A]">Order Management Console</h3>
-                  <p className="text-xs text-slate-500">Live order fulfillment for B2C retail & B2B wholesale dispatches</p>
+                  <h3 className="text-xl font-black text-[#3D040A]">
+                    {adminMode === 'b2c'
+                      ? 'B2C Retail Orders Console'
+                      : adminMode === 'b2b'
+                      ? 'B2B Wholesale Orders Console'
+                      : 'Order Management Console (Unified)'}
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    {adminMode === 'b2c'
+                      ? 'Live retail consumer orders and 10–15 min express doorstep delivery'
+                      : adminMode === 'b2b'
+                      ? 'Live commercial dispatches for hotels, banquets and cloud kitchens'
+                      : 'Live order fulfillment for B2C retail & B2B wholesale dispatches'}
+                  </p>
                 </div>
 
                 {/* Filters */}
                 <div className="flex flex-wrap items-center gap-2">
+                  {/* Inline Scope Switcher */}
+                  <div className="flex items-center bg-[#FAF5EC] p-1 rounded-xl border border-[#E8DDCF] text-xs font-bold">
+                    <button
+                      onClick={() => {
+                        setAdminMode('b2c');
+                        showToast('Filtered to B2C Retail Orders');
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
+                        adminMode === 'b2c'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      B2C ({b2cOrdersCount})
+                    </button>
+                    <button
+                      onClick={() => {
+                        setAdminMode('b2b');
+                        showToast('Filtered to B2B Wholesale Orders');
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
+                        adminMode === 'b2b'
+                          ? 'bg-[#7D0A14] text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      B2B ({b2bOrdersCount})
+                    </button>
+                    <button
+                      onClick={() => {
+                        setAdminMode('unified');
+                        showToast('Showing All Orders');
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
+                        adminMode === 'unified'
+                          ? 'bg-[#F5A623] text-[#3D040A] shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      All ({orders.length})
+                    </button>
+                  </div>
+
                   <div className="relative">
                     <input
                       type="text"
                       placeholder="Search order ID, hotel or client..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#E8DDCF] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14] w-48 sm:w-60"
+                      className="pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#E8DDCF] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14] w-44 sm:w-56"
                     />
                     <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                   </div>
