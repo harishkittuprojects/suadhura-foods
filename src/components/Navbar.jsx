@@ -15,7 +15,6 @@ import {
   Zap,
   Mic,
   Package,
-  Bike,
   Utensils,
   ShoppingBag,
   LogOut,
@@ -161,19 +160,8 @@ export const Navbar = () => {
             <span className="text-amber-100 hidden md:inline">Free delivery above ₹99</span>
           </div>
 
-          {/* VIP Toggle & Active Order Tracker */}
+          {/* VIP Toggle & Subscription Order */}
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {activeOrder && (
-              <button
-                onClick={() => setIsLiveTrackingOpen(true)}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-[11px] flex items-center gap-1 shadow-sm animate-pulse"
-              >
-                <Bike className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span className="hidden sm:inline">Track Order (11m)</span>
-                <span className="sm:hidden">Track (11m)</span>
-              </button>
-            )}
-
             <button
               onClick={() => setIsSubscriptionModalOpen(true)}
               className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-extrabold transition-all ${
@@ -326,17 +314,6 @@ export const Navbar = () => {
 
           {/* Action Icons */}
           <div className="flex items-center gap-1 sm:gap-2.5 flex-shrink-0">
-            {/* Live Order Tracker Button in Navbar */}
-            {activeOrder && (
-              <button
-                onClick={() => setIsLiveTrackingOpen(true)}
-                className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold hover:bg-emerald-100 transition-colors"
-              >
-                <Bike className="w-4 h-4 text-emerald-600 animate-bounce" />
-                <span>Track Live</span>
-              </button>
-            )}
-
             {/* Notification Bell (Matching Reference with red badge '2') */}
             <div className="relative">
               <button
