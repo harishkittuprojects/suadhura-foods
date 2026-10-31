@@ -10,7 +10,9 @@ import {
   Plus,
   Minus,
   Sparkles,
-  RotateCcw
+  RotateCcw,
+  Lock,
+  Building2
 } from 'lucide-react';
 
 export const ProductQuickViewModal = () => {
@@ -21,8 +23,14 @@ export const ProductQuickViewModal = () => {
     toggleWishlist,
     isInWishlist,
     pricingMode,
-    setPricingMode
+    setPricingMode,
+    user,
+    setIsAuthModalOpen,
+    setAuthModalTab,
+    showToast
   } = useShop();
+
+  const isB2B = Boolean(user && user.isBusiness);
 
   const [quantity, setQuantity] = useState(1);
 
@@ -108,19 +116,29 @@ export const ProductQuickViewModal = () => {
                   <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-[#EDE1D1] text-[10px] font-black">
                     <button
                       onClick={() => setPricingMode('retail')}
-                      className={`px-2 py-0.5 rounded ${
+                      className={`px-2 py-0.5 rounded transition-all ${
                         pricingMode === 'retail' ? 'bg-blue-600 text-white' : 'text-slate-600'
                       }`}
                     >
                       Retail
                     </button>
                     <button
-                      onClick={() => setPricingMode('wholesale')}
-                      className={`px-2 py-0.5 rounded ${
+                      onClick={() => {
+                        if (!isB2B) {
+                          setAuthModalTab('business');
+                          setIsAuthModalOpen(true);
+                          setQuickViewProduct(null);
+                          showToast('🔒 B2B Login Required: Please login with a verified Business account to access wholesale rates', 'info');
+                          return;
+                        }
+                        setPricingMode('wholesale');
+                      }}
+                      className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
                         pricingMode === 'wholesale' ? 'bg-[#7D0A14] text-white' : 'text-slate-600'
                       }`}
                     >
-                      Wholesale
+                      <span>Wholesale</span>
+                      {!isB2B && <Lock className="w-2.5 h-2.5 text-amber-600" />}
                     </button>
                   </div>
                 </div>
@@ -140,28 +158,64 @@ export const ProductQuickViewModal = () => {
                     <div className="text-[10px] text-slate-500 truncate">{quickViewProduct.unit}</div>
                   </div>
 
-                  {/* Wholesale Rate */}
-                  <div
-                    onClick={() => setPricingMode('wholesale')}
-                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                      pricingMode === 'wholesale'
-                        ? 'bg-white border-[#7D0A14] ring-2 ring-[#7D0A14]/20 shadow-xs'
-                        : 'bg-white/60 border-slate-200 opacity-80'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between text-[10px] font-black text-[#7D0A14] uppercase">
-                      <span>Wholesale Rate</span>
-                      <span className="bg-amber-100 text-amber-900 px-1 rounded text-[9px]">
-                        {quickViewProduct.wholesaleSavings || 'Save 26%'}
-                      </span>
+                  {/* Wholesale Rate (Unlocked only for B2B accounts) */}
+                  {isB2B ? (
+                    <div
+                      onClick={() => setPricingMode('wholesale')}
+                      className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                        pricingMode === 'wholesale'
+                          ? 'bg-white border-[#7D0A14] ring-2 ring-[#7D0A14]/20 shadow-xs'
+                          : 'bg-white/60 border-slate-200 opacity-80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between text-[10px] font-black text-[#7D0A14] uppercase">
+                        <span>Wholesale Rate</span>
+                        <span className="bg-amber-100 text-amber-900 px-1 rounded text-[9px]">
+                          {quickViewProduct.wholesaleSavings || 'Save 26%'}
+                        </span>
+                      </div>
+                      <div className="text-xl font-black text-[#7D0A14]">
+                        ₹{quickViewProduct.wholesalePrice || Math.round(quickViewProduct.price * 0.74)}
+                      </div>
+                      <div className="text-[10px] text-amber-900 font-bold truncate">
+                        {quickViewProduct.wholesaleUnit || 'Commercial Bulk Pack'}
+                      </div>
                     </div>
-                    <div className="text-xl font-black text-[#7D0A14]">
-                      ₹{quickViewProduct.wholesalePrice || Math.round(quickViewProduct.price * 0.74)}
+                  ) : (
+                    <div
+                      onClick={() => {
+                        setAuthModalTab('business');
+                        setIsAuthModalOpen(true);
+                        setQuickViewProduct(null);
+                        showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
+                      }}
+                      className="p-2.5 rounded-xl border-2 border-dashed border-[#7D0A14]/30 bg-gradient-to-br from-[#FFFBF5] to-[#FAF5EC] hover:border-[#7D0A14] hover:bg-[#F5ECE0] transition-all cursor-pointer flex flex-col justify-between group shadow-2xs"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between text-[10px] font-black text-[#7D0A14] uppercase">
+                          <span className="flex items-center gap-1">
+                            <Lock className="w-3 h-3 text-amber-600" /> B2B Wholesale
+                          </span>
+                          <span className="bg-[#7D0A14] text-amber-200 px-1 rounded text-[8.5px] font-black">
+                            Save 35%
+                          </span>
+                        </div>
+                        <div className="text-xs font-black text-[#3D040A] mt-1 leading-tight">
+                          Confidential Rates
+                        </div>
+                        <div className="text-[9.5px] text-slate-500 mt-0.5">
+                          GST / Trade accounts only
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="mt-2 w-full py-1 px-2 rounded-lg bg-[#7D0A14] group-hover:bg-[#5A070E] text-white text-[10px] font-black flex items-center justify-center gap-1 shadow-xs"
+                      >
+                        <Building2 className="w-3 h-3 text-amber-300" />
+                        <span>Unlock with B2B Login</span>
+                      </button>
                     </div>
-                    <div className="text-[10px] text-amber-900 font-bold truncate">
-                      {quickViewProduct.wholesaleUnit || 'Commercial Bulk Pack'}
-                    </div>
-                  </div>
+                  )}
                 </div>
 
                 <div className="text-[10px] text-slate-500 flex items-center justify-between pt-1 border-t border-[#E8DDCF]/60">
@@ -214,10 +268,20 @@ export const ProductQuickViewModal = () => {
 
               <button
                 onClick={handleAddToCart}
-                className="flex-1 py-3 px-5 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 transition-all"
+                className={`flex-1 py-3 px-5 rounded-2xl active:scale-98 text-white font-black text-sm flex items-center justify-center gap-2 shadow-lg transition-all ${
+                  isB2B && pricingMode === 'wholesale'
+                    ? 'bg-[#7D0A14] hover:bg-[#60060E] shadow-[#7D0A14]/25'
+                    : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/25'
+                }`}
               >
                 <ShoppingCart className="w-4 h-4" />
-                <span>Add to Cart (₹{quickViewProduct.price * quantity})</span>
+                <span>
+                  {isB2B && pricingMode === 'wholesale' ? 'Bulk Add to Cart' : 'Add to Cart'} (₹
+                  {(isB2B && pricingMode === 'wholesale'
+                    ? quickViewProduct.wholesalePrice || Math.round(quickViewProduct.price * 0.74)
+                    : quickViewProduct.price) * quantity}
+                  )
+                </span>
               </button>
 
               <button

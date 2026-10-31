@@ -45,18 +45,32 @@ export const ShopProvider = ({ children }) => {
   // Service Mode: 'grocery' (10-15m grocery) | 'food' (kitchen meals) | 'genie' (custom courier)
   const [serviceMode, setServiceMode] = useState('grocery');
 
-  // Pricing Mode: 'retail' (B2C) | 'wholesale' (B2B Commercial / Whole Piece rates)
+  // Pricing Mode: strictly 'wholesale' ONLY FOR VERIFIED B2B LOGIN
+  // If user is not logged in or is not a business account, always 'retail'
   const [pricingMode, setPricingModeState] = useState(() => {
     try {
-      const saved = localStorage.getItem('sumadhura_pricing_mode');
-      if (saved === 'wholesale' || saved === 'retail') return saved;
       const savedUser = localStorage.getItem('sumadhura_user');
       if (savedUser && JSON.parse(savedUser)?.isBusiness) return 'wholesale';
     } catch {}
     return 'retail';
   });
 
+  // Keep pricingMode strictly in sync with user login state
+  useEffect(() => {
+    if (user?.isBusiness) {
+      setPricingModeState('wholesale');
+    } else {
+      setPricingModeState('retail');
+    }
+  }, [user]);
+
   const setPricingMode = (mode) => {
+    if (mode === 'wholesale' && (!user || !user.isBusiness)) {
+      setAuthModalTab('business');
+      setIsAuthModalOpen(true);
+      showToast('🔒 B2B Login Required: Please login with a verified Business account to access wholesale rates', 'info');
+      return;
+    }
     setPricingModeState(mode);
     try {
       localStorage.setItem('sumadhura_pricing_mode', mode);
@@ -85,6 +99,12 @@ export const ShopProvider = ({ children }) => {
   };
 
   const togglePricingMode = () => {
+    if (!user || !user.isBusiness) {
+      setAuthModalTab('business');
+      setIsAuthModalOpen(true);
+      showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
+      return;
+    }
     setPricingMode(pricingMode === 'wholesale' ? 'retail' : 'wholesale');
   };
 
@@ -243,7 +263,7 @@ export const ShopProvider = ({ children }) => {
 
   // Cart operations
   const addToCart = (product, quantity = 1) => {
-    const isWholesale = pricingMode === 'wholesale';
+    const isWholesale = Boolean(user && user.isBusiness && pricingMode === 'wholesale');
     const activePrice = isWholesale
       ? product.wholesalePrice || Math.round(product.price * 0.74)
       : product.price;
@@ -398,11 +418,25 @@ export const ShopProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setPricingModeState('retail');
     try {
       localStorage.removeItem('sumadhura_user');
+      localStorage.setItem('sumadhura_pricing_mode', 'retail');
     } catch (e) {
       console.error(e);
     }
+    // Revert existing cart items to retail rates
+    setCart((prevCart) =>
+      prevCart.map((item) => {
+        const prod = products.find((p) => p.id === item.id) || item;
+        return {
+          ...item,
+          price: prod.price,
+          unit: prod.unit,
+          isWholesale: false
+        };
+      })
+    );
     showToast('Logged out successfully', 'info');
   };
 

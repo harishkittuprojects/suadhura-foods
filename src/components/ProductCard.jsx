@@ -1,6 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { Heart, Plus, Minus, Star, Eye, Clock, Sparkles } from 'lucide-react';
+import { Heart, Plus, Minus, Star, Eye, Clock, Sparkles, Lock, Building2 } from 'lucide-react';
 
 export const ProductCard = ({ product, priority = false }) => {
   const {
@@ -11,14 +11,18 @@ export const ProductCard = ({ product, priority = false }) => {
     isInWishlist,
     setQuickViewProduct,
     pricingMode,
-    setPricingMode
+    setPricingMode,
+    user,
+    setIsAuthModalOpen,
+    setAuthModalTab,
+    showToast
   } = useShop();
 
   const isLiked = isInWishlist(product.id);
   const cartItem = cart.find((item) => item.id === product.id);
   const quantityInCart = cartItem ? cartItem.quantity : 0;
 
-  const isWholesale = pricingMode === 'wholesale';
+  const isWholesale = Boolean(user && user.isBusiness && pricingMode === 'wholesale');
   const activePrice = isWholesale
     ? product.wholesalePrice || Math.round(product.price * 0.74)
     : product.price;
@@ -167,11 +171,18 @@ export const ProductCard = ({ product, priority = false }) => {
                   )}
                 </div>
                 <button
-                  onClick={() => setPricingMode('wholesale')}
-                  className="text-[9px] text-[#7D0A14] hover:underline font-bold block truncate"
-                  title="Switch to wholesale rates"
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setAuthModalTab('business');
+                    setIsAuthModalOpen(true);
+                    showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
+                  }}
+                  className="text-[9.5px] text-[#7D0A14] hover:text-[#5A070E] font-bold flex items-center gap-1 mt-0.5 truncate"
+                  title="B2B Login Required to unlock wholesale rates"
                 >
-                  🏢 Wholesale: ₹{product.wholesalePrice}
+                  <Lock className="w-2.5 h-2.5 text-amber-600 flex-shrink-0" />
+                  <span className="truncate">Wholesale: <strong className="underline font-black">Login to Unlock 🔒</strong></span>
                 </button>
               </div>
             )}

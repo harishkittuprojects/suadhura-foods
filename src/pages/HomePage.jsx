@@ -46,7 +46,11 @@ export const HomePage = () => {
     addToCart,
     setQuickViewProduct,
     pricingMode,
-    setPricingMode
+    setPricingMode,
+    user,
+    setIsAuthModalOpen,
+    setAuthModalTab,
+    showToast
   } = useShop();
 
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
@@ -559,21 +563,24 @@ export const HomePage = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-2.5 flex-shrink-0 relative z-10 w-full sm:w-auto">
-            {pricingMode !== 'wholesale' ? (
-              <button
-                onClick={() => setPricingMode('wholesale')}
-                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
-                title="Switch whole website to Wholesale Rates"
-              >
-                <span>View Wholesale Rates (Save 35%)</span>
-                <ArrowRight className="w-4 h-4 text-[#3D040A]" />
-              </button>
+            {user?.isBusiness ? (
+              <div className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#F5A623] text-[#3D040A] font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2">
+                <Building2 className="w-4 h-4" />
+                <span>Wholesale Rates Active</span>
+              </div>
             ) : (
               <button
-                onClick={() => setPricingMode('retail')}
-                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-white text-[#7D0A14] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+                onClick={() => {
+                  setAuthModalTab('business');
+                  setIsAuthModalOpen(true);
+                  showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
+                }}
+                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+                title="B2B Login Required for Wholesale Rates"
               >
-                <span>Switch to Retail Rates 🛍️</span>
+                <Lock className="w-4 h-4 text-[#3D040A]" />
+                <span>Unlock Wholesale Rates (B2B Login)</span>
+                <ArrowRight className="w-4 h-4 text-[#3D040A]" />
               </button>
             )}
 
@@ -588,7 +595,7 @@ export const HomePage = () => {
       </section>
 
       {/* 3.6 Active Wholesale Mode Status Notice */}
-      {pricingMode === 'wholesale' && (
+      {Boolean(user?.isBusiness && pricingMode === 'wholesale') && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="bg-gradient-to-r from-amber-500/15 via-[#FAF5EC] to-amber-500/10 border-2 border-[#7D0A14] p-4 sm:p-5 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm animate-in fade-in duration-200">
             <div className="flex items-center gap-3">

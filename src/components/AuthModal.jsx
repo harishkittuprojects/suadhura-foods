@@ -25,7 +25,15 @@ export const AuthModal = () => {
   } = useShop();
 
   // Mode: 'user' | 'business'
-  const [accountType, setAccountType] = useState('user'); // 'user' | 'business'
+  const [accountType, setAccountType] = useState(
+    authModalTab === 'business' ? 'business' : 'user'
+  );
+
+  React.useEffect(() => {
+    if (authModalTab === 'business') {
+      setAccountType('business');
+    }
+  }, [authModalTab]);
 
   // Personal user fields
   const [identifier, setIdentifier] = useState('rajesh.sharma@example.com');

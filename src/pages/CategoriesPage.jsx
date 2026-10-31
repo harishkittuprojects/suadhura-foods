@@ -9,7 +9,9 @@ import {
   Sparkles,
   ChevronRight,
   Filter,
-  X
+  X,
+  Lock,
+  Building2
 } from 'lucide-react';
 
 export const CategoriesPage = () => {
@@ -21,7 +23,11 @@ export const CategoriesPage = () => {
     setSearchQuery,
     pricingMode,
     setPricingMode,
-    togglePricingMode
+    togglePricingMode,
+    user,
+    setIsAuthModalOpen,
+    setAuthModalTab,
+    showToast
   } = useShop();
 
   const [searchFilter, setSearchFilter] = useState(searchQuery || '');
@@ -354,16 +360,31 @@ export const CategoriesPage = () => {
               >
                 🛍️ Retail
               </button>
-              <button
-                onClick={() => setPricingMode('wholesale')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
-                  pricingMode === 'wholesale'
-                    ? 'bg-[#7D0A14] text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                🏢 Wholesale Rate
-              </button>
+              {user?.isBusiness ? (
+                <button
+                  onClick={() => setPricingMode('wholesale')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
+                    pricingMode === 'wholesale'
+                      ? 'bg-[#7D0A14] text-white shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  🏢 Wholesale Rate
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setAuthModalTab('business');
+                    setIsAuthModalOpen(true);
+                    showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
+                  }}
+                  className="px-2.5 py-1 rounded-lg text-xs font-black text-[#7D0A14] hover:bg-amber-100/60 flex items-center gap-1 transition-all"
+                  title="B2B Login Required for Wholesale Rates"
+                >
+                  <Lock className="w-3 h-3 text-amber-600" />
+                  <span>Wholesale (B2B)</span>
+                </button>
+              )}
             </div>
 
             {/* Organic Only */}
@@ -451,7 +472,7 @@ export const CategoriesPage = () => {
       </div>
 
       {/* Active Wholesale Pricing Banner */}
-      {pricingMode === 'wholesale' && (
+      {Boolean(user?.isBusiness && pricingMode === 'wholesale') && (
         <div className="bg-gradient-to-r from-amber-500/15 via-[#FAF5EC] to-amber-500/10 border-2 border-[#7D0A14] p-3.5 sm:p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
           <div className="flex items-center gap-3">
             <span className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-200 flex items-center justify-center font-black flex-shrink-0">
