@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
 import { categories, products, servicesList, customerTestimonials } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
@@ -48,6 +48,121 @@ export const HomePage = () => {
 
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
   const [heroSlide, setHeroSlide] = useState(0);
+  const [isHeroPaused, setIsHeroPaused] = useState(false);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+
+  // Hero Carousel Slides
+  const heroSlides = [
+    {
+      id: 'slide-1',
+      badge: 'Sumadhura Signature',
+      titleLine1: 'Food',
+      titleLine2: 'Crafted with',
+      highlight: 'Love',
+      hasHeart: true,
+      highlightColor: 'text-[#F8B62A]',
+      description: 'Traditional authentic taste prepared with 100% pure desi ghee & heritage recipes.',
+      buttonText: 'Explore Menu',
+      buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+      buttonAction: () => navigateTo('categories'),
+      image: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80',
+      imageAlt: 'Sumadhura Traditional Feast',
+      borderColor: 'border-[#F5A623]/80',
+      gradient: 'from-[#60060E] via-[#7D0A14] to-[#91131E]',
+      borderWrapper: 'border-[#8B121C]'
+    },
+    {
+      id: 'slide-2',
+      badge: 'Farm Direct Harvest',
+      titleLine1: 'Fresh Veggies',
+      titleLine2: 'Delivered in',
+      highlight: '10-15 Mins ⚡',
+      hasHeart: false,
+      highlightColor: 'text-emerald-300',
+      description: 'Crisp handpicked vegetables and fruits directly from local sustainable farmers.',
+      buttonText: 'Shop Fresh Veggies',
+      buttonBg: 'bg-emerald-400 hover:bg-emerald-300 text-emerald-950',
+      buttonAction: () => navigateTo('categories', 'Vegetables'),
+      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
+      imageAlt: 'Farm Fresh Vegetables',
+      borderColor: 'border-emerald-400/80',
+      gradient: 'from-[#064E3B] via-[#047857] to-[#059669]',
+      borderWrapper: 'border-emerald-600'
+    },
+    {
+      id: 'slide-3',
+      badge: 'Morning Subscription',
+      titleLine1: 'Pure Cow Milk',
+      titleLine2: '& Bilona Desi',
+      highlight: 'A2 Ghee 🥛',
+      hasHeart: false,
+      highlightColor: 'text-amber-300',
+      description: 'Pure, raw milk and traditionally churned ghee delivered to your doorstep before 7:00 AM.',
+      buttonText: 'Subscribe Daily',
+      buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+      buttonAction: () => setIsSubscriptionModalOpen(true),
+      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
+      imageAlt: 'Pure Cow Milk and Ghee',
+      borderColor: 'border-amber-400/80',
+      gradient: 'from-[#1E3A8A] via-[#1D4ED8] to-[#2563EB]',
+      borderWrapper: 'border-blue-600'
+    },
+    {
+      id: 'slide-4',
+      badge: 'Mega Grocery Savings',
+      titleLine1: 'Kitchen Staples',
+      titleLine2: 'Save Flat',
+      highlight: '25% OFF 🎉',
+      hasHeart: false,
+      highlightColor: 'text-amber-300',
+      description: 'Unpolished dals, aged basmati rice, cold-pressed oils & premium whole dry fruits.',
+      buttonText: 'Shop Groceries',
+      buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+      buttonAction: () => navigateTo('categories', 'Groceries'),
+      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80',
+      imageAlt: 'Organic Groceries and Dry Fruits',
+      borderColor: 'border-purple-300/80',
+      gradient: 'from-[#4C1D95] via-[#6D28D9] to-[#7C3AED]',
+      borderWrapper: 'border-purple-600'
+    }
+  ];
+
+  // Auto-play sliding effect
+  useEffect(() => {
+    if (isHeroPaused) return;
+    const interval = setInterval(() => {
+      setHeroSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isHeroPaused, heroSlides.length]);
+
+  const nextHeroSlide = () => {
+    setHeroSlide((prev) => (prev + 1) % heroSlides.length);
+  };
+
+  const prevHeroSlide = () => {
+    setHeroSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const diff = touchStartX.current - touchEndX.current;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        nextHeroSlide();
+      } else {
+        prevHeroSlide();
+      }
+    }
+  };
 
   // Category Quick Pill Cards with REAL FOOD IMAGES matching reference screen
   const categoryPills = [
@@ -244,37 +359,104 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 3. Hero Curved Banner ("Food Crafted with Love") */}
-      <section className="max-w-7xl mx-auto px-3 sm:px-6">
-        <div className="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-[#60060E] via-[#7D0A14] to-[#91131E] text-white p-5 sm:p-8 flex items-center justify-between border border-[#8B121C]">
-          {/* Left Text & CTA */}
-          <div className="relative z-10 max-w-[58%] sm:max-w-md space-y-2.5 sm:space-y-4">
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight">
-              Food <br />
-              Crafted with{' '}
-              <span className="font-serif italic text-[#F8B62A] tracking-normal inline-flex items-center gap-1 font-bold">
-                Love <Heart className="w-4 h-4 sm:w-6 sm:h-6 fill-[#F8B62A] text-[#F8B62A] inline" />
-              </span>
-            </h1>
+      {/* 3. Hero Carousel Banner with Auto-Sliding, Touch Swipes & Navigation */}
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 relative group">
+        <div
+          onMouseEnter={() => setIsHeroPaused(true)}
+          onMouseLeave={() => setIsHeroPaused(false)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="relative rounded-3xl overflow-hidden shadow-xl text-white select-none"
+        >
+          {/* Sliding Track */}
+          <div
+            className="flex transition-transform duration-700 ease-out"
+            style={{ transform: `translateX(-${heroSlide * 100}%)` }}
+          >
+            {heroSlides.map((slide, idx) => (
+              <div
+                key={slide.id}
+                className={`w-full flex-shrink-0 bg-gradient-to-r ${slide.gradient} p-5 sm:p-8 flex items-center justify-between border ${slide.borderWrapper} relative min-h-[175px] sm:min-h-[220px] lg:min-h-[260px]`}
+              >
+                {/* Left Text & CTA */}
+                <div className="relative z-10 max-w-[62%] sm:max-w-md space-y-2 sm:space-y-3.5">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-sm text-[10px] sm:text-xs font-black uppercase tracking-wider text-amber-200">
+                    <Sparkles className="w-3 h-3 text-amber-300" />
+                    <span>{slide.badge}</span>
+                  </div>
 
-            <button
-              onClick={() => navigateTo('categories')}
-              className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#F5A623] hover:bg-[#E09215] active:scale-95 text-[#55070E] font-black text-xs sm:text-sm shadow-md transition-all inline-flex items-center gap-1.5"
-            >
-              <span>Explore Menu</span>
-              <ArrowRight className="w-4 h-4 text-[#55070E]" />
-            </button>
+                  <h1 className="text-xl sm:text-4xl lg:text-5xl font-black text-white leading-[1.1] tracking-tight">
+                    {slide.titleLine1} <br />
+                    {slide.titleLine2}{' '}
+                    <span className={`font-serif italic ${slide.highlightColor} tracking-normal inline-flex items-center gap-1 font-bold`}>
+                      {slide.highlight}
+                      {slide.hasHeart && (
+                        <Heart className="w-4 h-4 sm:w-6 sm:h-6 fill-[#F8B62A] text-[#F8B62A] inline animate-pulse" />
+                      )}
+                    </span>
+                  </h1>
+
+                  <p className="text-[11px] sm:text-xs text-white/85 line-clamp-1 sm:line-clamp-2 max-w-sm font-medium">
+                    {slide.description}
+                  </p>
+
+                  <button
+                    onClick={slide.buttonAction}
+                    className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full ${slide.buttonBg} active:scale-95 font-black text-xs sm:text-sm shadow-md transition-all inline-flex items-center gap-1.5`}
+                  >
+                    <span>{slide.buttonText}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Right Image: Framed by circular border arc */}
+                <div className="relative flex-shrink-0 -mr-2 sm:mr-0">
+                  <div className={`w-32 h-32 sm:w-52 sm:h-52 lg:w-60 lg:h-60 rounded-full overflow-hidden border-4 ${slide.borderColor} shadow-2xl relative bg-black/20`}>
+                    <img
+                      src={slide.image}
+                      alt={slide.imageAlt}
+                      className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Right Image: South Indian Feast Thali Platter framed by Golden Arc */}
-          <div className="relative flex-shrink-0 -mr-2 sm:mr-0">
-            <div className="w-36 h-36 sm:w-56 sm:h-56 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-[#F5A623]/80 shadow-2xl relative">
-              <img
-                src="https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80"
-                alt="Sumadhura Caterers Traditional Feast"
-                className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-500"
+          {/* Prev Slide Arrow */}
+          <button
+            onClick={prevHeroSlide}
+            aria-label="Previous Slide"
+            className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center transition-all duration-200 shadow-lg border border-white/20 active:scale-90 z-20 opacity-80 sm:opacity-0 sm:group-hover:opacity-100"
+          >
+            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6" />
+          </button>
+
+          {/* Next Slide Arrow */}
+          <button
+            onClick={nextHeroSlide}
+            aria-label="Next Slide"
+            className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center transition-all duration-200 shadow-lg border border-white/20 active:scale-90 z-20 opacity-80 sm:opacity-0 sm:group-hover:opacity-100"
+          >
+            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6" />
+          </button>
+
+          {/* Pagination Dots */}
+          <div className="absolute bottom-2.5 sm:bottom-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20 bg-black/35 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+            {heroSlides.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setHeroSlide(idx)}
+                aria-label={`Go to slide ${idx + 1}`}
+                className={`transition-all duration-300 rounded-full ${
+                  heroSlide === idx
+                    ? 'w-6 h-2 bg-[#F5A623] shadow-sm'
+                    : 'w-2 h-2 bg-white/50 hover:bg-white/80'
+                }`}
               />
-            </div>
+            ))}
           </div>
         </div>
       </section>

@@ -429,11 +429,10 @@ export const LoginPage = () => {
             setAccountType('user');
             setTab('login');
           }}
-          className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
-            accountType === 'user'
+          className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${accountType === 'user'
               ? 'bg-[#7D0A14] text-white shadow-md'
               : 'text-slate-600 hover:text-slate-900 hover:bg-[#FAF5EC]'
-          }`}
+            }`}
         >
           <User className="w-4 h-4" />
           <span>User Login</span>
@@ -445,11 +444,10 @@ export const LoginPage = () => {
             setAccountType('business');
             setTab('login');
           }}
-          className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
-            accountType === 'business'
+          className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${accountType === 'business'
               ? 'bg-[#7D0A14] text-white shadow-md'
               : 'text-slate-600 hover:text-slate-900 hover:bg-[#FAF5EC]'
-          }`}
+            }`}
         >
           <Building2 className="w-4 h-4" />
           <span>Business Login</span>
@@ -541,22 +539,20 @@ export const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => setTab('login')}
-                className={`py-2 text-xs font-bold rounded-xl transition-all ${
-                  tab === 'login'
+                className={`py-2 text-xs font-bold rounded-xl transition-all ${tab === 'login'
                     ? 'bg-white text-[#7D0A14] shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 Sign In
               </button>
               <button
                 type="button"
                 onClick={() => setTab('register')}
-                className={`py-2 text-xs font-bold rounded-xl transition-all ${
-                  tab === 'register'
+                className={`py-2 text-xs font-bold rounded-xl transition-all ${tab === 'register'
                     ? 'bg-white text-[#7D0A14] shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
-                }`}
+                  }`}
               >
                 {accountType === 'business' ? 'Register Business' : 'Create Account'}
               </button>
@@ -820,8 +816,8 @@ export const LoginPage = () => {
                       ? 'Sign In to Business Portal'
                       : 'Register Business Account'
                     : tab === 'login'
-                    ? 'Sign In to Account'
-                    : 'Create My Account'}
+                      ? 'Sign In to Account'
+                      : 'Create My Account'}
                 </span>
                 <ArrowRight className="w-4 h-4" />
               </button>
