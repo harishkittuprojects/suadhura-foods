@@ -23,7 +23,6 @@ export const CategoriesPage = () => {
 
   const [searchFilter, setSearchFilter] = useState(searchQuery || '');
   const [searchScope, setSearchScope] = useState('all'); // 'all' (Fast Search for ALL items) | 'current' (Only in current category)
-  const [sortBy, setSortBy] = useState('popular'); // 'popular' | 'price-low' | 'price-high' | 'rating'
   const [organicOnly, setOrganicOnly] = useState(false);
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
 
@@ -224,15 +223,6 @@ export const CategoriesPage = () => {
     return isCatMatch && matchesSearch && matchesOrganic;
   });
 
-  // Sort products
-  if (sortBy === 'price-low') {
-    filtered.sort((a, b) => a.price - b.price);
-  } else if (sortBy === 'price-high') {
-    filtered.sort((a, b) => b.price - a.price);
-  } else if (sortBy === 'rating') {
-    filtered.sort((a, b) => b.rating - a.rating);
-  }
-
   const currentOption =
     aisleOptions.find(
       (o) =>
@@ -349,18 +339,6 @@ export const CategoriesPage = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Sort */}
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer"
-            >
-              <option value="popular">Popular First</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="rating">Top Rated</option>
-            </select>
-
             {/* Organic Only */}
             <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl hover:bg-slate-100">
               <input
