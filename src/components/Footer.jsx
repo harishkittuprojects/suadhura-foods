@@ -139,6 +139,14 @@ export const Footer = () => {
               </li>
               <li>
                 <button
+                  onClick={() => navigateTo('b2b')}
+                  className="text-amber-300 font-bold hover:text-amber-200 transition-colors flex items-center gap-1.5"
+                >
+                  <span>🏢 B2B Wholesale Supply</span>
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => navigateTo('services')}
                   className="hover:text-amber-300 transition-colors"
                 >

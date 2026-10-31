@@ -20,6 +20,7 @@ import { ServicesPage } from './pages/ServicesPage';
 import { WishlistPage } from './pages/WishlistPage';
 import { CartPage } from './pages/CartPage';
 import { LoginPage } from './pages/LoginPage';
+import { B2BPage } from './pages/B2BPage';
 
 const MainLayout = () => {
   const { activeTab } = useShop();
@@ -48,6 +49,7 @@ const MainLayout = () => {
         {activeTab === 'home' && <HomePage />}
         {(activeTab === 'categories' || activeTab === 'menu') && <CategoriesPage />}
         {(activeTab === 'services' || activeTab === 'bookings') && <ServicesPage />}
+        {activeTab === 'b2b' && <B2BPage />}
         {activeTab === 'wishlist' && <WishlistPage />}
         {activeTab === 'cart' && <CartPage />}
         {activeTab === 'login' && <LoginPage />}
