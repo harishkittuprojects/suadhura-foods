@@ -421,37 +421,59 @@ export const LoginPage = () => {
   // ----------------------------------------------------
   return (
     <div className="max-w-md mx-auto px-4 py-8 space-y-4">
-      {/* 1. Account Type Switcher: User vs Business */}
-      <div className="bg-white p-1.5 rounded-2xl border border-[#EDE1D1] shadow-2xs grid grid-cols-2 gap-1.5">
-        <button
-          type="button"
-          onClick={() => {
-            setAccountType('user');
-            setTab('login');
-          }}
-          className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${accountType === 'user'
-              ? 'bg-[#7D0A14] text-white shadow-md'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-[#FAF5EC]'
+      {/* 1. Account Type Switcher: B2C vs B2B */}
+      <div className="bg-white p-2 rounded-2xl border border-[#EDE1D1] shadow-2xs space-y-1.5">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+            Select Portal
+          </span>
+          <span className="text-[10px] font-bold text-[#7D0A14]">
+            {accountType === 'user' ? 'Retail / Household' : 'Wholesale / Commercial'}
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setAccountType('user');
+              setTab('login');
+            }}
+            className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+              accountType === 'user'
+                ? 'bg-[#7D0A14] text-white shadow-md ring-2 ring-[#7D0A14]/20'
+                : 'bg-[#FAF5EC] text-slate-700 hover:text-slate-900 hover:bg-[#F3EAD9]'
             }`}
-        >
-          <User className="w-4 h-4" />
-          <span>User Login</span>
-        </button>
+          >
+            <User className="w-4 h-4" />
+            <div className="text-left">
+              <div className="leading-tight font-black">B2C Login</div>
+              <div className={`text-[9px] font-normal ${accountType === 'user' ? 'text-amber-200' : 'text-slate-500'}`}>
+                Retail Customer
+              </div>
+            </div>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            setAccountType('business');
-            setTab('login');
-          }}
-          className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${accountType === 'business'
-              ? 'bg-[#7D0A14] text-white shadow-md'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-[#FAF5EC]'
+          <button
+            type="button"
+            onClick={() => {
+              setAccountType('business');
+              setTab('login');
+            }}
+            className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+              accountType === 'business'
+                ? 'bg-[#7D0A14] text-white shadow-md ring-2 ring-[#7D0A14]/20'
+                : 'bg-[#FAF5EC] text-slate-700 hover:text-slate-900 hover:bg-[#F3EAD9]'
             }`}
-        >
-          <Building2 className="w-4 h-4" />
-          <span>Business Login</span>
-        </button>
+          >
+            <Building2 className="w-4 h-4 text-amber-300" />
+            <div className="text-left">
+              <div className="leading-tight font-black">B2B Login</div>
+              <div className={`text-[9px] font-normal ${accountType === 'business' ? 'text-amber-200' : 'text-slate-500'}`}>
+                Wholesale Business
+              </div>
+            </div>
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-3xl border border-[#EDE1D1] shadow-soft overflow-hidden">
@@ -465,11 +487,11 @@ export const LoginPage = () => {
             )}
           </div>
           <h1 className="text-xl font-black">
-            {accountType === 'business' ? 'Sumadhura for Business' : 'User Login'}
+            {accountType === 'business' ? 'B2B Wholesale Portal' : 'B2C Customer Login'}
           </h1>
           <p className="text-xs text-amber-100/90 mt-1 max-w-sm mx-auto leading-relaxed">
             {accountType === 'business'
-              ? 'Wholesale bulk pricing, GST tax invoices & recurring morning supplies for hotels, restaurants & offices'
+              ? 'Wholesale bulk pricing, GST tax invoices & recurring morning kitchen supplies for hotels, restaurants & caterers'
               : 'Sign in to track orders, manage daily milk subscriptions & save your favorites'}
           </p>
 
@@ -480,7 +502,7 @@ export const LoginPage = () => {
               <span>•</span>
               <span>🧾 GST Invoices</span>
               <span>•</span>
-              <span>🚚 Bulk Crates</span>
+              <span>🚚 5:00 AM Delivery</span>
             </div>
           )}
         </div>
@@ -849,6 +871,38 @@ export const LoginPage = () => {
           </div>
         )}
       </div>
+
+      {/* B2B Wholesale Supply Information Card */}
+      {accountType === 'business' ? (
+        <div className="bg-white p-4 rounded-2xl border border-[#EDE1D1] shadow-2xs space-y-2 text-xs">
+          <div className="flex items-center justify-between font-bold text-[#3D040A]">
+            <span className="flex items-center gap-1.5">
+              <Building2 className="w-4 h-4 text-[#7D0A14]" />
+              <span>Wholesale Bulk Supply Desk</span>
+            </span>
+            <button
+              onClick={() => navigateTo('b2b')}
+              className="text-[#7D0A14] font-black hover:underline flex items-center gap-1"
+            >
+              <span>View Wholesale Portal</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <p className="text-slate-600 text-[11px] leading-relaxed">
+            Need customized quotations, daily milk cans, 50kg vegetable bags or basmati rice for your commercial kitchen?
+          </p>
+        </div>
+      ) : (
+        <div className="bg-white p-3.5 rounded-2xl border border-[#EDE1D1] shadow-2xs text-center text-xs text-slate-500">
+          Looking for commercial bulk supply? Switch to{' '}
+          <button
+            onClick={() => setAccountType('business')}
+            className="text-[#7D0A14] font-black underline hover:text-[#55070E]"
+          >
+            B2B Wholesale Login
+          </button>
+        </div>
+      )}
     </div>
   );
 };

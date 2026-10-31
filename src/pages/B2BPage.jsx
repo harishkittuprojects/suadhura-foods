@@ -854,3 +854,4 @@ export const B2BPage = () => {
     </div>
   );
 };
+
