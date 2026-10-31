@@ -47,10 +47,10 @@ const MainLayout = () => {
     AOS.refresh();
   }, [activeTab]);
 
-  // SEPARATE STANDALONE ADMIN PORTAL LAYOUT (No customer navbar, cart bar, or footer)
+  // SEPARATE STANDALONE ADMIN PORTAL LAYOUT (Styled to match live website Royal Maroon & Cream theme)
   if (activeTab === 'admin') {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-amber-400 selection:text-slate-950">
+      <div className="min-h-screen bg-[#FAF5EC] text-slate-900 font-sans antialiased selection:bg-[#F5A623] selection:text-[#3D040A]">
         <AdminPage />
         <Toast />
       </div>

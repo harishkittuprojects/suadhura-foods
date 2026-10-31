@@ -506,53 +506,53 @@ export const AdminPage = () => {
   ];
 
   return (
-    <div className="flex h-screen w-full bg-[#0F141C] text-slate-100 overflow-hidden font-sans">
+    <div className="flex h-screen w-full bg-[#FAF5EC] text-[#3D040A] overflow-hidden font-sans">
       {/* ============================================================= */}
-      {/* 1. STANDALONE LEFT SIDEBAR                                     */}
+      {/* 1. STANDALONE LEFT SIDEBAR (SUMADHURA ROYAL MAROON BRAND THEME)*/}
       {/* ============================================================= */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#171D27] border-r border-slate-800 flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#3D040A] text-white border-r border-[#52060E] flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Brand Header */}
-          <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+          <div className="p-5 bg-[#4D060D] border-b border-[#52060E] flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-[#F5A623] text-[#3D040A] flex items-center justify-center font-black text-xl shadow-lg shadow-amber-500/20">
+              <div className="w-10 h-10 rounded-2xl bg-[#F5A623] text-[#3D040A] flex items-center justify-center font-black text-xl shadow-lg">
                 <Store className="w-5 h-5 text-[#3D040A]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="font-black text-sm text-white tracking-tight">Sumadhura Ops</h2>
-                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#F5A623] text-[#3D040A]">
                     HQ v2.4
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400">Enterprise Operations Portal</p>
+                <p className="text-[11px] text-amber-200/80">Operations Command Center</p>
               </div>
             </div>
 
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 text-slate-400 hover:text-white rounded-lg"
+              className="lg:hidden p-1.5 text-white/70 hover:text-white rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Mode Switcher Segmented Control */}
-          <div className="p-4 border-b border-slate-800">
-            <div className="text-[10px] font-black uppercase tracking-wider text-slate-500 mb-2">
+          <div className="p-4 border-b border-[#52060E] bg-[#330308]">
+            <div className="text-[10px] font-black uppercase tracking-wider text-amber-300/80 mb-2">
               Operational Scope
             </div>
-            <div className="grid grid-cols-3 gap-1 bg-[#0F141C] p-1 rounded-xl border border-slate-800 text-[11px] font-extrabold text-center">
+            <div className="grid grid-cols-3 gap-1 bg-[#230206] p-1 rounded-xl border border-[#52060E] text-[11px] font-extrabold text-center">
               <button
                 onClick={() => setAdminMode('unified')}
                 className={`py-1.5 rounded-lg transition-all ${
                   adminMode === 'unified'
-                    ? 'bg-amber-400 text-slate-950 font-black shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#F5A623] text-[#3D040A] font-black shadow-sm'
+                    : 'text-amber-100/70 hover:text-white'
                 }`}
               >
                 Unified
@@ -562,7 +562,7 @@ export const AdminPage = () => {
                 className={`py-1.5 rounded-lg transition-all ${
                   adminMode === 'b2c'
                     ? 'bg-blue-600 text-white font-black shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    : 'text-amber-100/70 hover:text-white'
                 }`}
               >
                 B2C Retail
@@ -571,8 +571,8 @@ export const AdminPage = () => {
                 onClick={() => setAdminMode('b2b')}
                 className={`py-1.5 rounded-lg transition-all ${
                   adminMode === 'b2b'
-                    ? 'bg-[#7D0A14] text-white font-black shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[#7D0A14] text-white border border-amber-400/40 font-black shadow-sm'
+                    : 'text-amber-100/70 hover:text-white'
                 }`}
               >
                 B2B Bulk
@@ -582,7 +582,7 @@ export const AdminPage = () => {
 
           {/* Navigation Links */}
           <div className="p-3 flex-1 overflow-y-auto space-y-1">
-            <div className="text-[10px] font-black uppercase tracking-wider text-slate-500 px-3 py-1">
+            <div className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 px-3 py-1">
               Management Modules
             </div>
             {sidebarLinks.map((item) => {
@@ -597,20 +597,20 @@ export const AdminPage = () => {
                   }}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
                     isActive
-                      ? 'bg-gradient-to-r from-amber-400/20 to-amber-500/10 text-amber-300 border border-amber-400/30'
-                      : 'text-slate-300 hover:bg-slate-800/60 hover:text-white'
+                      ? 'bg-gradient-to-r from-[#F5A623]/30 to-transparent text-amber-300 border-l-4 border-[#F5A623] font-black'
+                      : 'text-amber-100/80 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-slate-400'}`} />
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-amber-200/70'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge !== null && (
                     <span
                       className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                         isActive
-                          ? 'bg-amber-400 text-slate-950'
-                          : 'bg-slate-800 text-slate-400'
+                          ? 'bg-[#F5A623] text-[#3D040A]'
+                          : 'bg-black/30 text-amber-200'
                       }`}
                     >
                       {item.badge}
@@ -622,18 +622,18 @@ export const AdminPage = () => {
           </div>
 
           {/* Bottom Card: Back to Live Storefront */}
-          <div className="p-4 border-t border-slate-800 space-y-3">
-            <div className="p-3 rounded-2xl bg-[#0F141C] border border-slate-800 text-xs">
+          <div className="p-4 border-t border-[#52060E] space-y-3 bg-[#330308]">
+            <div className="p-3 rounded-2xl bg-[#230206] border border-[#52060E] text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-extrabold text-white text-[11px]">Dark Store Hub: Bengaluru South</span>
+                <span className="font-extrabold text-white text-[11px]">Dark Store: Bengaluru South</span>
               </div>
-              <div className="text-[10px] text-slate-400 mt-1">Logged in as Operations Supervisor</div>
+              <div className="text-[10px] text-amber-200/70 mt-1">Logged in as Operations Supervisor</div>
             </div>
 
             <button
               onClick={() => navigateTo('home')}
-              className="w-full py-2.5 px-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-all flex items-center justify-center gap-2 shadow-md active:scale-95"
+              className="w-full py-2.5 px-3 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs transition-all flex items-center justify-center gap-2 shadow-md active:scale-95"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Back to Customer Store</span>
@@ -651,26 +651,26 @@ export const AdminPage = () => {
       )}
 
       {/* ============================================================= */}
-      {/* 2. MAIN ADMIN CANVAS (HEADER + SCROLLABLE CONTENT)            */}
+      {/* 2. MAIN ADMIN CANVAS (MATCHING STOREFRONT CREAM & MAROON)      */}
       {/* ============================================================= */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#0A0D14]">
-        {/* Standalone Admin Header Bar */}
-        <header className="h-16 bg-[#121721] border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between flex-shrink-0 z-20">
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF5EC]">
+        {/* Header Bar */}
+        <header className="h-16 bg-white border-b border-[#E8DDCF] px-4 sm:px-6 flex items-center justify-between flex-shrink-0 z-20 shadow-xs">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white"
+              className="lg:hidden p-2 rounded-xl bg-[#FAF5EC] text-[#7D0A14] hover:bg-[#F3EAD9]"
             >
               <Menu className="w-5 h-5" />
             </button>
 
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
-                <span>Operations</span>
-                <ChevronRight className="w-3 h-3 text-slate-600" />
-                <span className="text-amber-300 capitalize">{activeTab.replace('-', ' ')}</span>
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                <span>Sumadhura Operations</span>
+                <ChevronRight className="w-3 h-3 text-slate-400" />
+                <span className="text-[#7D0A14] capitalize font-black">{activeTab.replace('-', ' ')}</span>
               </div>
-              <h1 className="text-sm sm:text-base font-black text-white capitalize">
+              <h1 className="text-sm sm:text-base font-black text-[#3D040A] capitalize">
                 {activeTab === 'overview'
                   ? 'Operations Command Dashboard'
                   : activeTab === 'b2b-quotes'
@@ -682,14 +682,14 @@ export const AdminPage = () => {
 
           {/* Quick Simulators & Storefront Jump */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-[11px] text-slate-300 font-medium">
-              <span className="text-amber-300 font-bold">❄️ 3.8°C</span>
+            <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
+              <span className="text-[#D98207]">❄️ 3.8°C</span>
               <span>Cold-Chain OK</span>
             </div>
 
             <button
               onClick={simulateNewB2COrder}
-              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
               title="Simulate a real-time incoming B2C retail order"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -699,7 +699,7 @@ export const AdminPage = () => {
 
             <button
               onClick={simulateNewB2BQuote}
-              className="px-3 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+              className="px-3 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
               title="Simulate incoming wholesale hotel quote"
             >
               <Building2 className="w-3.5 h-3.5" />
@@ -709,10 +709,10 @@ export const AdminPage = () => {
 
             <button
               onClick={() => navigateTo('home')}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
             >
               <Store className="w-3.5 h-3.5" />
-              <span>Storefront</span>
+              <span>Customer Storefront</span>
             </button>
           </div>
         </header>
@@ -727,67 +727,67 @@ export const AdminPage = () => {
               {/* Metric Cards Grid */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Card 1: B2C Retail Today */}
-                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
                     <span>Today's B2C Retail</span>
-                    <span className="p-1.5 rounded-xl bg-blue-500/10 text-blue-400">
+                    <span className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
                       <User className="w-4 h-4" />
                     </span>
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-white">
+                  <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
                     ₹{b2cRevenue.toLocaleString()}
                   </div>
-                  <div className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                  <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
                     <TrendingUp className="w-3.5 h-3.5" />
                     <span>{b2cOrdersCount} orders • 11.2m avg delivery</span>
                   </div>
                 </div>
 
                 {/* Card 2: B2B Wholesale Dispatched */}
-                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
                     <span>B2B Wholesale Dispatched</span>
-                    <span className="p-1.5 rounded-xl bg-amber-500/10 text-amber-400">
+                    <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
                       <Building2 className="w-4 h-4" />
                     </span>
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-amber-300">
+                  <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
                     ₹{b2bRevenue.toLocaleString()}
                   </div>
-                  <div className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                  <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
                     <TrendingUp className="w-3.5 h-3.5" />
                     <span>{b2bOrdersCount} bulk commercial shipments</span>
                   </div>
                 </div>
 
                 {/* Card 3: Morning Milk Subscribers */}
-                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
                     <span>Morning Milk Subscribers</span>
-                    <span className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-400">
+                    <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
                       <Clock className="w-4 h-4" />
                     </span>
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-white">
+                  <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
                     520 <span className="text-xs text-slate-400 font-normal">Homes</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 font-medium">
+                  <div className="text-[11px] text-slate-500 font-medium">
                     Delivered 6:00 AM daily • 100% On Time
                   </div>
                 </div>
 
                 {/* Card 4: Wholesale RFPs & Pipeline */}
-                <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 shadow-sm space-y-1">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-bold">
+                <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
+                  <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
                     <span>Commercial RFPs & Quotes</span>
-                    <span className="p-1.5 rounded-xl bg-purple-500/10 text-purple-400">
+                    <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
                       <FileText className="w-4 h-4" />
                     </span>
                   </div>
-                  <div className="text-2xl sm:text-3xl font-black text-white">
+                  <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
                     {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Hotels</span>
                   </div>
-                  <div className="text-[11px] text-amber-400 font-bold">
+                  <div className="text-[11px] text-amber-700 font-bold">
                     Est. ₹5.8 Lakhs pipeline value
                   </div>
                 </div>
@@ -796,57 +796,57 @@ export const AdminPage = () => {
               {/* Two Column Section: Live Dispatch + Operations Info */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left 2 Cols: Live Orders Dispatch Stream */}
-                <div className="lg:col-span-2 bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-4">
+                <div className="lg:col-span-2 bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-4 shadow-xs">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-black text-base text-white">Live Dispatch Activity</h3>
-                      <p className="text-xs text-slate-400">Real-time status of retail deliveries & bulk morning shipments</p>
+                      <h3 className="font-black text-base text-[#3D040A]">Live Dispatch Activity</h3>
+                      <p className="text-xs text-slate-500">Real-time status of retail deliveries & bulk morning shipments</p>
                     </div>
                     <button
                       onClick={() => setActiveTab('orders')}
-                      className="text-xs font-bold text-amber-300 hover:underline flex items-center gap-1"
+                      className="text-xs font-bold text-[#7D0A14] hover:underline flex items-center gap-1"
                     >
                       <span>View all {orders.length} orders</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  <div className="divide-y divide-slate-800">
+                  <div className="divide-y divide-slate-100">
                     {orders.slice(0, 4).map((order) => (
                       <div key={order.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-start gap-3">
                           <div
                             className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs flex-shrink-0 ${
                               order.type === 'b2b'
-                                ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30'
-                                : 'bg-blue-500/15 text-blue-300 border border-blue-500/30'
+                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                : 'bg-blue-100 text-blue-900 border border-blue-200'
                             }`}
                           >
                             {order.type === 'b2b' ? 'B2B' : 'B2C'}
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-extrabold text-sm text-white">{order.id}</span>
-                              <span className="text-xs text-slate-400">• {order.customer}</span>
+                              <span className="font-extrabold text-sm text-slate-900">{order.id}</span>
+                              <span className="text-xs text-slate-500">• {order.customer}</span>
                             </div>
-                            <div className="text-xs text-slate-400 line-clamp-1">
+                            <div className="text-xs text-slate-500 line-clamp-1">
                               {order.items.map((i) => `${i.name} (x${i.qty})`).join(', ')}
                             </div>
-                            <div className="text-[10px] text-slate-500 mt-0.5">
+                            <div className="text-[10px] text-slate-400 mt-0.5">
                               {order.deliverySlot} • {order.timestamp}
                             </div>
                           </div>
                         </div>
 
                         <div className="flex items-center justify-between sm:justify-end gap-3 self-end sm:self-center">
-                          <span className="font-black text-sm text-white">₹{order.total.toLocaleString()}</span>
+                          <span className="font-black text-sm text-[#3D040A]">₹{order.total.toLocaleString()}</span>
                           <span
                             className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
                               order.status === 'Delivered'
-                                ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                 : order.status === 'Dispatched'
-                                ? 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
-                                : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                : 'bg-amber-100 text-amber-800 border border-amber-200'
                             }`}
                           >
                             {order.status}
@@ -859,7 +859,7 @@ export const AdminPage = () => {
 
                 {/* Right 1 Col: Cold-Chain & Quick Action Cards */}
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-br from-[#2A0407] to-[#45070D] text-white p-6 rounded-3xl border border-[#680811] space-y-4 shadow-xl">
+                  <div className="bg-gradient-to-r from-[#3D040A] via-[#5C0810] to-[#7D0A14] text-white p-6 rounded-3xl border border-[#8B121C] space-y-4 shadow-md">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black uppercase text-amber-300">Warehouse Cold-Chain</span>
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -884,37 +884,37 @@ export const AdminPage = () => {
                     </div>
                   </div>
 
-                  <div className="bg-[#171D27] p-5 rounded-3xl border border-slate-800 space-y-3">
-                    <h4 className="font-extrabold text-xs text-slate-300 uppercase tracking-wider">
+                  <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] space-y-3 shadow-xs">
+                    <h4 className="font-extrabold text-xs text-[#3D040A] uppercase tracking-wider">
                       Operations Shortcuts
                     </h4>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <button
                         onClick={() => setActiveTab('b2b-quotes')}
-                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-amber-300 text-left transition-colors flex flex-col justify-between"
+                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
                       >
                         <Building2 className="w-4 h-4 mb-1" />
                         <span>Review B2B RFPs</span>
                       </button>
                       <button
                         onClick={() => setActiveTab('subscriptions')}
-                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-slate-200 text-left transition-colors flex flex-col justify-between"
+                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
                       >
-                        <Clock className="w-4 h-4 mb-1 text-emerald-400" />
+                        <Clock className="w-4 h-4 mb-1 text-emerald-600" />
                         <span>Milk Run-Sheet</span>
                       </button>
                       <button
                         onClick={() => setActiveTab('invoices')}
-                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-slate-200 text-left transition-colors flex flex-col justify-between"
+                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
                       >
-                        <Receipt className="w-4 h-4 mb-1 text-blue-400" />
+                        <Receipt className="w-4 h-4 mb-1 text-blue-600" />
                         <span>GST Invoices</span>
                       </button>
                       <button
                         onClick={() => setActiveTab('inventory')}
-                        className="p-3 rounded-2xl bg-slate-800/80 hover:bg-slate-700/80 font-bold text-slate-200 text-left transition-colors flex flex-col justify-between"
+                        className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
                       >
-                        <Percent className="w-4 h-4 mb-1 text-yellow-400" />
+                        <Percent className="w-4 h-4 mb-1 text-amber-600" />
                         <span>Dual-Pricing</span>
                       </button>
                     </div>
@@ -928,11 +928,11 @@ export const AdminPage = () => {
           {/* 2. ORDER MANAGEMENT CONSOLE                               */}
           {/* ========================================================= */}
           {activeTab === 'orders' && (
-            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-xl font-black text-white">Order Management Console</h3>
-                  <p className="text-xs text-slate-400">Live order fulfillment for B2C retail & B2B wholesale dispatches</p>
+                  <h3 className="text-xl font-black text-[#3D040A]">Order Management Console</h3>
+                  <p className="text-xs text-slate-500">Live order fulfillment for B2C retail & B2B wholesale dispatches</p>
                 </div>
 
                 {/* Filters */}
@@ -943,7 +943,7 @@ export const AdminPage = () => {
                       placeholder="Search order ID, hotel or client..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-400 w-48 sm:w-60"
+                      className="pl-8 pr-3 py-1.5 text-xs rounded-xl bg-white border border-[#E8DDCF] text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14] w-48 sm:w-60"
                     />
                     <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
                   </div>
@@ -951,7 +951,7 @@ export const AdminPage = () => {
                   <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="px-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white font-medium focus:outline-none"
+                    className="px-3 py-1.5 text-xs rounded-xl bg-white border border-[#E8DDCF] text-slate-800 font-medium focus:outline-none"
                   >
                     <option value="All">All Statuses</option>
                     <option value="Packing">Packing</option>
@@ -965,7 +965,7 @@ export const AdminPage = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="bg-slate-800/60 text-slate-400 font-extrabold border-b border-slate-800">
+                    <tr className="bg-[#FAF5EC] text-slate-600 font-extrabold border-b border-[#EDE1D1]">
                       <th className="p-3 rounded-l-xl">Order ID & Type</th>
                       <th className="p-3">Customer / Enterprise</th>
                       <th className="p-3">Items & Packaging</th>
@@ -974,51 +974,51 @@ export const AdminPage = () => {
                       <th className="p-3 rounded-r-xl text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {filteredOrders.map((order) => (
-                      <tr key={order.id} className="hover:bg-slate-800/40 transition-colors">
+                      <tr key={order.id} className="hover:bg-[#FAF5EC]/50 transition-colors">
                         <td className="p-3">
                           <span
                             className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase ${
                               order.type === 'b2b'
-                                ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                                : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                : 'bg-blue-100 text-blue-900 border border-blue-200'
                             }`}
                           >
                             {order.type === 'b2b' ? 'B2B Wholesale' : 'B2C Retail'}
                           </span>
-                          <div className="font-extrabold text-white mt-1">{order.id}</div>
-                          <div className="text-[10px] text-slate-500">{order.timestamp}</div>
+                          <div className="font-extrabold text-[#3D040A] mt-1">{order.id}</div>
+                          <div className="text-[10px] text-slate-400">{order.timestamp}</div>
                         </td>
 
                         <td className="p-3">
-                          <div className="font-bold text-white">{order.customer}</div>
+                          <div className="font-bold text-slate-900">{order.customer}</div>
                           {order.gstin && (
-                            <div className="text-[10px] text-amber-400 font-mono font-bold">
+                            <div className="text-[10px] text-amber-700 font-mono font-bold">
                               GSTIN: {order.gstin}
                             </div>
                           )}
-                          <div className="text-[10px] text-slate-400 line-clamp-1">{order.contact}</div>
+                          <div className="text-[10px] text-slate-500 line-clamp-1">{order.contact}</div>
                         </td>
 
                         <td className="p-3 max-w-xs">
                           <div className="space-y-0.5">
                             {order.items.map((item, idx) => (
-                              <div key={idx} className="text-[11px] text-slate-300">
-                                <span className="font-bold text-white">{item.qty}x</span> {item.name}
+                              <div key={idx} className="text-[11px] text-slate-700">
+                                <span className="font-bold">{item.qty}x</span> {item.name}
                               </div>
                             ))}
                           </div>
-                          <div className="text-[10px] text-amber-300 font-bold mt-1">
+                          <div className="text-[10px] text-[#7D0A14] font-bold mt-1">
                             Slot: {order.deliverySlot}
                           </div>
                         </td>
 
                         <td className="p-3">
-                          <div className="font-black text-sm text-white">
+                          <div className="font-black text-sm text-[#7D0A14]">
                             ₹{order.total.toLocaleString()}
                           </div>
-                          <div className="text-[10px] text-emerald-400 font-bold">
+                          <div className="text-[10px] text-emerald-600 font-bold">
                             {order.paymentMethod}
                           </div>
                         </td>
@@ -1027,10 +1027,10 @@ export const AdminPage = () => {
                           <span
                             className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black ${
                               order.status === 'Delivered'
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                                 : order.status === 'Dispatched'
-                                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                : 'bg-amber-100 text-amber-800 border border-amber-200'
                             }`}
                           >
                             {order.status}
@@ -1042,7 +1042,7 @@ export const AdminPage = () => {
                             {order.status === 'Packing' && (
                               <button
                                 onClick={() => updateOrderStatus(order.id, 'Dispatched')}
-                                className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-black shadow-xs"
+                                className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black shadow-xs"
                               >
                                 Dispatch
                               </button>
@@ -1050,7 +1050,7 @@ export const AdminPage = () => {
                             {order.status === 'Dispatched' && (
                               <button
                                 onClick={() => updateOrderStatus(order.id, 'Delivered')}
-                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-black shadow-xs"
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black shadow-xs"
                               >
                                 Mark Delivered
                               </button>
@@ -1076,7 +1076,7 @@ export const AdminPage = () => {
                                     });
                                   }
                                 }}
-                                className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-[10px] font-bold border border-slate-700"
+                                className="px-2.5 py-1 rounded-lg bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] text-[10px] font-bold border border-[#EDE1D1]"
                                 title="Print GST Invoice"
                               >
                                 <FileText className="w-3.5 h-3.5 inline mr-1" />
@@ -1097,13 +1097,13 @@ export const AdminPage = () => {
           {/* 3. MORNING SUBSCRIPTIONS (B2C)                            */}
           {/* ========================================================= */}
           {activeTab === 'subscriptions' && (
-            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-xl font-black text-white">
+                  <h3 className="text-xl font-black text-[#3D040A]">
                     Morning Milk & Veggie Subscriptions (B2C)
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Automated doorstep delivery before 7:00 AM every single morning.
                   </p>
                 </div>
@@ -1113,9 +1113,9 @@ export const AdminPage = () => {
                     window.print();
                     showToast('Preparing printable morning delivery run-sheet...');
                   }}
-                  className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
+                  className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
                 >
-                  <Printer className="w-3.5 h-3.5" />
+                  <Printer className="w-3.5 h-3.5 text-amber-300" />
                   <span>Print Route Run-Sheet</span>
                 </button>
               </div>
@@ -1124,45 +1124,45 @@ export const AdminPage = () => {
                 {subscriptions.map((sub) => (
                   <div
                     key={sub.id}
-                    className="bg-slate-900/80 p-4 sm:p-5 rounded-2xl border border-slate-800 space-y-3"
+                    className="bg-[#FAF5EC] p-4 sm:p-5 rounded-2xl border border-[#EDE1D1] space-y-3"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-xs text-amber-400">{sub.id}</span>
-                        <span className="font-extrabold text-sm text-white">{sub.customer}</span>
+                        <span className="font-mono font-black text-xs text-[#7D0A14]">{sub.id}</span>
+                        <span className="font-extrabold text-sm text-[#3D040A]">{sub.customer}</span>
                       </div>
                       <span
                         className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
                           sub.status === 'Active'
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            : 'bg-amber-100 text-amber-800 border border-amber-200'
                         }`}
                       >
                         {sub.status}
                       </span>
                     </div>
 
-                    <div className="text-xs text-slate-300 space-y-1">
+                    <div className="text-xs text-slate-600 space-y-1">
                       <div>
-                        <strong className="text-white">Items:</strong> {sub.items}
+                        <strong className="text-slate-900">Items:</strong> {sub.items}
                       </div>
                       <div>
-                        <strong className="text-white">Address:</strong> {sub.apartment}
+                        <strong className="text-slate-900">Address:</strong> {sub.apartment}
                       </div>
                       <div>
-                        <strong className="text-white">Delivery Window:</strong> {sub.slot} ({sub.frequency})
+                        <strong className="text-slate-900">Delivery Window:</strong> {sub.slot} ({sub.frequency})
                       </div>
-                      <div className="text-[11px] text-slate-500">
+                      <div className="text-[11px] text-slate-400">
                         Subscribed Since: {sub.since} • Phone: {sub.phone}
                       </div>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+                    <div className="pt-2 border-t border-[#E8DDCF] flex items-center justify-between">
                       <button
                         onClick={() => toggleSubscriptionStatus(sub.id)}
                         className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
                           sub.status === 'Active'
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30'
+                            ? 'bg-amber-200 text-amber-950 hover:bg-amber-300'
                             : 'bg-emerald-600 text-white hover:bg-emerald-700'
                         }`}
                       >
@@ -1171,7 +1171,7 @@ export const AdminPage = () => {
 
                       <button
                         onClick={() => showToast(`SMS dispatch reminder sent to ${sub.customer}`)}
-                        className="text-xs font-bold text-blue-400 hover:underline"
+                        className="text-xs font-bold text-blue-600 hover:underline"
                       >
                         Send SMS Update
                       </button>
@@ -1186,19 +1186,19 @@ export const AdminPage = () => {
           {/* 4. B2B COMMERCIAL QUOTES & RFPs                           */}
           {/* ========================================================= */}
           {activeTab === 'b2b-quotes' && (
-            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-xl font-black text-white">
+                  <h3 className="text-xl font-black text-[#3D040A]">
                     B2B Wholesale Quotes & RFP Inquiries
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Manage bulk price requests from Hotels, Cloud Kitchens, Caterers & Canteens
                   </p>
                 </div>
 
-                <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-300 bg-amber-500/15 px-3 py-1 rounded-full border border-amber-500/30">
-                  <Building2 className="w-4 h-4 text-amber-400" />
+                <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                  <Building2 className="w-4 h-4 text-amber-700" />
                   <span>{b2bQuotes.length} Commercial Leads Active</span>
                 </div>
               </div>
@@ -1207,17 +1207,17 @@ export const AdminPage = () => {
                 {b2bQuotes.map((quote) => (
                   <div
                     key={quote.id}
-                    className="bg-slate-900/80 rounded-2xl p-5 border border-slate-800 hover:border-amber-400/50 transition-all space-y-3"
+                    className="bg-[#FAF5EC]/70 rounded-2xl p-5 border border-[#EDE1D1] hover:border-[#7D0A14] transition-all space-y-3"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DDCF] pb-3">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-black text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                          <span className="font-mono font-black text-xs text-[#7D0A14] bg-white px-2 py-0.5 rounded border border-[#EDE1D1]">
                             {quote.id}
                           </span>
-                          <h4 className="font-black text-base text-white">{quote.company}</h4>
+                          <h4 className="font-black text-base text-[#3D040A]">{quote.company}</h4>
                         </div>
-                        <div className="text-xs text-slate-400 mt-0.5">
+                        <div className="text-xs text-slate-500 mt-0.5">
                           {quote.contactPerson} • {quote.businessType}
                         </div>
                       </div>
@@ -1226,10 +1226,10 @@ export const AdminPage = () => {
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-black ${
                             quote.status === 'Contract Approved'
-                              ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                               : quote.status === 'Quote Sent'
-                              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              : 'bg-amber-100 text-amber-800 border border-amber-200'
                           }`}
                         >
                           {quote.status}
@@ -1239,27 +1239,27 @@ export const AdminPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
                       <div>
-                        <span className="text-slate-500 font-bold uppercase text-[10px] block">
+                        <span className="text-slate-400 font-bold uppercase text-[10px] block">
                           Estimated Volume
                         </span>
-                        <strong className="text-white">{quote.monthlyVolume}</strong>
+                        <strong className="text-[#3D040A]">{quote.monthlyVolume}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-500 font-bold uppercase text-[10px] block">
+                        <span className="text-slate-400 font-bold uppercase text-[10px] block">
                           Contact Info
                         </span>
-                        <div className="text-slate-300">{quote.phone}</div>
-                        <div className="text-slate-400 text-[11px]">{quote.email}</div>
+                        <div className="text-slate-800">{quote.phone}</div>
+                        <div className="text-slate-500 text-[11px]">{quote.email}</div>
                       </div>
                       <div>
-                        <span className="text-slate-500 font-bold uppercase text-[10px] block">
+                        <span className="text-slate-400 font-bold uppercase text-[10px] block">
                           Requested Categories
                         </span>
                         <div className="flex flex-wrap gap-1 mt-1">
                           {quote.categories.map((c, i) => (
                             <span
                               key={i}
-                              className="bg-slate-800 text-amber-300 border border-slate-700 px-2 py-0.5 rounded text-[10px] font-bold"
+                              className="bg-white text-[#7D0A14] border border-[#EDE1D1] px-2 py-0.5 rounded text-[10px] font-bold"
                             >
                               {c}
                             </span>
@@ -1269,14 +1269,14 @@ export const AdminPage = () => {
                     </div>
 
                     {quote.notes && (
-                      <div className="p-3 rounded-xl bg-[#121721] text-xs text-slate-300 italic border border-slate-800">
+                      <div className="p-3 rounded-xl bg-white text-xs text-slate-700 italic border border-[#EDE1D1]">
                         "{quote.notes}"
                       </div>
                     )}
 
                     {/* Actions */}
                     <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[11px] text-slate-500">Received {quote.date}</span>
+                      <span className="text-[11px] text-slate-400">Received {quote.date}</span>
                       <div className="flex items-center gap-2">
                         <a
                           href={`https://wa.me/${quote.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(
@@ -1284,14 +1284,14 @@ export const AdminPage = () => {
                           )},%20this%20is%20Sumadhura%20Foods%20B2B%20Procurement%20Desk.`}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
+                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
                         >
                           <span>WhatsApp Quote</span>
                         </a>
                         {quote.status === 'New Inquiry' && (
                           <button
                             onClick={() => updateQuoteStatus(quote.id, 'Quote Sent')}
-                            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs"
+                            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
                           >
                             Mark Quote Sent
                           </button>
@@ -1299,7 +1299,7 @@ export const AdminPage = () => {
                         {quote.status === 'Quote Sent' && (
                           <button
                             onClick={() => updateQuoteStatus(quote.id, 'Contract Approved')}
-                            className="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs"
+                            className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs"
                           >
                             Approve Wholesale Contract
                           </button>
@@ -1316,18 +1316,18 @@ export const AdminPage = () => {
           {/* 5. INVENTORY & PRICING (RETAIL vs WHOLESALE)              */}
           {/* ========================================================= */}
           {activeTab === 'inventory' && (
-            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-xl font-black text-white">
+                  <h3 className="text-xl font-black text-[#3D040A]">
                     Dual-Tier Pricing & Inventory Management
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Side-by-side management of B2C Retail & B2B Wholesale price tiers and stock
                   </p>
                 </div>
 
-                <div className="text-xs text-slate-400 font-medium">
+                <div className="text-xs text-slate-500 font-medium">
                   Showing {inventoryList.length} Core Essential SKUs
                 </div>
               </div>
@@ -1335,7 +1335,7 @@ export const AdminPage = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="bg-slate-800/60 text-slate-400 font-extrabold border-b border-slate-800">
+                    <tr className="bg-[#FAF5EC] text-slate-600 font-extrabold border-b border-[#EDE1D1]">
                       <th className="p-3 rounded-l-xl">Product & Category</th>
                       <th className="p-3">Current Stock</th>
                       <th className="p-3">B2C Retail Price</th>
@@ -1344,30 +1344,30 @@ export const AdminPage = () => {
                       <th className="p-3 rounded-r-xl text-right">Stock Status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800 font-medium">
+                  <tbody className="divide-y divide-slate-100 font-medium">
                     {inventoryList.map((prod) => (
-                      <tr key={prod.id} className="hover:bg-slate-800/40 transition-colors">
+                      <tr key={prod.id} className="hover:bg-[#FAF5EC]/50 transition-colors">
                         <td className="p-3">
-                          <div className="font-bold text-white">{prod.name}</div>
+                          <div className="font-bold text-slate-900">{prod.name}</div>
                           <span className="text-[10px] text-slate-400">{prod.category}</span>
                         </td>
-                        <td className="p-3 font-bold text-slate-200">{prod.stock}</td>
+                        <td className="p-3 font-bold text-slate-800">{prod.stock}</td>
                         <td className="p-3">
-                          <div className="font-extrabold text-blue-400">₹{prod.retailPrice}</div>
-                          <div className="text-[10px] text-slate-500">{prod.retailUnit}</div>
+                          <div className="font-extrabold text-blue-700">₹{prod.retailPrice}</div>
+                          <div className="text-[10px] text-slate-400">{prod.retailUnit}</div>
                         </td>
                         <td className="p-3">
-                          <div className="font-extrabold text-amber-300">₹{prod.wholesalePrice}</div>
-                          <div className="text-[10px] text-slate-400">{prod.wholesaleUnit}</div>
+                          <div className="font-extrabold text-[#7D0A14]">₹{prod.wholesalePrice}</div>
+                          <div className="text-[10px] text-slate-500">{prod.wholesaleUnit}</div>
                         </td>
-                        <td className="p-3 font-mono font-bold text-slate-300">{prod.moq}</td>
+                        <td className="p-3 font-mono font-bold text-slate-700">{prod.moq}</td>
                         <td className="p-3 text-right">
                           <button
                             onClick={() => toggleInventoryStock(prod.id)}
                             className={`px-3 py-1 rounded-full text-[10px] font-black transition-colors ${
                               prod.inStock
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-rose-500/20 hover:text-rose-400'
-                                : 'bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-emerald-500/20 hover:text-emerald-400'
+                                ? 'bg-emerald-100 text-emerald-800 hover:bg-rose-100 hover:text-rose-800 border border-emerald-200'
+                                : 'bg-rose-100 text-rose-800 hover:bg-emerald-100 hover:text-emerald-800 border border-rose-200'
                             }`}
                           >
                             {prod.inStock ? 'In Stock (Active)' : 'Out of Stock'}
@@ -1385,23 +1385,23 @@ export const AdminPage = () => {
           {/* 6. B2B GST TAX INVOICES & BILLING                         */}
           {/* ========================================================= */}
           {activeTab === 'invoices' && (
-            <div className="bg-[#171D27] rounded-3xl border border-slate-800 p-5 sm:p-6 space-y-5 animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-xl font-black text-white">
+                  <h3 className="text-xl font-black text-[#3D040A]">
                     B2B Official GST Tax Invoices
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Government compliant tax invoices for commercial client Input Tax Credit (ITC)
                   </p>
                 </div>
 
-                <div className="text-xs font-bold text-emerald-400 bg-emerald-500/15 px-3 py-1 rounded-full border border-emerald-500/30">
+                <div className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
                   All Invoices 100% ITC Eligible
                 </div>
               </div>
 
-              <div className="divide-y divide-slate-800">
+              <div className="divide-y divide-slate-100">
                 {invoices.map((inv) => (
                   <div
                     key={inv.invoiceNo}
@@ -1409,31 +1409,31 @@ export const AdminPage = () => {
                   >
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-sm text-amber-300">
+                        <span className="font-mono font-black text-sm text-[#7D0A14]">
                           {inv.invoiceNo}
                         </span>
-                        <span className="text-xs text-slate-500">• {inv.date}</span>
+                        <span className="text-xs text-slate-400">• {inv.date}</span>
                       </div>
-                      <div className="font-extrabold text-sm text-white">{inv.client}</div>
-                      <div className="text-xs text-amber-400 font-mono">
+                      <div className="font-extrabold text-sm text-slate-900">{inv.client}</div>
+                      <div className="text-xs text-amber-800 font-mono">
                         GSTIN: <strong>{inv.gstin}</strong>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between sm:justify-end gap-4">
                       <div className="text-right">
-                        <div className="text-xs text-slate-500">Taxable: ₹{inv.taxableAmount.toLocaleString()}</div>
-                        <div className="font-black text-base text-white">
+                        <div className="text-xs text-slate-400">Taxable: ₹{inv.taxableAmount.toLocaleString()}</div>
+                        <div className="font-black text-base text-[#3D040A]">
                           ₹{inv.totalAmount.toLocaleString()}
                         </div>
-                        <div className="text-[10px] text-slate-400">CGST + SGST: ₹{(inv.cgst * 2).toFixed(2)}</div>
+                        <div className="text-[10px] text-slate-500">CGST + SGST: ₹{(inv.cgst * 2).toFixed(2)}</div>
                       </div>
 
                       <button
                         onClick={() => setSelectedInvoice(inv)}
-                        className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                        className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                       >
-                        <Eye className="w-3.5 h-3.5 text-slate-950" />
+                        <Eye className="w-3.5 h-3.5 text-amber-300" />
                         <span>View & Print</span>
                       </button>
                     </div>
@@ -1449,7 +1449,7 @@ export const AdminPage = () => {
       {/* GST INVOICE MODAL (PRINTABLE LAYOUT)                          */}
       {/* ------------------------------------------------------------- */}
       {selectedInvoice && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div
             className="bg-white text-slate-900 rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-6"
             onClick={(e) => e.stopPropagation()}
