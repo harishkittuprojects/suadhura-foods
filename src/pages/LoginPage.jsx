@@ -903,6 +903,18 @@ export const LoginPage = () => {
           </button>
         </div>
       )}
+      {/* Admin Panel Direct Jump Demo Card */}
+      <div className="bg-[#FAF5EC] p-3 rounded-2xl border border-[#EDE1D1] flex items-center justify-between text-xs">
+        <span className="font-bold text-slate-700 flex items-center gap-1.5">
+          <span>⚙️ Operations Admin Panel</span>
+        </span>
+        <button
+          onClick={() => navigateTo('admin')}
+          className="px-3 py-1.5 rounded-xl bg-[#3D040A] hover:bg-[#52060E] text-white font-extrabold text-[11px] transition-colors"
+        >
+          Open Admin Demo
+        </button>
+      </div>
     </div>
   );
 };

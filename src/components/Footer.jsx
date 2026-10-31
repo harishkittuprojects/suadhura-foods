@@ -155,6 +155,14 @@ export const Footer = () => {
               </li>
               <li>
                 <button
+                  onClick={() => navigateTo('admin')}
+                  className="text-amber-200 hover:text-white transition-colors flex items-center gap-1.5 font-bold"
+                >
+                  <span>⚙️ Operations Admin Panel (Demo)</span>
+                </button>
+              </li>
+              <li>
+                <button
                   onClick={() => navigateTo('wishlist')}
                   className="hover:text-amber-300 transition-colors"
                 >

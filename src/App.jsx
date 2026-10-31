@@ -21,6 +21,7 @@ import { WishlistPage } from './pages/WishlistPage';
 import { CartPage } from './pages/CartPage';
 import { LoginPage } from './pages/LoginPage';
 import { B2BPage } from './pages/B2BPage';
+import { AdminPage } from './pages/AdminPage';
 
 const MainLayout = () => {
   const { activeTab } = useShop();
@@ -53,6 +54,7 @@ const MainLayout = () => {
         {activeTab === 'wishlist' && <WishlistPage />}
         {activeTab === 'cart' && <CartPage />}
         {activeTab === 'login' && <LoginPage />}
+        {activeTab === 'admin' && <AdminPage />}
       </main>
 
       {/* Sticky Floating Bottom Cart Bar */}
