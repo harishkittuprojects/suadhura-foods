@@ -34,6 +34,7 @@ export const CheckoutModal = () => {
     savedAddresses,
     setSelectedAddress,
     setActiveOrder,
+    addOrder,
     setIsLiveTrackingOpen,
     navigateTo,
     pricingMode
@@ -83,15 +84,19 @@ export const CheckoutModal = () => {
         status: 'Packing'
       };
 
-      try {
-        const existingOrders = JSON.parse(localStorage.getItem('sumadhura_orders') || '[]');
-        localStorage.setItem('sumadhura_orders', JSON.stringify([placedOrder, ...existingOrders]));
-      } catch (err) {
-        console.error(err);
+      if (addOrder) {
+        addOrder(placedOrder);
+      } else {
+        try {
+          const existingOrders = JSON.parse(localStorage.getItem('sumadhura_orders') || '[]');
+          localStorage.setItem('sumadhura_orders', JSON.stringify([placedOrder, ...existingOrders]));
+        } catch (err) {
+          console.error(err);
+        }
+        setActiveOrder(placedOrder);
       }
 
       setOrderSummary(placedOrder);
-      setActiveOrder(placedOrder);
       clearCart();
       setIsSubmitting(false);
       setStep(3);

@@ -223,9 +223,8 @@ export const ServicesPage = () => {
                 >
                   <span>{faq.q}</span>
                   <ChevronDown
-                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ${
-                      openFaq === index ? 'rotate-180 text-blue-600' : ''
-                    }`}
+                    className={`w-4 h-4 text-slate-400 transition-transform duration-200 flex-shrink-0 ${openFaq === index ? 'rotate-180 text-blue-600' : ''
+                      }`}
                   />
                 </button>
                 {openFaq === index && (

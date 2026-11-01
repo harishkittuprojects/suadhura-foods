@@ -133,6 +133,50 @@ export const ShopProvider = ({ children }) => {
   });
   const [isLiveTrackingOpen, setIsLiveTrackingOpen] = useState(false);
 
+  // Persistent Orders for Real Logged-in Customers (Zero Fake Orders)
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_orders');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const fakeKeywords = [
+          'priya sharma',
+          'vikram reddy',
+          'ananya rao',
+          'sri krishna grand',
+          'spice valley',
+          'royal orchid',
+          'deepak verma',
+          'rajesh sharma',
+          'b2b-smd-99104',
+          'b2b-smd-98842',
+          'smd-739201',
+          'smd-684192'
+        ];
+        return parsed.filter((o) => {
+          const cust = (o.customer || '').toLowerCase();
+          const comp = (o.companyName || '').toLowerCase();
+          const id = (o.id || '').toLowerCase();
+          return !fakeKeywords.some((fk) => cust.includes(fk) || comp.includes(fk) || id.includes(fk));
+        });
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
+  const addOrder = (newOrder) => {
+    setOrders((prev) => {
+      const updated = [newOrder, ...prev.filter((o) => o.id !== newOrder.id)];
+      try {
+        localStorage.setItem('sumadhura_orders', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setActiveOrder(newOrder);
+  };
+
   // Modals & Drawers
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -233,6 +277,14 @@ export const ShopProvider = ({ children }) => {
       console.error(e);
     }
   }, [activeSubscription]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sumadhura_orders', JSON.stringify(orders));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [orders]);
 
   const toggleOneMember = () => {
     setIsOneMember((prev) => {
@@ -512,6 +564,9 @@ export const ShopProvider = ({ children }) => {
         noContactDelivery,
         deliveryInstructions,
         activeOrder,
+        orders,
+        setOrders,
+        addOrder,
         isLiveTrackingOpen,
         isCartOpen,
         isLocationModalOpen,

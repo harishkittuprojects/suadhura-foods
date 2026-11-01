@@ -25,6 +25,7 @@ export const SubscriptionModal = () => {
     activeSubscription,
     setActiveSubscription,
     selectedAddress,
+    user,
     showToast
   } = useShop();
 
@@ -93,6 +94,10 @@ export const SubscriptionModal = () => {
       return;
     }
 
+    const addrStr = selectedAddress
+      ? `${selectedAddress.title}, ${selectedAddress.area}`
+      : 'Madhapur / Hitec City, Hyderabad';
+
     const newSub = {
       id: `SUB-${Math.floor(100 + Math.random() * 900)}`,
       customer: user?.name || user?.companyName || 'Subscribed Customer',
@@ -108,8 +113,8 @@ export const SubscriptionModal = () => {
       dailyCost: dailyTotal,
       totalPaid: netPayable,
       startDate: 'Tomorrow Morning',
-      address: `${selectedAddress.title}, ${selectedAddress.area}`,
-      apartment: `${selectedAddress.title}, ${selectedAddress.area}`,
+      address: addrStr,
+      apartment: addrStr,
       since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       status: 'Active'
     };
@@ -117,6 +122,7 @@ export const SubscriptionModal = () => {
     try {
       const existingSubs = JSON.parse(localStorage.getItem('sumadhura_subscriptions') || '[]');
       localStorage.setItem('sumadhura_subscriptions', JSON.stringify([newSub, ...existingSubs]));
+      localStorage.setItem('sumadhura_subscription', JSON.stringify(newSub));
     } catch (e) {
       console.error(e);
     }
@@ -140,10 +146,19 @@ export const SubscriptionModal = () => {
     const nextState = !isPaused;
     setIsPaused(nextState);
     if (activeSubscription) {
-      setActiveSubscription({
+      const updated = {
         ...activeSubscription,
         status: nextState ? 'Paused' : 'Active'
-      });
+      };
+      setActiveSubscription(updated);
+      try {
+        localStorage.setItem('sumadhura_subscription', JSON.stringify(updated));
+        const existingSubs = JSON.parse(localStorage.getItem('sumadhura_subscriptions') || '[]');
+        localStorage.setItem(
+          'sumadhura_subscriptions',
+          JSON.stringify(existingSubs.map((s) => (s.id === updated.id ? updated : s)))
+        );
+      } catch {}
     }
     showToast(
       nextState
@@ -154,6 +169,16 @@ export const SubscriptionModal = () => {
 
   const handleCancelSub = () => {
     setActiveSubscription(null);
+    try {
+      localStorage.removeItem('sumadhura_subscription');
+      if (activeSubscription) {
+        const existingSubs = JSON.parse(localStorage.getItem('sumadhura_subscriptions') || '[]');
+        localStorage.setItem(
+          'sumadhura_subscriptions',
+          JSON.stringify(existingSubs.filter((s) => s.id !== activeSubscription.id))
+        );
+      }
+    } catch {}
     setStep(1);
     showToast('Subscription cancelled. Refund credited for remaining days.', 'info');
   };
@@ -374,7 +399,7 @@ export const SubscriptionModal = () => {
             <button
               type="submit"
               disabled={dailyTotal === 0}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-98 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all"
+              className="w-full py-3.5 bg-[#7D0A14] hover:bg-[#680811] active:scale-98 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg shadow-[#7D0A14]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <span>Start Morning Subscription (₹{netPayable})</span>
               <ArrowRight className="w-4 h-4" />
@@ -440,7 +465,7 @@ export const SubscriptionModal = () => {
                 Your Daily Morning Items
               </h4>
               <div className="space-y-2">
-                {activeSubscription?.items?.map((item, idx) => (
+                {(activeSubscription?.itemsList || (Array.isArray(activeSubscription?.items) ? activeSubscription.items : [])).map((item, idx) => (
                   <div
                     key={idx}
                     className="p-3 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between text-xs"
@@ -448,11 +473,16 @@ export const SubscriptionModal = () => {
                     <span className="font-bold text-slate-800">
                       {item.qty}x {item.name}
                     </span>
-                    <span className="font-extrabold text-blue-700">
-                      ₹{item.unitPrice * item.qty} / day
+                    <span className="font-extrabold text-[#7D0A14]">
+                      ₹{(item.unitPrice || 0) * (item.qty || 1)} / day
                     </span>
                   </div>
                 ))}
+                {(!activeSubscription?.itemsList && typeof activeSubscription?.items === 'string') && (
+                  <div className="p-3 rounded-xl border border-slate-100 bg-slate-50 text-xs font-bold text-slate-800">
+                    {activeSubscription.items}
+                  </div>
+                )}
               </div>
             </div>
 

@@ -36,19 +36,19 @@ export const AuthModal = () => {
   }, [authModalTab]);
 
   // Personal user fields
-  const [identifier, setIdentifier] = useState('rajesh.sharma@example.com');
-  const [password, setPassword] = useState('password123');
-  const [name, setName] = useState('Rajesh Sharma');
-  const [phone, setPhone] = useState('+91 98450 12345');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
 
   // Business user fields
-  const [businessIdentifier, setBusinessIdentifier] = useState('procurement@srikrishnagrand.com');
-  const [businessPassword, setBusinessPassword] = useState('business2026');
-  const [companyName, setCompanyName] = useState('Sri Krishna Grand Hotels & Banquets');
-  const [contactPerson, setContactPerson] = useState('K. S. Narayana');
-  const [businessPhone, setBusinessPhone] = useState('+91 98450 99888');
-  const [gstin, setGstin] = useState('36AABCU9603R1ZM');
-  const [businessType, setBusinessType] = useState('Restaurant & Hotel');
+  const [businessIdentifier, setBusinessIdentifier] = useState('');
+  const [businessPassword, setBusinessPassword] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [businessPhone, setBusinessPhone] = useState('');
+  const [gstin, setGstin] = useState('');
+  const [businessType, setBusinessType] = useState('Restaurant & Commercial Kitchen');
 
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordView, setForgotPasswordView] = useState(false);

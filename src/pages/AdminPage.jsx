@@ -74,30 +74,62 @@ export const AdminPage = () => {
   // -------------------------------------------------------------------
   // REAL REGISTERED & LOGGED-IN CUSTOMERS (ZERO FAKE CUSTOMERS)
   // -------------------------------------------------------------------
+  const FAKE_MOCK_KEYWORDS = [
+    'rajesh sharma',
+    'sunita venkatesh',
+    'karthik balan',
+    'deepa kulkarni',
+    'priya sharma',
+    'vikram reddy',
+    'ananya rao',
+    'sri krishna grand',
+    'spice valley',
+    'royal orchid',
+    'deepak verma',
+    'b2b-smd-99104',
+    'b2b-smd-98842',
+    'smd-739201',
+    'smd-684192',
+    'sub-101',
+    'sub-102',
+    'sub-103',
+    'sub-104'
+  ];
+
   const [customers, setCustomers] = useState(() => {
     try {
       const saved = localStorage.getItem('sumadhura_registered_customers');
       let list = saved ? JSON.parse(saved) : [];
+      list = list.filter((c) => {
+        const name = (c.name || '').toLowerCase();
+        const comp = (c.companyName || '').toLowerCase();
+        return !FAKE_MOCK_KEYWORDS.some((fk) => name.includes(fk) || comp.includes(fk));
+      });
       const savedUser = localStorage.getItem('sumadhura_user');
       if (savedUser) {
         const u = JSON.parse(savedUser);
-        const exists = list.some(
-          (c) => (u.email && c.email === u.email) || (u.phone && c.phone === u.phone)
-        );
-        if (!exists) {
-          list.unshift({
-            id: u.id || `CUST-${u.isBusiness ? 'B2B' : 'B2C'}-101`,
-            name: u.name || (u.isBusiness ? u.companyName : 'Customer'),
-            email: u.email || '',
-            phone: u.phone || '',
-            isBusiness: Boolean(u.isBusiness),
-            companyName: u.companyName || null,
-            gstin: u.gstin || null,
-            businessType: u.businessType || null,
-            registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-            lastLogin: 'Live Now',
-            status: 'Active'
-          });
+        const name = (u.name || '').toLowerCase();
+        const comp = (u.companyName || '').toLowerCase();
+        const isFake = FAKE_MOCK_KEYWORDS.some((fk) => name.includes(fk) || comp.includes(fk));
+        if (!isFake) {
+          const exists = list.some(
+            (c) => (u.email && c.email === u.email) || (u.phone && c.phone === u.phone)
+          );
+          if (!exists) {
+            list.unshift({
+              id: u.id || `CUST-${u.isBusiness ? 'B2B' : 'B2C'}-101`,
+              name: u.name || (u.isBusiness ? u.companyName : 'Customer'),
+              email: u.email || '',
+              phone: u.phone || '',
+              isBusiness: Boolean(u.isBusiness),
+              companyName: u.companyName || null,
+              gstin: u.gstin || null,
+              businessType: u.businessType || null,
+              registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+              lastLogin: 'Live Now',
+              status: 'Active'
+            });
+          }
         }
       }
       return list;
@@ -112,6 +144,11 @@ export const AdminPage = () => {
       setCustomers((prev) => {
         const email = user.email || '';
         const phone = user.phone || '';
+        const name = (user.name || '').toLowerCase();
+        const comp = (user.companyName || '').toLowerCase();
+        if (FAKE_MOCK_KEYWORDS.some((fk) => name.includes(fk) || comp.includes(fk))) {
+          return prev;
+        }
         const exists = prev.some(
           (c) => (email && c.email === email) || (phone && c.phone === phone)
         );
@@ -143,10 +180,20 @@ export const AdminPage = () => {
     try {
       const saved = localStorage.getItem('sumadhura_orders');
       let list = saved ? JSON.parse(saved) : [];
+      list = list.filter((o) => {
+        const cust = (o.customer || '').toLowerCase();
+        const comp = (o.companyName || '').toLowerCase();
+        const id = (o.id || '').toLowerCase();
+        return !FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || comp.includes(fk) || id.includes(fk));
+      });
       const savedOrder = localStorage.getItem('sumadhura_active_order');
       if (savedOrder) {
         const o = JSON.parse(savedOrder);
-        if (!list.some((item) => item.id === o.id)) {
+        const cust = (o.customer || '').toLowerCase();
+        const comp = (o.companyName || '').toLowerCase();
+        const id = (o.id || '').toLowerCase();
+        const isFake = FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || comp.includes(fk) || id.includes(fk));
+        if (!isFake && !list.some((item) => item.id === o.id)) {
           list.unshift(o);
         }
       }
@@ -163,10 +210,18 @@ export const AdminPage = () => {
     try {
       const saved = localStorage.getItem('sumadhura_subscriptions');
       let list = saved ? JSON.parse(saved) : [];
+      list = list.filter((s) => {
+        const cust = (s.customer || '').toLowerCase();
+        const id = (s.id || '').toLowerCase();
+        return !FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || id.includes(fk));
+      });
       const savedSub = localStorage.getItem('sumadhura_subscription');
       if (savedSub) {
         const s = JSON.parse(savedSub);
-        if (!list.some((item) => item.id === s.id)) {
+        const cust = (s.customer || '').toLowerCase();
+        const id = (s.id || '').toLowerCase();
+        const isFake = FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || id.includes(fk));
+        if (!isFake && !list.some((item) => item.id === s.id)) {
           list.unshift(s);
         }
       }

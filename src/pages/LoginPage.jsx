@@ -27,30 +27,54 @@ import {
 } from 'lucide-react';
 
 export const LoginPage = () => {
-  const { user, login, logout, navigateTo, wishlist, cart, showToast } = useShop();
+  const {
+    user,
+    login,
+    logout,
+    navigateTo,
+    wishlist,
+    cart,
+    showToast,
+    orders,
+    setActiveOrder,
+    setIsLiveTrackingOpen
+  } = useShop();
 
   // Mode: 'user' | 'business'
   const [accountType, setAccountType] = useState('user'); // 'user' | 'business'
   const [tab, setTab] = useState('login'); // 'login' | 'register'
 
   // Personal User fields
-  const [identifier, setIdentifier] = useState('rajesh.sharma@example.com');
-  const [password, setPassword] = useState('password123');
-  const [name, setName] = useState('Rajesh Sharma');
-  const [phone, setPhone] = useState('+91 98450 12345');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
 
   // Business User fields
-  const [businessIdentifier, setBusinessIdentifier] = useState('procurement@srikrishnagrand.com');
-  const [businessPassword, setBusinessPassword] = useState('business2026');
-  const [companyName, setCompanyName] = useState('Sri Krishna Grand Hotels & Banquets');
-  const [contactPerson, setContactPerson] = useState('K. S. Narayana');
-  const [businessPhone, setBusinessPhone] = useState('+91 98450 99888');
-  const [gstin, setGstin] = useState('36AABCU9603R1ZM');
-  const [businessType, setBusinessType] = useState('Restaurant & Hotel');
+  const [businessIdentifier, setBusinessIdentifier] = useState('');
+  const [businessPassword, setBusinessPassword] = useState('');
+  const [companyName, setCompanyName] = useState('');
+  const [contactPerson, setContactPerson] = useState('');
+  const [businessPhone, setBusinessPhone] = useState('');
+  const [gstin, setGstin] = useState('');
+  const [businessType, setBusinessType] = useState('Restaurant & Commercial Kitchen');
 
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordActive, setForgotPasswordActive] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+
+  // Filter orders exclusively for the currently logged-in customer
+  const currentCustomerOrders = (orders || []).filter((o) => {
+    if (!user) return false;
+    const matchName = user.name && o.customer && o.customer.toLowerCase().includes(user.name.toLowerCase());
+    const matchCompany = user.companyName && ((o.customer && o.customer.toLowerCase().includes(user.companyName.toLowerCase())) || (o.companyName && o.companyName.toLowerCase().includes(user.companyName.toLowerCase())));
+    const matchPhone = user.phone && o.contact && o.contact.includes(user.phone);
+    const matchEmail = user.email && o.email && o.email === user.email;
+    return matchName || matchCompany || matchPhone || matchEmail;
+  });
+
+  const b2bCustomerOrders = currentCustomerOrders.filter((o) => o.type === 'b2b');
+  const b2cCustomerOrders = currentCustomerOrders.filter((o) => o.type !== 'b2b');
 
   // Submit Handler
   const handleSubmit = (e) => {
@@ -70,7 +94,7 @@ export const LoginPage = () => {
       } else {
         login({
           name: contactPerson || 'Business Partner',
-          companyName: companyName || 'New Commercial Enterprise',
+          companyName: companyName || 'Commercial Enterprise Partner',
           email: businessIdentifier,
           phone: businessPhone,
           gstin: gstin || '36AABCU9603R1ZM',
@@ -82,14 +106,14 @@ export const LoginPage = () => {
       // Personal User
       if (tab === 'login') {
         login({
-          name: identifier.includes('@') ? identifier.split('@')[0].replace('.', ' ') : 'Rajesh Sharma',
+          name: identifier.includes('@') ? identifier.split('@')[0].replace(/[._]/g, ' ') : 'Customer',
           email: identifier.includes('@') ? identifier : `${identifier}@customer.com`,
           phone: identifier.includes('@') ? '+91 98450 12345' : identifier,
           isBusiness: false
         });
       } else {
         login({
-          name: name || 'New Customer',
+          name: name || 'Customer',
           email: identifier,
           phone: phone,
           isBusiness: false
@@ -112,21 +136,21 @@ export const LoginPage = () => {
   const fillCustomerDemo = () => {
     setAccountType('user');
     setTab('login');
-    setIdentifier('rajesh.sharma@example.com');
-    setPassword('password123');
-    showToast('Filled Customer demo credentials');
+    setIdentifier('customer@sumadhurafoods.com');
+    setPassword('customer123');
+    showToast('Filled Customer login fields');
   };
 
   const fillBusinessDemo = () => {
     setAccountType('business');
     setTab('login');
-    setBusinessIdentifier('procurement@srikrishnagrand.com');
-    setBusinessPassword('business2026');
-    setCompanyName('Sri Krishna Grand Hotels & Banquets');
-    setContactPerson('K. S. Narayana');
+    setBusinessIdentifier('procurement@enterprise.com');
+    setBusinessPassword('business123');
+    setCompanyName('Enterprise Hospitality & Banquets');
+    setContactPerson('Procurement Head');
     setGstin('36AABCU9603R1ZM');
-    setBusinessType('Restaurant & Hotel');
-    showToast('Filled Business demo credentials');
+    setBusinessType('Restaurant & Commercial Kitchen');
+    showToast('Filled B2B Wholesale login fields');
   };
 
   // ----------------------------------------------------
@@ -248,52 +272,65 @@ export const LoginPage = () => {
                 <Package className="w-5 h-5 text-[#7D0A14]" />
                 <h2 className="font-extrabold text-slate-900 text-base">Recent Commercial Deliveries</h2>
               </div>
-              <span className="text-xs text-slate-400">B2B Order History</span>
+              <span className="text-xs text-slate-400">
+                {b2bCustomerOrders.length} {b2bCustomerOrders.length === 1 ? 'Shipment' : 'Shipments'}
+              </span>
             </div>
 
-            <div className="divide-y divide-slate-100">
-              <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 text-xs sm:text-sm">#B2B-SMD-99104</span>
-                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                      Delivered (Invoice #INV-2026-904)
-                    </span>
+            {b2bCustomerOrders.length > 0 ? (
+              <div className="divide-y divide-slate-100">
+                {b2bCustomerOrders.map((order) => (
+                  <div key={order.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900 text-xs sm:text-sm">#{order.id}</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          order.status === 'Delivered'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {order.status} (Invoice #INV-2026-{order.id.replace(/[^0-9]/g, '').slice(-3) || '901'})
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 mt-1 font-medium">
+                        {order.items && order.items.length > 0
+                          ? order.items.map((i) => `${i.name} (x${i.qty})`).join(', ')
+                          : 'Commercial Bulk Supplies'}
+                      </p>
+                      <span className="text-[11px] text-slate-400">
+                        {order.slot || '5:00 AM Commercial Kitchen Dispatch'} • {order.date || order.timestamp || 'Today'}
+                      </span>
+                    </div>
+                    <div className="text-right sm:flex-shrink-0">
+                      <span className="font-black text-[#7D0A14] text-base">
+                        ₹{Number(order.total).toLocaleString()}
+                      </span>
+                      <button
+                        onClick={() => showToast(`Generating official GST Tax Invoice for Order #${order.id}...`)}
+                        className="block text-[11px] text-blue-600 font-bold hover:underline ml-auto"
+                      >
+                        Download Tax Invoice PDF
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-xs text-slate-600 mt-1 font-medium">
-                    Pure Cow Milk Can (50 Liters), Fresh Malai Paneer Blocks (10kg), Kashmiri Chili Powder (5kg)
-                  </p>
-                  <span className="text-[11px] text-slate-400">Delivered Today at 5:45 AM • Gate #2 Kitchen Entrance</span>
-                </div>
-                <div className="text-right sm:flex-shrink-0">
-                  <span className="font-black text-[#7D0A14] text-base">₹6,850</span>
-                  <span className="block text-[11px] text-blue-600 font-bold cursor-pointer hover:underline">
-                    Download Tax Invoice PDF
-                  </span>
-                </div>
+                ))}
               </div>
-
-              <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900 text-xs sm:text-sm">#B2B-SMD-98842</span>
-                    <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                      Delivered (Invoice #INV-2026-842)
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-600 mt-1 font-medium">
-                    Aged Royal Basmati Rice (25kg Bag), Farm Fresh Tomatoes Crate (20kg), Cold-Pressed Groundnut Oil (15L Tin)
-                  </p>
-                  <span className="text-[11px] text-slate-400">Delivered 3 days ago • Scheduled Standing Order</span>
-                </div>
-                <div className="text-right sm:flex-shrink-0">
-                  <span className="font-black text-[#7D0A14] text-base">₹9,420</span>
-                  <span className="block text-[11px] text-blue-600 font-bold cursor-pointer hover:underline">
-                    Download Tax Invoice PDF
-                  </span>
-                </div>
+            ) : (
+              <div className="py-8 text-center space-y-3">
+                <Package className="w-10 h-10 text-slate-300 mx-auto" />
+                <h3 className="font-extrabold text-slate-800 text-sm">No Commercial Deliveries Placed Yet</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  All mock orders have been removed. Commercial wholesale orders placed under your account ({user.companyName || user.name}) will appear here in real-time.
+                </p>
+                <button
+                  onClick={() => navigateTo('categories')}
+                  className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#680811] text-white text-xs font-bold shadow-xs transition-all inline-flex items-center gap-1.5"
+                >
+                  <span>Browse Wholesale Catalog</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       );
@@ -365,52 +402,72 @@ export const LoginPage = () => {
               <Package className="w-5 h-5 text-[#7D0A14]" />
               <h2 className="font-extrabold text-slate-900 text-base">Recent Household Orders</h2>
             </div>
-            <span className="text-xs text-slate-400">Order history</span>
+            <span className="text-xs text-slate-400">
+              {b2cCustomerOrders.length} {b2cCustomerOrders.length === 1 ? 'Order' : 'Orders'}
+            </span>
           </div>
 
-          <div className="divide-y divide-slate-100">
-            <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-900 text-xs sm:text-sm">#SMD-739201</span>
-                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                    Delivered
-                  </span>
+          {b2cCustomerOrders.length > 0 ? (
+            <div className="divide-y divide-slate-100">
+              {b2cCustomerOrders.map((order) => (
+                <div key={order.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-slate-900 text-xs sm:text-sm">#{order.id}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        order.status === 'Delivered'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {order.items && order.items.length > 0
+                        ? order.items.map((i) => `${i.name} (x${i.qty})`).join(', ')
+                        : 'Fresh Household Groceries'}
+                    </p>
+                    <span className="text-[11px] text-slate-400">
+                      {order.slot || '10-15 Min Express Delivery'} • {order.date || order.timestamp || 'Today'}
+                    </span>
+                  </div>
+                  <div className="text-right sm:flex-shrink-0">
+                    <span className="font-black text-slate-900 text-sm">
+                      ₹{Number(order.total).toLocaleString()}
+                    </span>
+                    <button
+                      onClick={() => {
+                        if (setActiveOrder && setIsLiveTrackingOpen) {
+                          setActiveOrder(order);
+                          setIsLiveTrackingOpen(true);
+                        } else {
+                          showToast(`Tracking Order #${order.id}...`);
+                        }
+                      }}
+                      className="block text-[11px] text-[#7D0A14] font-bold hover:underline ml-auto"
+                    >
+                      Track Order &rarr;
+                    </button>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Farm Fresh Cow Milk (2x), Crisp Onions (1kg), A2 Cow Ghee (500ml)
-                </p>
-                <span className="text-[11px] text-slate-400">Delivered Yesterday at 6:42 AM</span>
-              </div>
-              <div className="text-right">
-                <span className="font-black text-slate-900 text-sm">₹695</span>
-                <span className="block text-[11px] text-[#7D0A14] font-bold cursor-pointer hover:underline">
-                  Reorder Items
-                </span>
-              </div>
+              ))}
             </div>
-
-            <div className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-slate-900 text-xs sm:text-sm">#SMD-684192</span>
-                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
-                    Delivered
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Fresh Malai Paneer (200g), Mountain Potatoes (1kg), Sharbati Atta (5kg)
-                </p>
-                <span className="text-[11px] text-slate-400">Delivered 4 days ago</span>
-              </div>
-              <div className="text-right">
-                <span className="font-black text-slate-900 text-sm">₹380</span>
-                <span className="block text-[11px] text-[#7D0A14] font-bold cursor-pointer hover:underline">
-                  Reorder Items
-                </span>
-              </div>
+          ) : (
+            <div className="py-8 text-center space-y-3">
+              <Package className="w-10 h-10 text-slate-300 mx-auto" />
+              <h3 className="font-extrabold text-slate-800 text-sm">No Household Orders Placed Yet</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                All mock demo orders have been removed. Any grocery or dairy orders placed under your account ({user.name}) will appear here in real-time.
+              </p>
+              <button
+                onClick={() => navigateTo('categories')}
+                className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#680811] text-white text-xs font-bold shadow-xs transition-all inline-flex items-center gap-1.5"
+              >
+                <span>Start Shopping</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
             </div>
-          </div>
+          )}
         </div>
       </div>
     );
