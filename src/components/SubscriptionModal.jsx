@@ -94,8 +94,14 @@ export const SubscriptionModal = () => {
     }
 
     const newSub = {
-      id: `SUB-${Math.floor(100000 + Math.random() * 900000)}`,
-      items: subItems.filter((i) => i.qty > 0),
+      id: `SUB-${Math.floor(100 + Math.random() * 900)}`,
+      customer: user?.name || user?.companyName || 'Subscribed Customer',
+      phone: user?.phone || '+91 98450 12345',
+      email: user?.email || '',
+      isBusiness: Boolean(user?.isBusiness),
+      companyName: user?.companyName || null,
+      items: subItems.filter((i) => i.qty > 0).map(i => `${i.name} (${i.qty})`).join(' + '),
+      itemsList: subItems.filter((i) => i.qty > 0),
       frequency,
       slot: slot === '6am-7am' ? '6:00 AM - 7:00 AM' : '7:00 AM - 8:00 AM',
       durationDays,
@@ -103,8 +109,17 @@ export const SubscriptionModal = () => {
       totalPaid: netPayable,
       startDate: 'Tomorrow Morning',
       address: `${selectedAddress.title}, ${selectedAddress.area}`,
+      apartment: `${selectedAddress.title}, ${selectedAddress.area}`,
+      since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       status: 'Active'
     };
+
+    try {
+      const existingSubs = JSON.parse(localStorage.getItem('sumadhura_subscriptions') || '[]');
+      localStorage.setItem('sumadhura_subscriptions', JSON.stringify([newSub, ...existingSubs]));
+    } catch (e) {
+      console.error(e);
+    }
 
     setActiveSubscription(newSub);
     setStep(2);

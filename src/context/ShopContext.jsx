@@ -397,6 +397,54 @@ export const ShopProvider = ({ children }) => {
   );
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
+  // Save customer to persistent real customer registry
+  const saveCustomerToRegistry = (userData) => {
+    if (!userData) return;
+    try {
+      const saved = localStorage.getItem('sumadhura_registered_customers');
+      let list = saved ? JSON.parse(saved) : [];
+      const email = userData.email || '';
+      const phone = userData.phone || '';
+      const idx = list.findIndex(
+        (c) => (email && c.email === email) || (phone && c.phone === phone)
+      );
+      const record = {
+        id: userData.id || `CUST-${userData.isBusiness ? 'B2B' : 'B2C'}-${Math.floor(100 + Math.random() * 900)}`,
+        name: userData.name || (userData.isBusiness ? userData.companyName : 'Customer'),
+        email,
+        phone,
+        isBusiness: Boolean(userData.isBusiness),
+        companyName: userData.companyName || null,
+        gstin: userData.gstin || null,
+        businessType: userData.businessType || null,
+        registeredAt: userData.registeredAt || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        lastLogin: new Date().toLocaleDateString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        status: 'Active'
+      };
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...record };
+      } else {
+        list.unshift(record);
+      }
+      localStorage.setItem('sumadhura_registered_customers', JSON.stringify(list));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  // Sync current user into registry on boot
+  useEffect(() => {
+    if (user) {
+      saveCustomerToRegistry(user);
+    }
+  }, [user]);
+
   // User auth simulation
   const login = (userData) => {
     setUser(userData);
@@ -405,6 +453,7 @@ export const ShopProvider = ({ children }) => {
     } catch (e) {
       console.error(e);
     }
+    saveCustomerToRegistry(userData);
     if (userData.isBusiness) {
       setPricingMode('wholesale');
     }

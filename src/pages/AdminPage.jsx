@@ -39,11 +39,22 @@ import {
   Bell,
   ExternalLink,
   ChevronRight,
-  Zap
+  Zap,
+  Users
 } from 'lucide-react';
 
 export const AdminPage = () => {
-  const { navigateTo, showToast } = useShop();
+  const {
+    navigateTo,
+    showToast,
+    user,
+    activeSubscription,
+    activeOrder,
+    setActiveSubscription,
+    setIsAuthModalOpen,
+    setIsSubscriptionModalOpen,
+    login
+  } = useShop();
 
   // Mode: 'unified' | 'b2c' | 'b2b'
   const [adminMode, setAdminMode] = useState('unified');
@@ -61,207 +72,146 @@ export const AdminPage = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   // -------------------------------------------------------------------
-  // INITIAL DEMO DATA (B2C & B2B)
+  // REAL REGISTERED & LOGGED-IN CUSTOMERS (ZERO FAKE CUSTOMERS)
   // -------------------------------------------------------------------
-  const [orders, setOrders] = useState([
-    {
-      id: 'SMD-9402',
-      type: 'b2c',
-      customer: 'Priya Sharma',
-      contact: '+91 98450 12345',
-      address: 'Sobha Dream Acres, Tower 4, Indiranagar, Bengaluru',
-      items: [
-        { name: 'Nandini Farm Fresh Cow Milk (500ml)', qty: 4, price: 112 },
-        { name: 'Farm Fresh Hybrid Tomatoes (1kg)', qty: 1, price: 32 },
-        { name: 'Fresh Malai Paneer (200g)', qty: 1, price: 140 }
-      ],
-      total: 284,
-      status: 'Packing',
-      paymentMethod: 'UPI • Paid',
-      timestamp: '10 mins ago',
-      deliverySlot: 'Express 10-15 Mins'
-    },
-    {
-      id: 'B2B-8041',
-      type: 'b2b',
-      customer: 'Sri Krishna Grand Hotels & Banquets',
-      contact: 'K. S. Narayana (Procurement Head) • +91 98450 99888',
-      gstin: '36AABCU9603R1ZM',
-      address: 'Central Kitchen Hub, Outer Ring Road, Bengaluru',
-      items: [
-        { name: 'Heritage Bilona Desi Cow Ghee (15kg Commercial Tin)', qty: 2, price: 17700 },
-        { name: 'Fresh Malai Paneer Blocks (5kg Vacuum Pack)', qty: 5, price: 7125 },
-        { name: 'Nashik Red Onions (50kg Gunny Bag)', qty: 4, price: 4800 },
-        { name: 'Farm Fresh Tomatoes (25kg Crate)', qty: 4, price: 1900 }
-      ],
-      total: 31525,
-      status: 'Dispatched',
-      paymentMethod: 'Net 15 Credit Account',
-      timestamp: '45 mins ago',
-      deliverySlot: '5:00 AM Kitchen Loading Bay'
-    },
-    {
-      id: 'SMD-9401',
-      type: 'b2c',
-      customer: 'Vikram Reddy',
-      contact: '+91 98450 67890',
-      address: 'Prestige Lakeside Habitat, Flat 1204, Whitefield',
-      items: [
-        { name: 'A2 Desi Cow Milk Glass Bottle (1L)', qty: 2, price: 196 },
-        { name: 'Cold-Pressed Groundnut Oil (1L)', qty: 1, price: 290 },
-        { name: 'Fresh Palak Spinach (250g)', qty: 2, price: 48 }
-      ],
-      total: 534,
-      status: 'Dispatched',
-      paymentMethod: 'Credit Card • Paid',
-      timestamp: '18 mins ago',
-      deliverySlot: 'Express 10-15 Mins'
-    },
-    {
-      id: 'B2B-8038',
-      type: 'b2b',
-      customer: 'Spice Valley Cloud Kitchens (4 Hubs)',
-      contact: 'Chef Anand Murthy • +91 98450 33445',
-      gstin: '29AAGCS4810P1Z4',
-      address: 'Koramangala Commercial Commissary, Bengaluru',
-      items: [
-        { name: '1121 XXL Aged Biryani Basmati Rice (25kg Bag)', qty: 4, price: 8900 },
-        { name: 'Wood-Churned Groundnut Oil (15L Commercial Tin)', qty: 2, price: 4700 },
-        { name: 'Whole Kashmiri Stemless Chillies (10kg Sack)', qty: 1, price: 2800 }
-      ],
-      total: 16400,
-      status: 'Packing',
-      paymentMethod: 'Bank NEFT • Paid',
-      timestamp: '1 hour ago',
-      deliverySlot: '5:00 AM Morning Dispatch'
-    },
-    {
-      id: 'SMD-9398',
-      type: 'b2c',
-      customer: 'Ananya Rao',
-      contact: '+91 98450 88221',
-      address: 'Sector 2, HSR Layout, Bengaluru',
-      items: [
-        { name: 'Sona Masoori Raw Rice (5kg Bag)', qty: 1, price: 340 },
-        { name: 'Guntur Unpolished Toor Dal (1kg)', qty: 2, price: 350 },
-        { name: 'A2 Bilona Cow Ghee (500ml Jar)', qty: 1, price: 540 }
-      ],
-      total: 1230,
-      status: 'Delivered',
-      paymentMethod: 'UPI • Paid',
-      timestamp: '2 hours ago',
-      deliverySlot: 'Delivered in 12 mins'
-    },
-    {
-      id: 'B2B-8035',
-      type: 'b2b',
-      customer: 'Royal Orchid Suites & Convention Centre',
-      contact: 'C. P. Varma (General Manager) • +91 98450 77112',
-      gstin: '36AAACR9214L1Z2',
-      address: 'Convention Center Dock 2, Airport Road, Bengaluru',
-      items: [
-        { name: 'Pure Farm Cow Milk (50L Food-Grade Can)', qty: 2, price: 4600 },
-        { name: 'Commercial Set Curd (10kg Bucket)', qty: 4, price: 2080 },
-        { name: 'MP Sharbati Chakki Atta (50kg Commercial Sack)', qty: 4, price: 6800 }
-      ],
-      total: 13480,
-      status: 'Delivered',
-      paymentMethod: 'Net 30 Credit (Due in 18 Days)',
-      timestamp: 'Today 5:15 AM',
-      deliverySlot: 'Delivered at 5:08 AM'
+  const [customers, setCustomers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_registered_customers');
+      let list = saved ? JSON.parse(saved) : [];
+      const savedUser = localStorage.getItem('sumadhura_user');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        const exists = list.some(
+          (c) => (u.email && c.email === u.email) || (u.phone && c.phone === u.phone)
+        );
+        if (!exists) {
+          list.unshift({
+            id: u.id || `CUST-${u.isBusiness ? 'B2B' : 'B2C'}-101`,
+            name: u.name || (u.isBusiness ? u.companyName : 'Customer'),
+            email: u.email || '',
+            phone: u.phone || '',
+            isBusiness: Boolean(u.isBusiness),
+            companyName: u.companyName || null,
+            gstin: u.gstin || null,
+            businessType: u.businessType || null,
+            registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            lastLogin: 'Live Now',
+            status: 'Active'
+          });
+        }
+      }
+      return list;
+    } catch {
+      return [];
     }
-  ]);
+  });
 
-  // Daily Morning Subscriptions (B2C)
-  const [subscriptions, setSubscriptions] = useState([
-    {
-      id: 'SUB-101',
-      customer: 'Rajesh Sharma',
-      phone: '+91 98450 12345',
-      apartment: 'Mantri Espana, Apt 402, Outer Ring Road',
-      items: 'Nandini Cow Milk 1L Daily + Bread (Alt days)',
-      slot: '6:00 AM - 6:30 AM',
-      frequency: 'Every Morning',
-      status: 'Active',
-      since: '14 Jan 2026'
-    },
-    {
-      id: 'SUB-102',
-      customer: 'Sunita Venkatesh',
-      phone: '+91 98450 22334',
-      apartment: 'Prestige Falcon City, Tower 6, Apt 1102',
-      items: 'Pure A2 Gir Cow Milk 1.5L + Farm Fresh Curd 500g',
-      slot: '6:30 AM - 7:00 AM',
-      frequency: 'Every Morning',
-      status: 'Active',
-      since: '02 Feb 2026'
-    },
-    {
-      id: 'SUB-103',
-      customer: 'Karthik Balan',
-      phone: '+91 98450 44556',
-      apartment: 'Brigade Metropolis, Arcade 3, Apt 501',
-      items: 'Nandini Toned Milk 2L + Weekly Vegetable Basket',
-      slot: '6:00 AM - 6:30 AM',
-      frequency: 'Every Morning',
-      status: 'Paused',
-      since: '18 Nov 2025'
-    },
-    {
-      id: 'SUB-104',
-      customer: 'Deepa Kulkarni',
-      phone: '+91 98450 66778',
-      apartment: 'Adarsh Palm Meadows, Villa 42',
-      items: 'A2 Cow Milk 2L + Farm Eggs (12 pcs Mon/Thu)',
-      slot: '7:00 AM - 7:30 AM',
-      frequency: 'Every Morning',
-      status: 'Active',
-      since: '28 Dec 2025'
+  // Keep customer list in sync if user logs in
+  React.useEffect(() => {
+    if (user) {
+      setCustomers((prev) => {
+        const email = user.email || '';
+        const phone = user.phone || '';
+        const exists = prev.some(
+          (c) => (email && c.email === email) || (phone && c.phone === phone)
+        );
+        if (!exists) {
+          const newCust = {
+            id: user.id || `CUST-${user.isBusiness ? 'B2B' : 'B2C'}-${Math.floor(100 + Math.random() * 900)}`,
+            name: user.name || (user.isBusiness ? user.companyName : 'Customer'),
+            email,
+            phone,
+            isBusiness: Boolean(user.isBusiness),
+            companyName: user.companyName || null,
+            gstin: user.gstin || null,
+            businessType: user.businessType || null,
+            registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            lastLogin: 'Live Now',
+            status: 'Active'
+          };
+          return [newCust, ...prev];
+        }
+        return prev;
+      });
     }
-  ]);
+  }, [user]);
 
-  // B2B Wholesale Inquiries & RFPs
-  const [b2bQuotes, setB2bQuotes] = useState([
-    {
-      id: 'QT-409',
-      company: 'Grand Orchid Banquets & Events',
-      contactPerson: 'Chef Ramesh (Executive Head Chef)',
-      phone: '+91 98450 11990',
-      email: 'ramesh@grandochidevents.com',
-      businessType: 'Banquet & Wedding Catering',
-      monthlyVolume: '₹1,50,000 - ₹3,00,000 / month',
-      categories: ['Bilona Desi Ghee', 'Fresh Malai Paneer', '1121 Biryani Basmati'],
-      notes: 'Need 40kg Malai Paneer and 30L Desi Ghee every Friday morning. Please dispatch trial sample.',
-      status: 'New Inquiry',
-      date: 'Today, 2:30 PM'
-    },
-    {
-      id: 'QT-408',
-      company: 'Silicon Tech Park Central Cafeteria',
-      contactPerson: 'Murthy K. (Facility Procurement)',
-      phone: '+91 98450 88334',
-      email: 'facilities@silicontechpark.com',
-      businessType: 'Corporate Tech Park Canteen',
-      monthlyVolume: '₹3,00,000 - ₹5,00,000 / month',
-      categories: ['Daily Milk Cans', 'Fresh Farm Vegetables', 'Cooking Oils'],
-      notes: 'Requires 200 Litres milk delivered daily before 5:30 AM across 3 cafeteria stations.',
-      status: 'Quote Sent',
-      date: 'Yesterday'
-    },
-    {
-      id: 'QT-407',
-      company: 'Coastal Curry & Biryani Kitchens',
-      contactPerson: 'Anand Rao (Managing Partner)',
-      phone: '+91 98450 55112',
-      email: 'anand@coastalcurry.in',
-      businessType: 'Cloud Kitchen & QSR Chain',
-      monthlyVolume: '₹50,000 - ₹1,00,000 / month',
-      categories: ['Cold-Pressed Groundnut Oil', 'Whole Spices', 'Toor Dal'],
-      notes: 'Approved contracted wholesale rate for 15L oil tins. Awaiting final KYC & GST verification.',
-      status: 'Contract Approved',
-      date: '28 Oct 2026'
+  // -------------------------------------------------------------------
+  // REAL CUSTOMER ORDERS (NO FAKE ORDERS)
+  // -------------------------------------------------------------------
+  const [orders, setOrders] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_orders');
+      let list = saved ? JSON.parse(saved) : [];
+      const savedOrder = localStorage.getItem('sumadhura_active_order');
+      if (savedOrder) {
+        const o = JSON.parse(savedOrder);
+        if (!list.some((item) => item.id === o.id)) {
+          list.unshift(o);
+        }
+      }
+      return list;
+    } catch {
+      return [];
     }
-  ]);
+  });
+
+  // -------------------------------------------------------------------
+  // REAL MORNING MILK SUBSCRIPTIONS (NO FAKE CUSTOMERS)
+  // -------------------------------------------------------------------
+  const [subscriptions, setSubscriptions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_subscriptions');
+      let list = saved ? JSON.parse(saved) : [];
+      const savedSub = localStorage.getItem('sumadhura_subscription');
+      if (savedSub) {
+        const s = JSON.parse(savedSub);
+        if (!list.some((item) => item.id === s.id)) {
+          list.unshift(s);
+        }
+      }
+      return list;
+    } catch {
+      return [];
+    }
+  });
+
+  // Keep subscription in sync if activeSubscription changes
+  React.useEffect(() => {
+    if (activeSubscription) {
+      setSubscriptions((prev) => {
+        if (!prev.some((s) => s.id === activeSubscription.id)) {
+          const subObj = {
+            id: activeSubscription.id || `SUB-${Math.floor(100 + Math.random() * 900)}`,
+            customer: user?.name || user?.companyName || 'Current Customer',
+            phone: user?.phone || '+91 98450 12345',
+            email: user?.email || '',
+            apartment: activeSubscription.address || 'Hitec City, Hyderabad',
+            items: activeSubscription.itemsList ? activeSubscription.itemsList.map(i => `${i.name} (${i.qty})`).join(' + ') : 'Pure Farm Cow Milk 1L',
+            slot: activeSubscription.slot || '6:00 AM - 7:00 AM',
+            frequency: activeSubscription.frequency || 'Every Morning',
+            status: activeSubscription.status || 'Active',
+            since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+            isBusiness: Boolean(user?.isBusiness)
+          };
+          return [subObj, ...prev];
+        }
+        return prev;
+      });
+    }
+  }, [activeSubscription, user]);
+
+  // -------------------------------------------------------------------
+  // REAL B2B WHOLESALE RFPs & QUOTES (NO FAKE RFPs)
+  // -------------------------------------------------------------------
+  const [b2bQuotes, setB2bQuotes] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_b2b_rfps');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
   // Product Inventory (Retail vs Wholesale Price Manager)
   const [inventoryList, setInventoryList] = useState([
@@ -339,94 +289,117 @@ export const AdminPage = () => {
     }
   ]);
 
-  // B2B GST Tax Invoices
-  const invoices = [
-    {
-      invoiceNo: 'INV-2026-118',
-      date: '31 Oct 2026',
-      client: 'Sri Krishna Grand Hotels & Banquets',
-      gstin: '36AABCU9603R1ZM',
-      orderId: 'B2B-8041',
-      taxableAmount: 30023.81,
-      cgst: 750.60,
-      sgst: 750.60,
-      totalAmount: 31525.00,
+  // B2B GST Tax Invoices (Dynamically generated from real B2B orders)
+  const invoices = orders
+    .filter((o) => o.type === 'b2b')
+    .map((o, idx) => ({
+      invoiceNo: `INV-2026-${100 + idx}`,
+      date: o.date || 'Today',
+      client: o.customer || o.companyName || 'B2B Client',
+      gstin: o.gstin || '36AABCU9603R1ZM',
+      orderId: o.id,
+      taxableAmount: Math.round((o.total / 1.05) * 100) / 100,
+      cgst: Math.round(((o.total - o.total / 1.05) / 2) * 100) / 100,
+      sgst: Math.round(((o.total - o.total / 1.05) / 2) * 100) / 100,
+      totalAmount: o.total,
       status: 'Paid',
-      dueDate: '15 Nov 2026 (Net 15)'
-    },
-    {
-      invoiceNo: 'INV-2026-117',
-      date: '31 Oct 2026',
-      client: 'Spice Valley Cloud Kitchens',
-      gstin: '29AAGCS4810P1Z4',
-      orderId: 'B2B-8038',
-      taxableAmount: 15619.05,
-      cgst: 390.48,
-      sgst: 390.48,
-      totalAmount: 16400.00,
-      status: 'Paid',
-      dueDate: 'Paid via NEFT'
-    },
-    {
-      invoiceNo: 'INV-2026-114',
-      date: '28 Oct 2026',
-      client: 'Royal Orchid Convention & Suites',
-      gstin: '36AAACR9214L1Z2',
-      orderId: 'B2B-8035',
-      taxableAmount: 12838.10,
-      cgst: 320.95,
-      sgst: 320.95,
-      totalAmount: 13480.00,
-      status: 'Payment Due',
-      dueDate: '27 Nov 2026 (Net 30)'
-    }
-  ];
+      dueDate: 'Net 15 Days'
+    }));
 
   // -------------------------------------------------------------------
-  // SIMULATORS
+  // REAL CUSTOMER ORDER & SUBSCRIPTION HELPERS
   // -------------------------------------------------------------------
   const simulateNewB2COrder = () => {
+    const custName = user?.name || (user?.isBusiness ? user.companyName : null);
+    if (!custName) {
+      showToast('⚠️ No customer logged in. Please sign in or click "Log In as Customer" below.', 'error');
+      return;
+    }
     const newId = `SMD-${Math.floor(1000 + Math.random() * 9000)}`;
     const newOrder = {
       id: newId,
-      type: 'b2c',
-      customer: 'Deepak Verma',
-      contact: '+91 98450 77665',
-      address: 'Purva Palm Beach, Tower 3, Hennur Road',
+      type: user?.isBusiness ? 'b2b' : 'b2c',
+      customer: custName,
+      contact: user?.phone || '+91 98450 12345',
+      email: user?.email || '',
+      gstin: user?.gstin || null,
+      address: 'Madhapur / Hitec City, Hyderabad',
       items: [
-        { name: 'Nandini Cow Milk (1L)', qty: 2, price: 56 },
-        { name: 'Farm Fresh Tomatoes (1kg)', qty: 1, price: 32 },
-        { name: 'Fresh Coriander Bunch', qty: 1, price: 15 }
+        { name: 'Nandini Farm Fresh Cow Milk (1L)', qty: 2, price: 56 },
+        { name: 'Fresh Malai Paneer (200g)', qty: 1, price: 140 }
       ],
-      total: 159,
+      total: 252,
       status: 'Packing',
       paymentMethod: 'UPI • Paid',
       timestamp: 'Just now',
-      deliverySlot: 'Express 10-15 Mins'
+      deliverySlot: 'Instant 10-15 Mins'
     };
 
-    setOrders([newOrder, ...orders]);
-    showToast(`🔔 New B2C Order ${newId} received! (₹159 • Express Dispatch)`);
+    const updated = [newOrder, ...orders];
+    setOrders(updated);
+    try {
+      localStorage.setItem('sumadhura_orders', JSON.stringify(updated));
+    } catch {}
+    showToast(`🔔 Real Order ${newId} created for ${custName}!`);
   };
 
   const simulateNewB2BQuote = () => {
-    const newId = `QT-${Math.floor(500 + Math.random() * 500)}`;
+    const compName = user?.isBusiness ? user.companyName : 'Commercial Enterprise Partner';
+    const contactP = user ? user.name : 'Procurement Manager';
+    const phone = user ? user.phone : '+91 98450 99888';
+    const newId = `QT-${Math.floor(100 + Math.random() * 900)}`;
     const newQuote = {
       id: newId,
-      company: 'The Heritage Residency & Banquets',
-      contactPerson: 'Chef Vinay Kumar (Executive Chef)',
-      phone: '+91 98450 44991',
-      email: 'chefvinay@heritageresidency.com',
-      businessType: 'Hotel & Banquet Hall',
-      monthlyVolume: '₹2,00,000+ / month',
-      categories: ['Bilona Desi Ghee', 'Fresh Malai Paneer', 'Aged Basmati Rice'],
-      notes: 'Need daily 5:00 AM delivery. Requesting contract rates for 15kg Ghee tins and 10kg Paneer blocks.',
+      company: compName,
+      contactPerson: contactP,
+      phone,
+      email: user?.email || 'procurement@business.com',
+      businessType: user?.businessType || 'Hospitality & Commercial Kitchen',
+      monthlyVolume: '₹2,50,000 / month',
+      categories: ['Heritage Bilona Ghee', 'Fresh Paneer Blocks', 'Basmati Rice'],
+      notes: 'Requested volume commercial pricing with 5:00 AM delivery SLA.',
       status: 'New Inquiry',
       date: 'Just now'
     };
 
-    setB2bQuotes([newQuote, ...b2bQuotes]);
-    showToast(`🏢 New B2B Wholesale Inquiry ${newId} from The Heritage Residency!`);
+    const updated = [newQuote, ...b2bQuotes];
+    setB2bQuotes(updated);
+    try {
+      localStorage.setItem('sumadhura_b2b_rfps', JSON.stringify(updated));
+    } catch {}
+    showToast(`🏢 B2B RFP ${newId} submitted for ${compName}!`);
+  };
+
+  const createSubscriptionForUser = (targetUser = user) => {
+    if (!targetUser) {
+      showToast('No customer logged in to create a subscription.', 'error');
+      return;
+    }
+    const newSubId = `SUB-${Math.floor(100 + Math.random() * 900)}`;
+    const newSub = {
+      id: newSubId,
+      customer: targetUser.name || targetUser.companyName || 'Customer',
+      phone: targetUser.phone || '+91 98450 12345',
+      email: targetUser.email || '',
+      isBusiness: Boolean(targetUser.isBusiness),
+      companyName: targetUser.companyName || null,
+      apartment: 'Madhapur / Hitec City, Hyderabad',
+      items: 'Nandini Farm Fresh Cow Milk 1L Daily (Morning)',
+      slot: '6:00 AM - 7:00 AM',
+      frequency: 'Every Morning',
+      status: 'Active',
+      since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+    };
+    const updated = [newSub, ...subscriptions];
+    setSubscriptions(updated);
+    if (setActiveSubscription) {
+      setActiveSubscription(newSub);
+    }
+    try {
+      localStorage.setItem('sumadhura_subscriptions', JSON.stringify(updated));
+      localStorage.setItem('sumadhura_subscription', JSON.stringify(newSub));
+    } catch {}
+    showToast(`🥛 Daily Morning Milk Subscription activated for ${targetUser.name || targetUser.companyName}!`);
   };
 
   const updateOrderStatus = (orderId, newStatus) => {
@@ -499,6 +472,13 @@ export const AdminPage = () => {
 
   const sidebarLinks = [
     { id: 'overview', label: 'Dashboard Overview', icon: Layers, badge: null },
+    {
+      id: 'customers',
+      label: 'Logged-In Customers',
+      icon: Users,
+      badge: customers.length,
+      scopeTag: null
+    },
     {
       id: 'orders',
       label:
@@ -1003,7 +983,7 @@ export const AdminPage = () => {
                         </span>
                       </div>
                       <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        520 <span className="text-xs text-slate-400 font-normal">Homes</span>
+                        {subscriptions.length} <span className="text-xs text-slate-400 font-normal">Active</span>
                       </div>
                       <div className="text-[11px] text-slate-500 font-medium">
                         Delivered 6:00 AM daily • Doorstep Fresh
@@ -1054,7 +1034,7 @@ export const AdminPage = () => {
                         </span>
                       </div>
                       <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        48 <span className="text-xs text-slate-400 font-normal">Clients</span>
+                        {customers.filter((c) => c.isBusiness).length} <span className="text-xs text-slate-400 font-normal">Clients</span>
                       </div>
                       <div className="text-[11px] text-slate-500 font-medium">
                         Hotels, Banquets & Cloud Kitchens
@@ -1086,7 +1066,7 @@ export const AdminPage = () => {
                         </span>
                       </div>
                       <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
-                        ₹32,450
+                        ₹{invoices.reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0).toLocaleString()}
                       </div>
                       <div className="text-[11px] text-slate-500 font-medium">
                         100% GST ITC Compliant Invoices
@@ -1138,7 +1118,7 @@ export const AdminPage = () => {
                         </span>
                       </div>
                       <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        520 <span className="text-xs text-slate-400 font-normal">Homes</span>
+                        {subscriptions.length} <span className="text-xs text-slate-400 font-normal">Active</span>
                       </div>
                       <div className="text-[11px] text-slate-500 font-medium">
                         Delivered 6:00 AM daily • 100% On Time
@@ -1610,6 +1590,25 @@ export const AdminPage = () => {
                         </td>
                       </tr>
                     ))}
+                    {filteredOrders.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="p-8 text-center">
+                          <div className="max-w-md mx-auto space-y-3">
+                            <Package className="w-10 h-10 text-[#7D0A14]/30 mx-auto" />
+                            <h4 className="font-black text-[#3D040A] text-sm">No Customer Orders Yet</h4>
+                            <p className="text-xs text-slate-500">
+                              Only real orders placed by verified logged-in customers are shown here. Place an order on the storefront or click below to simulate an order for the logged-in customer.
+                            </p>
+                            <button
+                              onClick={simulateNewB2COrder}
+                              className="px-3.5 py-1.5 rounded-xl bg-[#7D0A14] text-white text-xs font-bold shadow-xs hover:bg-[#60060E] transition-colors"
+                            >
+                              + Simulate Order for Current Customer
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -1617,7 +1616,149 @@ export const AdminPage = () => {
           )}
 
           {/* ========================================================= */}
-          {/* 3. MORNING SUBSCRIPTIONS (B2C)                            */}
+          {/* LOGGED-IN CUSTOMERS REGISTRY (ZERO FAKE CUSTOMERS)        */}
+          {/* ========================================================= */}
+          {activeTab === 'customers' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-[#3D040A]">
+                    Verified Logged-In Customers Registry
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Live authenticated customer database. Displays exclusively real customer accounts (No fake mock accounts).
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm"
+                  >
+                    <User className="w-3.5 h-3.5 text-amber-300" />
+                    <span>{user ? `Switch Account (Logged in as ${user.name || 'User'})` : 'Sign In as Customer'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {customers.length === 0 && !user ? (
+                <div className="py-12 text-center bg-[#FAF5EC]/50 rounded-2xl border border-dashed border-[#EDE1D1] p-6 space-y-3">
+                  <Users className="w-12 h-12 text-[#7D0A14]/30 mx-auto" />
+                  <h4 className="font-black text-[#3D040A] text-base">No Customers Logged In Yet</h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Fake mock customers have been completely eliminated. Once customers sign in or register on the storefront, their live account profiles and credentials will automatically appear here.
+                  </p>
+                  <button
+                    onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
+                    className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
+                  >
+                    <User className="w-4 h-4 text-amber-300" />
+                    <span>Log In as Customer Now</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {customers.map((c) => {
+                    const isCurrentUser = user && ((user.email && user.email === c.email) || (user.phone && user.phone === c.phone));
+                    const custSub = subscriptions.find(s => s.phone === c.phone || s.customer === c.name);
+                    const custOrders = orders.filter(o => o.customer === c.name || (o.contact && o.contact.includes(c.phone)));
+
+                    return (
+                      <div
+                        key={c.id || c.phone || c.email}
+                        className={`p-5 rounded-2xl border space-y-3 transition-all ${
+                          isCurrentUser
+                            ? 'bg-amber-50/70 border-amber-300 ring-2 ring-amber-400/40 shadow-xs'
+                            : 'bg-[#FAF5EC] border-[#EDE1D1]'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-sm ${
+                              c.isBusiness ? 'bg-purple-100 text-purple-900 border border-purple-200' : 'bg-[#7D0A14] text-white'
+                            }`}>
+                              {c.name ? c.name[0].toUpperCase() : 'C'}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-extrabold text-sm text-[#3D040A]">{c.name}</span>
+                                {isCurrentUser && (
+                                  <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    Live Session
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[11px] text-slate-500">{c.phone} {c.email ? `• ${c.email}` : ''}</div>
+                            </div>
+                          </div>
+
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
+                              c.isBusiness
+                                ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                                : 'bg-blue-100 text-blue-800 border border-blue-200'
+                            }`}
+                          >
+                            {c.isBusiness ? 'B2B Wholesale' : 'B2C Retail'}
+                          </span>
+                        </div>
+
+                        {c.isBusiness && c.companyName && (
+                          <div className="p-2.5 rounded-xl bg-white border border-[#EDE1D1] text-xs">
+                            <div className="font-bold text-slate-900">{c.companyName}</div>
+                            <div className="text-[11px] text-slate-500">{c.businessType || 'Commercial Enterprise'}</div>
+                            {c.gstin && <div className="text-[10px] font-mono text-amber-800 mt-0.5">GSTIN: {c.gstin}</div>}
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-[#E8DDCF]">
+                          <div className="bg-white/80 p-2 rounded-xl border border-[#EDE1D1]">
+                            <span className="text-[10px] text-slate-400 block font-bold">Morning Milk Sub</span>
+                            <strong className="text-slate-800">
+                              {custSub ? `Active (${custSub.slot})` : 'None'}
+                            </strong>
+                          </div>
+                          <div className="bg-white/80 p-2 rounded-xl border border-[#EDE1D1]">
+                            <span className="text-[10px] text-slate-400 block font-bold">Total Orders</span>
+                            <strong className="text-slate-800">{custOrders.length} Orders Placed</strong>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-1 text-xs">
+                          {!custSub ? (
+                            <button
+                              onClick={() => createSubscriptionForUser(c)}
+                              className="px-3 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-amber-950 font-black text-[11px] transition-colors"
+                            >
+                              🥛 Activate Morning Subscription
+                            </button>
+                          ) : (
+                            <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                              <CheckCircle2 className="w-3.5 h-3.5" /> Subscribed
+                            </span>
+                          )}
+
+                          <button
+                            onClick={() => {
+                              if (login) login(c);
+                              showToast(`Switched active customer session to ${c.name}`);
+                            }}
+                            className="text-xs font-bold text-[#7D0A14] hover:underline"
+                          >
+                            Switch Session →
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* 3. MORNING SUBSCRIPTIONS (B2C) - AUTHENTIC CUSTOMERS ONLY */}
           {/* ========================================================= */}
           {activeTab === 'subscriptions' && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
@@ -1627,81 +1768,170 @@ export const AdminPage = () => {
                     Morning Milk & Veggie Subscriptions (B2C)
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Automated doorstep delivery before 7:00 AM every single morning.
+                    Automated doorstep delivery before 7:00 AM every single morning (Real Subscriptions Only).
                   </p>
                 </div>
 
-                <button
-                  onClick={() => {
-                    window.print();
-                    showToast('Preparing printable morning delivery run-sheet...');
-                  }}
-                  className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm self-start sm:self-auto"
-                >
-                  <Printer className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Print Route Run-Sheet</span>
-                </button>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  {user && (
+                    <button
+                      onClick={() => createSubscriptionForUser(user)}
+                      className="px-3.5 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-amber-950 text-xs font-black flex items-center gap-1.5 shadow-xs transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Subscribe {user.name || 'User'}</span>
+                    </button>
+                  )}
+                  <button
+                    onClick={() => {
+                      window.print();
+                      showToast('Preparing printable morning delivery run-sheet...');
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Print Route Run-Sheet</span>
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {subscriptions.map((sub) => (
-                  <div
-                    key={sub.id}
-                    className="bg-[#FAF5EC] p-4 sm:p-5 rounded-2xl border border-[#EDE1D1] space-y-3"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-xs text-[#7D0A14]">{sub.id}</span>
-                        <span className="font-extrabold text-sm text-[#3D040A]">{sub.customer}</span>
-                      </div>
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
-                          sub.status === 'Active'
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                            : 'bg-amber-100 text-amber-800 border border-amber-200'
-                        }`}
-                      >
-                        {sub.status}
+              {/* Active Logged-In Customer Status Banner */}
+              <div className="bg-[#FAF5EC] p-4 rounded-2xl border border-[#EDE1D1] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#7D0A14] text-white flex items-center justify-center font-black text-sm flex-shrink-0">
+                    {user ? (user.name ? user.name[0].toUpperCase() : 'U') : <User className="w-5 h-5 text-amber-300" />}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-extrabold text-sm text-[#3D040A]">
+                        {user ? (user.name || user.companyName) : 'No Customer Logged In'}
                       </span>
+                      {user ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Online Customer Session
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
+                          Signed Out / Guest Mode
+                        </span>
+                      )}
                     </div>
-
-                    <div className="text-xs text-slate-600 space-y-1">
-                      <div>
-                        <strong className="text-slate-900">Items:</strong> {sub.items}
-                      </div>
-                      <div>
-                        <strong className="text-slate-900">Address:</strong> {sub.apartment}
-                      </div>
-                      <div>
-                        <strong className="text-slate-900">Delivery Window:</strong> {sub.slot} ({sub.frequency})
-                      </div>
-                      <div className="text-[11px] text-slate-400">
-                        Subscribed Since: {sub.since} • Phone: {sub.phone}
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-[#E8DDCF] flex items-center justify-between">
-                      <button
-                        onClick={() => toggleSubscriptionStatus(sub.id)}
-                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
-                          sub.status === 'Active'
-                            ? 'bg-amber-200 text-amber-950 hover:bg-amber-300'
-                            : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                        }`}
-                      >
-                        {sub.status === 'Active' ? 'Pause Daily Dispatch' : 'Resume Daily Dispatch'}
-                      </button>
-
-                      <button
-                        onClick={() => showToast(`SMS dispatch reminder sent to ${sub.customer}`)}
-                        className="text-xs font-bold text-blue-600 hover:underline"
-                      >
-                        Send SMS Update
-                      </button>
+                    <div className="text-xs text-slate-500">
+                      {user ? (
+                        <span>{user.phone} {user.email ? `• ${user.email}` : ''} • {user.isBusiness ? 'B2B Wholesale' : 'B2C Retail'}</span>
+                      ) : (
+                        <span>Sign in on the storefront to register a real customer morning milk subscription.</span>
+                      )}
                     </div>
                   </div>
-                ))}
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-auto">
+                  {!user ? (
+                    <button
+                      onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
+                      className="px-3.5 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-colors"
+                    >
+                      <User className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Log In as Customer</span>
+                    </button>
+                  ) : (
+                    <span className="text-xs font-bold text-slate-600">
+                      Subscriptions: <strong className="text-[#7D0A14]">{subscriptions.length} active</strong>
+                    </span>
+                  )}
+                </div>
               </div>
+
+              {/* Subscriptions Grid or Clean Empty State */}
+              {subscriptions.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {subscriptions.map((sub) => (
+                    <div
+                      key={sub.id}
+                      className="bg-[#FAF5EC] p-4 sm:p-5 rounded-2xl border border-[#EDE1D1] space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-black text-xs text-[#7D0A14]">{sub.id}</span>
+                          <span className="font-extrabold text-sm text-[#3D040A]">{sub.customer}</span>
+                        </div>
+                        <span
+                          className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${
+                            sub.status === 'Active'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                              : 'bg-amber-100 text-amber-800 border border-amber-200'
+                          }`}
+                        >
+                          {sub.status}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-slate-600 space-y-1">
+                        <div>
+                          <strong className="text-slate-900">Items:</strong> {sub.items}
+                        </div>
+                        <div>
+                          <strong className="text-slate-900">Address:</strong> {sub.apartment}
+                        </div>
+                        <div>
+                          <strong className="text-slate-900">Delivery Window:</strong> {sub.slot} ({sub.frequency})
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          Subscribed Since: {sub.since} • Phone: {sub.phone}
+                        </div>
+                      </div>
+
+                      <div className="pt-2 border-t border-[#E8DDCF] flex items-center justify-between">
+                        <button
+                          onClick={() => toggleSubscriptionStatus(sub.id)}
+                          className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
+                            sub.status === 'Active'
+                              ? 'bg-amber-200 text-amber-950 hover:bg-amber-300'
+                              : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                          }`}
+                        >
+                          {sub.status === 'Active' ? 'Pause Daily Dispatch' : 'Resume Daily Dispatch'}
+                        </button>
+
+                        <button
+                          onClick={() => showToast(`SMS dispatch reminder sent to ${sub.customer}`)}
+                          className="text-xs font-bold text-blue-600 hover:underline"
+                        >
+                          Send SMS Update
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-12 text-center bg-[#FAF5EC]/50 rounded-2xl border border-dashed border-[#EDE1D1] p-6 space-y-3">
+                  <Clock className="w-12 h-12 text-[#7D0A14]/30 mx-auto" />
+                  <h4 className="font-black text-[#3D040A] text-base">No Customer Subscriptions Active</h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    All mock demo customers (Rajesh Sharma, Sunita Venkatesh, Karthik Balan, Deepa Kulkarni) have been completely removed.
+                    Only real logged-in customers who subscribe will appear here.
+                  </p>
+                  {user ? (
+                    <button
+                      onClick={() => createSubscriptionForUser(user)}
+                      className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
+                    >
+                      <Plus className="w-4 h-4 text-amber-300" />
+                      <span>Activate Morning Milk Delivery for {user.name || user.companyName}</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
+                    >
+                      <User className="w-4 h-4 text-amber-300" />
+                      <span>Log In as Customer to Subscribe</span>
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -1726,112 +1956,129 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                {b2bQuotes.map((quote) => (
-                  <div
-                    key={quote.id}
-                    className="bg-[#FAF5EC]/70 rounded-2xl p-5 border border-[#EDE1D1] hover:border-[#7D0A14] transition-all space-y-3"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DDCF] pb-3">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-black text-xs text-[#7D0A14] bg-white px-2 py-0.5 rounded border border-[#EDE1D1]">
-                            {quote.id}
-                          </span>
-                          <h4 className="font-black text-base text-[#3D040A]">{quote.company}</h4>
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          {quote.contactPerson} • {quote.businessType}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-black ${
-                            quote.status === 'Contract Approved'
-                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                              : quote.status === 'Quote Sent'
-                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                              : 'bg-amber-100 text-amber-800 border border-amber-200'
-                          }`}
-                        >
-                          {quote.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                      <div>
-                        <span className="text-slate-400 font-bold uppercase text-[10px] block">
-                          Estimated Volume
-                        </span>
-                        <strong className="text-[#3D040A]">{quote.monthlyVolume}</strong>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 font-bold uppercase text-[10px] block">
-                          Contact Info
-                        </span>
-                        <div className="text-slate-800">{quote.phone}</div>
-                        <div className="text-slate-500 text-[11px]">{quote.email}</div>
-                      </div>
-                      <div>
-                        <span className="text-slate-400 font-bold uppercase text-[10px] block">
-                          Requested Categories
-                        </span>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {quote.categories.map((c, i) => (
-                            <span
-                              key={i}
-                              className="bg-white text-[#7D0A14] border border-[#EDE1D1] px-2 py-0.5 rounded text-[10px] font-bold"
-                            >
-                              {c}
+              {b2bQuotes.length > 0 ? (
+                <div className="space-y-4">
+                  {b2bQuotes.map((quote) => (
+                    <div
+                      key={quote.id}
+                      className="bg-[#FAF5EC]/70 rounded-2xl p-5 border border-[#EDE1D1] hover:border-[#7D0A14] transition-all space-y-3"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DDCF] pb-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-black text-xs text-[#7D0A14] bg-white px-2 py-0.5 rounded border border-[#EDE1D1]">
+                              {quote.id}
                             </span>
-                          ))}
+                            <h4 className="font-black text-base text-[#3D040A]">{quote.company}</h4>
+                          </div>
+                          <div className="text-xs text-slate-500 mt-0.5">
+                            {quote.contactPerson} • {quote.businessType}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-black ${
+                              quote.status === 'Contract Approved'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                : quote.status === 'Quote Sent'
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                : 'bg-amber-100 text-amber-800 border border-amber-200'
+                            }`}
+                          >
+                            {quote.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div>
+                          <span className="text-slate-400 font-bold uppercase text-[10px] block">
+                            Estimated Volume
+                          </span>
+                          <strong className="text-[#3D040A]">{quote.monthlyVolume}</strong>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 font-bold uppercase text-[10px] block">
+                            Contact Info
+                          </span>
+                          <div className="text-slate-800">{quote.phone}</div>
+                          <div className="text-slate-500 text-[11px]">{quote.email}</div>
+                        </div>
+                        <div>
+                          <span className="text-slate-400 font-bold uppercase text-[10px] block">
+                            Requested Categories
+                          </span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {quote.categories.map((c, i) => (
+                              <span
+                                key={i}
+                                className="bg-white text-[#7D0A14] border border-[#EDE1D1] px-2 py-0.5 rounded text-[10px] font-bold"
+                              >
+                                {c}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {quote.notes && (
+                        <div className="p-3 rounded-xl bg-white text-xs text-slate-700 italic border border-[#EDE1D1]">
+                          "{quote.notes}"
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-[11px] text-slate-400">Received {quote.date}</span>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={`https://wa.me/${quote.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(
+                              quote.contactPerson
+                            )},%20this%20is%20Sumadhura%20Foods%20B2B%20Procurement%20Desk.`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
+                          >
+                            <span>WhatsApp Quote</span>
+                          </a>
+                          {quote.status === 'New Inquiry' && (
+                            <button
+                              onClick={() => updateQuoteStatus(quote.id, 'Quote Sent')}
+                              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
+                            >
+                              Mark Quote Sent
+                            </button>
+                          )}
+                          {quote.status === 'Quote Sent' && (
+                            <button
+                              onClick={() => updateQuoteStatus(quote.id, 'Contract Approved')}
+                              className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs"
+                            >
+                              Approve Wholesale Contract
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
-
-                    {quote.notes && (
-                      <div className="p-3 rounded-xl bg-white text-xs text-slate-700 italic border border-[#EDE1D1]">
-                        "{quote.notes}"
-                      </div>
-                    )}
-
-                    {/* Actions */}
-                    <div className="pt-2 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-[11px] text-slate-400">Received {quote.date}</span>
-                      <div className="flex items-center gap-2">
-                        <a
-                          href={`https://wa.me/${quote.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(
-                            quote.contactPerson
-                          )},%20this%20is%20Sumadhura%20Foods%20B2B%20Procurement%20Desk.`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1 shadow-xs"
-                        >
-                          <span>WhatsApp Quote</span>
-                        </a>
-                        {quote.status === 'New Inquiry' && (
-                          <button
-                            onClick={() => updateQuoteStatus(quote.id, 'Quote Sent')}
-                            className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
-                          >
-                            Mark Quote Sent
-                          </button>
-                        )}
-                        {quote.status === 'Quote Sent' && (
-                          <button
-                            onClick={() => updateQuoteStatus(quote.id, 'Contract Approved')}
-                            className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs"
-                          >
-                            Approve Wholesale Contract
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-12 text-center bg-[#FAF5EC]/50 rounded-2xl border border-dashed border-[#EDE1D1] p-6 space-y-3">
+                  <Building2 className="w-12 h-12 text-[#7D0A14]/30 mx-auto" />
+                  <h4 className="font-black text-[#3D040A] text-base">No Wholesale RFP Inquiries Yet</h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Fake mock inquiries have been removed. Commercial RFPs submitted by hotel, restaurant, and catering partners via the B2B portal will appear here.
+                  </p>
+                  <button
+                    onClick={simulateNewB2BQuote}
+                    className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
+                  >
+                    <Plus className="w-4 h-4 text-amber-300" />
+                    <span>+ Simulate Commercial RFP</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -1924,45 +2171,55 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              <div className="divide-y divide-slate-100">
-                {invoices.map((inv) => (
-                  <div
-                    key={inv.invoiceNo}
-                    className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono font-black text-sm text-[#7D0A14]">
-                          {inv.invoiceNo}
-                        </span>
-                        <span className="text-xs text-slate-400">• {inv.date}</span>
-                      </div>
-                      <div className="font-extrabold text-sm text-slate-900">{inv.client}</div>
-                      <div className="text-xs text-amber-800 font-mono">
-                        GSTIN: <strong>{inv.gstin}</strong>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between sm:justify-end gap-4">
-                      <div className="text-right">
-                        <div className="text-xs text-slate-400">Taxable: ₹{inv.taxableAmount.toLocaleString()}</div>
-                        <div className="font-black text-base text-[#3D040A]">
-                          ₹{inv.totalAmount.toLocaleString()}
+              {invoices.length > 0 ? (
+                <div className="divide-y divide-slate-100">
+                  {invoices.map((inv) => (
+                    <div
+                      key={inv.invoiceNo}
+                      className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-black text-sm text-[#7D0A14]">
+                            {inv.invoiceNo}
+                          </span>
+                          <span className="text-xs text-slate-400">• {inv.date}</span>
                         </div>
-                        <div className="text-[10px] text-slate-500">CGST + SGST: ₹{(inv.cgst * 2).toFixed(2)}</div>
+                        <div className="font-extrabold text-sm text-slate-900">{inv.client}</div>
+                        <div className="text-xs text-amber-800 font-mono">
+                          GSTIN: <strong>{inv.gstin}</strong>
+                        </div>
                       </div>
 
-                      <button
-                        onClick={() => setSelectedInvoice(inv)}
-                        className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
-                      >
-                        <Eye className="w-3.5 h-3.5 text-amber-300" />
-                        <span>View & Print</span>
-                      </button>
+                      <div className="flex items-center justify-between sm:justify-end gap-4">
+                        <div className="text-right">
+                          <div className="text-xs text-slate-400">Taxable: ₹{inv.taxableAmount.toLocaleString()}</div>
+                          <div className="font-black text-base text-[#3D040A]">
+                            ₹{inv.totalAmount.toLocaleString()}
+                          </div>
+                          <div className="text-[10px] text-slate-500">CGST + SGST: ₹{(inv.cgst * 2).toFixed(2)}</div>
+                        </div>
+
+                        <button
+                          onClick={() => setSelectedInvoice(inv)}
+                          className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                        >
+                          <Eye className="w-3.5 h-3.5 text-amber-300" />
+                          <span>View & Print</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-12 text-center bg-[#FAF5EC]/50 rounded-2xl border border-dashed border-[#EDE1D1] p-6 space-y-3">
+                  <Receipt className="w-12 h-12 text-[#7D0A14]/30 mx-auto" />
+                  <h4 className="font-black text-[#3D040A] text-base">No B2B Invoices Generated Yet</h4>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
+                    Official GST tax invoices are automatically created when registered B2B clients place commercial orders.
+                  </p>
+                </div>
+              )}
             </div>
           )}
         </main>

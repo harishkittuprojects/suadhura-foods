@@ -299,6 +299,26 @@ export const B2BPage = () => {
       return;
     }
 
+    try {
+      const existingQuotes = JSON.parse(localStorage.getItem('sumadhura_b2b_rfps') || '[]');
+      const newQuote = {
+        id: `QT-${Math.floor(100 + Math.random() * 900)}`,
+        company: quoteForm.companyName,
+        contactPerson: quoteForm.contactPerson || 'Procurement Incharge',
+        phone: quoteForm.phone,
+        email: quoteForm.email,
+        businessType: quoteForm.businessType || 'Commercial Hospitality',
+        monthlyVolume: quoteForm.estimatedVolume || '₹1,50,000 / month',
+        categories: quoteForm.categories || ['Dairy', 'Ghee', 'Basmati Rice'],
+        notes: quoteForm.notes || 'Inquiry submitted from B2B Wholesale Portal',
+        status: 'New Inquiry',
+        date: 'Today, Just now'
+      };
+      localStorage.setItem('sumadhura_b2b_rfps', JSON.stringify([newQuote, ...existingQuotes]));
+    } catch (err) {
+      console.error(err);
+    }
+
     setFormSubmitted(true);
     showToast('B2B quotation request submitted! Our corporate desk will call you within 30 minutes.');
   };

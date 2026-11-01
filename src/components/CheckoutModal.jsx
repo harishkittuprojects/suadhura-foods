@@ -57,6 +57,10 @@ export const CheckoutModal = () => {
           ? `B2B-${Math.floor(1000 + Math.random() * 9000)}`
           : `SMD-${Math.floor(100000 + Math.random() * 900000)}`,
         type: isB2bOrder ? 'b2b' : 'b2c',
+        customer: user?.name || (isB2bOrder ? user?.companyName || 'Business Partner' : 'Customer'),
+        contact: user?.phone || '+91 98450 12345',
+        email: user?.email || '',
+        companyName: user?.companyName || null,
         items: [...cart],
         subtotal: cartSubtotal,
         deliveryFee,
@@ -75,8 +79,16 @@ export const CheckoutModal = () => {
         address: `${selectedAddress.title}, ${selectedAddress.area}`,
         slot: isB2bOrder ? '5:00 AM Morning Loading Bay Dispatch' : 'Instant 10-15 Min Express Delivery',
         paymentMethod: paymentMethod.toUpperCase(),
-        partner: 'Ramesh Kumar (★ 4.9)'
+        partner: 'Ramesh Kumar (★ 4.9)',
+        status: 'Packing'
       };
+
+      try {
+        const existingOrders = JSON.parse(localStorage.getItem('sumadhura_orders') || '[]');
+        localStorage.setItem('sumadhura_orders', JSON.stringify([placedOrder, ...existingOrders]));
+      } catch (err) {
+        console.error(err);
+      }
 
       setOrderSummary(placedOrder);
       setActiveOrder(placedOrder);
