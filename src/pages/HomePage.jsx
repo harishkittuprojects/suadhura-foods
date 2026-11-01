@@ -563,25 +563,11 @@ export const HomePage = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-2.5 flex-shrink-0 relative z-10 w-full sm:w-auto">
-            {user?.isBusiness ? (
+            {user?.isBusiness && (
               <div className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#F5A623] text-[#3D040A] font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-2">
                 <Building2 className="w-4 h-4" />
                 <span>Wholesale Rates Active</span>
               </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setAuthModalTab('business');
-                  setIsAuthModalOpen(true);
-                  showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
-                }}
-                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
-                title="B2B Login Required for Wholesale Rates"
-              >
-                <Lock className="w-4 h-4 text-[#3D040A]" />
-                <span>Unlock Wholesale Rates (B2B Login)</span>
-                <ArrowRight className="w-4 h-4 text-[#3D040A]" />
-              </button>
             )}
 
             <button

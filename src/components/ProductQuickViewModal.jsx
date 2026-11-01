@@ -107,59 +107,49 @@ export const ProductQuickViewModal = () => {
                 </span>
               </div>
 
-              {/* Dual-Pricing Tier Box (Retail vs Wholesale / Whole Piece Rate) */}
-              <div className="mt-4 p-3 rounded-2xl bg-[#FAF5EC] border border-[#E8DDCF] space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
-                    Pricing Rates (B2C & B2B)
-                  </span>
-                  <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-[#EDE1D1] text-[10px] font-black">
-                    <button
+              {/* B2B Dual-Pricing Box (Shown ONLY when a verified B2B customer is logged in) */}
+              {isB2B ? (
+                <div className="mt-4 p-3 rounded-2xl bg-[#FAF5EC] border border-[#E8DDCF] space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-slate-500 uppercase tracking-wider text-[10px]">
+                      Pricing Rates (B2C & B2B)
+                    </span>
+                    <div className="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-[#EDE1D1] text-[10px] font-black">
+                      <button
+                        onClick={() => setPricingMode('retail')}
+                        className={`px-2 py-0.5 rounded transition-all ${
+                          pricingMode === 'retail' ? 'bg-blue-600 text-white' : 'text-slate-600'
+                        }`}
+                      >
+                        Retail
+                      </button>
+                      <button
+                        onClick={() => setPricingMode('wholesale')}
+                        className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
+                          pricingMode === 'wholesale' ? 'bg-[#7D0A14] text-white' : 'text-slate-600'
+                        }`}
+                      >
+                        Wholesale
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    {/* Retail Rate */}
+                    <div
                       onClick={() => setPricingMode('retail')}
-                      className={`px-2 py-0.5 rounded transition-all ${
-                        pricingMode === 'retail' ? 'bg-blue-600 text-white' : 'text-slate-600'
+                      className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                        pricingMode === 'retail'
+                          ? 'bg-white border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
+                          : 'bg-white/60 border-slate-200 opacity-80'
                       }`}
                     >
-                      Retail
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (!isB2B) {
-                          setAuthModalTab('business');
-                          setIsAuthModalOpen(true);
-                          setQuickViewProduct(null);
-                          showToast('🔒 B2B Login Required: Please login with a verified Business account to access wholesale rates', 'info');
-                          return;
-                        }
-                        setPricingMode('wholesale');
-                      }}
-                      className={`px-2 py-0.5 rounded transition-all flex items-center gap-1 ${
-                        pricingMode === 'wholesale' ? 'bg-[#7D0A14] text-white' : 'text-slate-600'
-                      }`}
-                    >
-                      <span>Wholesale</span>
-                      {!isB2B && <Lock className="w-2.5 h-2.5 text-amber-600" />}
-                    </button>
-                  </div>
-                </div>
+                      <div className="text-[10px] font-bold text-slate-500 uppercase">Retail Rate (B2C)</div>
+                      <div className="text-xl font-black text-[#52060E]">₹{quickViewProduct.price}</div>
+                      <div className="text-[10px] text-slate-500 truncate">{quickViewProduct.unit}</div>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  {/* Retail Rate */}
-                  <div
-                    onClick={() => setPricingMode('retail')}
-                    className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                      pricingMode === 'retail'
-                        ? 'bg-white border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
-                        : 'bg-white/60 border-slate-200 opacity-80'
-                    }`}
-                  >
-                    <div className="text-[10px] font-bold text-slate-500 uppercase">Retail Rate (B2C)</div>
-                    <div className="text-xl font-black text-[#52060E]">₹{quickViewProduct.price}</div>
-                    <div className="text-[10px] text-slate-500 truncate">{quickViewProduct.unit}</div>
-                  </div>
-
-                  {/* Wholesale Rate (Unlocked only for B2B accounts) */}
-                  {isB2B ? (
+                    {/* Wholesale Rate */}
                     <div
                       onClick={() => setPricingMode('wholesale')}
                       className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
@@ -181,48 +171,29 @@ export const ProductQuickViewModal = () => {
                         {quickViewProduct.wholesaleUnit || 'Commercial Bulk Pack'}
                       </div>
                     </div>
-                  ) : (
-                    <div
-                      onClick={() => {
-                        setAuthModalTab('business');
-                        setIsAuthModalOpen(true);
-                        setQuickViewProduct(null);
-                        showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
-                      }}
-                      className="p-2.5 rounded-xl border-2 border-dashed border-[#7D0A14]/30 bg-gradient-to-br from-[#FFFBF5] to-[#FAF5EC] hover:border-[#7D0A14] hover:bg-[#F5ECE0] transition-all cursor-pointer flex flex-col justify-between group shadow-2xs"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between text-[10px] font-black text-[#7D0A14] uppercase">
-                          <span className="flex items-center gap-1">
-                            <Lock className="w-3 h-3 text-amber-600" /> B2B Wholesale
-                          </span>
-                          <span className="bg-[#7D0A14] text-amber-200 px-1 rounded text-[8.5px] font-black">
-                            Save 35%
-                          </span>
-                        </div>
-                        <div className="text-xs font-black text-[#3D040A] mt-1 leading-tight">
-                          Confidential Rates
-                        </div>
-                        <div className="text-[9.5px] text-slate-500 mt-0.5">
-                          GST / Trade accounts only
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        className="mt-2 w-full py-1 px-2 rounded-lg bg-[#7D0A14] group-hover:bg-[#5A070E] text-white text-[10px] font-black flex items-center justify-center gap-1 shadow-xs"
-                      >
-                        <Building2 className="w-3 h-3 text-amber-300" />
-                        <span>Unlock with B2B Login</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
+                  </div>
 
-                <div className="text-[10px] text-slate-500 flex items-center justify-between pt-1 border-t border-[#E8DDCF]/60">
-                  <span>MOQ: <strong>{quickViewProduct.wholesaleMoq || 'Commercial Bulk'}</strong></span>
-                  <span className="text-emerald-700 font-bold">100% GST ITC Invoice Eligible</span>
+                  <div className="text-[10px] text-slate-500 flex items-center justify-between pt-1 border-t border-[#E8DDCF]/60">
+                    <span>MOQ: <strong>{quickViewProduct.wholesaleMoq || 'Commercial Bulk'}</strong></span>
+                    <span className="text-emerald-700 font-bold">100% GST ITC Invoice Eligible</span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                /* B2C Retail Website Price Display */
+                <div className="mt-4 flex items-baseline gap-2">
+                  <span className="text-2xl font-black text-[#52060E]">
+                    ₹{quickViewProduct.price}
+                  </span>
+                  {quickViewProduct.originalPrice && (
+                    <span className="text-sm text-slate-400 line-through">
+                      ₹{quickViewProduct.originalPrice}
+                    </span>
+                  )}
+                  <span className="text-xs text-slate-500 font-semibold ml-1">
+                    per {quickViewProduct.unit}
+                  </span>
+                </div>
+              )}
 
               {/* Description */}
               <p className="mt-3 text-sm text-slate-600 leading-relaxed">

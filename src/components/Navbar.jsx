@@ -167,34 +167,38 @@ export const Navbar = () => {
 
           {/* B2B Wholesale Rate Status / B2B Login & Subscription Order */}
           <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {user?.isBusiness ? (
-              /* Verified B2B Account: Wholesale Rates Active */
-              <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-[#290306] border border-amber-400/50 text-[10px] sm:text-[11px] font-black text-amber-300 shadow-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>🏢 Wholesale Rates Active</span>
-                {user.gstin && (
-                  <span className="bg-[#7D0A14] text-amber-200 text-[9px] px-1.5 py-0.2 rounded font-mono hidden md:inline">
-                    GST: {user.gstin}
-                  </span>
-                )}
+            {/* Show B2B Wholesale option ONLY when a B2B customer is logged in */}
+            {user?.isBusiness && (
+              <div className="flex items-center bg-[#290306] p-0.5 rounded-full border border-amber-400/50 text-[10px] sm:text-[11px] font-black">
+                <button
+                  onClick={() => setPricingMode('retail')}
+                  className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all flex items-center gap-1 ${
+                    pricingMode === 'retail'
+                      ? 'bg-[#FAF5EC] text-[#3D040A] shadow-xs'
+                      : 'text-amber-200/70 hover:text-white'
+                  }`}
+                  title="Switch to standard retail pricing"
+                >
+                  <span>🛍️ Retail</span>
+                </button>
+                <button
+                  onClick={() => setPricingMode('wholesale')}
+                  className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all flex items-center gap-1 ${
+                    pricingMode === 'wholesale'
+                      ? 'bg-[#F5A623] text-[#3D040A] shadow-xs'
+                      : 'text-amber-200/70 hover:text-white'
+                  }`}
+                  title="Commercial B2B wholesale rates active"
+                >
+                  <Building2 className="w-3 h-3 text-[#3D040A]" />
+                  <span>B2B Wholesale</span>
+                  {user.gstin && (
+                    <span className="bg-[#7D0A14] text-white text-[8.5px] px-1 rounded hidden lg:inline font-mono">
+                      GST
+                    </span>
+                  )}
+                </button>
               </div>
-            ) : (
-              /* Non-B2B Visitor: Prompt to Login to Unlock Wholesale Rates */
-              <button
-                onClick={() => {
-                  setAuthModalTab('business');
-                  setIsAuthModalOpen(true);
-                  showToast('Login with your B2B Business Account to unlock Wholesale Rates 🏢', 'info');
-                }}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-[#290306] hover:bg-[#3D040A] border border-amber-400/40 text-[10px] sm:text-[11px] font-bold text-amber-200 transition-all shadow-xs"
-                title="B2B Login required to view confidential wholesale rates"
-              >
-                <Building2 className="w-3.5 h-3.5 text-amber-300" />
-                <span>B2B Wholesale</span>
-                <span className="text-[9px] bg-amber-400/20 text-amber-300 px-1 rounded font-black border border-amber-400/30 flex items-center gap-0.5">
-                  <Lock className="w-2.5 h-2.5" /> Unlock
-                </span>
-              </button>
             )}
 
             <button
@@ -630,54 +634,47 @@ export const Navbar = () => {
                 </div>
               </button>
 
-              {/* Pricing Rate Tier Switcher (Mobile) */}
-              <div className="mt-3 p-2.5 bg-[#FAF5EC] rounded-xl border border-[#E8DDCF]">
-                {user?.isBusiness ? (
-                  <div className="space-y-1">
+              {/* Pricing Rate Tier Switcher (Mobile: Shown only for B2B users) */}
+              {user?.isBusiness && (
+                <div className="mt-3 p-2.5 bg-[#FAF5EC] rounded-xl border border-[#E8DDCF]">
+                  <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-600 px-1">
                       <span>B2B Commercial Account</span>
                       <span className="text-emerald-700 font-bold flex items-center gap-1">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active
                       </span>
                     </div>
-                    <div className="p-2 rounded-lg bg-[#290306] text-white flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-xs font-black text-amber-300">
-                        <Building2 className="w-4 h-4" />
-                        <span>Wholesale Rates Unlocked</span>
-                      </div>
-                      {user.gstin && (
-                        <span className="text-[9px] bg-[#7D0A14] text-amber-200 px-1.5 py-0.5 rounded font-mono">
-                          {user.gstin}
-                        </span>
-                      )}
+                    <div className="grid grid-cols-2 gap-1 text-xs font-bold text-center">
+                      <button
+                        onClick={() => {
+                          setPricingMode('retail');
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`py-1.5 rounded-lg transition-all ${
+                          pricingMode === 'retail'
+                            ? 'bg-blue-600 text-white font-black shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900 bg-white'
+                        }`}
+                      >
+                        🛍️ Retail
+                      </button>
+                      <button
+                        onClick={() => {
+                          setPricingMode('wholesale');
+                          setMobileMenuOpen(false);
+                        }}
+                        className={`py-1.5 rounded-lg transition-all ${
+                          pricingMode === 'wholesale'
+                            ? 'bg-[#7D0A14] text-white font-black shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900 bg-white'
+                        }`}
+                      >
+                        🏢 Wholesale
+                      </button>
                     </div>
                   </div>
-                ) : (
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-600 px-1">
-                      <span>Store Pricing Mode</span>
-                      <span className="text-blue-700 font-bold">Retail Active</span>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        setAuthModalTab('business');
-                        setIsAuthModalOpen(true);
-                        showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
-                      }}
-                      className="w-full py-2 px-3 rounded-lg bg-[#290306] hover:bg-[#3D040A] text-amber-200 text-xs font-bold flex items-center justify-between transition-all"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <Building2 className="w-4 h-4 text-amber-300" />
-                        <span>B2B Wholesale Rates</span>
-                      </div>
-                      <span className="text-[10px] bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded font-black border border-amber-400/30 flex items-center gap-1">
-                        <Lock className="w-2.5 h-2.5" /> Login to Unlock
-                      </span>
-                    </button>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Nav links */}
               <div className="mt-6 space-y-1">

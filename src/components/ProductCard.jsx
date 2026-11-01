@@ -170,20 +170,6 @@ export const ProductCard = ({ product, priority = false }) => {
                     </span>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setAuthModalTab('business');
-                    setIsAuthModalOpen(true);
-                    showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
-                  }}
-                  className="text-[9.5px] text-[#7D0A14] hover:text-[#5A070E] font-bold flex items-center gap-1 mt-0.5 truncate"
-                  title="B2B Login Required to unlock wholesale rates"
-                >
-                  <Lock className="w-2.5 h-2.5 text-amber-600 flex-shrink-0" />
-                  <span className="truncate">Wholesale: <strong className="underline font-black">Login to Unlock 🔒</strong></span>
-                </button>
               </div>
             )}
           </div>

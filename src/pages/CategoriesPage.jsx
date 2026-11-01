@@ -348,19 +348,19 @@ export const CategoriesPage = () => {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Store Rate Tier Pill */}
-            <div className="flex items-center bg-[#FAF5EC] p-0.5 rounded-xl border border-[#E8DDCF] text-xs font-bold">
-              <button
-                onClick={() => setPricingMode('retail')}
-                className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
-                  pricingMode === 'retail'
-                    ? 'bg-blue-600 text-white shadow-2xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                🛍️ Retail
-              </button>
-              {user?.isBusiness ? (
+            {/* Store Rate Tier Pill (Shown ONLY for verified B2B logins) */}
+            {user?.isBusiness && (
+              <div className="flex items-center bg-[#FAF5EC] p-0.5 rounded-xl border border-[#E8DDCF] text-xs font-bold">
+                <button
+                  onClick={() => setPricingMode('retail')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
+                    pricingMode === 'retail'
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  🛍️ Retail
+                </button>
                 <button
                   onClick={() => setPricingMode('wholesale')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
@@ -371,21 +371,8 @@ export const CategoriesPage = () => {
                 >
                   🏢 Wholesale Rate
                 </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setAuthModalTab('business');
-                    setIsAuthModalOpen(true);
-                    showToast('🔒 B2B Login Required: Login with your business account to unlock wholesale rates', 'info');
-                  }}
-                  className="px-2.5 py-1 rounded-lg text-xs font-black text-[#7D0A14] hover:bg-amber-100/60 flex items-center gap-1 transition-all"
-                  title="B2B Login Required for Wholesale Rates"
-                >
-                  <Lock className="w-3 h-3 text-amber-600" />
-                  <span>Wholesale (B2B)</span>
-                </button>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Organic Only */}
             <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 cursor-pointer bg-slate-50 border border-slate-200 px-2.5 py-1.5 rounded-xl hover:bg-slate-100">
