@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useShop } from '../context/ShopContext';
 import {
   Building2,
   User,
