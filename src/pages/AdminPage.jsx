@@ -1455,17 +1455,6 @@ export const AdminPage = () => {
               </button>
             )}
 
-            {(adminMode === 'b2b' || adminMode === 'unified') && (
-              <button
-                onClick={simulateNewB2BQuote}
-                className="px-3 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-                title="Create incoming wholesale RFP quote"
-              >
-                <Building2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">B2B RFP</span>
-                <span className="sm:hidden">B2B</span>
-              </button>
-            )}
 
             <button
               onClick={() => navigateTo('home')}
