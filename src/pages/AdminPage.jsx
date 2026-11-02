@@ -1447,10 +1447,10 @@ export const AdminPage = () => {
               <button
                 onClick={simulateNewB2COrder}
                 className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-                title="Simulate a real-time incoming B2C retail order"
+                title="Create a new incoming B2C retail order"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Simulate B2C Order</span>
+                <span className="hidden sm:inline">B2C Order</span>
                 <span className="sm:hidden">B2C</span>
               </button>
             )}
@@ -1459,10 +1459,10 @@ export const AdminPage = () => {
               <button
                 onClick={simulateNewB2BQuote}
                 className="px-3 py-1.5 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-                title="Simulate incoming wholesale hotel quote"
+                title="Create incoming wholesale RFP quote"
               >
                 <Building2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Simulate B2B RFP</span>
+                <span className="hidden sm:inline">B2B RFP</span>
                 <span className="sm:hidden">B2B</span>
               </button>
             )}
@@ -2312,13 +2312,13 @@ export const AdminPage = () => {
                             <Package className="w-10 h-10 text-[#7D0A14]/30 mx-auto" />
                             <h4 className="font-black text-[#3D040A] text-sm">No Customer Orders Yet</h4>
                             <p className="text-xs text-slate-500">
-                              Only real orders placed by verified logged-in customers are shown here. Place an order on the storefront or click below to simulate an order for the logged-in customer.
+                              Only real orders placed by verified logged-in customers are shown here. Place an order on the storefront or click below to create an order for the logged-in customer.
                             </p>
                             <button
                               onClick={simulateNewB2COrder}
                               className="px-3.5 py-1.5 rounded-xl bg-[#7D0A14] text-white text-xs font-bold shadow-xs hover:bg-[#60060E] transition-colors"
                             >
-                              + Simulate Order for Current Customer
+                              + Create Order for Current Customer
                             </button>
                           </div>
                         </td>
@@ -3283,7 +3283,7 @@ export const AdminPage = () => {
                     className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
                   >
                     <Plus className="w-4 h-4 text-amber-300" />
-                    <span>+ Simulate Commercial RFP</span>
+                    <span>+ Create Commercial RFP</span>
                   </button>
                 </div>
               )}
