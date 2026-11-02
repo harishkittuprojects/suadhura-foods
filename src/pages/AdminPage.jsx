@@ -1261,7 +1261,7 @@ export const AdminPage = () => {
             {(adminMode === 'b2c' || adminMode === 'unified') && (
               <button
                 onClick={simulateNewB2COrder}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
                 title="Simulate a real-time incoming B2C retail order"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -1297,227 +1297,225 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 1. DASHBOARD OVERVIEW                                     */}
           {/* ========================================================= */}
-                    {(activeTab === 'dashboard' || activeTab === 'overview') && (
-            <div className="space-y-6 animate-in fade-in duration-200">
-              {/* 1. Header Section */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                              {(activeTab === 'dashboard' || activeTab === 'overview') && (
+            <div className="space-y-5 animate-in fade-in duration-200">
+              {/* Dashboard Sub-Header with Date Filter */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#EDE1D1] shadow-2xs">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#7D0A14] text-[#F5A623] flex items-center justify-center shrink-0 shadow-xs">
                     <Home className="w-5 h-5 text-[#F5A623]" />
                   </div>
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-[#3D040A] tracking-tight">
-                      Dashboard
-                    </h1>
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                      Welcome back! Here's what's happening with your store today.
+                    <h2 className="text-lg sm:text-xl font-black text-[#3D040A] tracking-tight">
+                      Store Performance & Live Operations
+                    </h2>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Real-time revenue, order dispatch volume, customer activity, and inventory health.
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <button
-                      onClick={() => showToast('Date range: Last 30 Days selected')}
-                      className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
-                    >
-                      <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                      <span>Last 30 Days</span>
-                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                    </button>
-                  </div>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <button
+                    onClick={() => showToast('Filtered period: Last 30 Days (Oct 02 - Nov 02)')}
+                    className="flex items-center gap-2 px-3.5 py-2 bg-[#FAF5EC] border border-[#EDE1D1] rounded-xl text-xs font-bold text-[#3D040A] hover:bg-amber-100/60 shadow-2xs transition-colors"
+                  >
+                    <Calendar className="w-3.5 h-3.5 text-[#7D0A14]" />
+                    <span>Last 30 Days</span>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  </button>
                 </div>
               </div>
 
-              {/* 2. Top 6 KPI Metric Cards */}
+              {/* 2. Top 6 KPI Metric Cards in Live Website Colors */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
                 {/* Total Sales */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14]/30 hover:shadow-xs transition-all">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-[#FBBF24] flex items-center justify-center text-slate-900 font-black text-sm shrink-0 shadow-2xs">
+                    <div className="w-9 h-9 rounded-full bg-[#F5A623] flex items-center justify-center text-[#3D040A] font-black text-sm shrink-0 shadow-2xs">
                       ₹
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-600">Total Sales</div>
-                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">₹4,75,250</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-slate-500 truncate">Total Sales</div>
+                      <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5 truncate" title="₹4,75,250">
+                        ₹4,75,250
+                      </div>
                     </div>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-600 mt-2">
-                    ↑ 12% <span className="text-slate-400 font-normal">vs last month</span>
+                  <div className="text-[11px] font-bold text-emerald-700 mt-2">
+                    ↑ 12% <span className="text-slate-400 font-normal">vs last mo</span>
                   </div>
-                  {/* Sparkline Wave */}
+                  {/* Saffron Gold Sparkline */}
                   <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
                     <defs>
-                      <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.4" />
-                        <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0" />
+                      <linearGradient id="salesGradLive" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#F5A623" stopOpacity="0.45" />
+                        <stop offset="100%" stopColor="#F5A623" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
-                    <path d="M0,20 Q15,10 30,16 T60,8 T85,14 T100,6 L100,25 L0,25 Z" fill="url(#salesGrad)" />
-                    <path d="M0,20 Q15,10 30,16 T60,8 T85,14 T100,6" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M0,20 Q15,10 30,16 T60,8 T85,14 T100,6 L100,25 L0,25 Z" fill="url(#salesGradLive)" />
+                    <path d="M0,20 Q15,10 30,16 T60,8 T85,14 T100,6" fill="none" stroke="#F5A623" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 </div>
 
                 {/* B2C Orders */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14]/30 hover:shadow-xs transition-all">
                   <div>
                     <div className="flex items-center justify-between">
-                      <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
+                      <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-900">
                         <ShoppingCart className="w-4 h-4" />
                       </div>
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#FEF08A] text-[#854D0E]">
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#F5A623] text-[#3D040A]">
                         B2C Retail
                       </span>
                     </div>
-                    <div className="text-xs font-bold text-slate-600 mt-2">B2C Orders</div>
-                    <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">628</div>
+                    <div className="text-xs font-bold text-slate-500 mt-2">B2C Orders</div>
+                    <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
+                      628
+                    </div>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-600 mt-1">
-                    ↑ 15% <span className="text-slate-400 font-normal">vs last month</span>
+                  <div className="text-[11px] font-bold text-emerald-700 mt-1">
+                    ↑ 15% <span className="text-slate-400 font-normal">vs last mo</span>
                   </div>
-                  {/* Sparkline Wave */}
+                  {/* Saffron Gold Sparkline */}
                   <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="b2cGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.4" />
-                        <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0,22 Q20,15 40,18 T70,10 T100,5 L100,25 L0,25 Z" fill="url(#b2cGrad)" />
-                    <path d="M0,22 Q20,15 40,18 T70,10 T100,5" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M0,22 Q20,15 40,18 T70,10 T100,5 L100,25 L0,25 Z" fill="url(#salesGradLive)" />
+                    <path d="M0,22 Q20,15 40,18 T70,10 T100,5" fill="none" stroke="#F5A623" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 </div>
 
                 {/* B2B Orders */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14]/30 hover:shadow-xs transition-all">
                   <div>
                     <div className="flex items-center justify-between">
-                      <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-700">
+                      <div className="w-8 h-8 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-[#7D0A14]">
                         <Handshake className="w-4 h-4" />
                       </div>
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#F43F5E] text-white">
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#7D0A14] text-white">
                         B2B Wholesale
                       </span>
                     </div>
-                    <div className="text-xs font-bold text-slate-600 mt-2">B2B Orders</div>
-                    <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">124</div>
+                    <div className="text-xs font-bold text-slate-500 mt-2">B2B Orders</div>
+                    <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
+                      124
+                    </div>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-600 mt-1">
-                    ↑ 10% <span className="text-slate-400 font-normal">vs last month</span>
+                  <div className="text-[11px] font-bold text-emerald-700 mt-1">
+                    ↑ 10% <span className="text-slate-400 font-normal">vs last mo</span>
                   </div>
-                  {/* Sparkline Wave */}
+                  {/* Royal Maroon Sparkline */}
                   <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
                     <defs>
-                      <linearGradient id="b2bGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#F43F5E" stopOpacity="0.4" />
-                        <stop offset="100%" stopColor="#F43F5E" stopOpacity="0.0" />
+                      <linearGradient id="maroonGradLive" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#7D0A14" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#7D0A14" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
-                    <path d="M0,20 Q20,12 45,17 T75,9 T100,7 L100,25 L0,25 Z" fill="url(#b2bGrad)" />
-                    <path d="M0,20 Q20,12 45,17 T75,9 T100,7" fill="none" stroke="#F43F5E" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M0,20 Q20,12 45,17 T75,9 T100,7 L100,25 L0,25 Z" fill="url(#maroonGradLive)" />
+                    <path d="M0,20 Q20,12 45,17 T75,9 T100,7" fill="none" stroke="#7D0A14" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 </div>
 
                 {/* Total Customers */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14]/30 hover:shadow-xs transition-all">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14] shrink-0">
                       <Users className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-600">Total Customers</div>
-                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">3,250</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-slate-500 truncate">Total Customers</div>
+                      <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
+                        3,250
+                      </div>
                     </div>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-600 mt-2">
-                    ↑ 14% <span className="text-slate-400 font-normal">vs last month</span>
+                  <div className="text-[11px] font-bold text-emerald-700 mt-2">
+                    ↑ 14% <span className="text-slate-400 font-normal">vs last mo</span>
                   </div>
-                  {/* Sparkline Wave */}
+                  {/* Blue/Navy Sparkline */}
                   <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
                     <defs>
-                      <linearGradient id="custGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.4" />
+                      <linearGradient id="custGradLive" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.35" />
                         <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
-                    <path d="M0,22 Q25,18 50,15 T75,8 T100,5 L100,25 L0,25 Z" fill="url(#custGrad)" />
-                    <path d="M0,22 Q25,18 50,15 T75,8 T100,5" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M0,22 Q25,18 50,15 T75,8 T100,5 L100,25 L0,25 Z" fill="url(#custGradLive)" />
+                    <path d="M0,22 Q25,18 50,15 T75,8 T100,5" fill="none" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 </div>
 
                 {/* Low Stock */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14]/30 hover:shadow-xs transition-all">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-800 shrink-0">
                       <Package className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-600">Low Stock</div>
-                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">18</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-slate-500 truncate">Low Stock</div>
+                      <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
+                        18
+                      </div>
                     </div>
                   </div>
-                  <div className="text-[11px] font-bold text-rose-600 mt-2">
-                    ⚠ Needs Attention
+                  <div className="text-[11px] font-bold text-rose-600 mt-2 flex items-center gap-1">
+                    <span>⚠ Needs Attention</span>
                   </div>
-                  {/* Sparkline Wave */}
+                  {/* Amber Sparkline */}
                   <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
-                    <defs>
-                      <linearGradient id="stockGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#F97316" stopOpacity="0.4" />
-                        <stop offset="100%" stopColor="#F97316" stopOpacity="0.0" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0,20 Q20,14 45,18 T80,11 T100,8 L100,25 L0,25 Z" fill="url(#stockGrad)" />
-                    <path d="M0,20 Q20,14 45,18 T80,11 T100,8" fill="none" stroke="#F97316" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M0,20 Q20,14 45,18 T80,11 T100,8 L100,25 L0,25 Z" fill="url(#salesGradLive)" />
+                    <path d="M0,20 Q20,14 45,18 T80,11 T100,8" fill="none" stroke="#F59E0B" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 </div>
 
                 {/* Pending Deliveries */}
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14]/30 hover:shadow-xs transition-all">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800 shrink-0">
                       <Truck className="w-4 h-4" />
                     </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-600">Pending Deliveries</div>
-                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">42</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-slate-500 truncate">Pending Delivery</div>
+                      <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
+                        42
+                      </div>
                     </div>
                   </div>
-                  <div className="text-[11px] font-bold text-emerald-600 mt-2">
-                    ↑ 5% <span className="text-slate-400 font-normal">vs last month</span>
+                  <div className="text-[11px] font-bold text-emerald-700 mt-2">
+                    ↑ 5% <span className="text-slate-400 font-normal">vs last mo</span>
                   </div>
-                  {/* Sparkline Wave */}
+                  {/* Emerald Sparkline */}
                   <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
                     <defs>
-                      <linearGradient id="delGrad" x1="0" y1="0" x2="0" y2="1">
+                      <linearGradient id="delGradLive" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
                         <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
-                    <path d="M0,21 Q25,17 50,13 T80,8 T100,4 L100,25 L0,25 Z" fill="url(#delGrad)" />
-                    <path d="M0,21 Q25,17 50,13 T80,8 T100,4" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M0,21 Q25,17 50,13 T80,8 T100,4 L100,25 L0,25 Z" fill="url(#delGradLive)" />
+                    <path d="M0,21 Q25,17 50,13 T80,8 T100,4" fill="none" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" />
                   </svg>
                 </div>
               </div>
 
               {/* 3. Middle Section: Sales & Orders Overview + Quick Actions */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                {/* Sales & Orders Overview Chart */}
-                <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                {/* Sales & Orders Overview Chart in Website Theme */}
+                <div className="lg:col-span-8 bg-white rounded-2xl border border-[#EDE1D1] p-5 shadow-2xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#EDE1D1] pb-3">
                     <div className="flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-slate-700" />
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
+                      <BarChart3 className="w-5 h-5 text-[#7D0A14]" />
+                      <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
                         Sales & Orders Overview
                       </h3>
                     </div>
                     <div className="flex items-center gap-4 text-xs font-bold">
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#EAB308]" />
+                      <div className="flex items-center gap-1.5 text-slate-700">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#F5A623]" />
                         <span>Sales (₹)</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-slate-600">
-                        <span className="w-2.5 h-2.5 rounded-full bg-[#E11D48]" />
+                      <div className="flex items-center gap-1.5 text-slate-700">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#7D0A14]" />
                         <span>Orders</span>
                       </div>
                     </div>
@@ -1529,25 +1527,24 @@ export const AdminPage = () => {
                       <svg className="w-full h-full overflow-visible" viewBox="0 0 700 200">
                         {/* Grid lines and Y-axis labels */}
                         <g className="text-slate-400 text-[10px] font-bold">
-                          <line x1="40" y1="20" x2="680" y2="20" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
-                          <text x="5" y="24" fill="#94A3B8">₹6L</text>
+                          <line x1="40" y1="20" x2="680" y2="20" stroke="#F8F3EA" strokeWidth="1" strokeDasharray="4 4" />
+                          <text x="5" y="24" fill="#8C7A6B">₹6L</text>
 
-                          <line x1="40" y1="75" x2="680" y2="75" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
-                          <text x="5" y="79" fill="#94A3B8">₹4L</text>
+                          <line x1="40" y1="75" x2="680" y2="75" stroke="#F8F3EA" strokeWidth="1" strokeDasharray="4 4" />
+                          <text x="5" y="79" fill="#8C7A6B">₹4L</text>
 
-                          <line x1="40" y1="130" x2="680" y2="130" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
-                          <text x="5" y="134" fill="#94A3B8">₹2L</text>
+                          <line x1="40" y1="130" x2="680" y2="130" stroke="#F8F3EA" strokeWidth="1" strokeDasharray="4 4" />
+                          <text x="5" y="134" fill="#8C7A6B">₹2L</text>
 
-                          <line x1="40" y1="185" x2="680" y2="185" stroke="#CBD5E1" strokeWidth="1" />
-                          <text x="5" y="189" fill="#94A3B8">₹0</text>
+                          <line x1="40" y1="185" x2="680" y2="185" stroke="#E8DDCF" strokeWidth="1" />
+                          <text x="5" y="189" fill="#8C7A6B">₹0</text>
                         </g>
 
-                        {/* Yellow Line: Sales (₹) */}
-                        {/* Points: Oct26: 140, Oct27: 105, Oct28: 80, Oct29: 75, Oct30: 35, Oct31: 55, Nov1: 65 */}
+                        {/* Yellow/Saffron Gold Line: Sales (₹) */}
                         <path
                           d="M60,140 L160,105 L260,80 L360,75 L460,35 L560,55 L660,65"
                           fill="none"
-                          stroke="#EAB308"
+                          stroke="#F5A623"
                           strokeWidth="3.5"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -1563,16 +1560,15 @@ export const AdminPage = () => {
                           { x: 660, y: 65, val: '₹4.4L' }
                         ].map((pt, i) => (
                           <g key={i}>
-                            <circle cx={pt.x} cy={pt.y} r="5" fill="#EAB308" stroke="#FFFFFF" strokeWidth="2.5" className="cursor-pointer hover:r-7 transition-all" />
+                            <circle cx={pt.x} cy={pt.y} r="5" fill="#F5A623" stroke="#FFFFFF" strokeWidth="2.5" className="cursor-pointer" />
                           </g>
                         ))}
 
-                        {/* Red Line: Orders */}
-                        {/* Points: Oct26: 170, Oct27: 145, Oct28: 148, Oct29: 148, Oct30: 125, Oct31: 145, Nov1: 140 */}
+                        {/* Royal Maroon Line: Orders */}
                         <path
                           d="M60,170 L160,145 L260,148 L360,148 L460,125 L560,145 L660,140"
                           fill="none"
-                          stroke="#E11D48"
+                          stroke="#7D0A14"
                           strokeWidth="3"
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -1588,7 +1584,7 @@ export const AdminPage = () => {
                           { x: 660, y: 140, val: '194 Orders' }
                         ].map((pt, i) => (
                           <g key={i}>
-                            <circle cx={pt.x} cy={pt.y} r="4.5" fill="#E11D48" stroke="#FFFFFF" strokeWidth="2" className="cursor-pointer hover:r-6 transition-all" />
+                            <circle cx={pt.x} cy={pt.y} r="4.5" fill="#7D0A14" stroke="#FFFFFF" strokeWidth="2" className="cursor-pointer" />
                           </g>
                         ))}
 
@@ -1607,11 +1603,11 @@ export const AdminPage = () => {
                   </div>
                 </div>
 
-                {/* Quick Actions (2x2 Grid) */}
-                <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col justify-between">
-                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
-                    <Zap className="w-5 h-5 text-amber-500 fill-amber-500/30" />
-                    <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
+                {/* Quick Actions in Website Warm Cream Theme */}
+                <div className="lg:col-span-4 bg-white rounded-2xl border border-[#EDE1D1] p-5 shadow-2xs flex flex-col justify-between">
+                  <div className="flex items-center gap-2 border-b border-[#EDE1D1] pb-3 mb-4">
+                    <Zap className="w-5 h-5 text-[#F5A623] fill-[#F5A623]/30" />
+                    <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
                       Quick Actions
                     </h3>
                   </div>
@@ -1620,9 +1616,9 @@ export const AdminPage = () => {
                     {/* Add Product */}
                     <button
                       onClick={() => setIsAddProductModalOpen(true)}
-                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                      className="p-4 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] flex flex-col items-center justify-center gap-2 text-xs font-bold text-[#3D040A] transition-all active:scale-95 shadow-2xs group"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14] group-hover:scale-110 transition-transform shadow-2xs">
                         <Package className="w-5 h-5" />
                       </div>
                       <span className="font-extrabold text-[#3D040A]">Add Product</span>
@@ -1631,9 +1627,9 @@ export const AdminPage = () => {
                     {/* Add B2B Customer */}
                     <button
                       onClick={() => setActiveTab('b2b-customers')}
-                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                      className="p-4 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] flex flex-col items-center justify-center gap-2 text-xs font-bold text-[#3D040A] transition-all active:scale-95 shadow-2xs group"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14] group-hover:scale-110 transition-transform shadow-2xs">
                         <Users className="w-5 h-5" />
                       </div>
                       <span className="font-extrabold text-[#3D040A]">Add B2B Customer</span>
@@ -1642,9 +1638,9 @@ export const AdminPage = () => {
                     {/* Create Offer */}
                     <button
                       onClick={() => setActiveTab('offers-coupons')}
-                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                      className="p-4 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] flex flex-col items-center justify-center gap-2 text-xs font-bold text-[#3D040A] transition-all active:scale-95 shadow-2xs group"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14] group-hover:scale-110 transition-transform shadow-2xs">
                         <Ticket className="w-5 h-5" />
                       </div>
                       <span className="font-extrabold text-[#3D040A]">Create Offer</span>
@@ -1653,9 +1649,9 @@ export const AdminPage = () => {
                     {/* Generate Invoice */}
                     <button
                       onClick={() => setActiveTab('invoices')}
-                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                      className="p-4 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] flex flex-col items-center justify-center gap-2 text-xs font-bold text-[#3D040A] transition-all active:scale-95 shadow-2xs group"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                      <div className="w-10 h-10 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14] group-hover:scale-110 transition-transform shadow-2xs">
                         <FileText className="w-5 h-5" />
                       </div>
                       <span className="font-extrabold text-[#3D040A]">Generate Invoice</span>
@@ -1667,17 +1663,17 @@ export const AdminPage = () => {
               {/* 4. Lower Section: Recent Orders + Low Stock Products */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
                 {/* Recent Orders Table */}
-                <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="lg:col-span-8 bg-white rounded-2xl border border-[#EDE1D1] p-5 shadow-2xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
                     <div className="flex items-center gap-2">
-                      <ShoppingCart className="w-5 h-5 text-rose-600" />
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
+                      <ShoppingCart className="w-5 h-5 text-[#7D0A14]" />
+                      <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
                         Recent Orders
                       </h3>
                     </div>
                     <button
                       onClick={() => setActiveTab('orders')}
-                      className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 hover:underline"
+                      className="text-xs font-black text-[#7D0A14] hover:text-[#52060E] flex items-center gap-1 hover:underline"
                     >
                       View All →
                     </button>
@@ -1685,7 +1681,7 @@ export const AdminPage = () => {
 
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse text-xs">
-                      <thead className="bg-[#FAF5EC]/70 border-b border-[#EDE1D1] text-slate-800 font-bold uppercase tracking-wider">
+                      <thead className="bg-[#FAF5EC] border-b border-[#EDE1D1] text-[#3D040A] font-extrabold uppercase tracking-wider">
                         <tr>
                           <th className="py-2.5 px-3">Order ID</th>
                           <th className="py-2.5 px-3">Customer</th>
@@ -1696,7 +1692,7 @@ export const AdminPage = () => {
                           <th className="py-2.5 px-3">Date</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 font-medium">
+                      <tbody className="divide-y divide-[#EDE1D1]/60 font-medium">
                         {[
                           { id: '#MNK10045', name: 'Ramesh Kumar', type: 'B2C', amt: '₹1,250', pay: 'UPI', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 02, 2026 5:12 PM' },
                           { id: '#MNK10044', name: 'Sri Sai Traders', type: 'B2B', amt: '₹12,800', pay: 'Bank Transfer', status: 'Processing', statusColor: 'bg-blue-100 text-blue-800', date: 'Nov 02, 2026 3:45 PM' },
@@ -1704,19 +1700,19 @@ export const AdminPage = () => {
                           { id: '#MNK10042', name: 'Vijaya Mart', type: 'B2B', amt: '₹25,600', pay: 'Net Banking', status: 'Pending', statusColor: 'bg-amber-100 text-amber-800', date: 'Nov 01, 2026 7:30 PM' },
                           { id: '#MNK10041', name: 'Mahesh Reddy', type: 'B2C', amt: '₹890', pay: 'COD', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 01, 2026 6:15 PM' }
                         ].map((row, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
-                            <td className="py-3 px-3 font-mono font-bold text-slate-800">{row.id}</td>
+                          <tr key={idx} className="hover:bg-[#FAF5EC]/40 transition-colors">
+                            <td className="py-3 px-3 font-mono font-bold text-[#7D0A14]">{row.id}</td>
                             <td className="py-3 px-3 font-bold text-[#3D040A]">{row.name}</td>
                             <td className="py-3 px-3">
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
                                 row.type === 'B2B'
-                                  ? 'bg-[#F43F5E] text-white'
-                                  : 'bg-[#FEF08A] text-[#854D0E]'
+                                  ? 'bg-[#7D0A14] text-white'
+                                  : 'bg-[#FEE2E2] text-[#991B1B]'
                               }`}>
                                 {row.type}
                               </span>
                             </td>
-                            <td className="py-3 px-3 font-black text-slate-900">{row.amt}</td>
+                            <td className="py-3 px-3 font-black text-[#3D040A]">{row.amt}</td>
                             <td className="py-3 px-3 text-slate-600 font-semibold">{row.pay}</td>
                             <td className="py-3 px-3">
                               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.statusColor}`}>
@@ -1731,32 +1727,32 @@ export const AdminPage = () => {
                   </div>
                 </div>
 
-                {/* Low Stock Products */}
-                <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                {/* Low Stock Products in Website Theme */}
+                <div className="lg:col-span-4 bg-white rounded-2xl border border-[#EDE1D1] p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+                  <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
                     <div className="flex items-center gap-2">
-                      <AlertTriangle className="w-5 h-5 text-rose-600" />
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
+                      <AlertTriangle className="w-5 h-5 text-[#7D0A14]" />
+                      <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
                         Low Stock Products
                       </h3>
                     </div>
                     <button
                       onClick={() => setActiveTab('inventory')}
-                      className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 hover:underline"
+                      className="text-xs font-black text-[#7D0A14] hover:text-[#52060E] flex items-center gap-1 hover:underline"
                     >
                       View All →
                     </button>
                   </div>
 
-                  <div className="space-y-3.5 flex-1">
+                  <div className="space-y-3 flex-1">
                     {[
                       { name: 'Tata Salt 1kg', left: 'Only 5 left', img: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=100&auto=format&fit=crop&q=80' },
                       { name: 'Sunflower Oil 1L', left: 'Only 8 left', img: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=100&auto=format&fit=crop&q=80' },
                       { name: 'Aashirvaad Atta 5kg', left: 'Only 10 left', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=100&auto=format&fit=crop&q=80' }
                     ].map((item, idx) => (
-                      <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50/70 transition-all">
+                      <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl border border-[#EDE1D1] bg-[#FAF5EC]/30 hover:bg-[#FAF5EC] transition-all">
                         <div className="flex items-center gap-3">
-                          <img src={item.img} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                          <img src={item.img} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-[#EDE1D1]" />
                           <div>
                             <div className="font-bold text-xs text-[#3D040A]">{item.name}</div>
                             <div className="text-[11px] font-bold text-rose-600">{item.left}</div>
@@ -1764,7 +1760,7 @@ export const AdminPage = () => {
                         </div>
                         <button
                           onClick={() => showToast(`Stock replenished for ${item.name}! +50 units added.`, 'success')}
-                          className="px-3 py-1 rounded-full border border-rose-300 text-rose-600 hover:bg-rose-50 text-xs font-bold active:scale-95 transition-all"
+                          className="px-3 py-1 rounded-full border border-[#7D0A14] text-[#7D0A14] hover:bg-[#7D0A14] hover:text-white text-xs font-black active:scale-95 transition-all shadow-2xs"
                         >
                           Restock
                         </button>
@@ -1774,9 +1770,9 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              {/* 5. Bottom Banner: B2B Section - Business Customers */}
-              <div className="bg-[#FFFBEB] border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
-                <div className="text-xs font-extrabold text-[#7D0A14] flex items-center gap-2">
+              {/* 5. Bottom Banner: B2B Section in Signature Royal Maroon Theme */}
+              <div className="bg-gradient-to-r from-[#FAF5EC] via-[#FDF7F2] to-[#FAF5EC] border border-[#EDE1D1] rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+                <div className="text-xs font-black text-[#7D0A14] flex items-center gap-2">
                   <Briefcase className="w-4 h-4 text-[#7D0A14]" />
                   <span>B2B Section – Business Customers</span>
                 </div>
@@ -1784,7 +1780,7 @@ export const AdminPage = () => {
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 flex-1 text-xs">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14]">
                         <Building2 className="w-4 h-4" />
                       </div>
                       <div>
@@ -1794,7 +1790,7 @@ export const AdminPage = () => {
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14]">
                         <FileText className="w-4 h-4" />
                       </div>
                       <div>
@@ -1804,7 +1800,7 @@ export const AdminPage = () => {
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14]">
                         <ShoppingCart className="w-4 h-4" />
                       </div>
                       <div>
@@ -1814,7 +1810,7 @@ export const AdminPage = () => {
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14]">
                         <Handshake className="w-4 h-4" />
                       </div>
                       <div>
@@ -1824,7 +1820,7 @@ export const AdminPage = () => {
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14]">
                         <ShieldCheck className="w-4 h-4" />
                       </div>
                       <div>
@@ -1836,7 +1832,7 @@ export const AdminPage = () => {
 
                   <button
                     onClick={() => setActiveTab('b2b-customers')}
-                    className="px-5 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all shrink-0 active:scale-95"
+                    className="px-5 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center justify-center gap-2 shadow-xs transition-all shrink-0 active:scale-95"
                   >
                     <span>Manage B2B →</span>
                   </button>
