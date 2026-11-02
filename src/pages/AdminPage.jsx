@@ -1044,41 +1044,41 @@ export const AdminPage = () => {
 
   return (
     <div className="flex h-screen w-full bg-[#FAF5EC] text-[#3D040A] overflow-hidden font-sans">
-            {/* ============================================================= */}
-      {/* 1. STANDALONE LEFT SIDEBAR (EXACT MATCH TO REFERENCE DESIGN)   */}
+                  {/* ============================================================= */}
+      {/* 1. STANDALONE LEFT SIDEBAR (SUMADHURA SIGNATURE ROYAL MAROON) */}
       {/* ============================================================= */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white text-[#1E2544] border-r border-slate-200 flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 shadow-sm ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#3D040A] text-white border-r border-[#52060E] flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 shadow-2xl ${
           sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Brand Header */}
-          <div className="p-4 sm:p-5 bg-white border-b border-slate-100 flex items-center justify-between">
+          <div className="p-4 sm:p-5 bg-[#4D060D] border-b border-[#52060E] flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#FACC15] text-[#1E2544] flex items-center justify-center font-black text-xl shadow-xs">
-                <Store className="w-5 h-5 text-[#1E2544]" />
+              <div className="w-10 h-10 rounded-2xl bg-[#F5A623] text-[#3D040A] flex items-center justify-center font-black text-xl shadow-lg">
+                <Store className="w-5 h-5 text-[#3D040A]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="font-extrabold text-sm text-[#1E2544] tracking-tight">Sumadhura Foods</h2>
-                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 text-[#854D0E] border border-amber-200">
+                  <h2 className="font-extrabold text-sm text-white tracking-tight">Sumadhura Foods</h2>
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#F5A623] text-[#3D040A]">
                     Admin
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 font-medium">Operations Portal</p>
+                <p className="text-[11px] text-amber-200/80 font-medium">Operations Command Center</p>
               </div>
             </div>
 
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
+              className="lg:hidden p-1.5 text-white/70 hover:text-white rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Navigation Links matching Screenshot */}
+          {/* Navigation Links with Signature Sumadhura Live Website Colors */}
           <div className="p-3 flex-1 overflow-y-auto space-y-1">
             {sidebarLinks.map((item) => {
               const Icon = item.icon;
@@ -1092,27 +1092,40 @@ export const AdminPage = () => {
                   }}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] font-bold transition-all text-left ${
                     isActive
-                      ? 'bg-[#FACC15] text-[#1E2544] font-black shadow-xs'
-                      : 'text-[#1E2544] hover:bg-slate-100/80 hover:text-slate-900'
+                      ? 'bg-gradient-to-r from-[#F5A623] to-[#F5A623]/95 text-[#3D040A] font-black shadow-md scale-[1.01]'
+                      : 'text-amber-100/80 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 ${isActive ? 'text-[#1E2544]' : 'text-[#1E2544]'}`} />
+                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 ${isActive ? 'text-[#3D040A]' : 'text-amber-200/80'}`} />
                     <span className="truncate">{item.label}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    {item.customBadge && (
-                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${item.customBadge.className}`}>
-                        {item.customBadge.text}
+                    {item.id === 'b2c-customers' && (
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                        isActive
+                          ? 'bg-[#3D040A] text-[#F5A623]'
+                          : 'bg-[#F5A623] text-[#3D040A]'
+                      }`}>
+                        B2C Retail
                       </span>
                     )}
-                    {item.badge !== null && !item.customBadge && (
+                    {item.id === 'b2b-customers' && (
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                        isActive
+                          ? 'bg-[#7D0A14] text-white border border-[#3D040A]'
+                          : 'bg-[#E11D48] text-white'
+                      }`}>
+                        B2B Wholesale
+                      </span>
+                    )}
+                    {item.badge !== null && !['b2c-customers', 'b2b-customers'].includes(item.id) && (
                       <span
                         className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                           isActive
-                            ? 'bg-[#1E2544] text-[#FACC15]'
-                            : 'bg-slate-100 text-slate-700'
+                            ? 'bg-[#3D040A] text-[#F5A623]'
+                            : 'bg-black/30 text-amber-200 border border-white/10'
                         }`}
                       >
                         {item.badge}
@@ -1124,22 +1137,22 @@ export const AdminPage = () => {
             })}
           </div>
 
-          {/* Bottom Card as seen in Screenshot */}
-          <div className="p-3 border-t border-slate-100 bg-white">
-            <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs space-y-2">
+          {/* Bottom Card in Royal Maroon Brand Theme */}
+          <div className="p-3 border-t border-[#52060E] bg-[#330308]">
+            <div className="p-3.5 rounded-2xl bg-[#230206] border border-[#52060E] text-xs space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-extrabold text-[#7D0A14] flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="font-extrabold text-amber-300 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   Live Storefront
                 </span>
-                <span className="text-[10px] font-bold text-amber-900">v2.4 Production</span>
+                <span className="text-[10px] font-bold text-amber-200/70">v2.4 Production</span>
               </div>
-              <p className="text-[11px] text-slate-600 font-medium">
+              <p className="text-[11px] text-amber-100/70 font-medium">
                 Connected to Bangalore Daily Morning Dispatch Hub.
               </p>
               <button
                 onClick={() => navigateTo('home')}
-                className="w-full py-1.5 rounded-xl bg-[#FACC15] hover:bg-[#EAB308] text-[#1E2544] font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
+                className="w-full py-2 rounded-xl bg-[#F5A623] hover:bg-[#D98207] text-[#3D040A] font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Visit Storefront</span>
@@ -1289,11 +1302,11 @@ export const AdminPage = () => {
               {/* 1. Header Section */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                    <Home className="w-5 h-5 text-slate-800" />
+                  <div className="w-10 h-10 rounded-xl bg-[#7D0A14] text-[#F5A623] flex items-center justify-center shrink-0 shadow-xs">
+                    <Home className="w-5 h-5 text-[#F5A623]" />
                   </div>
                   <div>
-                    <h1 className="text-2xl sm:text-3xl font-black text-[#1E2544] tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl font-black text-[#3D040A] tracking-tight">
                       Dashboard
                     </h1>
                     <p className="text-xs sm:text-sm text-slate-500 font-medium">
@@ -1326,7 +1339,7 @@ export const AdminPage = () => {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-600">Total Sales</div>
-                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">₹4,75,250</div>
+                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">₹4,75,250</div>
                     </div>
                   </div>
                   <div className="text-[11px] font-bold text-emerald-600 mt-2">
@@ -1357,7 +1370,7 @@ export const AdminPage = () => {
                       </span>
                     </div>
                     <div className="text-xs font-bold text-slate-600 mt-2">B2C Orders</div>
-                    <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">628</div>
+                    <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">628</div>
                   </div>
                   <div className="text-[11px] font-bold text-emerald-600 mt-1">
                     ↑ 15% <span className="text-slate-400 font-normal">vs last month</span>
@@ -1387,7 +1400,7 @@ export const AdminPage = () => {
                       </span>
                     </div>
                     <div className="text-xs font-bold text-slate-600 mt-2">B2B Orders</div>
-                    <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">124</div>
+                    <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">124</div>
                   </div>
                   <div className="text-[11px] font-bold text-emerald-600 mt-1">
                     ↑ 10% <span className="text-slate-400 font-normal">vs last month</span>
@@ -1413,7 +1426,7 @@ export const AdminPage = () => {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-600">Total Customers</div>
-                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">3,250</div>
+                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">3,250</div>
                     </div>
                   </div>
                   <div className="text-[11px] font-bold text-emerald-600 mt-2">
@@ -1440,7 +1453,7 @@ export const AdminPage = () => {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-600">Low Stock</div>
-                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">18</div>
+                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">18</div>
                     </div>
                   </div>
                   <div className="text-[11px] font-bold text-rose-600 mt-2">
@@ -1467,7 +1480,7 @@ export const AdminPage = () => {
                     </div>
                     <div>
                       <div className="text-xs font-bold text-slate-600">Pending Deliveries</div>
-                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">42</div>
+                      <div className="text-xl font-black text-[#3D040A] tracking-tight mt-0.5">42</div>
                     </div>
                   </div>
                   <div className="text-[11px] font-bold text-emerald-600 mt-2">
@@ -1494,7 +1507,7 @@ export const AdminPage = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-slate-700" />
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
                         Sales & Orders Overview
                       </h3>
                     </div>
@@ -1598,7 +1611,7 @@ export const AdminPage = () => {
                 <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col justify-between">
                   <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
                     <Zap className="w-5 h-5 text-amber-500 fill-amber-500/30" />
-                    <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                    <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
                       Quick Actions
                     </h3>
                   </div>
@@ -1612,7 +1625,7 @@ export const AdminPage = () => {
                       <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
                         <Package className="w-5 h-5" />
                       </div>
-                      <span className="font-extrabold text-[#1E2544]">Add Product</span>
+                      <span className="font-extrabold text-[#3D040A]">Add Product</span>
                     </button>
 
                     {/* Add B2B Customer */}
@@ -1623,7 +1636,7 @@ export const AdminPage = () => {
                       <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
                         <Users className="w-5 h-5" />
                       </div>
-                      <span className="font-extrabold text-[#1E2544]">Add B2B Customer</span>
+                      <span className="font-extrabold text-[#3D040A]">Add B2B Customer</span>
                     </button>
 
                     {/* Create Offer */}
@@ -1634,7 +1647,7 @@ export const AdminPage = () => {
                       <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
                         <Ticket className="w-5 h-5" />
                       </div>
-                      <span className="font-extrabold text-[#1E2544]">Create Offer</span>
+                      <span className="font-extrabold text-[#3D040A]">Create Offer</span>
                     </button>
 
                     {/* Generate Invoice */}
@@ -1645,7 +1658,7 @@ export const AdminPage = () => {
                       <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
                         <FileText className="w-5 h-5" />
                       </div>
-                      <span className="font-extrabold text-[#1E2544]">Generate Invoice</span>
+                      <span className="font-extrabold text-[#3D040A]">Generate Invoice</span>
                     </button>
                   </div>
                 </div>
@@ -1658,7 +1671,7 @@ export const AdminPage = () => {
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div className="flex items-center gap-2">
                       <ShoppingCart className="w-5 h-5 text-rose-600" />
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
                         Recent Orders
                       </h3>
                     </div>
@@ -1693,7 +1706,7 @@ export const AdminPage = () => {
                         ].map((row, idx) => (
                           <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
                             <td className="py-3 px-3 font-mono font-bold text-slate-800">{row.id}</td>
-                            <td className="py-3 px-3 font-bold text-[#1E2544]">{row.name}</td>
+                            <td className="py-3 px-3 font-bold text-[#3D040A]">{row.name}</td>
                             <td className="py-3 px-3">
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
                                 row.type === 'B2B'
@@ -1723,7 +1736,7 @@ export const AdminPage = () => {
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                     <div className="flex items-center gap-2">
                       <AlertTriangle className="w-5 h-5 text-rose-600" />
-                      <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#3D040A]">
                         Low Stock Products
                       </h3>
                     </div>
@@ -1745,7 +1758,7 @@ export const AdminPage = () => {
                         <div className="flex items-center gap-3">
                           <img src={item.img} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
                           <div>
-                            <div className="font-bold text-xs text-[#1E2544]">{item.name}</div>
+                            <div className="font-bold text-xs text-[#3D040A]">{item.name}</div>
                             <div className="text-[11px] font-bold text-rose-600">{item.left}</div>
                           </div>
                         </div>
@@ -1771,51 +1784,51 @@ export const AdminPage = () => {
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 flex-1 text-xs">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
                         <Building2 className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-black text-sm text-[#1E2544]">124</div>
+                        <div className="font-black text-sm text-[#3D040A]">124</div>
                         <div className="text-[10px] text-slate-500 font-semibold">B2B Customers</div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
                         <FileText className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-bold text-xs text-[#1E2544]">Wholesale Price Lists</div>
+                        <div className="font-bold text-xs text-[#3D040A]">Wholesale Price Lists</div>
                         <div className="text-[10px] text-slate-500">Manage B2B Pricing</div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
                         <ShoppingCart className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-bold text-xs text-[#1E2544]">Min. Order Quantity</div>
+                        <div className="font-bold text-xs text-[#3D040A]">Min. Order Quantity</div>
                         <div className="text-[10px] text-slate-500">Set MOQ Rules</div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
                         <Handshake className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-bold text-xs text-[#1E2544]">Credit / Payment Terms</div>
+                        <div className="font-bold text-xs text-[#3D040A]">Credit / Payment Terms</div>
                         <div className="text-[10px] text-slate-500">Net 30 / Net 45</div>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#3D040A]">
                         <ShieldCheck className="w-4 h-4" />
                       </div>
                       <div>
-                        <div className="font-bold text-xs text-[#1E2544]">GST / Business Details</div>
+                        <div className="font-bold text-xs text-[#3D040A]">GST / Business Details</div>
                         <div className="text-[10px] text-slate-500">Manage Business Info</div>
                       </div>
                     </div>
@@ -1823,7 +1836,7 @@ export const AdminPage = () => {
 
                   <button
                     onClick={() => setActiveTab('b2b-customers')}
-                    className="px-5 py-2.5 rounded-xl bg-[#1E2544] hover:bg-[#0F172A] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all shrink-0 active:scale-95"
+                    className="px-5 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all shrink-0 active:scale-95"
                   >
                     <span>Manage B2B →</span>
                   </button>
