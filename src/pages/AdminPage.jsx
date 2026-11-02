@@ -49,7 +49,8 @@ import {
   ImageIcon,
   Upload,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  Boxes
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
@@ -442,6 +443,20 @@ export const AdminPage = () => {
       localStorage.setItem('sumadhura_store_content', JSON.stringify(DEFAULT_ADMIN_CONTENT));
     } catch {}
     showToast('Reset store content to default configuration');
+  };
+
+  // Inventory Search & Filter State
+  const [inventorySearch, setInventorySearch] = useState('');
+  const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState('All');
+
+  const handleResetInventory = () => {
+    if (window.confirm('Reset inventory catalog to default core SKUs?')) {
+      setInventoryList(DEFAULT_INVENTORY);
+      try {
+        localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(DEFAULT_INVENTORY));
+      } catch {}
+      showToast('Reset inventory catalog to default core SKUs');
+    }
   };
 
   // Inventory Editor Modals
@@ -847,7 +862,7 @@ export const AdminPage = () => {
       badge: b2bQuotes.length,
       scopeTag: 'B2B'
     },
-    { id: 'inventory', label: 'Catalog & Dual-Pricing', icon: Percent, badge: null },
+    { id: 'inventory', label: 'Inventory & Stock Pricing', icon: Boxes, badge: inventoryList.length, scopeTag: null },
     {
       id: 'invoices',
       label: 'GST Tax Invoices',
@@ -2525,15 +2540,74 @@ export const AdminPage = () => {
 
                 <div className="flex items-center gap-2">
                   <button
+                    type="button"
+                    onClick={handleResetInventory}
+                    className="px-3 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors"
+                  >
+                    Reset Defaults
+                  </button>
+                  <button
                     onClick={() => setIsAddProductModalOpen(true)}
                     className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                   >
                     <Plus className="w-3.5 h-3.5 text-amber-300" />
                     <span>+ Add Product SKU</span>
                   </button>
-                  <div className="text-xs text-slate-500 font-medium">
-                    Showing {inventoryList.length} Core Essential SKUs
+                </div>
+              </div>
+
+              {/* Inventory Quick KPI Ribbon */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1]">
+                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Total SKUs</span>
+                  <div className="text-xl font-black text-[#3D040A] mt-0.5">{inventoryList.length} Items</div>
+                </div>
+                <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/60">
+                  <span className="text-[10px] font-bold text-emerald-700 block uppercase">In Stock (Active)</span>
+                  <div className="text-xl font-black text-emerald-800 mt-0.5">
+                    {inventoryList.filter((p) => p.inStock).length} SKUs
                   </div>
+                </div>
+                <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-200/60">
+                  <span className="text-[10px] font-bold text-rose-700 block uppercase">Out of Stock</span>
+                  <div className="text-xl font-black text-rose-800 mt-0.5">
+                    {inventoryList.filter((p) => !p.inStock).length} SKUs
+                  </div>
+                </div>
+                <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/60">
+                  <span className="text-[10px] font-bold text-amber-800 block uppercase">B2B Wholesale Margin</span>
+                  <div className="text-xl font-black text-amber-900 mt-0.5">Avg 26% Bulk Off</div>
+                </div>
+              </div>
+
+              {/* Search & Filter Controls */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={inventorySearch}
+                    onChange={(e) => setInventorySearch(e.target.value)}
+                    placeholder="Search SKU by name, category, stock..."
+                    className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 bg-[#FAF5EC]/40 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold">
+                  {['All', 'In Stock', 'Out of Stock', 'Dairy', 'Vegetables', 'Staples'].map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setInventoryCategoryFilter(cat)}
+                      className={`px-3 py-1.5 rounded-xl transition-all ${
+                        inventoryCategoryFilter === cat
+                          ? 'bg-[#7D0A14] text-white shadow-xs'
+                          : 'bg-[#FAF5EC] text-slate-600 hover:bg-[#F3EAD9] border border-[#EDE1D1]'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -2551,7 +2625,23 @@ export const AdminPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
-                    {inventoryList.map((prod) => (
+                    {inventoryList
+                      .filter((prod) => {
+                        if (inventoryCategoryFilter === 'In Stock') return prod.inStock;
+                        if (inventoryCategoryFilter === 'Out of Stock') return !prod.inStock;
+                        if (inventoryCategoryFilter !== 'All' && prod.category !== inventoryCategoryFilter)
+                          return false;
+                        if (inventorySearch.trim()) {
+                          const q = inventorySearch.toLowerCase();
+                          return (
+                            prod.name.toLowerCase().includes(q) ||
+                            prod.category.toLowerCase().includes(q) ||
+                            (prod.stock && prod.stock.toLowerCase().includes(q))
+                          );
+                        }
+                        return true;
+                      })
+                      .map((prod) => (
                       <tr key={prod.id} className="hover:bg-[#FAF5EC]/50 transition-colors">
                         <td className="p-3">
                           <div className="font-bold text-slate-900">{prod.name}</div>
