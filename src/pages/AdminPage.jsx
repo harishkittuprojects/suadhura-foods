@@ -45,8 +45,14 @@ import {
   Edit3,
   Pencil,
   Save,
-  Settings
+  Settings,
+  ImageIcon,
+  Upload,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
+
+import { DEFAULT_HERO_SLIDES } from './HomePage';
 
 export const AdminPage = () => {
   const {
@@ -515,6 +521,123 @@ export const AdminPage = () => {
     }
   };
 
+  // -------------------------------------------------------------------
+  // HERO SECTION BANNERS & IMAGES CMS
+  // -------------------------------------------------------------------
+  const [heroSlides, setHeroSlides] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_hero_slides');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return DEFAULT_HERO_SLIDES;
+    } catch {
+      return DEFAULT_HERO_SLIDES;
+    }
+  });
+
+  const [isAddHeroModalOpen, setIsAddHeroModalOpen] = useState(false);
+  const [editingHeroSlide, setEditingHeroSlide] = useState(null);
+  const [heroSlideForm, setHeroSlideForm] = useState({
+    badge: 'Special Feature',
+    titleLine1: 'Fresh Farm Goodness',
+    titleLine2: 'Delivered to your',
+    highlight: 'Doorstep 🥛',
+    highlightColor: 'text-amber-300',
+    description: '100% natural, hygienic daily morning essentials delivered before 7:00 AM.',
+    buttonText: 'Order Now',
+    buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+    actionType: 'categories',
+    actionCategory: '',
+    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Hero Banner Image',
+    borderColor: 'border-amber-400/80',
+    gradient: 'from-[#60060E] via-[#7D0A14] to-[#91131E]',
+    borderWrapper: 'border-[#8B121C]'
+  });
+
+  const handleSaveHeroSlides = (newSlides) => {
+    setHeroSlides(newSlides);
+    try {
+      localStorage.setItem('sumadhura_hero_slides', JSON.stringify(newSlides));
+      window.dispatchEvent(new Event('sumadhura_hero_slides_updated'));
+    } catch {}
+  };
+
+  const handleAddNewHeroSlide = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!heroSlideForm.image) {
+      showToast('Please provide an image URL or upload an image file', 'error');
+      return;
+    }
+    const newSlide = {
+      ...heroSlideForm,
+      id: `slide-${Date.now().toString().slice(-4)}`
+    };
+    const updated = [...heroSlides, newSlide];
+    handleSaveHeroSlides(updated);
+    setIsAddHeroModalOpen(false);
+    showToast(`✅ New Hero Section Banner added!`);
+  };
+
+  const handleSaveEditedHeroSlide = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!editingHeroSlide) return;
+    const updated = heroSlides.map((s) => (s.id === editingHeroSlide.id ? editingHeroSlide : s));
+    handleSaveHeroSlides(updated);
+    setEditingHeroSlide(null);
+    showToast(`✅ Hero Section Banner updated!`);
+  };
+
+  const handleDeleteHeroSlide = (slideId) => {
+    if (heroSlides.length <= 1) {
+      showToast('You must keep at least 1 hero banner active', 'error');
+      return;
+    }
+    if (window.confirm('Delete this hero banner slide from the homepage carousel?')) {
+      const updated = heroSlides.filter((s) => s.id !== slideId);
+      handleSaveHeroSlides(updated);
+      showToast('Hero banner removed');
+    }
+  };
+
+  const handleMoveHeroSlide = (index, direction) => {
+    const targetIdx = index + direction;
+    if (targetIdx < 0 || targetIdx >= heroSlides.length) return;
+    const copy = [...heroSlides];
+    const temp = copy[index];
+    copy[index] = copy[targetIdx];
+    copy[targetIdx] = temp;
+    handleSaveHeroSlides(copy);
+    showToast('Reordered hero banner slides');
+  };
+
+  const handleResetHeroSlides = () => {
+    if (window.confirm('Reset hero section banners to factory defaults?')) {
+      handleSaveHeroSlides(DEFAULT_HERO_SLIDES);
+      showToast('Reset hero banners to default slides');
+    }
+  };
+
+  const handleHeroFileUpload = (e, target = 'add') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (uploadEvent) => {
+      const dataUrl = uploadEvent.target?.result;
+      if (typeof dataUrl === 'string') {
+        if (target === 'edit' && editingHeroSlide) {
+          setEditingHeroSlide({ ...editingHeroSlide, image: dataUrl });
+        } else {
+          setHeroSlideForm({ ...heroSlideForm, image: dataUrl });
+        }
+        showToast('📸 Image uploaded successfully!');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   // B2B GST Tax Invoices (Dynamically generated from real B2B orders)
   const invoices = orders
     .filter((o) => o.type === 'b2b')
@@ -731,6 +854,13 @@ export const AdminPage = () => {
       icon: Receipt,
       badge: invoices.length,
       scopeTag: 'B2B'
+    },
+    {
+      id: 'hero-banners',
+      label: 'Hero Section Banners',
+      icon: ImageIcon,
+      badge: heroSlides.length,
+      scopeTag: null
     },
     {
       id: 'content',
@@ -2559,6 +2689,173 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 7. STORE CONTENT & CMS (EDIT ADMIN & STORE CONTENT)       */}
           {/* ========================================================= */}
+          {/* ========================================================= */}
+          {/* 7. HERO SECTION BANNERS & IMAGES CMS                      */}
+          {/* ========================================================= */}
+          {activeTab === 'hero-banners' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-[#7D0A14]" />
+                    <h3 className="text-xl font-black text-[#3D040A]">
+                      Hero Section Banners & Image Carousel
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Customize the top hero banners, upload custom images, edit titles, and reorder homepage slides
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetHeroSlides}
+                    className="px-3 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors"
+                  >
+                    Reset Defaults
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHeroSlideForm({
+                        badge: 'Special Feature',
+                        titleLine1: 'Fresh Farm Goodness',
+                        titleLine2: 'Delivered to your',
+                        highlight: 'Doorstep 🥛',
+                        highlightColor: 'text-amber-300',
+                        description: '100% natural, hygienic daily morning essentials delivered before 7:00 AM.',
+                        buttonText: 'Order Now',
+                        buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+                        actionType: 'categories',
+                        actionCategory: '',
+                        image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
+                        imageAlt: 'Hero Banner Image',
+                        borderColor: 'border-amber-400/80',
+                        gradient: 'from-[#60060E] via-[#7D0A14] to-[#91131E]',
+                        borderWrapper: 'border-[#8B121C]'
+                      });
+                      setIsAddHeroModalOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-amber-300" />
+                    <span>+ Add New Hero Banner</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Status bar */}
+              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-extrabold text-[#3D040A]">
+                    {heroSlides.length} Hero Slides Active
+                  </span>
+                  <span className="text-slate-500 hidden sm:inline">
+                    • Auto-rotating every 4.5 seconds on the customer storefront
+                  </span>
+                </div>
+                <button
+                  onClick={() => navigateTo('home')}
+                  className="text-xs font-bold text-[#7D0A14] hover:underline flex items-center gap-1"
+                >
+                  <span>Preview on Homepage</span>
+                  <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
+
+              {/* Slides Grid */}
+              <div className="space-y-4">
+                {heroSlides.map((slide, index) => (
+                  <div
+                    key={slide.id}
+                    className="bg-[#FAF5EC]/60 rounded-2xl p-4 sm:p-5 border border-[#EDE1D1] hover:border-[#7D0A14]/40 transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
+                  >
+                    {/* Left: Visual Preview of Banner Card */}
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="relative flex-shrink-0">
+                        <div className={`w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-2 ${slide.borderColor || 'border-amber-400'} shadow-md bg-slate-900`}>
+                          <img
+                            src={slide.image}
+                            alt={slide.imageAlt || 'Slide image'}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 bg-[#3D040A] text-amber-300 text-[10px] font-black rounded-full border border-amber-400/50">
+                          #{index + 1}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="px-2 py-0.5 rounded-full bg-[#7D0A14]/10 text-[#7D0A14] font-black text-[10px] uppercase tracking-wider border border-[#7D0A14]/20">
+                            {slide.badge}
+                          </span>
+                          <span className="text-[11px] text-slate-400">
+                            Action: {slide.actionType === 'subscription' ? 'Morning Subscriptions' : 'Browse Catalog'}
+                          </span>
+                        </div>
+                        <h4 className="font-black text-sm sm:text-base text-slate-900 tracking-tight">
+                          {slide.titleLine1} {slide.titleLine2}{' '}
+                          <span className="text-[#7D0A14] font-serif italic">
+                            {slide.highlight}
+                          </span>
+                        </h4>
+                        <p className="text-xs text-slate-600 line-clamp-1 max-w-lg">
+                          {slide.description}
+                        </p>
+                        <div className="pt-1 flex items-center gap-2 text-[11px]">
+                          <span className="font-bold text-slate-500">CTA:</span>
+                          <span className="px-2 py-0.5 rounded bg-white border border-slate-200 font-extrabold text-slate-800">
+                            {slide.buttonText}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Controls (Reorder, Edit, Delete) */}
+                    <div className="flex items-center gap-1.5 self-end md:self-center flex-shrink-0">
+                      <button
+                        onClick={() => handleMoveHeroSlide(index, -1)}
+                        disabled={index === 0}
+                        className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                        title="Move slide earlier in rotation"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleMoveHeroSlide(index, 1)}
+                        disabled={index === heroSlides.length - 1}
+                        className="p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-white disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                        title="Move slide later in rotation"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => setEditingHeroSlide({ ...slide })}
+                        className="p-2 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                        title="Edit banner content & image"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteHeroSlide(slide.id)}
+                        className="p-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors"
+                        title="Delete banner slide"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* 8. STORE CONTENT & CMS (EDIT ADMIN & STORE CONTENT)       */}
+          {/* ========================================================= */}
           {activeTab === 'content' && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
@@ -3217,6 +3514,449 @@ export const AdminPage = () => {
           </div>
         </div>
       )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* ADD NEW HERO SECTION BANNER MODAL                             */}
+      {/* ------------------------------------------------------------- */}
+      {isAddHeroModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-[#7D0A14]" />
+                <h3 className="font-black text-base text-slate-900">
+                  Add Hero Section Banner & Image
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsAddHeroModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddNewHeroSlide} className="space-y-4 text-xs">
+              {/* Image Input: File Upload or Web URL */}
+              <div className="p-3.5 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1] space-y-3">
+                <label className="font-bold text-slate-800 block">
+                  1. Hero Banner Image (Upload from Computer or Web URL) *
+                </label>
+
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <label className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95 transition-all">
+                    <Upload className="w-4 h-4 text-amber-300" />
+                    <span>Upload Image File</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleHeroFileUpload(e, 'add')}
+                    />
+                  </label>
+
+                  <span className="text-slate-400 font-bold">OR</span>
+
+                  <input
+                    type="url"
+                    value={heroSlideForm.image}
+                    onChange={(e) => setHeroSlideForm({ ...heroSlideForm, image: e.target.value })}
+                    className="flex-1 w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white font-semibold text-slate-800"
+                    placeholder="Paste image link: https://images.unsplash.com/..."
+                    required
+                  />
+                </div>
+
+                {heroSlideForm.image && (
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#7D0A14] bg-slate-100 flex-shrink-0 shadow-sm">
+                      <img
+                        src={heroSlideForm.image}
+                        alt="Hero preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-[11px] text-emerald-700 font-bold">
+                      ✓ Image preview loaded successfully!
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Title & Badge */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Badge Tag</label>
+                  <input
+                    type="text"
+                    value={heroSlideForm.badge}
+                    onChange={(e) => setHeroSlideForm({ ...heroSlideForm, badge: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. Festival Special"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Highlight Word</label>
+                  <input
+                    type="text"
+                    value={heroSlideForm.highlight}
+                    onChange={(e) => setHeroSlideForm({ ...heroSlideForm, highlight: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-[#7D0A14]"
+                    placeholder="e.g. 100% Pure 🥛"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Title Line 1</label>
+                  <input
+                    type="text"
+                    value={heroSlideForm.titleLine1}
+                    onChange={(e) => setHeroSlideForm({ ...heroSlideForm, titleLine1: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. Pure Cow Milk"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Title Line 2</label>
+                  <input
+                    type="text"
+                    value={heroSlideForm.titleLine2}
+                    onChange={(e) => setHeroSlideForm({ ...heroSlideForm, titleLine2: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. Crafted with"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Subtitle / Description</label>
+                <textarea
+                  rows="2"
+                  value={heroSlideForm.description}
+                  onChange={(e) => setHeroSlideForm({ ...heroSlideForm, description: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  placeholder="Traditional authentic taste prepared with 100% pure desi ghee & heritage recipes."
+                  required
+                />
+              </div>
+
+              {/* Button & Action */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Button CTA Text</label>
+                  <input
+                    type="text"
+                    value={heroSlideForm.buttonText}
+                    onChange={(e) => setHeroSlideForm({ ...heroSlideForm, buttonText: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. Explore Menu / Subscribe Daily"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Button Action Target</label>
+                  <select
+                    value={heroSlideForm.actionType}
+                    onChange={(e) => setHeroSlideForm({ ...heroSlideForm, actionType: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold bg-white"
+                  >
+                    <option value="categories">Browse Store Catalog</option>
+                    <option value="subscription">Open Morning Subscription Modal</option>
+                    <option value="cart">Open Shopping Cart</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Color Gradient Theme */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Banner Background Theme</label>
+                <select
+                  value={heroSlideForm.gradient}
+                  onChange={(e) => {
+                    const g = e.target.value;
+                    let border = 'border-[#8B121C]';
+                    let circle = 'border-[#F5A623]/80';
+                    if (g.includes('064E3B')) {
+                      border = 'border-emerald-600';
+                      circle = 'border-emerald-400/80';
+                    } else if (g.includes('1E3A8A')) {
+                      border = 'border-blue-600';
+                      circle = 'border-amber-400/80';
+                    } else if (g.includes('4C1D95')) {
+                      border = 'border-purple-600';
+                      circle = 'border-purple-300/80';
+                    }
+                    setHeroSlideForm({
+                      ...heroSlideForm,
+                      gradient: g,
+                      borderWrapper: border,
+                      borderColor: circle
+                    });
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold bg-white"
+                >
+                  <option value="from-[#60060E] via-[#7D0A14] to-[#91131E]">Royal Maroon (Sumadhura Signature)</option>
+                  <option value="from-[#064E3B] via-[#047857] to-[#059669]">Farm Emerald Green (Vegetables & Greens)</option>
+                  <option value="from-[#1E3A8A] via-[#1D4ED8] to-[#2563EB]">Dairy Blue (Morning Milk & Ghee)</option>
+                  <option value="from-[#4C1D95] via-[#6D28D9] to-[#7C3AED]">Royal Purple (Staples & Groceries)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddHeroModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                >
+                  <Plus className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Add to Hero Carousel</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* EDIT HERO SECTION BANNER MODAL                                */}
+      {/* ------------------------------------------------------------- */}
+      {editingHeroSlide && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Pencil className="w-5 h-5 text-[#7D0A14]" />
+                <h3 className="font-black text-base text-slate-900">
+                  Edit Hero Banner: {editingHeroSlide.badge}
+                </h3>
+              </div>
+              <button
+                onClick={() => setEditingHeroSlide(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEditedHeroSlide} className="space-y-4 text-xs">
+              {/* Image Input: File Upload or Web URL */}
+              <div className="p-3.5 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1] space-y-3">
+                <label className="font-bold text-slate-800 block">
+                  1. Hero Banner Image (Upload from Computer or Web URL) *
+                </label>
+
+                <div className="flex flex-col sm:flex-row items-center gap-3">
+                  <label className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-xs active:scale-95 transition-all">
+                    <Upload className="w-4 h-4 text-amber-300" />
+                    <span>Upload New Image</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleHeroFileUpload(e, 'edit')}
+                    />
+                  </label>
+
+                  <span className="text-slate-400 font-bold">OR</span>
+
+                  <input
+                    type="url"
+                    value={editingHeroSlide.image}
+                    onChange={(e) =>
+                      setEditingHeroSlide({ ...editingHeroSlide, image: e.target.value })
+                    }
+                    className="flex-1 w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white font-semibold text-slate-800"
+                    placeholder="Paste image link: https://images.unsplash.com/..."
+                    required
+                  />
+                </div>
+
+                {editingHeroSlide.image && (
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#7D0A14] bg-slate-100 flex-shrink-0 shadow-sm">
+                      <img
+                        src={editingHeroSlide.image}
+                        alt="Hero preview"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <span className="text-[11px] text-emerald-700 font-bold">
+                      ✓ Active Image Preview
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Title & Badge */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Badge Tag</label>
+                  <input
+                    type="text"
+                    value={editingHeroSlide.badge}
+                    onChange={(e) =>
+                      setEditingHeroSlide({ ...editingHeroSlide, badge: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Highlight Word</label>
+                  <input
+                    type="text"
+                    value={editingHeroSlide.highlight}
+                    onChange={(e) =>
+                      setEditingHeroSlide({ ...editingHeroSlide, highlight: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-[#7D0A14]"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Title Line 1</label>
+                  <input
+                    type="text"
+                    value={editingHeroSlide.titleLine1}
+                    onChange={(e) =>
+                      setEditingHeroSlide({ ...editingHeroSlide, titleLine1: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Title Line 2</label>
+                  <input
+                    type="text"
+                    value={editingHeroSlide.titleLine2}
+                    onChange={(e) =>
+                      setEditingHeroSlide({ ...editingHeroSlide, titleLine2: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Subtitle / Description</label>
+                <textarea
+                  rows="2"
+                  value={editingHeroSlide.description}
+                  onChange={(e) =>
+                    setEditingHeroSlide({ ...editingHeroSlide, description: e.target.value })
+                  }
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  required
+                />
+              </div>
+
+              {/* Button & Action */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Button CTA Text</label>
+                  <input
+                    type="text"
+                    value={editingHeroSlide.buttonText}
+                    onChange={(e) =>
+                      setEditingHeroSlide({ ...editingHeroSlide, buttonText: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Button Action Target</label>
+                  <select
+                    value={editingHeroSlide.actionType || 'categories'}
+                    onChange={(e) =>
+                      setEditingHeroSlide({ ...editingHeroSlide, actionType: e.target.value })
+                    }
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold bg-white"
+                  >
+                    <option value="categories">Browse Store Catalog</option>
+                    <option value="subscription">Open Morning Subscription Modal</option>
+                    <option value="cart">Open Shopping Cart</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Color Gradient Theme */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Banner Background Theme</label>
+                <select
+                  value={editingHeroSlide.gradient}
+                  onChange={(e) => {
+                    const g = e.target.value;
+                    let border = 'border-[#8B121C]';
+                    let circle = 'border-[#F5A623]/80';
+                    if (g.includes('064E3B')) {
+                      border = 'border-emerald-600';
+                      circle = 'border-emerald-400/80';
+                    } else if (g.includes('1E3A8A')) {
+                      border = 'border-blue-600';
+                      circle = 'border-amber-400/80';
+                    } else if (g.includes('4C1D95')) {
+                      border = 'border-purple-600';
+                      circle = 'border-purple-300/80';
+                    }
+                    setEditingHeroSlide({
+                      ...editingHeroSlide,
+                      gradient: g,
+                      borderWrapper: border,
+                      borderColor: circle
+                    });
+                  }}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold bg-white"
+                >
+                  <option value="from-[#60060E] via-[#7D0A14] to-[#91131E]">Royal Maroon (Sumadhura Signature)</option>
+                  <option value="from-[#064E3B] via-[#047857] to-[#059669]">Farm Emerald Green (Vegetables & Greens)</option>
+                  <option value="from-[#1E3A8A] via-[#1D4ED8] to-[#2563EB]">Dairy Blue (Morning Milk & Ghee)</option>
+                  <option value="from-[#4C1D95] via-[#6D28D9] to-[#7C3AED]">Royal Purple (Staples & Groceries)</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingHeroSlide(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                >
+                  <Save className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

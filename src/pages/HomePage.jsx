@@ -35,6 +35,83 @@ import {
   Apple
 } from 'lucide-react';
 
+export const DEFAULT_HERO_SLIDES = [
+  {
+    id: 'slide-1',
+    badge: 'Sumadhura Signature',
+    titleLine1: 'Food',
+    titleLine2: 'Crafted with',
+    highlight: 'Love',
+    hasHeart: true,
+    highlightColor: 'text-[#F8B62A]',
+    description: 'Traditional authentic taste prepared with 100% pure desi ghee & heritage recipes.',
+    buttonText: 'Explore Menu',
+    buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+    actionType: 'categories',
+    image: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Sumadhura Traditional Feast',
+    borderColor: 'border-[#F5A623]/80',
+    gradient: 'from-[#60060E] via-[#7D0A14] to-[#91131E]',
+    borderWrapper: 'border-[#8B121C]'
+  },
+  {
+    id: 'slide-2',
+    badge: 'Farm Direct Harvest',
+    titleLine1: 'Fresh Veggies',
+    titleLine2: 'Delivered in',
+    highlight: '10-15 Mins ⚡',
+    hasHeart: false,
+    highlightColor: 'text-emerald-300',
+    description: 'Crisp handpicked vegetables and fruits directly from local sustainable farmers.',
+    buttonText: 'Shop Fresh Veggies',
+    buttonBg: 'bg-emerald-400 hover:bg-emerald-300 text-emerald-950',
+    actionType: 'categories',
+    actionCategory: 'Vegetables',
+    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Farm Fresh Vegetables',
+    borderColor: 'border-emerald-400/80',
+    gradient: 'from-[#064E3B] via-[#047857] to-[#059669]',
+    borderWrapper: 'border-emerald-600'
+  },
+  {
+    id: 'slide-3',
+    badge: 'Morning Subscription',
+    titleLine1: 'Pure Cow Milk',
+    titleLine2: '& Bilona Desi',
+    highlight: 'A2 Ghee 🥛',
+    hasHeart: false,
+    highlightColor: 'text-amber-300',
+    description: 'Pure, raw milk and traditionally churned ghee delivered to your doorstep before 7:00 AM.',
+    buttonText: 'Subscribe Daily',
+    buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+    actionType: 'subscription',
+    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Pure Cow Milk and Ghee',
+    borderColor: 'border-amber-400/80',
+    gradient: 'from-[#1E3A8A] via-[#1D4ED8] to-[#2563EB]',
+    borderWrapper: 'border-blue-600'
+  },
+  {
+    id: 'slide-4',
+    badge: 'Mega Grocery Savings',
+    titleLine1: 'Kitchen Staples',
+    titleLine2: 'Save Flat',
+    highlight: '25% OFF 🎉',
+    hasHeart: false,
+    highlightColor: 'text-amber-300',
+    description: 'Unpolished dals, aged basmati rice, cold-pressed oils & premium whole dry fruits.',
+    buttonText: 'Shop Groceries',
+    buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+    actionType: 'categories',
+    actionCategory: 'Dairy Products',
+    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Organic Groceries and Dry Fruits',
+    borderColor: 'border-purple-300/80',
+    gradient: 'from-[#4C1D95] via-[#6D28D9] to-[#7C3AED]',
+    borderWrapper: 'border-purple-600'
+  }
+];
+
 export const HomePage = () => {
   const {
     navigateTo,
@@ -59,81 +136,53 @@ export const HomePage = () => {
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
-  // Hero Carousel Slides
-  const heroSlides = [
-    {
-      id: 'slide-1',
-      badge: 'Sumadhura Signature',
-      titleLine1: 'Food',
-      titleLine2: 'Crafted with',
-      highlight: 'Love',
-      hasHeart: true,
-      highlightColor: 'text-[#F8B62A]',
-      description: 'Traditional authentic taste prepared with 100% pure desi ghee & heritage recipes.',
-      buttonText: 'Explore Menu',
-      buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
-      buttonAction: () => navigateTo('categories'),
-      image: 'https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?auto=format&fit=crop&w=800&q=80',
-      imageAlt: 'Sumadhura Traditional Feast',
-      borderColor: 'border-[#F5A623]/80',
-      gradient: 'from-[#60060E] via-[#7D0A14] to-[#91131E]',
-      borderWrapper: 'border-[#8B121C]'
-    },
-    {
-      id: 'slide-2',
-      badge: 'Farm Direct Harvest',
-      titleLine1: 'Fresh Veggies',
-      titleLine2: 'Delivered in',
-      highlight: '10-15 Mins ⚡',
-      hasHeart: false,
-      highlightColor: 'text-emerald-300',
-      description: 'Crisp handpicked vegetables and fruits directly from local sustainable farmers.',
-      buttonText: 'Shop Fresh Veggies',
-      buttonBg: 'bg-emerald-400 hover:bg-emerald-300 text-emerald-950',
-      buttonAction: () => navigateTo('categories', 'Vegetables'),
-      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
-      imageAlt: 'Farm Fresh Vegetables',
-      borderColor: 'border-emerald-400/80',
-      gradient: 'from-[#064E3B] via-[#047857] to-[#059669]',
-      borderWrapper: 'border-emerald-600'
-    },
-    {
-      id: 'slide-3',
-      badge: 'Morning Subscription',
-      titleLine1: 'Pure Cow Milk',
-      titleLine2: '& Bilona Desi',
-      highlight: 'A2 Ghee 🥛',
-      hasHeart: false,
-      highlightColor: 'text-amber-300',
-      description: 'Pure, raw milk and traditionally churned ghee delivered to your doorstep before 7:00 AM.',
-      buttonText: 'Subscribe Daily',
-      buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
-      buttonAction: () => setIsSubscriptionModalOpen(true),
-      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
-      imageAlt: 'Pure Cow Milk and Ghee',
-      borderColor: 'border-amber-400/80',
-      gradient: 'from-[#1E3A8A] via-[#1D4ED8] to-[#2563EB]',
-      borderWrapper: 'border-blue-600'
-    },
-    {
-      id: 'slide-4',
-      badge: 'Mega Grocery Savings',
-      titleLine1: 'Kitchen Staples',
-      titleLine2: 'Save Flat',
-      highlight: '25% OFF 🎉',
-      hasHeart: false,
-      highlightColor: 'text-amber-300',
-      description: 'Unpolished dals, aged basmati rice, cold-pressed oils & premium whole dry fruits.',
-      buttonText: 'Shop Groceries',
-      buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
-      buttonAction: () => navigateTo('categories', 'Groceries'),
-      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80',
-      imageAlt: 'Organic Groceries and Dry Fruits',
-      borderColor: 'border-purple-300/80',
-      gradient: 'from-[#4C1D95] via-[#6D28D9] to-[#7C3AED]',
-      borderWrapper: 'border-purple-600'
+  // Hero Carousel Slides (Persisted & Editable from Admin CMS)
+  const [heroSlides, setHeroSlides] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_hero_slides');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      return DEFAULT_HERO_SLIDES;
+    } catch {
+      return DEFAULT_HERO_SLIDES;
     }
-  ];
+  });
+
+  useEffect(() => {
+    const handleSync = () => {
+      try {
+        const saved = localStorage.getItem('sumadhura_hero_slides');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) setHeroSlides(parsed);
+        }
+      } catch {}
+    };
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('sumadhura_hero_slides_updated', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('sumadhura_hero_slides_updated', handleSync);
+    };
+  }, []);
+
+  const handleSlideButtonClick = (slide) => {
+    if (slide.buttonAction && typeof slide.buttonAction === 'function') {
+      slide.buttonAction();
+      return;
+    }
+    if (slide.actionType === 'subscription') {
+      setIsSubscriptionModalOpen(true);
+    } else if (slide.actionType === 'categories') {
+      navigateTo('categories', slide.actionCategory || undefined);
+    } else if (slide.actionType === 'cart') {
+      navigateTo('cart');
+    } else {
+      navigateTo('categories');
+    }
+  };
 
   // Auto-play sliding effect
   useEffect(() => {
@@ -409,7 +458,7 @@ export const HomePage = () => {
                   </p>
 
                   <button
-                    onClick={slide.buttonAction}
+                    onClick={() => handleSlideButtonClick(slide)}
                     className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-full ${slide.buttonBg} active:scale-95 font-black text-xs sm:text-sm shadow-md transition-all inline-flex items-center gap-1.5`}
                   >
                     <span>{slide.buttonText}</span>
