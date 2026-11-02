@@ -148,10 +148,26 @@ export const ShopProvider = ({ children }) => {
           'royal orchid',
           'deepak verma',
           'rajesh sharma',
+          'ramesh kumar',
+          'sri sai traders',
+          'lakshmi devi',
+          'vijaya mart',
+          'mahesh reddy',
+          'ravi kumar',
+          'sneha reddy',
+          'sri venkateshwara',
+          'svfoods',
+          'prakash rao',
+          'andromeda',
           'b2b-smd-99104',
           'b2b-smd-98842',
           'smd-739201',
-          'smd-684192'
+          'smd-684192',
+          '#mnk10045',
+          '#mnk10044',
+          '#mnk10043',
+          '#mnk10042',
+          '#mnk10041'
         ];
         return parsed.filter((o) => {
           const cust = (o.customer || '').toLowerCase();

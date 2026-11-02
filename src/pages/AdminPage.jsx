@@ -109,119 +109,88 @@ export const AdminPage = () => {
   // Selected invoice for Modal viewing
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
-    // -------------------------------------------------------------------
-  // CUSTOMER MANAGEMENT SYSTEM (EXACT REFERENCE DATA + DYNAMIC CUSTOMERS)
+      // -------------------------------------------------------------------
+  // ZERO FAKE CUSTOMERS POLICY: REAL AUTHENTIC LOGGED-IN CUSTOMERS ONLY
   // -------------------------------------------------------------------
-  const REFERENCE_CUSTOMERS = [
-    {
-      id: 'cust-ref-1',
-      name: 'Ravi Kumar',
-      type: 'B2C',
-      isBusiness: false,
-      phone: '+91 98765 43210',
-      email: 'ravi@gmail.com',
-      ordersCount: 5,
-      totalSpent: 4850,
-      status: 'Active',
-      subscription: 'Morning Pure Cow Milk (Daily 1L)',
-      registeredAt: '12 Jan 2026'
-    },
-    {
-      id: 'cust-ref-2',
-      name: 'Sneha Reddy',
-      type: 'B2C',
-      isBusiness: false,
-      phone: '+91 91234 56789',
-      email: 'sneha@yahoo.com',
-      ordersCount: 3,
-      totalSpent: 2700,
-      status: 'Active',
-      subscription: 'A2 Buffalo Milk (Alternate Days)',
-      registeredAt: '24 Jan 2026'
-    },
-    {
-      id: 'cust-ref-3',
-      name: 'Sri Venkateshwara Foods Pvt Ltd',
-      companyName: 'Sri Venkateshwara Foods Pvt Ltd',
-      type: 'B2B',
-      isBusiness: true,
-      phone: '+91 99887 76655',
-      email: 'info@svfoods.in',
-      ordersCount: 8,
-      totalSpent: 28500,
-      status: 'Active',
-      subscription: 'B2B Bulk Paneer & Ghee Wholesale',
-      registeredAt: '05 Feb 2026'
-    },
-    {
-      id: 'cust-ref-4',
-      name: 'Prakash Rao',
-      type: 'B2C',
-      isBusiness: false,
-      phone: '+91 90011 22334',
-      email: 'prakash@gmail.com',
-      ordersCount: 2,
-      totalSpent: 1200,
-      status: 'Active',
-      subscription: 'Morning Pure Cow Milk',
-      registeredAt: '18 Feb 2026'
-    },
-    {
-      id: 'cust-ref-5',
-      name: 'Andromeda Finance Solutions',
-      companyName: 'Andromeda Finance Solutions',
-      type: 'B2B',
-      isBusiness: true,
-      phone: '+91 88999 77661',
-      email: 'support@andromeda.in',
-      ordersCount: 12,
-      totalSpent: 52300,
-      status: 'Active',
-      subscription: 'Corporate Dairy Pantry Supply',
-      registeredAt: '27 Feb 2026'
-    }
+  const FAKE_MOCK_KEYWORDS = [
+    'ravi kumar',
+    'sneha reddy',
+    'sri venkateshwara',
+    'svfoods',
+    'prakash rao',
+    'andromeda',
+    'ramesh kumar',
+    'sri sai traders',
+    'lakshmi devi',
+    'vijaya mart',
+    'mahesh reddy',
+    'rajesh sharma',
+    'sunita venkatesh',
+    'karthik balan',
+    'deepa kulkarni',
+    'priya sharma',
+    'vikram reddy',
+    'ananya rao',
+    'sri krishna grand',
+    'spice valley',
+    'royal orchid',
+    'deepak verma',
+    'cust-ref-'
   ];
+
+  const isFakeCustomer = (c) => {
+    if (!c) return true;
+    const name = (c.name || '').toLowerCase();
+    const comp = (c.companyName || '').toLowerCase();
+    const email = (c.email || '').toLowerCase();
+    const id = (c.id || '').toLowerCase();
+    return FAKE_MOCK_KEYWORDS.some(fk => name.includes(fk) || comp.includes(fk) || email.includes(fk) || id.includes(fk));
+  };
 
   const [customers, setCustomers] = useState(() => {
     try {
-      const saved = localStorage.getItem('sumadhura_customer_registry');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
-    } catch {}
+      // Clean up any old cached fake registries from localStorage
+      localStorage.removeItem('sumadhura_customer_registry');
 
-    try {
-      const realSaved = localStorage.getItem('sumadhura_registered_customers');
-      const realList = realSaved ? JSON.parse(realSaved) : [];
-      const combined = [...REFERENCE_CUSTOMERS];
-      realList.forEach(rc => {
-        if (!combined.some(c => (rc.email && c.email === rc.email) || (rc.phone && c.phone === rc.phone))) {
-          combined.unshift({
-            id: rc.id || `CUST-${rc.isBusiness ? 'B2B' : 'B2C'}-${Date.now()}`,
-            name: rc.name || (rc.isBusiness ? rc.companyName : 'Customer'),
-            type: rc.isBusiness ? 'B2B' : 'B2C',
-            isBusiness: Boolean(rc.isBusiness),
-            companyName: rc.companyName || null,
-            phone: rc.phone || '+91 98888 11111',
-            email: rc.email || 'customer@sumadhura.com',
-            ordersCount: 1,
-            totalSpent: 950,
-            status: rc.status || 'Active',
-            subscription: 'Morning Pure Cow Milk',
-            registeredAt: rc.registeredAt || 'Today'
-          });
+      const saved = localStorage.getItem('sumadhura_registered_customers');
+      let list = saved ? JSON.parse(saved) : [];
+      list = list.filter(c => !isFakeCustomer(c));
+
+      // Merge current live logged-in user if exists
+      const savedUser = localStorage.getItem('sumadhura_user');
+      if (savedUser) {
+        const u = JSON.parse(savedUser);
+        if (u && !isFakeCustomer(u)) {
+          const exists = list.some(
+            c => (u.email && c.email === u.email) || (u.phone && c.phone === u.phone)
+          );
+          if (!exists) {
+            list.unshift({
+              id: u.id || `CUST-${u.isBusiness ? 'B2B' : 'B2C'}-${Date.now()}`,
+              name: u.name || (u.isBusiness ? u.companyName : 'Customer'),
+              type: u.isBusiness ? 'B2B' : 'B2C',
+              isBusiness: Boolean(u.isBusiness),
+              companyName: u.companyName || null,
+              phone: u.phone || '',
+              email: u.email || '',
+              ordersCount: 0,
+              totalSpent: 0,
+              status: 'Active',
+              subscription: 'Morning Pure Cow Milk',
+              registeredAt: 'Live Now'
+            });
+          }
         }
-      });
-      return combined;
+      }
+      return list;
     } catch {
-      return REFERENCE_CUSTOMERS;
+      return [];
     }
   });
 
-  // Keep customer list in sync if live user signs in
+  // Keep customer list strictly in sync if live user signs in
   React.useEffect(() => {
-    if (user) {
+    if (user && !isFakeCustomer(user)) {
       setCustomers((prev) => {
         const email = user.email || '';
         const phone = user.phone || '';
@@ -235,17 +204,17 @@ export const AdminPage = () => {
             type: user.isBusiness ? 'B2B' : 'B2C',
             isBusiness: Boolean(user.isBusiness),
             companyName: user.companyName || null,
-            phone: phone || '+91 98765 00000',
-            email: email || 'user@sumadhura.com',
-            ordersCount: 1,
-            totalSpent: 850,
+            phone: phone || '',
+            email: email || '',
+            ordersCount: 0,
+            totalSpent: 0,
             status: 'Active',
             subscription: 'Morning Pure Cow Milk (Daily 1L)',
-            registeredAt: 'Just Now'
+            registeredAt: 'Live Now'
           };
           const updated = [newCust, ...prev];
           try {
-            localStorage.setItem('sumadhura_customer_registry', JSON.stringify(updated));
+            localStorage.setItem('sumadhura_registered_customers', JSON.stringify(updated));
           } catch {}
           return updated;
         }
@@ -263,19 +232,17 @@ export const AdminPage = () => {
   const [customerActionMenuId, setCustomerActionMenuId] = useState(null);
   const [customerPage, setCustomerPage] = useState(1);
 
-  // Computed KPI Metrics matching reference figures
-  const totalCustomerCount = 2840 + (customers.length - 5);
-  const b2cCustomerCount = 1950 + (customers.filter(c => !c.isBusiness).length - 3);
-  const b2bCustomerCount = 890 + (customers.filter(c => c.isBusiness).length - 2);
-  const activeCustomerCount = 2620 + (customers.filter(c => c.status === 'Active').length - 5);
+  // Computed KPI Metrics based 100% on authentic live database
+  const totalCustomerCount = customers.length;
+  const b2cCustomerCount = customers.filter(c => !c.isBusiness).length;
+  const b2bCustomerCount = customers.filter(c => c.isBusiness).length;
+  const activeCustomerCount = customers.filter(c => c.status === 'Active').length;
 
   // Filtered customer list
   const filteredCustomers = customers.filter(c => {
-    // Scope filter
     if (customerScope === 'b2c' && c.isBusiness) return false;
     if (customerScope === 'b2b' && !c.isBusiness) return false;
 
-    // Search filter
     if (customerSearchTerm.trim()) {
       const q = customerSearchTerm.toLowerCase();
       const matchName = (c.name || '').toLowerCase().includes(q);
@@ -285,10 +252,8 @@ export const AdminPage = () => {
       if (!matchName && !matchPhone && !matchEmail && !matchCompany) return false;
     }
 
-    // Status filter
     if (customerStatusFilter !== 'all' && c.status !== customerStatusFilter) return false;
 
-    // Subscription filter
     if (customerSubFilter === 'subscribed' && (!c.subscription || c.subscription === 'None')) return false;
     if (customerSubFilter === 'none' && c.subscription && c.subscription !== 'None') return false;
 
@@ -300,7 +265,7 @@ export const AdminPage = () => {
     const updated = customers.map(c => c.id === cust.id ? { ...c, status: newStatus } : c);
     setCustomers(updated);
     try {
-      localStorage.setItem('sumadhura_customer_registry', JSON.stringify(updated));
+      localStorage.setItem('sumadhura_registered_customers', JSON.stringify(updated));
     } catch {}
     showToast(`Status for ${cust.name} set to ${newStatus}`);
   };
@@ -311,7 +276,6 @@ export const AdminPage = () => {
     );
     setCustomers(updated);
     try {
-      localStorage.setItem('sumadhura_customer_registry', JSON.stringify(updated));
       localStorage.setItem('sumadhura_registered_customers', JSON.stringify(updated));
       if (user && (user.email === cust.email || user.phone === cust.phone)) {
         localStorage.removeItem('sumadhura_user');
@@ -321,12 +285,13 @@ export const AdminPage = () => {
   };
 
   const clearAllCustomers = () => {
-    if (window.confirm('Are you sure you want to reset customer database to reference standards?')) {
-      setCustomers(REFERENCE_CUSTOMERS);
+    if (window.confirm('Are you sure you want to remove all registered customers from the live database?')) {
+      setCustomers([]);
       try {
-        localStorage.setItem('sumadhura_customer_registry', JSON.stringify(REFERENCE_CUSTOMERS));
+        localStorage.setItem('sumadhura_registered_customers', JSON.stringify([]));
+        localStorage.removeItem('sumadhura_user');
       } catch {}
-      showToast('Customer database reset to standard defaults.', 'info');
+      showToast('All customer records have been cleared.', 'info');
     }
   };
 
@@ -1367,8 +1332,8 @@ export const AdminPage = () => {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-xs font-bold text-slate-500 truncate">Total Sales</div>
-                      <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5 truncate" title="₹4,75,250">
-                        ₹4,75,250
+                      <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5 truncate">
+                        {orders.length > 0 ? `₹${orders.reduce((sum, o) => sum + (o.total || 0), 0).toLocaleString('en-IN')}` : '₹0'}
                       </div>
                     </div>
                   </div>
@@ -1401,7 +1366,7 @@ export const AdminPage = () => {
                     </div>
                     <div className="text-xs font-bold text-slate-500 mt-2">B2C Orders</div>
                     <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
-                      628
+                      {orders.filter(o => o.type === 'b2c').length}
                     </div>
                   </div>
                   <div className="text-[11px] font-bold text-emerald-700 mt-1">
@@ -1427,7 +1392,7 @@ export const AdminPage = () => {
                     </div>
                     <div className="text-xs font-bold text-slate-500 mt-2">B2B Orders</div>
                     <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
-                      124
+                      {orders.filter(o => o.type === 'b2b').length}
                     </div>
                   </div>
                   <div className="text-[11px] font-bold text-emerald-700 mt-1">
@@ -1459,7 +1424,7 @@ export const AdminPage = () => {
                     <div className="min-w-0 flex-1">
                       <div className="text-xs font-bold text-slate-500 truncate">Total Customers</div>
                       <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
-                        3,250
+                        {customers.length}
                       </div>
                     </div>
                   </div>
@@ -1511,7 +1476,7 @@ export const AdminPage = () => {
                     <div className="min-w-0 flex-1">
                       <div className="text-xs font-bold text-slate-500 truncate">Pending Delivery</div>
                       <div className="text-base sm:text-lg lg:text-xl font-black text-[#3D040A] tracking-tight mt-0.5">
-                        42
+                        {orders.filter(o => o.status !== 'Delivered').length}
                       </div>
                     </div>
                   </div>
@@ -1727,35 +1692,74 @@ export const AdminPage = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#EDE1D1]/60 font-medium">
-                        {[
-                          { id: '#MNK10045', name: 'Ramesh Kumar', type: 'B2C', amt: '₹1,250', pay: 'UPI', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 02, 2026 5:12 PM' },
-                          { id: '#MNK10044', name: 'Sri Sai Traders', type: 'B2B', amt: '₹12,800', pay: 'Bank Transfer', status: 'Processing', statusColor: 'bg-blue-100 text-blue-800', date: 'Nov 02, 2026 3:45 PM' },
-                          { id: '#MNK10043', name: 'Lakshmi Devi', type: 'B2C', amt: '₹650', pay: 'UPI', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 02, 2026 1:20 PM' },
-                          { id: '#MNK10042', name: 'Vijaya Mart', type: 'B2B', amt: '₹25,600', pay: 'Net Banking', status: 'Pending', statusColor: 'bg-amber-100 text-amber-800', date: 'Nov 01, 2026 7:30 PM' },
-                          { id: '#MNK10041', name: 'Mahesh Reddy', type: 'B2C', amt: '₹890', pay: 'COD', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 01, 2026 6:15 PM' }
-                        ].map((row, idx) => (
-                          <tr key={idx} className="hover:bg-[#FAF5EC]/40 transition-colors">
-                            <td className="py-3 px-3 font-mono font-bold text-[#7D0A14]">{row.id}</td>
-                            <td className="py-3 px-3 font-bold text-[#3D040A]">{row.name}</td>
-                            <td className="py-3 px-3">
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                                row.type === 'B2B'
-                                  ? 'bg-[#7D0A14] text-white'
-                                  : 'bg-[#FEE2E2] text-[#991B1B]'
-                              }`}>
-                                {row.type}
-                              </span>
+                        {orders.length === 0 ? (
+                          <tr>
+                            <td colSpan="7" className="py-8 text-center text-slate-500">
+                              <ShoppingCart className="w-8 h-8 text-[#7D0A14]/30 mx-auto mb-2" />
+                              <div className="font-extrabold text-[#3D040A] text-sm">No live orders placed yet</div>
+                              <p className="text-xs text-slate-500 mt-0.5 max-w-sm mx-auto">
+                                All fake demo orders have been removed. Only real orders placed by authentic customers on the live website will appear here.
+                              </p>
+                              <div className="flex items-center justify-center gap-2 mt-3">
+                                <button
+                                  onClick={() => navigateTo('home')}
+                                  className="px-3.5 py-1.5 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] font-bold text-xs hover:bg-[#F3EAD9] transition-colors"
+                                >
+                                  Go to Storefront →
+                                </button>
+                                {user && (
+                                  <button
+                                    onClick={simulateNewB2COrder}
+                                    className="px-3.5 py-1.5 rounded-xl bg-[#7D0A14] text-white font-bold text-xs hover:bg-[#60060E] transition-colors shadow-2xs"
+                                  >
+                                    + Place Test Order for {user.name || 'You'}
+                                  </button>
+                                )}
+                              </div>
                             </td>
-                            <td className="py-3 px-3 font-black text-[#3D040A]">{row.amt}</td>
-                            <td className="py-3 px-3 text-slate-600 font-semibold">{row.pay}</td>
-                            <td className="py-3 px-3">
-                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.statusColor}`}>
-                                {row.status}
-                              </span>
-                            </td>
-                            <td className="py-3 px-3 text-slate-500 text-[11px]">{row.date}</td>
                           </tr>
-                        ))}
+                        ) : (
+                          orders.slice(0, 6).map((order) => {
+                            const isB2B = order.type === 'b2b';
+                            const statusColor =
+                              order.status === 'Delivered'
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : order.status === 'Processing'
+                                ? 'bg-blue-100 text-blue-800'
+                                : order.status === 'Shipped'
+                                ? 'bg-purple-100 text-purple-800'
+                                : 'bg-amber-100 text-amber-800';
+                            return (
+                              <tr key={order.id} className="hover:bg-[#FAF5EC]/40 transition-colors">
+                                <td className="py-3 px-3 font-mono font-bold text-[#7D0A14]">{order.id}</td>
+                                <td className="py-3 px-3 font-bold text-[#3D040A]">{order.customer || order.name || order.shippingAddress?.fullName || 'Customer'}</td>
+                                <td className="py-3 px-3">
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                                    isB2B
+                                      ? 'bg-[#7D0A14] text-white'
+                                      : 'bg-[#FEE2E2] text-[#991B1B]'
+                                  }`}>
+                                    {isB2B ? 'B2B' : 'B2C'}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-3 font-black text-[#3D040A]">
+                                  ₹{(order.total || 0).toLocaleString('en-IN')}
+                                </td>
+                                <td className="py-3 px-3 text-slate-600 font-semibold">
+                                  {order.paymentMethod || order.payment || 'UPI / COD'}
+                                </td>
+                                <td className="py-3 px-3">
+                                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${statusColor}`}>
+                                    {order.status || 'Processing'}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-3 text-slate-500 text-[11px]">
+                                  {order.date || order.createdAt || 'Today'}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -2379,9 +2383,28 @@ export const AdminPage = () => {
                     <tbody className="divide-y divide-[#F0E6D8]">
                       {filteredCustomers.length === 0 ? (
                         <tr>
-                          <td colSpan="8" className="py-12 text-center text-slate-500 text-sm">
-                            <Users className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                            No matching customers found. Try clearing filters or searching another keyword.
+                          <td colSpan="8" className="py-14 text-center">
+                            <Users className="w-12 h-12 text-[#7D0A14]/30 mx-auto mb-3" />
+                            <h4 className="font-black text-[#3D040A] text-base">No Customers Logged In Yet</h4>
+                            <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                              All fake demo customer accounts have been completely removed.
+                              Only authentic users who register or sign in on the live website will appear here.
+                            </p>
+                            <div className="flex items-center justify-center gap-2 mt-4">
+                              <button
+                                onClick={() => setIsAuthModalOpen(true)}
+                                className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
+                              >
+                                <User className="w-3.5 h-3.5 text-amber-300" />
+                                <span>Sign In as Customer Now</span>
+                              </button>
+                              <button
+                                onClick={() => navigateTo('home')}
+                                className="px-4 py-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] text-xs font-bold hover:bg-[#F3EAD9] transition-all inline-flex items-center gap-1.5"
+                              >
+                                <span>Go to Storefront</span>
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ) : (
