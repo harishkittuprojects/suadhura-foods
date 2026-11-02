@@ -53,7 +53,8 @@ import {
   Boxes,
   MoreVertical,
   ChevronLeft,
-  LayoutGrid
+  LayoutGrid,
+  Briefcase
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
@@ -1274,556 +1275,549 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 1. DASHBOARD OVERVIEW                                     */}
           {/* ========================================================= */}
-          {(activeTab === 'dashboard' || activeTab === 'overview') && (
+                    {(activeTab === 'dashboard' || activeTab === 'overview') && (
             <div className="space-y-6 animate-in fade-in duration-200">
-              {/* Active Mode Quick Switch Banner */}
-              <div
-                className={`p-4 rounded-3xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs transition-all ${
-                  adminMode === 'b2c'
-                    ? 'bg-gradient-to-r from-blue-50 via-white to-blue-50/60 border-blue-200'
-                    : adminMode === 'b2b'
-                    ? 'bg-gradient-to-r from-rose-50 via-white to-amber-50/60 border-rose-200'
-                    : 'bg-gradient-to-r from-amber-50 via-white to-[#FAF5EC] border-[#EDE1D1]'
-                }`}
-              >
+              {/* 1. Header Section */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black flex-shrink-0 ${
-                      adminMode === 'b2c'
-                        ? 'bg-blue-600 text-white shadow-md'
-                        : adminMode === 'b2b'
-                        ? 'bg-[#7D0A14] text-white shadow-md'
-                        : 'bg-[#F5A623] text-[#3D040A] shadow-md'
-                    }`}
-                  >
-                    {adminMode === 'b2c' ? (
-                      <User className="w-5 h-5" />
-                    ) : adminMode === 'b2b' ? (
-                      <Building2 className="w-5 h-5" />
-                    ) : (
-                      <Layers className="w-5 h-5" />
-                    )}
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                    <Home className="w-5 h-5 text-slate-800" />
                   </div>
                   <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-sm sm:text-base font-black text-[#3D040A]">
-                        {adminMode === 'b2c'
-                          ? 'B2C Retail Operations Dashboard'
-                          : adminMode === 'b2b'
-                          ? 'B2B Wholesale & Commercial Portal'
-                          : 'Unified Operations Command (B2C Retail + B2B Wholesale)'}
-                      </h2>
-                      <span
-                        className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full ${
-                          adminMode === 'b2c'
-                            ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                            : adminMode === 'b2b'
-                            ? 'bg-rose-100 text-[#7D0A14] border border-rose-200'
-                            : 'bg-amber-100 text-amber-900 border border-amber-200'
-                        }`}
-                      >
-                        {adminMode === 'b2c'
-                          ? 'B2C Scope Active'
-                          : adminMode === 'b2b'
-                          ? 'B2B Scope Active'
-                          : 'Combined Scope Active'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      {adminMode === 'b2c'
-                        ? 'Showing consumer retail orders, 10–15 min express delivery SLA & daily morning milk subscriptions.'
-                        : adminMode === 'b2b'
-                        ? 'Showing commercial hotel/kitchen bulk shipments, RFP quotation pipeline & GST tax invoicing.'
-                        : 'Consolidated overview showing both retail consumer streams and commercial wholesale dispatches.'}
+                    <h1 className="text-2xl sm:text-3xl font-black text-[#1E2544] tracking-tight">
+                      Dashboard
+                    </h1>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                      Welcome back! Here's what's happening with your store today.
                     </p>
                   </div>
                 </div>
 
-                {/* Instant 1-Click Toggle Button */}
-                <div className="flex items-center gap-2 self-start sm:self-center">
-                  {adminMode === 'b2c' && (
+                <div className="flex items-center gap-2">
+                  <div className="relative">
                     <button
-                      onClick={() => {
-                        setAdminMode('b2b');
-                        showToast('Switched to B2B Wholesale Portal');
-                      }}
-                      className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                      onClick={() => showToast('Date range: Last 30 Days selected')}
+                      className="flex items-center gap-2 px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors"
                     >
-                      <Building2 className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Switch to B2B Wholesale</span>
-                      <ArrowRight className="w-3 h-3 ml-0.5" />
+                      <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Last 30 Days</span>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                     </button>
-                  )}
-                  {adminMode === 'b2b' && (
-                    <button
-                      onClick={() => {
-                        setAdminMode('b2c');
-                        showToast('Switched to B2C Retail Operations');
-                      }}
-                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
-                    >
-                      <User className="w-3.5 h-3.5 text-blue-200" />
-                      <span>Switch to B2C Retail</span>
-                      <ArrowRight className="w-3 h-3 ml-0.5" />
-                    </button>
-                  )}
-                  {adminMode === 'unified' && (
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          setAdminMode('b2c');
-                          showToast('Switched to B2C Retail Operations');
-                        }}
-                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black flex items-center gap-1 shadow-xs"
-                      >
-                        <User className="w-3 h-3" />
-                        <span>Filter B2C</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setAdminMode('b2b');
-                          showToast('Switched to B2B Wholesale Portal');
-                        }}
-                        className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1 shadow-xs"
-                      >
-                        <Building2 className="w-3 h-3" />
-                        <span>Filter B2B</span>
-                      </button>
-                    </div>
-                  )}
+                  </div>
                 </div>
               </div>
 
-              {/* Dynamic Metric Cards Grid */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {adminMode === 'b2c' ? (
-                  <>
-                    {/* B2C Card 1: Today's Retail Revenue */}
-                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Today's B2C Retail</span>
-                        <span className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
-                          <User className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        ₹{b2cRevenue.toLocaleString()}
-                      </div>
-                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" />
-                        <span>{b2cOrdersCount} orders • 100% Prepaid UPI</span>
-                      </div>
+              {/* 2. Top 6 KPI Metric Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+                {/* Total Sales */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-full bg-[#FBBF24] flex items-center justify-center text-slate-900 font-black text-sm shrink-0 shadow-2xs">
+                      ₹
                     </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-600">Total Sales</div>
+                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">₹4,75,250</div>
+                    </div>
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-600 mt-2">
+                    ↑ 12% <span className="text-slate-400 font-normal">vs last month</span>
+                  </div>
+                  {/* Sparkline Wave */}
+                  <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,20 Q15,10 30,16 T60,8 T85,14 T100,6 L100,25 L0,25 Z" fill="url(#salesGrad)" />
+                    <path d="M0,20 Q15,10 30,16 T60,8 T85,14 T100,6" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
 
-                    {/* B2C Card 2: Express Delivery SLA */}
-                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Avg Express Delivery</span>
-                        <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
-                          <Zap className="w-4 h-4 text-amber-600" />
-                        </span>
+                {/* B2C Orders */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
+                        <ShoppingCart className="w-4 h-4" />
                       </div>
-                      <div className="text-2xl sm:text-3xl font-black text-emerald-700">
-                        11.2 <span className="text-xs text-slate-400 font-normal">Mins</span>
-                      </div>
-                      <div className="text-[11px] text-slate-500 font-medium">
-                        10–15 Min SLA • 100% On-Time Dispatch
-                      </div>
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#FEF08A] text-[#854D0E]">
+                        B2C Retail
+                      </span>
                     </div>
+                    <div className="text-xs font-bold text-slate-600 mt-2">B2C Orders</div>
+                    <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">628</div>
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-600 mt-1">
+                    ↑ 15% <span className="text-slate-400 font-normal">vs last month</span>
+                  </div>
+                  {/* Sparkline Wave */}
+                  <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="b2cGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#F59E0B" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,22 Q20,15 40,18 T70,10 T100,5 L100,25 L0,25 Z" fill="url(#b2cGrad)" />
+                    <path d="M0,22 Q20,15 40,18 T70,10 T100,5" fill="none" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
 
-                    {/* B2C Card 3: Morning Milk Subscribers */}
-                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Morning Milk Subscribers</span>
-                        <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
-                          <Clock className="w-4 h-4" />
-                        </span>
+                {/* B2B Orders */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <div className="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-700">
+                        <Handshake className="w-4 h-4" />
                       </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        {subscriptions.length} <span className="text-xs text-slate-400 font-normal">Active</span>
-                      </div>
-                      <div className="text-[11px] text-slate-500 font-medium">
-                        Delivered 6:00 AM daily • Doorstep Fresh
-                      </div>
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full bg-[#F43F5E] text-white">
+                        B2B Wholesale
+                      </span>
                     </div>
+                    <div className="text-xs font-bold text-slate-600 mt-2">B2B Orders</div>
+                    <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">124</div>
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-600 mt-1">
+                    ↑ 10% <span className="text-slate-400 font-normal">vs last month</span>
+                  </div>
+                  {/* Sparkline Wave */}
+                  <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="b2bGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#F43F5E" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#F43F5E" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,20 Q20,12 45,17 T75,9 T100,7 L100,25 L0,25 Z" fill="url(#b2bGrad)" />
+                    <path d="M0,20 Q20,12 45,17 T75,9 T100,7" fill="none" stroke="#F43F5E" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
 
-                    {/* B2C Card 4: Retail Avg Order Value */}
-                    <div className="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Retail Avg Order Value</span>
-                        <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
-                          <ShoppingBag className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        ₹{b2cOrdersCount ? Math.round(b2cRevenue / b2cOrdersCount) : 0}
-                      </div>
-                      <div className="text-[11px] text-emerald-600 font-bold">
-                        +18% repeat customer rate
-                      </div>
+                {/* Total Customers */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                      <Users className="w-4 h-4" />
                     </div>
-                  </>
-                ) : adminMode === 'b2b' ? (
-                  <>
-                    {/* B2B Card 1: Wholesale Revenue */}
-                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>B2B Wholesale Dispatched</span>
-                        <span className="p-1.5 rounded-xl bg-rose-50 text-[#7D0A14]">
-                          <Building2 className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
-                        ₹{b2bRevenue.toLocaleString()}
-                      </div>
-                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" />
-                        <span>{b2bOrdersCount} bulk commercial shipments</span>
-                      </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-600">Total Customers</div>
+                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">3,250</div>
                     </div>
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-600 mt-2">
+                    ↑ 14% <span className="text-slate-400 font-normal">vs last month</span>
+                  </div>
+                  {/* Sparkline Wave */}
+                  <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="custGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,22 Q25,18 50,15 T75,8 T100,5 L100,25 L0,25 Z" fill="url(#custGrad)" />
+                    <path d="M0,22 Q25,18 50,15 T75,8 T100,5" fill="none" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
 
-                    {/* B2B Card 2: Commercial Hotel Accounts */}
-                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Active Commercial Accounts</span>
-                        <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
-                          <Store className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        {customers.filter((c) => c.isBusiness).length} <span className="text-xs text-slate-400 font-normal">Clients</span>
-                      </div>
-                      <div className="text-[11px] text-slate-500 font-medium">
-                        Hotels, Banquets & Cloud Kitchens
-                      </div>
+                {/* Low Stock */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                      <Package className="w-4 h-4" />
                     </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-600">Low Stock</div>
+                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">18</div>
+                    </div>
+                  </div>
+                  <div className="text-[11px] font-bold text-rose-600 mt-2">
+                    ⚠ Needs Attention
+                  </div>
+                  {/* Sparkline Wave */}
+                  <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="stockGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#F97316" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#F97316" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,20 Q20,14 45,18 T80,11 T100,8 L100,25 L0,25 Z" fill="url(#stockGrad)" />
+                    <path d="M0,20 Q20,14 45,18 T80,11 T100,8" fill="none" stroke="#F97316" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
 
-                    {/* B2B Card 3: Commercial RFPs & Pipeline */}
-                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Commercial RFPs & Quotes</span>
-                        <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
-                          <FileText className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Inquiries</span>
-                      </div>
-                      <div className="text-[11px] text-amber-700 font-bold">
-                        Est. ₹5.8 Lakhs pipeline value
-                      </div>
+                {/* Pending Deliveries */}
+                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:shadow-xs transition-all">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+                      <Truck className="w-4 h-4" />
                     </div>
-
-                    {/* B2B Card 4: Net Receivables */}
-                    <div className="bg-white p-5 rounded-3xl border border-rose-100 shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Net 15 / 30 Receivables</span>
-                        <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
-                          <Receipt className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
-                        ₹{invoices.reduce((sum, inv) => sum + (Number(inv.totalAmount) || 0), 0).toLocaleString()}
-                      </div>
-                      <div className="text-[11px] text-slate-500 font-medium">
-                        100% GST ITC Compliant Invoices
-                      </div>
+                    <div>
+                      <div className="text-xs font-bold text-slate-600">Pending Deliveries</div>
+                      <div className="text-xl font-black text-[#1E2544] tracking-tight mt-0.5">42</div>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Unified Card 1: B2C Retail Today */}
-                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Today's B2C Retail</span>
-                        <span className="p-1.5 rounded-xl bg-blue-50 text-blue-600">
-                          <User className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        ₹{b2cRevenue.toLocaleString()}
-                      </div>
-                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" />
-                        <span>{b2cOrdersCount} orders • 11.2m avg delivery</span>
-                      </div>
-                    </div>
-
-                    {/* Unified Card 2: B2B Wholesale Dispatched */}
-                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>B2B Wholesale Dispatched</span>
-                        <span className="p-1.5 rounded-xl bg-amber-50 text-amber-700">
-                          <Building2 className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
-                        ₹{b2bRevenue.toLocaleString()}
-                      </div>
-                      <div className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" />
-                        <span>{b2bOrdersCount} bulk commercial shipments</span>
-                      </div>
-                    </div>
-
-                    {/* Unified Card 3: Morning Milk Subscribers */}
-                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Morning Milk Subscribers</span>
-                        <span className="p-1.5 rounded-xl bg-emerald-50 text-emerald-700">
-                          <Clock className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        {subscriptions.length} <span className="text-xs text-slate-400 font-normal">Active</span>
-                      </div>
-                      <div className="text-[11px] text-slate-500 font-medium">
-                        Delivered 6:00 AM daily • 100% On Time
-                      </div>
-                    </div>
-
-                    {/* Unified Card 4: Wholesale RFPs & Pipeline */}
-                    <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] shadow-xs space-y-1">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
-                        <span>Commercial RFPs & Quotes</span>
-                        <span className="p-1.5 rounded-xl bg-purple-50 text-purple-700">
-                          <FileText className="w-4 h-4" />
-                        </span>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black text-[#3D040A]">
-                        {b2bQuotes.length} <span className="text-xs text-slate-400 font-normal">Hotels</span>
-                      </div>
-                      <div className="text-[11px] text-amber-700 font-bold">
-                        Est. ₹5.8 Lakhs pipeline value
-                      </div>
-                    </div>
-                  </>
-                )}
+                  </div>
+                  <div className="text-[11px] font-bold text-emerald-600 mt-2">
+                    ↑ 5% <span className="text-slate-400 font-normal">vs last month</span>
+                  </div>
+                  {/* Sparkline Wave */}
+                  <svg className="w-full h-7 mt-1" viewBox="0 0 100 25" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="delGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.4" />
+                        <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0,21 Q25,17 50,13 T80,8 T100,4 L100,25 L0,25 Z" fill="url(#delGrad)" />
+                    <path d="M0,21 Q25,17 50,13 T80,8 T100,4" fill="none" stroke="#10B981" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
               </div>
 
-              {/* Two Column Section: Live Dispatch + Operations Info */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left 2 Cols: Live Orders Dispatch Stream (Filtered based on adminMode) */}
-                <div className="lg:col-span-2 bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-4 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-black text-base text-[#3D040A]">
-                        {adminMode === 'b2c'
-                          ? 'Live B2C Retail Dispatches (10–15 Min Express)'
-                          : adminMode === 'b2b'
-                          ? 'Live B2B Commercial Shipments (Bulk Kitchen Dispatch)'
-                          : 'Live Dispatch Activity (Retail & Bulk Shipments)'}
+              {/* 3. Middle Section: Sales & Orders Overview + Quick Actions */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                {/* Sales & Orders Overview Chart */}
+                <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-slate-700" />
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                        Sales & Orders Overview
                       </h3>
-                      <p className="text-xs text-slate-500">
-                        {adminMode === 'b2c'
-                          ? 'Real-time status of express consumer deliveries in transit'
-                          : adminMode === 'b2b'
-                          ? 'Real-time status of commercial bulk dispatches to hotels and restaurants'
-                          : 'Real-time status of retail deliveries & bulk morning shipments'}
-                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs font-bold">
+                      <div className="flex items-center gap-1.5 text-slate-600">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#EAB308]" />
+                        <span>Sales (₹)</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-slate-600">
+                        <span className="w-2.5 h-2.5 rounded-full bg-[#E11D48]" />
+                        <span>Orders</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SVG Line Chart */}
+                  <div className="relative pt-2">
+                    <div className="h-56 w-full flex items-end">
+                      <svg className="w-full h-full overflow-visible" viewBox="0 0 700 200">
+                        {/* Grid lines and Y-axis labels */}
+                        <g className="text-slate-400 text-[10px] font-bold">
+                          <line x1="40" y1="20" x2="680" y2="20" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+                          <text x="5" y="24" fill="#94A3B8">₹6L</text>
+
+                          <line x1="40" y1="75" x2="680" y2="75" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+                          <text x="5" y="79" fill="#94A3B8">₹4L</text>
+
+                          <line x1="40" y1="130" x2="680" y2="130" stroke="#F1F5F9" strokeWidth="1" strokeDasharray="4 4" />
+                          <text x="5" y="134" fill="#94A3B8">₹2L</text>
+
+                          <line x1="40" y1="185" x2="680" y2="185" stroke="#CBD5E1" strokeWidth="1" />
+                          <text x="5" y="189" fill="#94A3B8">₹0</text>
+                        </g>
+
+                        {/* Yellow Line: Sales (₹) */}
+                        {/* Points: Oct26: 140, Oct27: 105, Oct28: 80, Oct29: 75, Oct30: 35, Oct31: 55, Nov1: 65 */}
+                        <path
+                          d="M60,140 L160,105 L260,80 L360,75 L460,35 L560,55 L660,65"
+                          fill="none"
+                          stroke="#EAB308"
+                          strokeWidth="3.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        {/* Sales Circles */}
+                        {[
+                          { x: 60, y: 140, val: '₹2.2L' },
+                          { x: 160, y: 105, val: '₹3.4L' },
+                          { x: 260, y: 80, val: '₹4.0L' },
+                          { x: 360, y: 75, val: '₹4.1L' },
+                          { x: 460, y: 35, val: '₹5.2L' },
+                          { x: 560, y: 55, val: '₹4.6L' },
+                          { x: 660, y: 65, val: '₹4.4L' }
+                        ].map((pt, i) => (
+                          <g key={i}>
+                            <circle cx={pt.x} cy={pt.y} r="5" fill="#EAB308" stroke="#FFFFFF" strokeWidth="2.5" className="cursor-pointer hover:r-7 transition-all" />
+                          </g>
+                        ))}
+
+                        {/* Red Line: Orders */}
+                        {/* Points: Oct26: 170, Oct27: 145, Oct28: 148, Oct29: 148, Oct30: 125, Oct31: 145, Nov1: 140 */}
+                        <path
+                          d="M60,170 L160,145 L260,148 L360,148 L460,125 L560,145 L660,140"
+                          fill="none"
+                          stroke="#E11D48"
+                          strokeWidth="3"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        {/* Orders Circles */}
+                        {[
+                          { x: 60, y: 170, val: '120 Orders' },
+                          { x: 160, y: 145, val: '185 Orders' },
+                          { x: 260, y: 148, val: '174 Orders' },
+                          { x: 360, y: 148, val: '176 Orders' },
+                          { x: 460, y: 125, val: '240 Orders' },
+                          { x: 560, y: 145, val: '188 Orders' },
+                          { x: 660, y: 140, val: '194 Orders' }
+                        ].map((pt, i) => (
+                          <g key={i}>
+                            <circle cx={pt.x} cy={pt.y} r="4.5" fill="#E11D48" stroke="#FFFFFF" strokeWidth="2" className="cursor-pointer hover:r-6 transition-all" />
+                          </g>
+                        ))}
+
+                        {/* X-axis labels */}
+                        <g className="text-slate-500 text-[11px] font-bold">
+                          <text x="60" y="202" textAnchor="middle" fill="#64748B">Oct 26</text>
+                          <text x="160" y="202" textAnchor="middle" fill="#64748B">Oct 27</text>
+                          <text x="260" y="202" textAnchor="middle" fill="#64748B">Oct 28</text>
+                          <text x="360" y="202" textAnchor="middle" fill="#64748B">Oct 29</text>
+                          <text x="460" y="202" textAnchor="middle" fill="#64748B">Oct 30</text>
+                          <text x="560" y="202" textAnchor="middle" fill="#64748B">Oct 31</text>
+                          <text x="660" y="202" textAnchor="middle" fill="#64748B">Nov 1</text>
+                        </g>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Actions (2x2 Grid) */}
+                <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs flex flex-col justify-between">
+                  <div className="flex items-center gap-2 border-b border-slate-100 pb-3 mb-4">
+                    <Zap className="w-5 h-5 text-amber-500 fill-amber-500/30" />
+                    <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                      Quick Actions
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 flex-1">
+                    {/* Add Product */}
+                    <button
+                      onClick={() => setIsAddProductModalOpen(true)}
+                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                        <Package className="w-5 h-5" />
+                      </div>
+                      <span className="font-extrabold text-[#1E2544]">Add Product</span>
+                    </button>
+
+                    {/* Add B2B Customer */}
+                    <button
+                      onClick={() => setActiveTab('b2b-customers')}
+                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                        <Users className="w-5 h-5" />
+                      </div>
+                      <span className="font-extrabold text-[#1E2544]">Add B2B Customer</span>
+                    </button>
+
+                    {/* Create Offer */}
+                    <button
+                      onClick={() => setActiveTab('offers-coupons')}
+                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                        <Ticket className="w-5 h-5" />
+                      </div>
+                      <span className="font-extrabold text-[#1E2544]">Create Offer</span>
+                    </button>
+
+                    {/* Generate Invoice */}
+                    <button
+                      onClick={() => setActiveTab('invoices')}
+                      className="p-4 rounded-2xl bg-[#FFFBEB] hover:bg-amber-100/70 border border-amber-200/80 flex flex-col items-center justify-center gap-2 text-xs font-bold text-slate-800 transition-all active:scale-95 shadow-2xs group"
+                    >
+                      <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center text-slate-800 group-hover:scale-110 transition-transform shadow-2xs">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <span className="font-extrabold text-[#1E2544]">Generate Invoice</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Lower Section: Recent Orders + Low Stock Products */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                {/* Recent Orders Table */}
+                <div className="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <ShoppingCart className="w-5 h-5 text-rose-600" />
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                        Recent Orders
+                      </h3>
                     </div>
                     <button
                       onClick={() => setActiveTab('orders')}
-                      className="text-xs font-bold text-[#7D0A14] hover:underline flex items-center gap-1"
+                      className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 hover:underline"
                     >
-                      <span>
-                        View all{' '}
-                        {adminMode === 'b2c'
-                          ? `${b2cOrdersCount} B2C`
-                          : adminMode === 'b2b'
-                          ? `${b2bOrdersCount} B2B`
-                          : `${orders.length}`}{' '}
-                        orders
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5" />
+                      View All →
                     </button>
                   </div>
 
-                  <div className="divide-y divide-slate-100">
-                    {filteredOrders.slice(0, 5).map((order) => (
-                      <div key={order.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div className="flex items-start gap-3">
-                          <div
-                            className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xs flex-shrink-0 ${
-                              order.type === 'b2b'
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
-                                : 'bg-blue-100 text-blue-900 border border-blue-200'
-                            }`}
-                          >
-                            {order.type === 'b2b' ? 'B2B' : 'B2C'}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-extrabold text-sm text-slate-900">{order.id}</span>
-                              <span className="text-xs text-slate-500">• {order.customer}</span>
-                            </div>
-                            <div className="text-xs text-slate-500 line-clamp-1">
-                              {order.items.map((i) => `${i.name} (x${i.qty})`).join(', ')}
-                            </div>
-                            <div className="text-[10px] text-slate-400 mt-0.5">
-                              {order.deliverySlot} • {order.timestamp}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between sm:justify-end gap-3 self-end sm:self-center">
-                          <span className="font-black text-sm text-[#3D040A]">₹{order.total.toLocaleString()}</span>
-                          <span
-                            className={`px-2.5 py-1 rounded-full text-[10px] font-black ${
-                              order.status === 'Delivered'
-                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                                : order.status === 'Dispatched'
-                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                                : 'bg-amber-100 text-amber-800 border border-amber-200'
-                            }`}
-                          >
-                            {order.status}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    {filteredOrders.length === 0 && (
-                      <div className="py-8 text-center text-xs text-slate-500">
-                        No {adminMode === 'b2c' ? 'B2C retail' : adminMode === 'b2b' ? 'B2B wholesale' : ''} orders matching current view.
-                      </div>
-                    )}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead className="bg-[#FAF5EC]/70 border-b border-[#EDE1D1] text-slate-800 font-bold uppercase tracking-wider">
+                        <tr>
+                          <th className="py-2.5 px-3">Order ID</th>
+                          <th className="py-2.5 px-3">Customer</th>
+                          <th className="py-2.5 px-3">Type</th>
+                          <th className="py-2.5 px-3">Amount</th>
+                          <th className="py-2.5 px-3">Payment</th>
+                          <th className="py-2.5 px-3">Status</th>
+                          <th className="py-2.5 px-3">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium">
+                        {[
+                          { id: '#MNK10045', name: 'Ramesh Kumar', type: 'B2C', amt: '₹1,250', pay: 'UPI', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 02, 2026 5:12 PM' },
+                          { id: '#MNK10044', name: 'Sri Sai Traders', type: 'B2B', amt: '₹12,800', pay: 'Bank Transfer', status: 'Processing', statusColor: 'bg-blue-100 text-blue-800', date: 'Nov 02, 2026 3:45 PM' },
+                          { id: '#MNK10043', name: 'Lakshmi Devi', type: 'B2C', amt: '₹650', pay: 'UPI', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 02, 2026 1:20 PM' },
+                          { id: '#MNK10042', name: 'Vijaya Mart', type: 'B2B', amt: '₹25,600', pay: 'Net Banking', status: 'Pending', statusColor: 'bg-amber-100 text-amber-800', date: 'Nov 01, 2026 7:30 PM' },
+                          { id: '#MNK10041', name: 'Mahesh Reddy', type: 'B2C', amt: '₹890', pay: 'COD', status: 'Delivered', statusColor: 'bg-emerald-100 text-emerald-800', date: 'Nov 01, 2026 6:15 PM' }
+                        ].map((row, idx) => (
+                          <tr key={idx} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="py-3 px-3 font-mono font-bold text-slate-800">{row.id}</td>
+                            <td className="py-3 px-3 font-bold text-[#1E2544]">{row.name}</td>
+                            <td className="py-3 px-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                                row.type === 'B2B'
+                                  ? 'bg-[#F43F5E] text-white'
+                                  : 'bg-[#FEF08A] text-[#854D0E]'
+                              }`}>
+                                {row.type}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 font-black text-slate-900">{row.amt}</td>
+                            <td className="py-3 px-3 text-slate-600 font-semibold">{row.pay}</td>
+                            <td className="py-3 px-3">
+                              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${row.statusColor}`}>
+                                {row.status}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 text-slate-500 text-[11px]">{row.date}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
 
-                {/* Right 1 Col: Cold-Chain & Contextual Shortcuts */}
-                <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-[#3D040A] via-[#5C0810] to-[#7D0A14] text-white p-6 rounded-3xl border border-[#8B121C] space-y-4 shadow-md">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-black uppercase text-amber-300">Warehouse Cold-Chain</span>
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                {/* Low Stock Products */}
+                <div className="lg:col-span-4 bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4 flex flex-col justify-between">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="w-5 h-5 text-rose-600" />
+                      <h3 className="font-extrabold text-sm sm:text-base text-[#1E2544]">
+                        Low Stock Products
+                      </h3>
                     </div>
-                    <div>
-                      <div className="text-3xl font-black text-white">3.8°C</div>
-                      <p className="text-xs text-amber-100/80">Optimal dairy storage temperature</p>
+                    <button
+                      onClick={() => setActiveTab('inventory')}
+                      className="text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 hover:underline"
+                    >
+                      View All →
+                    </button>
+                  </div>
+
+                  <div className="space-y-3.5 flex-1">
+                    {[
+                      { name: 'Tata Salt 1kg', left: 'Only 5 left', img: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=100&auto=format&fit=crop&q=80' },
+                      { name: 'Sunflower Oil 1L', left: 'Only 8 left', img: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=100&auto=format&fit=crop&q=80' },
+                      { name: 'Aashirvaad Atta 5kg', left: 'Only 10 left', img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=100&auto=format&fit=crop&q=80' }
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 hover:bg-slate-50/70 transition-all">
+                        <div className="flex items-center gap-3">
+                          <img src={item.img} alt={item.name} className="w-10 h-10 rounded-lg object-cover border border-slate-200" />
+                          <div>
+                            <div className="font-bold text-xs text-[#1E2544]">{item.name}</div>
+                            <div className="text-[11px] font-bold text-rose-600">{item.left}</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => showToast(`Stock replenished for ${item.name}! +50 units added.`, 'success')}
+                          className="px-3 py-1 rounded-full border border-rose-300 text-rose-600 hover:bg-rose-50 text-xs font-bold active:scale-95 transition-all"
+                        >
+                          Restock
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. Bottom Banner: B2B Section - Business Customers */}
+              <div className="bg-[#FFFBEB] border border-amber-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+                <div className="text-xs font-extrabold text-[#7D0A14] flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-[#7D0A14]" />
+                  <span>B2B Section – Business Customers</span>
+                </div>
+
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 flex-1 text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                        <Building2 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-black text-sm text-[#1E2544]">124</div>
+                        <div className="text-[10px] text-slate-500 font-semibold">B2B Customers</div>
+                      </div>
                     </div>
-                    <div className="pt-2 border-t border-white/10 space-y-2 text-xs">
-                      <div className="flex justify-between">
-                        <span className="text-amber-200/80">Milk Tanker 1:</span>
-                        <strong className="text-white">100% Tested Pure</strong>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                        <FileText className="w-4 h-4" />
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-amber-200/80">Mandi Veggie Arrival:</span>
-                        <strong className="text-white">4:15 AM Handpicked</strong>
+                      <div>
+                        <div className="font-bold text-xs text-[#1E2544]">Wholesale Price Lists</div>
+                        <div className="text-[10px] text-slate-500">Manage B2B Pricing</div>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-amber-200/80">On-Time Dispatch Rate:</span>
-                        <strong className="text-emerald-300">99.4%</strong>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                        <ShoppingCart className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-[#1E2544]">Min. Order Quantity</div>
+                        <div className="text-[10px] text-slate-500">Set MOQ Rules</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                        <Handshake className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-[#1E2544]">Credit / Payment Terms</div>
+                        <div className="text-[10px] text-slate-500">Net 30 / Net 45</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-amber-200 flex items-center justify-center text-[#1E2544]">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-[#1E2544]">GST / Business Details</div>
+                        <div className="text-[10px] text-slate-500">Manage Business Info</div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white p-5 rounded-3xl border border-[#EDE1D1] space-y-3 shadow-xs">
-                    <h4 className="font-extrabold text-xs text-[#3D040A] uppercase tracking-wider">
-                      Operations Shortcuts ({adminMode.toUpperCase()})
-                    </h4>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      {adminMode === 'b2c' ? (
-                        <>
-                          <button
-                            onClick={() => setActiveTab('subscriptions')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Clock className="w-4 h-4 mb-1 text-emerald-600" />
-                            <span>Milk Run-Sheet</span>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('inventory')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Percent className="w-4 h-4 mb-1 text-blue-600" />
-                            <span>Retail Stock</span>
-                          </button>
-                          <button
-                            onClick={simulateNewB2COrder}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-blue-700 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Plus className="w-4 h-4 mb-1 text-blue-600" />
-                            <span>Simulate Order</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              setAdminMode('b2b');
-                              showToast('Switched to B2B Wholesale Portal');
-                            }}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Building2 className="w-4 h-4 mb-1 text-[#7D0A14]" />
-                            <span>Switch to B2B</span>
-                          </button>
-                        </>
-                      ) : adminMode === 'b2b' ? (
-                        <>
-                          <button
-                            onClick={() => setActiveTab('b2b-quotes')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Building2 className="w-4 h-4 mb-1 text-[#7D0A14]" />
-                            <span>Review B2B RFPs</span>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('invoices')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Receipt className="w-4 h-4 mb-1 text-purple-600" />
-                            <span>GST Invoices</span>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('inventory')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Percent className="w-4 h-4 mb-1 text-amber-600" />
-                            <span>Bulk MOQ & Rates</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              setAdminMode('b2c');
-                              showToast('Switched to B2C Retail Operations');
-                            }}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-blue-700 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <User className="w-4 h-4 mb-1 text-blue-600" />
-                            <span>Switch to B2C</span>
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => setActiveTab('b2b-quotes')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-[#7D0A14] text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Building2 className="w-4 h-4 mb-1" />
-                            <span>Review B2B RFPs</span>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('subscriptions')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Clock className="w-4 h-4 mb-1 text-emerald-600" />
-                            <span>Milk Run-Sheet</span>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('invoices')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Receipt className="w-4 h-4 mb-1 text-blue-600" />
-                            <span>GST Invoices</span>
-                          </button>
-                          <button
-                            onClick={() => setActiveTab('inventory')}
-                            className="p-3 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] font-bold text-slate-800 text-left transition-colors flex flex-col justify-between border border-[#EDE1D1]"
-                          >
-                            <Percent className="w-4 h-4 mb-1 text-amber-600" />
-                            <span>Dual-Pricing</span>
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
+                  <button
+                    onClick={() => setActiveTab('b2b-customers')}
+                    className="px-5 py-2.5 rounded-xl bg-[#1E2544] hover:bg-[#0F172A] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all shrink-0 active:scale-95"
+                  >
+                    <span>Manage B2B →</span>
+                  </button>
                 </div>
               </div>
             </div>
