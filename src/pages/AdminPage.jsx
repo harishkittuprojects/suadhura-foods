@@ -1204,6 +1204,36 @@ export const AdminPage = () => {
             </div>
           </div>
 
+                    {/* Header Customer Search Bar */}
+          <div className="relative flex-1 min-w-[200px] max-w-xs sm:max-w-sm">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search customers (name, phone, email)..."
+              value={customerSearchTerm}
+              onChange={(e) => {
+                setCustomerSearchTerm(e.target.value);
+                if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                  setActiveTab('b2c-customers');
+                }
+              }}
+              onFocus={() => {
+                if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                  setActiveTab('b2c-customers');
+                }
+              }}
+              className="w-full pl-9 pr-7 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
+            />
+            {customerSearchTerm && (
+              <button
+                onClick={() => setCustomerSearchTerm('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
           {/* Central Header Scope Switch Toggle (Switch between B2C and B2B instantly) */}
           <div className="flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
             <button
@@ -1213,7 +1243,7 @@ export const AdminPage = () => {
               }}
               className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
                 adminMode === 'b2c'
-                  ? 'bg-blue-600 text-white shadow-sm scale-[1.02]'
+                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
@@ -1417,7 +1447,11 @@ export const AdminPage = () => {
                 </div>
 
                 {/* Total Customers */}
-                <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14]/30 hover:shadow-xs transition-all">
+                <div
+                  onClick={() => setActiveTab('b2c-customers')}
+                  className="cursor-pointer bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs p-3.5 relative overflow-hidden flex flex-col justify-between hover:border-[#7D0A14] hover:shadow-sm transition-all group"
+                  title="Click to open Customer Management & Search"
+                >
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] flex items-center justify-center text-[#7D0A14] shrink-0">
                       <Users className="w-4 h-4" />
@@ -1875,7 +1909,7 @@ export const AdminPage = () => {
                       }}
                       className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
                         adminMode === 'b2c'
-                          ? 'bg-blue-600 text-white shadow-xs'
+                          ? 'bg-[#7D0A14] text-white shadow-xs'
                           : 'text-slate-600 hover:text-slate-900'
                       }`}
                     >
@@ -2025,7 +2059,7 @@ export const AdminPage = () => {
                             {order.status === 'Packing' && (
                               <button
                                 onClick={() => updateOrderStatus(order.id, 'Dispatched')}
-                                className="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black shadow-xs"
+                                className="px-2.5 py-1 rounded-lg bg-[#7D0A14] hover:bg-[#60060E] text-white text-[10px] font-black shadow-xs"
                               >
                                 Dispatch
                               </button>
@@ -2999,7 +3033,7 @@ export const AdminPage = () => {
                           {quote.status === 'New Inquiry' && (
                             <button
                               onClick={() => updateQuoteStatus(quote.id, 'Quote Sent')}
-                              className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs"
+                              className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold text-xs"
                             >
                               Mark Quote Sent
                             </button>
@@ -3193,7 +3227,7 @@ export const AdminPage = () => {
                           <div className="flex items-center justify-center gap-1.5">
                             <button
                               onClick={() => setEditingProduct({ ...prod })}
-                              className="p-1.5 rounded-lg text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-200 transition-colors shadow-2xs"
+                              className="p-1.5 rounded-lg text-blue-600 hover:text-white hover:bg-[#7D0A14] border border-blue-200 transition-colors shadow-2xs"
                               title="Edit product details & prices"
                             >
                               <Pencil className="w-3.5 h-3.5" />
@@ -3444,7 +3478,7 @@ export const AdminPage = () => {
                       </button>
                       <button
                         onClick={() => setEditingHeroSlide({ ...slide })}
-                        className="p-2 rounded-xl border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                        className="p-2 rounded-xl border border-blue-200 text-blue-600 hover:bg-[#7D0A14] hover:text-white transition-colors"
                         title="Edit banner content & image"
                       >
                         <Pencil className="w-3.5 h-3.5" />
