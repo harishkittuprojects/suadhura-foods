@@ -52,7 +52,8 @@ import {
   ArrowDown,
   Boxes,
   MoreVertical,
-  ChevronLeft
+  ChevronLeft,
+  LayoutGrid
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
@@ -86,7 +87,7 @@ export const AdminPage = () => {
   // Mode: 'unified' | 'b2c' | 'b2b'
   const [adminMode, setAdminMode] = useState('unified');
   // Tabs: 'overview' | 'orders' | 'subscriptions' | 'b2b-quotes' | 'inventory' | 'invoices'
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   // Mobile sidebar open state
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -917,164 +918,161 @@ export const AdminPage = () => {
     .filter((o) => o.type === 'b2b')
     .reduce((sum, o) => sum + o.total, 0);
 
-  const sidebarLinks = [
-    { id: 'overview', label: 'Dashboard Overview', icon: Layers, badge: null },
+    const sidebarLinks = [
     {
-      id: 'customers',
-      label: 'Customer Management',
-      icon: Users,
-      badge: customers.length,
-      scopeTag: null
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: LayoutGrid,
+      badge: null,
+      customBadge: null
     },
     {
       id: 'orders',
-      label:
-        adminMode === 'b2c'
-          ? 'B2C Orders Dispatch'
-          : adminMode === 'b2b'
-          ? 'B2B Wholesale Orders'
-          : 'Live Orders Dispatch',
+      label: 'Orders',
+      icon: ShoppingCart,
+      badge: orders.length,
+      customBadge: null
+    },
+    {
+      id: 'b2c-customers',
+      label: 'B2C Customers',
+      icon: User,
+      badge: null,
+      customBadge: {
+        text: 'B2C Retail',
+        className: 'bg-[#FEF08A] text-[#854D0E] border border-amber-300'
+      }
+    },
+    {
+      id: 'b2b-customers',
+      label: 'B2B Customers',
+      icon: Users,
+      badge: null,
+      customBadge: {
+        text: 'B2B Wholesale',
+        className: 'bg-[#F43F5E] text-white'
+      }
+    },
+    {
+      id: 'products',
+      label: 'Products',
       icon: Package,
-      badge:
-        adminMode === 'b2c'
-          ? b2cOrdersCount
-          : adminMode === 'b2b'
-          ? b2bOrdersCount
-          : orders.length
+      badge: inventoryList.length,
+      customBadge: null
     },
     {
-      id: 'subscriptions',
-      label: 'Morning Subscriptions',
-      icon: Clock,
-      badge: subscriptions.length,
-      scopeTag: 'B2C'
+      id: 'categories',
+      label: 'Categories',
+      icon: LayoutGrid,
+      badge: 6,
+      customBadge: null
     },
     {
-      id: 'b2b-quotes',
-      label: 'Wholesale RFPs & Quotes',
-      icon: Building2,
-      badge: b2bQuotes.length,
-      scopeTag: 'B2B'
+      id: 'inventory',
+      label: 'Inventory/Stock',
+      icon: Warehouse,
+      badge: inventoryList.filter(p => (p.stock || p.stockQuantity) <= 20).length || null,
+      customBadge: null
     },
-    { id: 'inventory', label: 'Inventory & Stock Pricing', icon: Boxes, badge: inventoryList.length, scopeTag: null },
+    {
+      id: 'b2b-pricing',
+      label: 'B2B Pricing',
+      icon: Tag,
+      badge: 'Slabs',
+      customBadge: null
+    },
+    {
+      id: 'offers-coupons',
+      label: 'Offers & Coupons',
+      icon: Percent,
+      badge: '4 Active',
+      customBadge: null
+    },
+    {
+      id: 'payments',
+      label: 'Payments',
+      icon: CreditCard,
+      badge: null,
+      customBadge: null
+    },
+    {
+      id: 'delivery',
+      label: 'Delivery',
+      icon: Truck,
+      badge: 'Morning Slots',
+      customBadge: null
+    },
     {
       id: 'invoices',
-      label: 'GST Tax Invoices',
-      icon: Receipt,
+      label: 'Invoices',
+      icon: FileText,
       badge: invoices.length,
-      scopeTag: 'B2B'
+      customBadge: null
     },
     {
-      id: 'hero-banners',
-      label: 'Hero Section Banners',
-      icon: ImageIcon,
-      badge: heroSlides.length,
-      scopeTag: null
+      id: 'reports',
+      label: 'Reports',
+      icon: BarChart3,
+      badge: null,
+      customBadge: null
     },
     {
-      id: 'content',
-      label: 'Store Content & CMS',
+      id: 'reviews',
+      label: 'Reviews',
+      icon: Star,
+      badge: '4.9 ★',
+      customBadge: null
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
       icon: Settings,
-      badge: 'Edit',
-      scopeTag: null
+      badge: null,
+      customBadge: null
     }
   ];
 
   return (
     <div className="flex h-screen w-full bg-[#FAF5EC] text-[#3D040A] overflow-hidden font-sans">
-      {/* ============================================================= */}
-      {/* 1. STANDALONE LEFT SIDEBAR (SUMADHURA ROYAL MAROON BRAND THEME)*/}
+            {/* ============================================================= */}
+      {/* 1. STANDALONE LEFT SIDEBAR (EXACT MATCH TO REFERENCE DESIGN)   */}
       {/* ============================================================= */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#3D040A] text-white border-r border-[#52060E] flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white text-[#1E2544] border-r border-slate-200 flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 shadow-sm ${
           sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Brand Header */}
-          <div className="p-5 bg-[#4D060D] border-b border-[#52060E] flex items-center justify-between">
+          <div className="p-4 sm:p-5 bg-white border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-[#F5A623] text-[#3D040A] flex items-center justify-center font-black text-xl shadow-lg">
-                <Store className="w-5 h-5 text-[#3D040A]" />
+              <div className="w-10 h-10 rounded-2xl bg-[#FACC15] text-[#1E2544] flex items-center justify-center font-black text-xl shadow-xs">
+                <Store className="w-5 h-5 text-[#1E2544]" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="font-black text-sm text-white tracking-tight">Sumadhura Ops</h2>
-                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#F5A623] text-[#3D040A]">
-                    {adminContent.hqVersion}
+                  <h2 className="font-extrabold text-sm text-[#1E2544] tracking-tight">Sumadhura Foods</h2>
+                  <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-100 text-[#854D0E] border border-amber-200">
+                    Admin
                   </span>
                 </div>
-                <p className="text-[11px] text-amber-200/80">Operations Command Center</p>
+                <p className="text-[11px] text-slate-500 font-medium">Operations Portal</p>
               </div>
             </div>
 
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1.5 text-white/70 hover:text-white rounded-lg"
+              className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Mode Switcher Segmented Control */}
-          <div className="p-4 border-b border-[#52060E] bg-[#330308]">
-            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-amber-300/80 mb-2">
-              <span>Operational Scope</span>
-              <span className="text-[9px] text-amber-400 font-bold lowercase">
-                {adminMode === 'b2c' ? 'retail only' : adminMode === 'b2b' ? 'wholesale only' : 'all operations'}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-1 bg-[#230206] p-1 rounded-xl border border-[#52060E] text-[11px] font-extrabold text-center">
-              <button
-                onClick={() => {
-                  setAdminMode('unified');
-                  showToast('Switched to Unified View (B2C + B2B)');
-                }}
-                className={`py-1.5 rounded-lg transition-all ${
-                  adminMode === 'unified'
-                    ? 'bg-[#F5A623] text-[#3D040A] font-black shadow-sm'
-                    : 'text-amber-100/70 hover:text-white'
-                }`}
-              >
-                Unified
-              </button>
-              <button
-                onClick={() => {
-                  setAdminMode('b2c');
-                  showToast('Switched to B2C Retail Operations');
-                }}
-                className={`py-1.5 rounded-lg transition-all ${
-                  adminMode === 'b2c'
-                    ? 'bg-blue-600 text-white font-black shadow-sm'
-                    : 'text-amber-100/70 hover:text-white'
-                }`}
-              >
-                B2C Retail
-              </button>
-              <button
-                onClick={() => {
-                  setAdminMode('b2b');
-                  showToast('Switched to B2B Wholesale Portal');
-                }}
-                className={`py-1.5 rounded-lg transition-all ${
-                  adminMode === 'b2b'
-                    ? 'bg-[#7D0A14] text-white border border-amber-400/40 font-black shadow-sm'
-                    : 'text-amber-100/70 hover:text-white'
-                }`}
-              >
-                B2B Wholesale
-              </button>
-            </div>
-          </div>
-
-          {/* Navigation Links */}
+          {/* Navigation Links matching Screenshot */}
           <div className="p-3 flex-1 overflow-y-auto space-y-1">
-            <div className="text-[10px] font-black uppercase tracking-wider text-amber-200/60 px-3 py-1">
-              Management Modules
-            </div>
             {sidebarLinks.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id;
+              const isActive = activeTab === item.id || (item.id === 'dashboard' && activeTab === 'overview');
               return (
                 <button
                   key={item.id}
@@ -1082,34 +1080,29 @@ export const AdminPage = () => {
                     setActiveTab(item.id);
                     setSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] font-bold transition-all text-left ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#F5A623]/30 to-transparent text-amber-300 border-l-4 border-[#F5A623] font-black'
-                      : 'text-amber-100/80 hover:bg-white/10 hover:text-white'
+                      ? 'bg-[#FACC15] text-[#1E2544] font-black shadow-xs'
+                      : 'text-[#1E2544] hover:bg-slate-100/80 hover:text-slate-900'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-amber-300' : 'text-amber-200/70'}`} />
-                    <span>{item.label}</span>
+                    <Icon className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 ${isActive ? 'text-[#1E2544]' : 'text-[#1E2544]'}`} />
+                    <span className="truncate">{item.label}</span>
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    {item.scopeTag && (
-                      <span
-                        className={`text-[9px] font-black px-1.5 py-0.2 rounded ${
-                          item.scopeTag === 'B2C'
-                            ? 'bg-blue-900/60 text-blue-200 border border-blue-500/30'
-                            : 'bg-amber-950/60 text-amber-200 border border-amber-500/30'
-                        }`}
-                      >
-                        {item.scopeTag}
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {item.customBadge && (
+                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${item.customBadge.className}`}>
+                        {item.customBadge.text}
                       </span>
                     )}
-                    {item.badge !== null && (
+                    {item.badge !== null && !item.customBadge && (
                       <span
                         className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                           isActive
-                            ? 'bg-[#F5A623] text-[#3D040A]'
-                            : 'bg-black/30 text-amber-200'
+                            ? 'bg-[#1E2544] text-[#FACC15]'
+                            : 'bg-slate-100 text-slate-700'
                         }`}
                       >
                         {item.badge}
@@ -1121,23 +1114,27 @@ export const AdminPage = () => {
             })}
           </div>
 
-          {/* Bottom Card: Back to Live Storefront */}
-          <div className="p-4 border-t border-[#52060E] space-y-3 bg-[#330308]">
-            <div className="p-3 rounded-2xl bg-[#230206] border border-[#52060E] text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-extrabold text-white text-[11px]">{adminContent.hubName}</span>
+          {/* Bottom Card as seen in Screenshot */}
+          <div className="p-3 border-t border-slate-100 bg-white">
+            <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-extrabold text-[#7D0A14] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Storefront
+                </span>
+                <span className="text-[10px] font-bold text-amber-900">v2.4 Production</span>
               </div>
-              <div className="text-[10px] text-amber-200/70 mt-1">Logged in as {adminContent.supervisorName}</div>
+              <p className="text-[11px] text-slate-600 font-medium">
+                Connected to Bangalore Daily Morning Dispatch Hub.
+              </p>
+              <button
+                onClick={() => navigateTo('home')}
+                className="w-full py-1.5 rounded-xl bg-[#FACC15] hover:bg-[#EAB308] text-[#1E2544] font-black text-xs flex items-center justify-center gap-1.5 transition-colors shadow-2xs"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Visit Storefront</span>
+              </button>
             </div>
-
-            <button
-              onClick={() => navigateTo('home')}
-              className="w-full py-2.5 px-3 rounded-xl bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] font-black text-xs transition-all flex items-center justify-center gap-2 shadow-md active:scale-95"
-            >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Back to Customer Store</span>
-            </button>
           </div>
         </div>
       </aside>
@@ -1277,7 +1274,7 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 1. DASHBOARD OVERVIEW                                     */}
           {/* ========================================================= */}
-          {activeTab === 'overview' && (
+          {(activeTab === 'dashboard' || activeTab === 'overview') && (
             <div className="space-y-6 animate-in fade-in duration-200">
               {/* Active Mode Quick Switch Banner */}
               <div
@@ -2096,7 +2093,7 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* LOGGED-IN CUSTOMERS REGISTRY (ZERO FAKE CUSTOMERS)        */}
           {/* ========================================================= */}
-                    {activeTab === 'customers' && (
+                    {(activeTab === 'b2c-customers' || activeTab === 'b2b-customers' || activeTab === 'customers') && (
             <div className="space-y-6 animate-in fade-in duration-200">
               {/* 1. Header Section matching Screenshot */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -2674,7 +2671,7 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 3. MORNING SUBSCRIPTIONS (B2C) - AUTHENTIC CUSTOMERS ONLY */}
           {/* ========================================================= */}
-          {activeTab === 'subscriptions' && (
+          {(activeTab === 'delivery' || activeTab === 'subscriptions') && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
@@ -2871,7 +2868,7 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 4. B2B COMMERCIAL QUOTES & RFPs                           */}
           {/* ========================================================= */}
-          {activeTab === 'b2b-quotes' && (
+          {(activeTab === 'b2b-pricing' || activeTab === 'b2b-quotes') && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
