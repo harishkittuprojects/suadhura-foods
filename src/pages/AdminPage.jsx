@@ -1099,6 +1099,16 @@ export const AdminPage = () => {
       customBadge: null
     },
     {
+      id: 'subscriptions',
+      label: 'Subscriptions',
+      icon: Clock,
+      badge: subscriptions.length > 0 ? subscriptions.length : null,
+      customBadge: {
+        text: 'Daily Milk',
+        className: 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+      }
+    },
+    {
       id: 'b2c-customers',
       label: 'B2C Customers',
       icon: User,
@@ -1984,6 +1994,78 @@ export const AdminPage = () => {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+
+              {/* 5. Morning Subscriptions Banner */}
+              <div className="bg-gradient-to-r from-amber-50/70 via-white to-amber-50/70 border border-amber-200/80 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+                <div className="text-xs font-black text-[#7D0A14] flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-[#7D0A14]" />
+                    <span className="font-black text-sm text-[#3D040A]">Morning Milk Subscriptions (Doorstep Daily)</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      Before 7:00 AM SLA
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('subscriptions')}
+                    className="text-xs font-black text-[#7D0A14] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>View All Subscriptions</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1 text-xs">
+                    <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-amber-200/60 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-900 font-black">
+                        🥛
+                      </div>
+                      <div>
+                        <div className="font-black text-sm text-[#3D040A]">{subscriptions.length}</div>
+                        <div className="text-[10px] text-slate-500 font-semibold">Active Subscriptions</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-amber-200/60 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-800">
+                        <CheckCircle2 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-[#3D040A]">Daily 6:00 - 7:00 AM</div>
+                        <div className="text-[10px] text-slate-500">Automated Route Dispatch</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-amber-200/60 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-800">
+                        <Truck className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-[#3D040A]">Live Dispatch Run-Sheet</div>
+                        <div className="text-[10px] text-slate-500">Printable Gate Slips</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-amber-200/60 shadow-2xs">
+                      <div className="w-8 h-8 rounded-lg bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-800">
+                        <Sparkles className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-xs text-[#3D040A]">Pure A2 & Farm Fresh</div>
+                        <div className="text-[10px] text-slate-500">Vacation Pause & Resume</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => setActiveTab('subscriptions')}
+                    className="px-4 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-xs transition-colors whitespace-nowrap cursor-pointer"
+                  >
+                    <span>Manage Subscriptions</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
+                  </button>
                 </div>
               </div>
 
@@ -2919,7 +3001,7 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 3. MORNING SUBSCRIPTIONS (B2C) - AUTHENTIC CUSTOMERS ONLY */}
           {/* ========================================================= */}
-          {(activeTab === 'delivery' || activeTab === 'subscriptions') && (
+          {(activeTab === 'subscriptions') && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
@@ -3110,6 +3192,125 @@ export const AdminPage = () => {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* 3B. MORNING DISPATCH & DELIVERY OPERATIONS (DELIVERY TAB)  */}
+          {/* ========================================================= */}
+          {activeTab === 'delivery' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <h3 className="text-xl font-black text-[#3D040A] flex items-center gap-2">
+                    <Truck className="w-5 h-5 text-[#7D0A14]" />
+                    <span>Morning Dispatch & Delivery Operations</span>
+                  </h3>
+                  <p className="text-xs text-slate-500">
+                    Live delivery slots, cold-chain temperature SLA, and automated driver route allocation.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>6 Vans Active on Route</span>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('subscriptions')}
+                    className="px-3.5 py-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] hover:bg-[#F3EAD9] text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Morning Subscriptions ({subscriptions.length})</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Delivery Slots Overview */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-2xl border border-amber-200 bg-amber-50/50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-amber-900 uppercase tracking-wide">Slot 1 • Early Morning</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800">
+                      Dispatched
+                    </span>
+                  </div>
+                  <div className="text-lg font-black text-[#3D040A]">6:00 AM – 7:00 AM</div>
+                  <p className="text-xs text-slate-600">Daily Milk & Morning Veggies Subscriptions</p>
+                  <div className="text-[11px] font-semibold text-slate-500 pt-2 border-t border-amber-200/60 flex items-center justify-between">
+                    <span>Active Subscriptions:</span>
+                    <strong className="text-[#7D0A14]">{subscriptions.length}</strong>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-blue-200 bg-blue-50/50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-blue-900 uppercase tracking-wide">Slot 2 • Standard Morning</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-100 text-blue-800">
+                      In Transit
+                    </span>
+                  </div>
+                  <div className="text-lg font-black text-[#3D040A]">7:00 AM – 9:00 AM</div>
+                  <p className="text-xs text-slate-600">Retail B2C Orders & Quick Grocery Deliveries</p>
+                  <div className="text-[11px] font-semibold text-slate-500 pt-2 border-t border-blue-200/60 flex items-center justify-between">
+                    <span>Pending Orders:</span>
+                    <strong className="text-blue-800">{orders.filter(o => o.status !== 'Delivered').length}</strong>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-purple-200 bg-purple-50/50 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-extrabold text-purple-900 uppercase tracking-wide">Slot 3 • B2B Bulk Afternoon</span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-800">
+                      Scheduled
+                    </span>
+                  </div>
+                  <div className="text-lg font-black text-[#3D040A]">1:00 PM – 3:00 PM</div>
+                  <p className="text-xs text-slate-600">Commercial Wholesale Bulk Crates to Kitchens & Hotels</p>
+                  <div className="text-[11px] font-semibold text-slate-500 pt-2 border-t border-purple-200/60 flex items-center justify-between">
+                    <span>B2B Fleet:</span>
+                    <strong className="text-purple-800">Heavy Van 02 & 04</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Delivery Fleet & Cold Chain Tracker */}
+              <div className="bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-emerald-700" />
+                    <h4 className="font-black text-[#3D040A] text-sm sm:text-base">
+                      Cold-Chain Fleet & Driver Assignment
+                    </h4>
+                  </div>
+                  <span className="text-xs font-bold text-slate-500">
+                    Temp Standard: <strong className="text-emerald-700">3.8°C (Optimal)</strong>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {[
+                    { driver: 'Ramesh Kumar', vehicle: 'KA-04-E-1042', status: 'Delivering HSR Layout', time: '5:45 AM', temp: '3.6°C', rating: '4.9 ★' },
+                    { driver: 'Suresh Gowda', vehicle: 'KA-04-E-2190', status: 'Delivering Indiranagar', time: '6:10 AM', temp: '3.8°C', rating: '4.8 ★' },
+                    { driver: 'Vijay Kumar', vehicle: 'KA-04-E-3381', status: 'Delivering Whitefield', time: '6:15 AM', temp: '3.9°C', rating: '5.0 ★' }
+                  ].map((f, i) => (
+                    <div key={i} className="bg-white p-3.5 rounded-xl border border-[#EDE1D1] space-y-2 shadow-2xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-extrabold text-xs text-[#3D040A]">{f.driver}</span>
+                        <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                          {f.rating}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 font-mono">
+                        {f.vehicle} • Cold: {f.temp}
+                      </div>
+                      <div className="text-xs font-bold text-emerald-700">
+                        ● {f.status}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
