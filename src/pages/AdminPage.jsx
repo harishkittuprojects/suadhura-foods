@@ -41,7 +41,11 @@ import {
   ChevronRight,
   Zap,
   Users,
-  Trash2
+  Trash2,
+  Edit3,
+  Pencil,
+  Save,
+  Settings
 } from 'lucide-react';
 
 export const AdminPage = () => {
@@ -304,7 +308,7 @@ export const AdminPage = () => {
   });
 
   // Product Inventory (Retail vs Wholesale Price Manager)
-  const [inventoryList, setInventoryList] = useState([
+  const DEFAULT_INVENTORY = [
     {
       id: 'p-1',
       name: 'Nandini Farm Fresh Cow Milk',
@@ -377,7 +381,139 @@ export const AdminPage = () => {
       moq: '50kg',
       inStock: true
     }
-  ]);
+  ];
+
+  const [inventoryList, setInventoryList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_admin_inventory');
+      return saved ? JSON.parse(saved) : DEFAULT_INVENTORY;
+    } catch {
+      return DEFAULT_INVENTORY;
+    }
+  });
+
+  // -------------------------------------------------------------------
+  // EDITABLE ADMIN & STOREFRONT CONTENT (CMS)
+  // -------------------------------------------------------------------
+  const DEFAULT_ADMIN_CONTENT = {
+    hubName: 'Dark Store: Bengaluru South',
+    supervisorName: 'Operations Supervisor',
+    hqVersion: 'HQ v2.4',
+    coldChainTemp: '3.8°C Cold-Chain OK',
+    announcementBar: '⚡ 10-15 Min Express Delivery across Bangalore & Hyderabad | Free delivery above ₹99',
+    morningDeliveryGuarantee: 'Automated doorstep delivery before 7:00 AM every single morning.',
+    vacationGuarantee: 'Going out of town? Pause or modify your milk and vegetable delivery anytime without charges.',
+    supportPhone: '+91 98450 99888',
+    supportEmail: 'ops@sumadhurafoods.com',
+    b2bNotice: 'Wholesale bulk rates, GST tax invoices & recurring morning kitchen supplies for hotels, restaurants & caterers',
+    freeDeliveryThreshold: 99
+  };
+
+  const [adminContent, setAdminContent] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_store_content');
+      return saved ? { ...DEFAULT_ADMIN_CONTENT, ...JSON.parse(saved) } : DEFAULT_ADMIN_CONTENT;
+    } catch {
+      return DEFAULT_ADMIN_CONTENT;
+    }
+  });
+
+  const [contentFormData, setContentFormData] = useState(adminContent);
+
+  const handleSaveAdminContent = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    setAdminContent(contentFormData);
+    try {
+      localStorage.setItem('sumadhura_store_content', JSON.stringify(contentFormData));
+    } catch {}
+    showToast('✅ Admin and Storefront content updated successfully!');
+  };
+
+  const handleResetAdminContent = () => {
+    setContentFormData(DEFAULT_ADMIN_CONTENT);
+    setAdminContent(DEFAULT_ADMIN_CONTENT);
+    try {
+      localStorage.setItem('sumadhura_store_content', JSON.stringify(DEFAULT_ADMIN_CONTENT));
+    } catch {}
+    showToast('Reset store content to default configuration');
+  };
+
+  // Inventory Editor Modals
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [newProductForm, setNewProductForm] = useState({
+    name: '',
+    category: 'Dairy',
+    stock: '50 Units',
+    retailPrice: '',
+    retailUnit: 'Per pack',
+    wholesalePrice: '',
+    wholesaleUnit: 'Bulk pack',
+    moq: '10 units',
+    inStock: true
+  });
+
+  const saveEditedProduct = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!editingProduct) return;
+    const updated = inventoryList.map((p) => (p.id === editingProduct.id ? editingProduct : p));
+    setInventoryList(updated);
+    try {
+      localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
+    } catch {}
+    setEditingProduct(null);
+    showToast(`✅ Saved changes for ${editingProduct.name}`);
+  };
+
+  const handleAddNewProduct = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!newProductForm.name || !newProductForm.retailPrice) {
+      showToast('Please enter product name and retail price', 'error');
+      return;
+    }
+    const newProd = {
+      id: `p-${Date.now().toString().slice(-4)}`,
+      name: newProductForm.name,
+      category: newProductForm.category,
+      stock: newProductForm.stock || '100 Units',
+      retailPrice: Number(newProductForm.retailPrice) || 0,
+      retailUnit: newProductForm.retailUnit || 'Per Unit',
+      wholesalePrice: Number(newProductForm.wholesalePrice) || Math.round(Number(newProductForm.retailPrice) * 0.75),
+      wholesaleUnit: newProductForm.wholesaleUnit || 'Bulk Pack',
+      moq: newProductForm.moq || '10 Units',
+      inStock: newProductForm.inStock
+    };
+    const updated = [newProd, ...inventoryList];
+    setInventoryList(updated);
+    try {
+      localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
+    } catch {}
+    setIsAddProductModalOpen(false);
+    setNewProductForm({
+      name: '',
+      category: 'Dairy',
+      stock: '50 Units',
+      retailPrice: '',
+      retailUnit: 'Per pack',
+      wholesalePrice: '',
+      wholesaleUnit: 'Bulk pack',
+      moq: '10 units',
+      inStock: true
+    });
+    showToast(`✅ Added new product: ${newProd.name}`);
+  };
+
+  const handleDeleteProduct = (prodId) => {
+    const prod = inventoryList.find((p) => p.id === prodId);
+    if (window.confirm(`Delete ${prod?.name || 'product'} from catalog?`)) {
+      const updated = inventoryList.filter((p) => p.id !== prodId);
+      setInventoryList(updated);
+      try {
+        localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
+      } catch {}
+      showToast(`Removed product from catalog`);
+    }
+  };
 
   // B2B GST Tax Invoices (Dynamically generated from real B2B orders)
   const invoices = orders
@@ -507,16 +643,18 @@ export const AdminPage = () => {
   };
 
   const toggleInventoryStock = (prodId) => {
-    setInventoryList(
-      inventoryList.map((p) => {
-        if (p.id === prodId) {
-          const updated = !p.inStock;
-          showToast(`${p.name} marked as ${updated ? 'In Stock' : 'Out of Stock'}`);
-          return { ...p, inStock: updated };
-        }
-        return p;
-      })
-    );
+    const updated = inventoryList.map((p) => {
+      if (p.id === prodId) {
+        const next = !p.inStock;
+        showToast(`${p.name} marked as ${next ? 'In Stock' : 'Out of Stock'}`);
+        return { ...p, inStock: next };
+      }
+      return p;
+    });
+    setInventoryList(updated);
+    try {
+      localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
+    } catch {}
   };
 
   // -------------------------------------------------------------------
@@ -593,6 +731,13 @@ export const AdminPage = () => {
       icon: Receipt,
       badge: invoices.length,
       scopeTag: 'B2B'
+    },
+    {
+      id: 'content',
+      label: 'Store Content & CMS',
+      icon: Settings,
+      badge: 'Edit',
+      scopeTag: null
     }
   ];
 
@@ -617,7 +762,7 @@ export const AdminPage = () => {
                 <div className="flex items-center gap-2">
                   <h2 className="font-black text-sm text-white tracking-tight">Sumadhura Ops</h2>
                   <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-[#F5A623] text-[#3D040A]">
-                    HQ v2.4
+                    {adminContent.hqVersion}
                   </span>
                 </div>
                 <p className="text-[11px] text-amber-200/80">Operations Command Center</p>
@@ -742,9 +887,9 @@ export const AdminPage = () => {
             <div className="p-3 rounded-2xl bg-[#230206] border border-[#52060E] text-xs">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-extrabold text-white text-[11px]">Dark Store: Bengaluru South</span>
+                <span className="font-extrabold text-white text-[11px]">{adminContent.hubName}</span>
               </div>
-              <div className="text-[10px] text-amber-200/70 mt-1">Logged in as Operations Supervisor</div>
+              <div className="text-[10px] text-amber-200/70 mt-1">Logged in as {adminContent.supervisorName}</div>
             </div>
 
             <button
@@ -851,8 +996,7 @@ export const AdminPage = () => {
           {/* Quick Simulators & Storefront Jump */}
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
-              <span className="text-[#D98207]">❄️ 3.8°C</span>
-              <span>Cold-Chain OK</span>
+              <span className="text-[#D98207]">❄️ {adminContent.coldChainTemp}</span>
             </div>
 
             {(adminMode === 'b2c' || adminMode === 'unified') && (
@@ -2249,8 +2393,17 @@ export const AdminPage = () => {
                   </p>
                 </div>
 
-                <div className="text-xs text-slate-500 font-medium">
-                  Showing {inventoryList.length} Core Essential SKUs
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsAddProductModalOpen(true)}
+                    className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-amber-300" />
+                    <span>+ Add Product SKU</span>
+                  </button>
+                  <div className="text-xs text-slate-500 font-medium">
+                    Showing {inventoryList.length} Core Essential SKUs
+                  </div>
                 </div>
               </div>
 
@@ -2263,7 +2416,8 @@ export const AdminPage = () => {
                       <th className="p-3">B2C Retail Price</th>
                       <th className="p-3">B2B Wholesale Price</th>
                       <th className="p-3">Wholesale MOQ</th>
-                      <th className="p-3 rounded-r-xl text-right">Stock Status</th>
+                      <th className="p-3 text-right">Stock Status</th>
+                      <th className="p-3 rounded-r-xl text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 font-medium">
@@ -2294,6 +2448,24 @@ export const AdminPage = () => {
                           >
                             {prod.inStock ? 'In Stock (Active)' : 'Out of Stock'}
                           </button>
+                        </td>
+                        <td className="p-3 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => setEditingProduct({ ...prod })}
+                              className="p-1.5 rounded-lg text-blue-600 hover:text-white hover:bg-blue-600 border border-blue-200 transition-colors shadow-2xs"
+                              title="Edit product details & prices"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteProduct(prod.id)}
+                              className="p-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors shadow-2xs"
+                              title="Delete SKU from catalog"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -2381,6 +2553,277 @@ export const AdminPage = () => {
                   </p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* 7. STORE CONTENT & CMS (EDIT ADMIN & STORE CONTENT)       */}
+          {/* ========================================================= */}
+          {activeTab === 'content' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Settings className="w-5 h-5 text-[#7D0A14]" />
+                    <h3 className="text-xl font-black text-[#3D040A]">
+                      Admin & Store Content Management (CMS)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Live editor to customize storefront banners, announcements, facility locations, and B2B procurement details
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResetAdminContent}
+                    className="px-3 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors"
+                  >
+                    Reset Defaults
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveAdminContent}
+                    className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                  >
+                    <Save className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Save Content Changes</span>
+                  </button>
+                </div>
+              </div>
+
+              <form onSubmit={handleSaveAdminContent} className="space-y-6">
+                {/* 1. Facility & Operational Dark Store Hub */}
+                <div className="bg-[#FAF5EC]/60 rounded-2xl p-5 border border-[#EDE1D1] space-y-4">
+                  <div className="flex items-center gap-2 border-b border-[#E8DDCF] pb-2">
+                    <Store className="w-4 h-4 text-[#7D0A14]" />
+                    <h4 className="font-extrabold text-sm text-[#3D040A]">
+                      1. Facility & Operations Hub Settings
+                    </h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Active Dark Store / Fulfillment Center Name
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.hubName}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, hubName: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="e.g. Dark Store: Bengaluru South"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        Displayed in the Admin status badge and dispatch route run-sheets.
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Operations Supervisor Name / Role
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.supervisorName}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, supervisorName: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="e.g. Operations Supervisor - Bangalore South Hub"
+                      />
+                      <span className="text-[10px] text-slate-400 mt-1 block">
+                        Identifies the supervisor signing off on daily morning deliveries.
+                      </span>
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Ops Center Version Badge
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.hqVersion}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, hqVersion: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="e.g. HQ v2.4"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Cold-Chain Temperature Status
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.coldChainTemp}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, coldChainTemp: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="e.g. 3.8°C Cold-Chain OK"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Customer Storefront Announcements & Banners */}
+                <div className="bg-[#FAF5EC]/60 rounded-2xl p-5 border border-[#EDE1D1] space-y-4">
+                  <div className="flex items-center gap-2 border-b border-[#E8DDCF] pb-2">
+                    <Bell className="w-4 h-4 text-blue-600" />
+                    <h4 className="font-extrabold text-sm text-[#3D040A]">
+                      2. Customer Storefront Announcements & Delivery SLA
+                    </h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div className="md:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Top Header Announcement Bar (Marquee Notice)
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.announcementBar}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, announcementBar: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="e.g. ⚡ 10-15 Min Express Delivery | Free delivery above ₹99"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Morning Subscription Guarantee SLA
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.morningDeliveryGuarantee}
+                        onChange={(e) =>
+                          setContentFormData({
+                            ...contentFormData,
+                            morningDeliveryGuarantee: e.target.value
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="e.g. Automated doorstep delivery before 7:00 AM every single morning."
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Free Delivery Minimum Order (₹)
+                      </label>
+                      <input
+                        type="number"
+                        value={contentFormData.freeDeliveryThreshold}
+                        onChange={(e) =>
+                          setContentFormData({
+                            ...contentFormData,
+                            freeDeliveryThreshold: Number(e.target.value) || 0
+                          })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="99"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Subscription Vacation & Pause Guarantee Notice
+                      </label>
+                      <textarea
+                        rows="2"
+                        value={contentFormData.vacationGuarantee}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, vacationGuarantee: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="Going out of town? Pause or modify your delivery anytime without charges."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. B2B Commercial Procurement & Support */}
+                <div className="bg-[#FAF5EC]/60 rounded-2xl p-5 border border-[#EDE1D1] space-y-4">
+                  <div className="flex items-center gap-2 border-b border-[#E8DDCF] pb-2">
+                    <Building2 className="w-4 h-4 text-amber-700" />
+                    <h4 className="font-extrabold text-sm text-[#3D040A]">
+                      3. B2B Wholesale Desk & Customer Support
+                    </h4>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Procurement Desk WhatsApp & Phone
+                      </label>
+                      <input
+                        type="text"
+                        value={contentFormData.supportPhone}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, supportPhone: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="+91 98450 99888"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="font-bold text-slate-700 block mb-1">
+                        Operations & Billing Email
+                      </label>
+                      <input
+                        type="email"
+                        value={contentFormData.supportEmail}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, supportEmail: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="ops@sumadhurafoods.com"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="font-bold text-slate-700 block mb-1">
+                        B2B Wholesale Portal Welcome Callout
+                      </label>
+                      <textarea
+                        rows="2"
+                        value={contentFormData.b2bNotice}
+                        onChange={(e) =>
+                          setContentFormData({ ...contentFormData, b2bNotice: e.target.value })
+                        }
+                        className="w-full px-3.5 py-2 rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                        placeholder="Wholesale bulk rates, GST tax invoices & recurring morning kitchen supplies..."
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={handleResetAdminContent}
+                    className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition-colors"
+                  >
+                    Reset Defaults
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] active:scale-95 text-white font-black text-xs flex items-center gap-2 shadow-md transition-all"
+                  >
+                    <Save className="w-4 h-4 text-amber-300" />
+                    <span>Save All Admin & Store Content</span>
+                  </button>
+                </div>
+              </form>
             </div>
           )}
         </main>
@@ -2497,6 +2940,280 @@ export const AdminPage = () => {
                 <span>Print Official Invoice</span>
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* EDIT PRODUCT SKU MODAL                                        */}
+      {/* ------------------------------------------------------------- */}
+      {editingProduct && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Pencil className="w-5 h-5 text-[#7D0A14]" />
+                <h3 className="font-black text-base text-slate-900">
+                  Edit SKU: {editingProduct.name}
+                </h3>
+              </div>
+              <button
+                onClick={() => setEditingProduct(null)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={saveEditedProduct} className="space-y-4 text-xs">
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Product Name</label>
+                <input
+                  type="text"
+                  value={editingProduct.name}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Category</label>
+                  <select
+                    value={editingProduct.category}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold"
+                  >
+                    <option value="Dairy">Dairy</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Staples">Staples</option>
+                    <option value="Oils & Ghee">Oils & Ghee</option>
+                    <option value="Bakery">Bakery</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Current Stock Count</label>
+                  <input
+                    type="text"
+                    value={editingProduct.stock}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, stock: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. 240 Litres"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">B2C Retail Price (₹)</label>
+                  <input
+                    type="number"
+                    value={editingProduct.retailPrice}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, retailPrice: Number(e.target.value) })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-blue-700"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Retail Unit</label>
+                  <input
+                    type="text"
+                    value={editingProduct.retailUnit}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, retailUnit: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. Per Litre"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">B2B Wholesale Price (₹)</label>
+                  <input
+                    type="number"
+                    value={editingProduct.wholesalePrice}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, wholesalePrice: Number(e.target.value) })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-[#7D0A14]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Wholesale MOQ</label>
+                  <input
+                    type="text"
+                    value={editingProduct.moq}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, moq: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. 20L / 15kg Tin"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={editingProduct.inStock}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, inStock: e.target.checked })}
+                    className="w-4 h-4 rounded text-[#7D0A14] accent-[#7D0A14]"
+                  />
+                  <span className="font-bold text-slate-700">Currently In Stock & Available for Order</span>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingProduct(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                >
+                  <Save className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Save SKU Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* ADD NEW PRODUCT SKU MODAL                                     */}
+      {/* ------------------------------------------------------------- */}
+      {isAddProductModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Plus className="w-5 h-5 text-[#7D0A14]" />
+                <h3 className="font-black text-base text-slate-900">
+                  Add New Product SKU
+                </h3>
+              </div>
+              <button
+                onClick={() => setIsAddProductModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddNewProduct} className="space-y-4 text-xs">
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Product Name *</label>
+                <input
+                  type="text"
+                  value={newProductForm.name}
+                  onChange={(e) => setNewProductForm({ ...newProductForm, name: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  placeholder="e.g. Pure Buffalo Milk (1L)"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Category</label>
+                  <select
+                    value={newProductForm.category}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold"
+                  >
+                    <option value="Dairy">Dairy</option>
+                    <option value="Vegetables">Vegetables</option>
+                    <option value="Staples">Staples</option>
+                    <option value="Oils & Ghee">Oils & Ghee</option>
+                    <option value="Bakery">Bakery</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Initial Stock</label>
+                  <input
+                    type="text"
+                    value={newProductForm.stock}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, stock: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. 100 Litres"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">B2C Retail Price (₹) *</label>
+                  <input
+                    type="number"
+                    value={newProductForm.retailPrice}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, retailPrice: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-blue-700"
+                    placeholder="64"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Retail Unit</label>
+                  <input
+                    type="text"
+                    value={newProductForm.retailUnit}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, retailUnit: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="Per Litre"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">B2B Wholesale Price (₹)</label>
+                  <input
+                    type="number"
+                    value={newProductForm.wholesalePrice}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, wholesalePrice: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-[#7D0A14]"
+                    placeholder="Auto-calculated (25% off)"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Wholesale MOQ</label>
+                  <input
+                    type="text"
+                    value={newProductForm.moq}
+                    onChange={(e) => setNewProductForm({ ...newProductForm, moq: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    placeholder="e.g. 20 Litres"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsAddProductModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                >
+                  <Plus className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Create SKU</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
