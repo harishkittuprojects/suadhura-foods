@@ -24,6 +24,7 @@ export const SubscriptionModal = () => {
     setIsSubscriptionModalOpen,
     activeSubscription,
     setActiveSubscription,
+    addSubscription,
     selectedAddress,
     user,
     showToast
@@ -62,6 +63,18 @@ export const SubscriptionModal = () => {
   const [durationDays, setDurationDays] = useState(30); // 7 | 30
   const [isPaused, setIsPaused] = useState(false);
   const [step, setStep] = useState(activeSubscription ? 2 : 1);
+  const [createdSub, setCreatedSub] = useState(null);
+
+  const currentSubscription = activeSubscription || createdSub;
+
+  useEffect(() => {
+    if (activeSubscription) {
+      setStep(2);
+      setIsPaused(activeSubscription.status === 'Paused');
+    } else {
+      setStep(1);
+    }
+  }, [activeSubscription, isSubscriptionModalOpen]);
 
   if (!isSubscriptionModalOpen) return null;
 
@@ -88,7 +101,7 @@ export const SubscriptionModal = () => {
   const netPayable = grossTotal - discountAmount;
 
   const handleStartSubscription = (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     if (dailyTotal === 0) {
       showToast('Please select at least 1 item for your subscription order', 'error');
       return;
@@ -119,15 +132,20 @@ export const SubscriptionModal = () => {
       status: 'Active'
     };
 
-    try {
-      const existingSubs = JSON.parse(localStorage.getItem('sumadhura_subscriptions') || '[]');
-      localStorage.setItem('sumadhura_subscriptions', JSON.stringify([newSub, ...existingSubs]));
-      localStorage.setItem('sumadhura_subscription', JSON.stringify(newSub));
-    } catch (e) {
-      console.error(e);
+    setCreatedSub(newSub);
+    if (addSubscription) {
+      addSubscription(newSub);
+    } else {
+      try {
+        const existingSubs = JSON.parse(localStorage.getItem('sumadhura_subscriptions') || '[]');
+        localStorage.setItem('sumadhura_subscriptions', JSON.stringify([newSub, ...existingSubs]));
+        localStorage.setItem('sumadhura_subscription', JSON.stringify(newSub));
+      } catch (e) {
+        console.error(e);
+      }
+      setActiveSubscription(newSub);
     }
 
-    setActiveSubscription(newSub);
     setStep(2);
     showToast('Subscription Order activated! Delivery starts tomorrow 6:00 AM 🥛');
 
@@ -397,7 +415,8 @@ export const SubscriptionModal = () => {
 
             {/* CTA */}
             <button
-              type="submit"
+              type="button"
+              onClick={handleStartSubscription}
               disabled={dailyTotal === 0}
               className="w-full py-3.5 bg-[#7D0A14] hover:bg-[#680811] active:scale-98 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg shadow-[#7D0A14]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
@@ -408,7 +427,7 @@ export const SubscriptionModal = () => {
         )}
 
         {/* View 2: Active Subscription Dashboard */}
-        {step === 2 && activeSubscription && (
+        {step === 2 && currentSubscription && (
           <div className="p-5 sm:p-6 space-y-5">
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -418,7 +437,7 @@ export const SubscriptionModal = () => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-black text-sm text-slate-900">
-                      Subscription #{activeSubscription.id}
+                      Subscription #{currentSubscription.id}
                     </span>
                     <span
                       className={`text-[10px] font-black px-2 py-0.2 rounded-full ${
@@ -431,7 +450,7 @@ export const SubscriptionModal = () => {
                     </span>
                   </div>
                   <p className="text-xs text-slate-500">
-                    Next Morning Drop: Tomorrow between {activeSubscription.slot}
+                    Next Morning Drop: Tomorrow between {currentSubscription.slot}
                   </p>
                 </div>
               </div>
@@ -465,7 +484,7 @@ export const SubscriptionModal = () => {
                 Your Daily Morning Items
               </h4>
               <div className="space-y-2">
-                {(activeSubscription?.itemsList || (Array.isArray(activeSubscription?.items) ? activeSubscription.items : [])).map((item, idx) => (
+                {(currentSubscription?.itemsList || (Array.isArray(currentSubscription?.items) ? currentSubscription.items : [])).map((item, idx) => (
                   <div
                     key={idx}
                     className="p-3 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between text-xs"
@@ -478,9 +497,9 @@ export const SubscriptionModal = () => {
                     </span>
                   </div>
                 ))}
-                {(!activeSubscription?.itemsList && typeof activeSubscription?.items === 'string') && (
+                {(!currentSubscription?.itemsList && typeof currentSubscription?.items === 'string') && (
                   <div className="p-3 rounded-xl border border-slate-100 bg-slate-50 text-xs font-bold text-slate-800">
-                    {activeSubscription.items}
+                    {currentSubscription.items}
                   </div>
                 )}
               </div>
@@ -489,14 +508,14 @@ export const SubscriptionModal = () => {
             {/* Delivery Details */}
             <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs text-slate-600 space-y-1">
               <div>
-                <strong>Delivery Address:</strong> {activeSubscription?.address || 'Default Address'}
+                <strong>Delivery Address:</strong> {currentSubscription?.address || 'Default Address'}
               </div>
               <div>
-                <strong>Schedule:</strong> {activeSubscription?.frequency?.toUpperCase() || 'DAILY'} at{' '}
-                {activeSubscription?.slot || '6:00 AM - 7:00 AM'}
+                <strong>Schedule:</strong> {currentSubscription?.frequency?.toUpperCase() || 'DAILY'} at{' '}
+                {currentSubscription?.slot || '6:00 AM - 7:00 AM'}
               </div>
               <div>
-                <strong>Total Plan Cost:</strong> ₹{activeSubscription?.totalPaid || 0} (30 Days prepaid)
+                <strong>Total Plan Cost:</strong> ₹{currentSubscription?.totalPaid || 0} ({currentSubscription?.durationDays || 30} Days prepaid)
               </div>
             </div>
 

@@ -40,7 +40,8 @@ import {
   ExternalLink,
   ChevronRight,
   Zap,
-  Users
+  Users,
+  Trash2
 } from 'lucide-react';
 
 export const AdminPage = () => {
@@ -53,8 +54,21 @@ export const AdminPage = () => {
     setActiveSubscription,
     setIsAuthModalOpen,
     setIsSubscriptionModalOpen,
-    login
+    login,
+    orders: contextOrders,
+    setOrders: setContextOrders,
+    subscriptions: contextSubs,
+    setSubscriptions: setContextSubs,
+    addSubscription,
+    toggleSubscriptionStatus,
+    cancelSubscription,
+    deleteOrder
   } = useShop();
+
+  const orders = contextOrders || [];
+  const subscriptions = contextSubs || [];
+  const setOrders = setContextOrders;
+  const setSubscriptions = setContextSubs;
 
   // Mode: 'unified' | 'b2c' | 'b2b'
   const [adminMode, setAdminMode] = useState('unified');
@@ -174,87 +188,108 @@ export const AdminPage = () => {
   }, [user]);
 
   // -------------------------------------------------------------------
-  // REAL CUSTOMER ORDERS (NO FAKE ORDERS)
+  // DELETE & REMOVE ACTIONS FOR ORDERS, CUSTOMERS & SUBSCRIPTIONS
   // -------------------------------------------------------------------
-  const [orders, setOrders] = useState(() => {
+  const deleteCustomer = (cust) => {
+    const updated = customers.filter(
+      (c) => c.id !== cust.id && c.phone !== cust.phone && c.email !== cust.email
+    );
+    setCustomers(updated);
     try {
-      const saved = localStorage.getItem('sumadhura_orders');
-      let list = saved ? JSON.parse(saved) : [];
-      list = list.filter((o) => {
-        const cust = (o.customer || '').toLowerCase();
-        const comp = (o.companyName || '').toLowerCase();
-        const id = (o.id || '').toLowerCase();
-        return !FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || comp.includes(fk) || id.includes(fk));
-      });
-      const savedOrder = localStorage.getItem('sumadhura_active_order');
-      if (savedOrder) {
-        const o = JSON.parse(savedOrder);
-        const cust = (o.customer || '').toLowerCase();
-        const comp = (o.companyName || '').toLowerCase();
-        const id = (o.id || '').toLowerCase();
-        const isFake = FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || comp.includes(fk) || id.includes(fk));
-        if (!isFake && !list.some((item) => item.id === o.id)) {
-          list.unshift(o);
-        }
+      localStorage.setItem('sumadhura_registered_customers', JSON.stringify(updated));
+      if (user && (user.email === cust.email || user.phone === cust.phone)) {
+        localStorage.removeItem('sumadhura_user');
       }
-      return list;
-    } catch {
-      return [];
-    }
-  });
+    } catch {}
+    showToast(`🗑️ Customer "${cust.name || cust.companyName}" removed from registry.`);
+  };
 
-  // -------------------------------------------------------------------
-  // REAL MORNING MILK SUBSCRIPTIONS (NO FAKE CUSTOMERS)
-  // -------------------------------------------------------------------
-  const [subscriptions, setSubscriptions] = useState(() => {
+  const clearAllCustomers = () => {
+    if (window.confirm('Are you sure you want to remove all registered customers from the database?')) {
+      setCustomers([]);
+      try {
+        localStorage.setItem('sumadhura_registered_customers', JSON.stringify([]));
+      } catch {}
+      showToast('All registered customers have been cleared.', 'info');
+    }
+  };
+
+  const handleDeleteOrder = (orderId) => {
+    if (deleteOrder) {
+      deleteOrder(orderId);
+    } else {
+      const updated = orders.filter((o) => o.id !== orderId);
+      setOrders(updated);
+      try {
+        localStorage.setItem('sumadhura_orders', JSON.stringify(updated));
+      } catch {}
+    }
+    showToast(`🗑️ Order #${orderId} deleted.`);
+  };
+
+  const clearAllOrders = () => {
+    if (window.confirm('Are you sure you want to delete all customer orders?')) {
+      setOrders([]);
+      try {
+        localStorage.setItem('sumadhura_orders', JSON.stringify([]));
+        localStorage.removeItem('sumadhura_active_order');
+      } catch {}
+      showToast('All customer orders have been deleted.', 'info');
+    }
+  };
+
+  const handleDeleteSubscription = (subId) => {
+    if (cancelSubscription) {
+      cancelSubscription(subId);
+    } else {
+      const updated = subscriptions.filter((s) => s.id !== subId);
+      setSubscriptions(updated);
+      try {
+        localStorage.setItem('sumadhura_subscriptions', JSON.stringify(updated));
+        if (activeSubscription && activeSubscription.id === subId) {
+          setActiveSubscription(null);
+          localStorage.removeItem('sumadhura_subscription');
+        }
+      } catch {}
+    }
+    showToast(`🗑️ Subscription #${subId} deleted.`);
+  };
+
+  const clearAllSubscriptions = () => {
+    if (window.confirm('Are you sure you want to remove all morning subscriptions?')) {
+      setSubscriptions([]);
+      if (setActiveSubscription) setActiveSubscription(null);
+      try {
+        localStorage.setItem('sumadhura_subscriptions', JSON.stringify([]));
+        localStorage.removeItem('sumadhura_subscription');
+      } catch {}
+      showToast('All morning subscriptions cleared.', 'info');
+    }
+  };
+
+  const deleteQuote = (quoteId) => {
+    const updated = b2bQuotes.filter((q) => q.id !== quoteId);
+    setB2bQuotes(updated);
     try {
-      const saved = localStorage.getItem('sumadhura_subscriptions');
-      let list = saved ? JSON.parse(saved) : [];
-      list = list.filter((s) => {
-        const cust = (s.customer || '').toLowerCase();
-        const id = (s.id || '').toLowerCase();
-        return !FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || id.includes(fk));
-      });
-      const savedSub = localStorage.getItem('sumadhura_subscription');
-      if (savedSub) {
-        const s = JSON.parse(savedSub);
-        const cust = (s.customer || '').toLowerCase();
-        const id = (s.id || '').toLowerCase();
-        const isFake = FAKE_MOCK_KEYWORDS.some((fk) => cust.includes(fk) || id.includes(fk));
-        if (!isFake && !list.some((item) => item.id === s.id)) {
-          list.unshift(s);
-        }
-      }
-      return list;
-    } catch {
-      return [];
-    }
-  });
+      localStorage.setItem('sumadhura_b2b_rfps', JSON.stringify(updated));
+    } catch {}
+    showToast(`🗑️ Wholesale Quote Inquiry #${quoteId} deleted.`);
+  };
 
-  // Keep subscription in sync if activeSubscription changes
-  React.useEffect(() => {
-    if (activeSubscription) {
-      setSubscriptions((prev) => {
-        if (!prev.some((s) => s.id === activeSubscription.id)) {
-          const subObj = {
-            id: activeSubscription.id || `SUB-${Math.floor(100 + Math.random() * 900)}`,
-            customer: user?.name || user?.companyName || 'Current Customer',
-            phone: user?.phone || '+91 98450 12345',
-            email: user?.email || '',
-            apartment: activeSubscription.address || 'Hitec City, Hyderabad',
-            items: activeSubscription.itemsList ? activeSubscription.itemsList.map(i => `${i.name} (${i.qty})`).join(' + ') : 'Pure Farm Cow Milk 1L',
-            slot: activeSubscription.slot || '6:00 AM - 7:00 AM',
-            frequency: activeSubscription.frequency || 'Every Morning',
-            status: activeSubscription.status || 'Active',
-            since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
-            isBusiness: Boolean(user?.isBusiness)
-          };
-          return [subObj, ...prev];
-        }
-        return prev;
-      });
+  const clearAllQuotes = () => {
+    if (window.confirm('Are you sure you want to clear all B2B quote inquiries?')) {
+      setB2bQuotes([]);
+      try {
+        localStorage.setItem('sumadhura_b2b_rfps', JSON.stringify([]));
+      } catch {}
+      showToast('All B2B inquiries have been cleared.', 'info');
     }
-  }, [activeSubscription, user]);
+  };
+
+  const deleteInvoice = (invoiceNo) => {
+    setInvoices((prev) => prev.filter((i) => i.invoiceNo !== invoiceNo));
+    showToast(`🗑️ Invoice #${invoiceNo} removed.`);
+  };
 
   // -------------------------------------------------------------------
   // REAL B2B WHOLESALE RFPs & QUOTES (NO FAKE RFPs)
@@ -462,19 +497,6 @@ export const AdminPage = () => {
       orders.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
     );
     showToast(`Order ${orderId} status updated to "${newStatus}"`);
-  };
-
-  const toggleSubscriptionStatus = (subId) => {
-    setSubscriptions(
-      subscriptions.map((s) => {
-        if (s.id === subId) {
-          const next = s.status === 'Active' ? 'Paused' : 'Active';
-          showToast(`Subscription ${subId} is now ${next}`);
-          return { ...s, status: next };
-        }
-        return s;
-      })
-    );
   };
 
   const updateQuoteStatus = (quoteId, nextStatus) => {
@@ -1516,6 +1538,17 @@ export const AdminPage = () => {
                     <option value="Dispatched">Dispatched</option>
                     <option value="Delivered">Delivered</option>
                   </select>
+
+                  {orders.length > 0 && (
+                    <button
+                      onClick={clearAllOrders}
+                      className="px-2.5 py-1.5 text-xs rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 font-bold flex items-center gap-1 transition-colors"
+                      title="Clear All Orders"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Clear All Orders</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
@@ -1641,6 +1674,13 @@ export const AdminPage = () => {
                                 Invoice
                               </button>
                             )}
+                            <button
+                              onClick={() => handleDeleteOrder(order.id)}
+                              className="p-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors shadow-2xs"
+                              title="Delete this order"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -1686,6 +1726,16 @@ export const AdminPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
+                  {customers.length > 0 && (
+                    <button
+                      onClick={clearAllCustomers}
+                      className="px-3 py-2 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                      title="Clear all registered customers"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Clear All Customers</span>
+                    </button>
+                  )}
                   <button
                     onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
                     className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm"
@@ -1794,15 +1844,24 @@ export const AdminPage = () => {
                             </span>
                           )}
 
-                          <button
-                            onClick={() => {
-                              if (login) login(c);
-                              showToast(`Switched active customer session to ${c.name}`);
-                            }}
-                            className="text-xs font-bold text-[#7D0A14] hover:underline"
-                          >
-                            Switch Session →
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => {
+                                if (login) login(c);
+                                showToast(`Switched active customer session to ${c.name}`);
+                              }}
+                              className="text-xs font-bold text-[#7D0A14] hover:underline"
+                            >
+                              Switch Session →
+                            </button>
+                            <button
+                              onClick={() => deleteCustomer(c)}
+                              className="p-1.5 rounded-lg text-rose-500 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors shadow-2xs"
+                              title="Delete customer from registry"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -1828,6 +1887,16 @@ export const AdminPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2 self-start sm:self-auto">
+                  {subscriptions.length > 0 && (
+                    <button
+                      onClick={clearAllSubscriptions}
+                      className="px-3 py-2 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                      title="Clear all subscriptions"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Clear All Subscriptions</span>
+                    </button>
+                  )}
                   {user && (
                     <button
                       onClick={() => createSubscriptionForUser(user)}
@@ -1939,16 +2008,25 @@ export const AdminPage = () => {
                       </div>
 
                       <div className="pt-2 border-t border-[#E8DDCF] flex items-center justify-between">
-                        <button
-                          onClick={() => toggleSubscriptionStatus(sub.id)}
-                          className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
-                            sub.status === 'Active'
-                              ? 'bg-amber-200 text-amber-950 hover:bg-amber-300'
-                              : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                          }`}
-                        >
-                          {sub.status === 'Active' ? 'Pause Daily Dispatch' : 'Resume Daily Dispatch'}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => toggleSubscriptionStatus(sub.id)}
+                            className={`px-3 py-1 rounded-xl text-xs font-bold transition-colors ${
+                              sub.status === 'Active'
+                                ? 'bg-amber-200 text-amber-950 hover:bg-amber-300'
+                                : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                            }`}
+                          >
+                            {sub.status === 'Active' ? 'Pause Daily Dispatch' : 'Resume Daily Dispatch'}
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSubscription(sub.id)}
+                            className="p-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors shadow-2xs"
+                            title="Delete subscription"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
 
                         <button
                           onClick={() => showToast(`SMS dispatch reminder sent to ${sub.customer}`)}
@@ -2005,9 +2083,21 @@ export const AdminPage = () => {
                   </p>
                 </div>
 
-                <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-                  <Building2 className="w-4 h-4 text-amber-700" />
-                  <span>{b2bQuotes.length} Commercial Leads Active</span>
+                <div className="flex items-center gap-2">
+                  {b2bQuotes.length > 0 && (
+                    <button
+                      onClick={clearAllQuotes}
+                      className="px-3 py-2 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                      title="Clear all commercial RFPs"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Clear All RFPs</span>
+                    </button>
+                  )}
+                  <div className="inline-flex items-center gap-2 text-xs font-bold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+                    <Building2 className="w-4 h-4 text-amber-700" />
+                    <span>{b2bQuotes.length} Commercial Leads Active</span>
+                  </div>
                 </div>
               </div>
 
@@ -2113,6 +2203,13 @@ export const AdminPage = () => {
                               Approve Wholesale Contract
                             </button>
                           )}
+                          <button
+                            onClick={() => deleteQuote(quote.id)}
+                            className="p-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors shadow-2xs"
+                            title="Delete quote inquiry"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -2255,13 +2352,22 @@ export const AdminPage = () => {
                           <div className="text-[10px] text-slate-500">CGST + SGST: ₹{(inv.cgst * 2).toFixed(2)}</div>
                         </div>
 
-                        <button
-                          onClick={() => setSelectedInvoice(inv)}
-                          className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-amber-300" />
-                          <span>View & Print</span>
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setSelectedInvoice(inv)}
+                            className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
+                          >
+                            <Eye className="w-3.5 h-3.5 text-amber-300" />
+                            <span>View & Print</span>
+                          </button>
+                          <button
+                            onClick={() => deleteInvoice(inv.invoiceNo)}
+                            className="p-2 rounded-xl text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors shadow-2xs"
+                            title="Delete GST Invoice"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

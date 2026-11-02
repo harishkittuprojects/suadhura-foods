@@ -23,7 +23,8 @@ import {
   Receipt,
   Headphones,
   CreditCard,
-  Percent
+  Percent,
+  Trash2
 } from 'lucide-react';
 
 export const LoginPage = () => {
@@ -36,6 +37,7 @@ export const LoginPage = () => {
     cart,
     showToast,
     orders,
+    deleteOrder,
     setActiveOrder,
     setIsLiveTrackingOpen
   } = useShop();
@@ -302,12 +304,26 @@ export const LoginPage = () => {
                       </span>
                     </div>
                     <div className="text-right sm:flex-shrink-0">
-                      <span className="font-black text-[#7D0A14] text-base">
-                        ₹{Number(order.total).toLocaleString()}
-                      </span>
+                      <div className="flex items-center justify-end gap-2">
+                        <span className="font-black text-[#7D0A14] text-base">
+                          ₹{Number(order.total).toLocaleString()}
+                        </span>
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Delete order #${order.id} from your history?`)) {
+                              deleteOrder(order.id);
+                              showToast(`Order #${order.id} removed`);
+                            }
+                          }}
+                          className="p-1 rounded-lg text-rose-500 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors"
+                          title="Delete / cancel order"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                       <button
                         onClick={() => showToast(`Generating official GST Tax Invoice for Order #${order.id}...`)}
-                        className="block text-[11px] text-blue-600 font-bold hover:underline ml-auto"
+                        className="block text-[11px] text-blue-600 font-bold hover:underline ml-auto mt-0.5"
                       >
                         Download Tax Invoice PDF
                       </button>
@@ -432,9 +448,23 @@ export const LoginPage = () => {
                     </span>
                   </div>
                   <div className="text-right sm:flex-shrink-0">
-                    <span className="font-black text-slate-900 text-sm">
-                      ₹{Number(order.total).toLocaleString()}
-                    </span>
+                    <div className="flex items-center justify-end gap-2">
+                      <span className="font-black text-slate-900 text-sm">
+                        ₹{Number(order.total).toLocaleString()}
+                      </span>
+                      <button
+                        onClick={() => {
+                          if (window.confirm(`Delete order #${order.id} from your history?`)) {
+                            deleteOrder(order.id);
+                            showToast(`Order #${order.id} removed`);
+                          }
+                        }}
+                        className="p-1 rounded-lg text-rose-500 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors"
+                        title="Delete / cancel order"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                     <button
                       onClick={() => {
                         if (setActiveOrder && setIsLiveTrackingOpen) {
@@ -444,7 +474,7 @@ export const LoginPage = () => {
                           showToast(`Tracking Order #${order.id}...`);
                         }
                       }}
-                      className="block text-[11px] text-[#7D0A14] font-bold hover:underline ml-auto"
+                      className="block text-[11px] text-[#7D0A14] font-bold hover:underline ml-auto mt-0.5"
                     >
                       Track Order &rarr;
                     </button>

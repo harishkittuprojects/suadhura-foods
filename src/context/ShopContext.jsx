@@ -194,6 +194,95 @@ export const ShopProvider = ({ children }) => {
     }
   });
 
+  // Persistent Subscriptions for Real Logged-in Customers (Zero Fake Subscriptions)
+  const [subscriptions, setSubscriptions] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_subscriptions');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const fakeKeywords = [
+          'rajesh sharma',
+          'sunita venkatesh',
+          'karthik balan',
+          'deepa kulkarni',
+          'sub-101',
+          'sub-102',
+          'sub-103',
+          'sub-104'
+        ];
+        return parsed.filter((s) => {
+          const cust = (s.customer || '').toLowerCase();
+          const id = (s.id || '').toLowerCase();
+          return !fakeKeywords.some((fk) => cust.includes(fk) || id.includes(fk));
+        });
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
+  const addSubscription = (newSub) => {
+    setSubscriptions((prev) => {
+      const updated = [newSub, ...prev.filter((s) => s.id !== newSub.id)];
+      try {
+        localStorage.setItem('sumadhura_subscriptions', JSON.stringify(updated));
+        localStorage.setItem('sumadhura_subscription', JSON.stringify(newSub));
+      } catch {}
+      return updated;
+    });
+    setActiveSubscription(newSub);
+  };
+
+  const toggleSubscriptionStatus = (subId) => {
+    setSubscriptions((prev) => {
+      const updated = prev.map((s) => {
+        if (s.id === subId) {
+          const nextStatus = s.status === 'Active' ? 'Paused' : 'Active';
+          return { ...s, status: nextStatus };
+        }
+        return s;
+      });
+      try {
+        localStorage.setItem('sumadhura_subscriptions', JSON.stringify(updated));
+        const matched = updated.find((s) => s.id === subId);
+        if (matched && activeSubscription && activeSubscription.id === subId) {
+          setActiveSubscription(matched);
+          localStorage.setItem('sumadhura_subscription', JSON.stringify(matched));
+        }
+      } catch {}
+      return updated;
+    });
+  };
+
+  const cancelSubscription = (subId) => {
+    setSubscriptions((prev) => {
+      const updated = prev.filter((s) => s.id !== subId);
+      try {
+        localStorage.setItem('sumadhura_subscriptions', JSON.stringify(updated));
+        if (activeSubscription && activeSubscription.id === subId) {
+          setActiveSubscription(null);
+          localStorage.removeItem('sumadhura_subscription');
+        }
+      } catch {}
+      return updated;
+    });
+  };
+
+  const deleteOrder = (orderId) => {
+    setOrders((prev) => {
+      const updated = prev.filter((o) => o.id !== orderId);
+      try {
+        localStorage.setItem('sumadhura_orders', JSON.stringify(updated));
+        if (activeOrder && activeOrder.id === orderId) {
+          setActiveOrder(null);
+          localStorage.removeItem('sumadhura_active_order');
+        }
+      } catch {}
+      return updated;
+    });
+  };
+
   // Saved Addresses (Hyderabad default matching Sumadhura Caterers reference)
   const [savedAddresses, setSavedAddresses] = useState([
     {
@@ -285,6 +374,42 @@ export const ShopProvider = ({ children }) => {
       console.error(e);
     }
   }, [orders]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('sumadhura_subscriptions', JSON.stringify(subscriptions));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [subscriptions]);
+
+  // Real-time synchronization across browser tabs (Admin <-> Storefront)
+  useEffect(() => {
+    const handleStorage = (e) => {
+      if (e.key === 'sumadhura_subscriptions') {
+        try {
+          setSubscriptions(e.newValue ? JSON.parse(e.newValue) : []);
+        } catch {}
+      }
+      if (e.key === 'sumadhura_subscription') {
+        try {
+          setActiveSubscription(e.newValue ? JSON.parse(e.newValue) : null);
+        } catch {}
+      }
+      if (e.key === 'sumadhura_orders') {
+        try {
+          setOrders(e.newValue ? JSON.parse(e.newValue) : []);
+        } catch {}
+      }
+      if (e.key === 'sumadhura_user') {
+        try {
+          setUser(e.newValue ? JSON.parse(e.newValue) : null);
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const toggleOneMember = () => {
     setIsOneMember((prev) => {
@@ -610,6 +735,12 @@ export const ShopProvider = ({ children }) => {
         setIsSubscriptionModalOpen,
         activeSubscription,
         setActiveSubscription,
+        subscriptions,
+        setSubscriptions,
+        addSubscription,
+        toggleSubscriptionStatus,
+        cancelSubscription,
+        deleteOrder,
         setSelectedAddress,
         setSavedAddresses,
         showToast,
