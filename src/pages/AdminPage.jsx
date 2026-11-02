@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useShop } from '../context/ShopContext';
 import {
   Building2,
   User,
   ShoppingBag,
+  ShoppingCart,
   TrendingUp,
   Truck,
   CheckCircle2,
   Clock,
   AlertCircle,
+  AlertTriangle,
   FileText,
   Search,
   Filter,
@@ -39,6 +40,7 @@ import {
   Bell,
   ExternalLink,
   ChevronRight,
+  ChevronLeft,
   Zap,
   Users,
   Trash2,
@@ -52,9 +54,15 @@ import {
   ArrowDown,
   Boxes,
   MoreVertical,
-  ChevronLeft,
   LayoutGrid,
-  Briefcase
+  Briefcase,
+  Handshake,
+  BarChart3,
+  Ticket,
+  Warehouse,
+  Tag,
+  CreditCard,
+  Star
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
