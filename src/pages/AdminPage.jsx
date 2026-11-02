@@ -607,6 +607,196 @@ export const AdminPage = () => {
   };
 
   // -------------------------------------------------------------------
+  // CATEGORIES & AISLE TAXONOMY MANAGEMENT
+  // -------------------------------------------------------------------
+  const DEFAULT_CATEGORIES = [
+    {
+      id: 'cat-dairy',
+      name: 'Dairy Products',
+      slug: 'dairy-products',
+      emoji: '🥛',
+      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=600&q=80',
+      description: 'Farm fresh milk, A2 bilona ghee, fresh paneer blocks, butter & curd',
+      subCategories: ['Milk & Cream', 'Paneer & Tofu', 'Ghee & Butter', 'Curd & Yogurt'],
+      featured: true,
+      active: true,
+      sortOrder: 1
+    },
+    {
+      id: 'cat-veg',
+      name: 'Fresh Vegetables',
+      slug: 'fresh-vegetables',
+      emoji: '🥬',
+      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
+      description: 'Daily harvest farm fresh vegetables, leafy greens, root veggies & salads',
+      subCategories: ['Fresh Veggies', 'Leafy Greens', 'Root Veggies', 'Salads & Herbs'],
+      featured: true,
+      active: true,
+      sortOrder: 2
+    },
+    {
+      id: 'cat-fruits',
+      name: 'Fresh Fruits',
+      slug: 'fresh-fruits',
+      emoji: '🍎',
+      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=600&q=80',
+      description: 'Seasonal orchard fruits, Alphonso mangoes, apples, pomegranates & bananas',
+      subCategories: ['Fresh Fruits', 'Seasonal Specials', 'Imported & Berries'],
+      featured: true,
+      active: true,
+      sortOrder: 3
+    },
+    {
+      id: 'cat-staples',
+      name: 'Rice, Atta and Dals',
+      slug: 'rice-atta-dals',
+      emoji: '🌾',
+      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
+      description: 'Aged basmati rice, MP Sharbati wheat flour, unpolished pulses and dals',
+      subCategories: ['Atta, Rice & Dals', 'Organic Pulses', 'Whole Grains'],
+      featured: true,
+      active: true,
+      sortOrder: 4
+    },
+    {
+      id: 'cat-oils',
+      name: 'Oils and Ghee',
+      slug: 'oils-ghee',
+      emoji: '🫒',
+      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=600&q=80',
+      description: 'Cold pressed wood-churned oils, pure A2 Gir cow ghee, mustard & sesame',
+      subCategories: ['Cold Pressed Oils', 'A2 Desi Cow Ghee', 'Cooking Oils'],
+      featured: true,
+      active: true,
+      sortOrder: 5
+    },
+    {
+      id: 'cat-spices',
+      name: 'Masalas and Dry Fruits',
+      slug: 'masalas-dry-fruits',
+      emoji: '🌶️',
+      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=600&q=80',
+      description: 'Authentic stone-ground spices, California almonds, cashews & dry fruits',
+      subCategories: ['Masalas & Spices', 'Dry Fruits & Nuts', 'Whole Spices'],
+      featured: true,
+      active: true,
+      sortOrder: 6
+    },
+    {
+      id: 'cat-dishes',
+      name: 'Popular Dishes',
+      slug: 'popular-dishes',
+      emoji: '🍛',
+      image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=600&q=80',
+      description: 'Authentic Hyderabadi Dum Biryani, Paneer Butter Masala, ready meals',
+      subCategories: ['Biryani & Rice', 'Curries & Gravies', 'South Indian Breakfast'],
+      featured: true,
+      active: true,
+      sortOrder: 7
+    },
+    {
+      id: 'cat-snacks',
+      name: 'Munchies and Snacks',
+      slug: 'munchies-snacks',
+      emoji: '🍿',
+      image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=600&q=80',
+      description: 'Traditional Kerala banana chips, roasted makhana, murukku & tea snacks',
+      subCategories: ['Snacks & Munchies', 'Roasted Snacks', 'Traditional Sweets'],
+      featured: false,
+      active: true,
+      sortOrder: 8
+    }
+  ];
+
+  const [categoriesList, setCategoriesList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_admin_categories');
+      return saved ? JSON.parse(saved) : DEFAULT_CATEGORIES;
+    } catch {
+      return DEFAULT_CATEGORIES;
+    }
+  });
+
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [categoryForm, setCategoryForm] = useState({
+    name: '',
+    slug: '',
+    emoji: '🛒',
+    image: '',
+    description: '',
+    subCategories: '',
+    featured: true,
+    active: true
+  });
+
+  const handleSaveCategory = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!categoryForm.name.trim()) {
+      showToast('Please enter category name', 'error');
+      return;
+    }
+    const subCats = typeof categoryForm.subCategories === 'string' 
+      ? categoryForm.subCategories.split(',').map(s => s.trim()).filter(Boolean)
+      : categoryForm.subCategories;
+
+    if (editingCategory) {
+      const updated = categoriesList.map(c => c.id === editingCategory.id ? {
+        ...c,
+        name: categoryForm.name.trim(),
+        slug: categoryForm.slug || categoryForm.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        emoji: categoryForm.emoji || '🛒',
+        image: categoryForm.image || editingCategory.image,
+        description: categoryForm.description,
+        subCategories: subCats.length > 0 ? subCats : c.subCategories,
+        featured: categoryForm.featured,
+        active: categoryForm.active
+      } : c);
+      setCategoriesList(updated);
+      try { localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updated)); } catch {}
+      showToast(`✅ Category "${categoryForm.name}" updated successfully`);
+    } else {
+      const newCat = {
+        id: `cat-${Date.now()}`,
+        name: categoryForm.name.trim(),
+        slug: categoryForm.slug || categoryForm.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        emoji: categoryForm.emoji || '🛒',
+        image: categoryForm.image || 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80',
+        description: categoryForm.description || 'Fresh gourmet quality produce and foods',
+        subCategories: subCats.length > 0 ? subCats : ['General'],
+        featured: categoryForm.featured,
+        active: categoryForm.active,
+        sortOrder: categoriesList.length + 1
+      };
+      const updated = [...categoriesList, newCat];
+      setCategoriesList(updated);
+      try { localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updated)); } catch {}
+      showToast(`🎉 Category "${newCat.name}" created successfully`);
+    }
+    setIsCategoryModalOpen(false);
+    setEditingCategory(null);
+  };
+
+  const handleToggleCategoryActive = (catId) => {
+    const updated = categoriesList.map(c => c.id === catId ? { ...c, active: !c.active } : c);
+    setCategoriesList(updated);
+    try { localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updated)); } catch {}
+    const target = updated.find(c => c.id === catId);
+    showToast(`${target.name} is now ${target.active ? 'Active' : 'Hidden'} in storefront`);
+  };
+
+  const handleDeleteCategory = (catId) => {
+    const target = categoriesList.find(c => c.id === catId);
+    if (!target) return;
+    if (window.confirm(`Are you sure you want to delete category "${target.name}"?`)) {
+      const updated = categoriesList.filter(c => c.id !== catId);
+      setCategoriesList(updated);
+      try { localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updated)); } catch {}
+      showToast(`Deleted category "${target.name}"`);
+    }
+  };
+
+  // -------------------------------------------------------------------
   // HERO SECTION BANNERS & IMAGES CMS
   // -------------------------------------------------------------------
   const [heroSlides, setHeroSlides] = useState(() => {
@@ -939,7 +1129,7 @@ export const AdminPage = () => {
       id: 'categories',
       label: 'Categories',
       icon: LayoutGrid,
-      badge: 6,
+      badge: categoriesList.length,
       customBadge: null
     },
     {
@@ -3101,9 +3291,209 @@ export const AdminPage = () => {
           )}
 
           {/* ========================================================= */}
+          {/* CATEGORIES & AISLE TAXONOMY MANAGEMENT                    */}
+          {/* ========================================================= */}
+          {activeTab === 'categories' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <LayoutGrid className="w-5 h-5 text-[#7D0A14]" />
+                    <h3 className="text-xl font-black text-[#3D040A]">
+                      Category & Aisle Taxonomy Management
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Configure customer storefront aisles, category banners, product mapping, and B2C/B2B visibility
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditingCategory(null);
+                      setCategoryForm({
+                        name: '',
+                        slug: '',
+                        emoji: '🛒',
+                        image: '',
+                        description: '',
+                        subCategories: '',
+                        featured: true,
+                        active: true
+                      });
+                      setIsCategoryModalOpen(true);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-amber-300" />
+                    <span>+ Add New Category</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI Ribbon */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1]">
+                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Total Aisles</span>
+                  <div className="text-xl font-black text-[#3D040A] mt-0.5">{categoriesList.length} Categories</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/60">
+                  <span className="text-[10px] font-bold text-emerald-700 block uppercase">Active in Storefront</span>
+                  <div className="text-xl font-black text-emerald-800 mt-0.5">
+                    {categoriesList.filter(c => c.active).length} Active
+                  </div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60">
+                  <span className="text-[10px] font-bold text-amber-800 block uppercase">Catalog Items</span>
+                  <div className="text-xl font-black text-amber-900 mt-0.5">
+                    {inventoryList.length} SKUs Mapped
+                  </div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200/60">
+                  <span className="text-[10px] font-bold text-rose-700 block uppercase">Featured Aisles</span>
+                  <div className="text-xl font-black text-rose-800 mt-0.5">
+                    {categoriesList.filter(c => c.featured).length} Featured
+                  </div>
+                </div>
+              </div>
+
+              {/* Categories Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {categoriesList.map((cat) => {
+                  const matchingProducts = inventoryList.filter(p => {
+                    const cName = (p.category || '').toLowerCase();
+                    const target = cat.name.toLowerCase();
+                    return cName.includes(target) || target.includes(cName);
+                  });
+                  return (
+                    <div
+                      key={cat.id}
+                      className="rounded-2xl border border-[#EDE1D1] bg-white overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                    >
+                      {/* Image Banner */}
+                      <div className="relative h-32 w-full overflow-hidden bg-slate-100">
+                        <img
+                          src={cat.image}
+                          alt={cat.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                        <span className="absolute top-2.5 left-2.5 text-2xl filter drop-shadow">
+                          {cat.emoji}
+                        </span>
+                        <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
+                          {cat.featured && (
+                            <span className="px-2 py-0.5 rounded-full bg-amber-400 text-[#3D040A] text-[9px] font-black uppercase shadow-xs">
+                              Featured
+                            </span>
+                          )}
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-black uppercase shadow-xs ${
+                            cat.active ? 'bg-emerald-500 text-white' : 'bg-slate-400 text-white'
+                          }`}>
+                            {cat.active ? 'Live' : 'Hidden'}
+                          </span>
+                        </div>
+                        <div className="absolute bottom-2 left-3 right-3 text-white">
+                          <h4 className="font-black text-base drop-shadow-sm flex items-center gap-1.5">
+                            <span>{cat.name}</span>
+                          </h4>
+                          <span className="text-[10px] text-amber-200 font-mono font-medium drop-shadow-sm">
+                            /{cat.slug} • {matchingProducts.length} SKUs in stock
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Content details */}
+                      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                        <div className="space-y-2">
+                          <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                            {cat.description}
+                          </p>
+                          <div className="flex flex-wrap gap-1">
+                            {cat.subCategories?.map((sub, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 rounded-md bg-[#FAF5EC] border border-[#EDE1D1] text-[10px] font-semibold text-[#7D0A14]"
+                              >
+                                {sub}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSearchQuery(cat.name);
+                              setActiveTab('inventory');
+                            }}
+                            className="flex-1 py-1.5 px-2 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Package className="w-3.5 h-3.5" />
+                            <span>View Products ({matchingProducts.length})</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingCategory(cat);
+                              setCategoryForm({
+                                name: cat.name,
+                                slug: cat.slug,
+                                emoji: cat.emoji,
+                                image: cat.image,
+                                description: cat.description,
+                                subCategories: cat.subCategories?.join(', ') || '',
+                                featured: cat.featured,
+                                active: cat.active
+                              });
+                              setIsCategoryModalOpen(true);
+                            }}
+                            className="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 cursor-pointer transition-colors"
+                            title="Edit Category"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleToggleCategoryActive(cat.id)}
+                            className={`p-1.5 rounded-xl border transition-colors cursor-pointer ${
+                              cat.active
+                                ? 'border-emerald-200 text-emerald-600 hover:bg-emerald-50'
+                                : 'border-slate-200 text-slate-400 hover:bg-slate-50'
+                            }`}
+                            title={cat.active ? 'Hide from storefront' : 'Show on storefront'}
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            className="p-1.5 rounded-xl border border-rose-200 text-rose-500 hover:bg-rose-50 cursor-pointer transition-colors"
+                            title="Delete Category"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
           {/* 5. INVENTORY & PRICING (RETAIL vs WHOLESALE)              */}
           {/* ========================================================= */}
-          {activeTab === 'inventory' && (
+          {(activeTab === 'inventory' || activeTab === 'products') && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
@@ -3523,7 +3913,7 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 8. STORE CONTENT & CMS (EDIT ADMIN & STORE CONTENT)       */}
           {/* ========================================================= */}
-          {activeTab === 'content' && (
+          {(activeTab === 'content' || activeTab === 'settings') && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                 <div>
@@ -3788,6 +4178,366 @@ export const AdminPage = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* OFFERS & COUPONS MANAGEMENT                               */}
+          {/* ========================================================= */}
+          {activeTab === 'offers-coupons' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Percent className="w-5 h-5 text-[#7D0A14]" />
+                    <h3 className="text-xl font-black text-[#3D040A]">
+                      Discounts, Coupons & Commercial Promotions
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Manage active coupon codes, minimum order value thresholds, and customer savings
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => showToast('Coupon creator ready! Fill details below.')}
+                  className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5 text-amber-300" />
+                  <span>+ Create Promo Code</span>
+                </button>
+              </div>
+
+              {/* KPI Ribbon */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1]">
+                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Active Campaigns</span>
+                  <div className="text-xl font-black text-[#3D040A] mt-0.5">4 Coupons</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/60">
+                  <span className="text-[10px] font-bold text-emerald-700 block uppercase">Total Redeemed</span>
+                  <div className="text-xl font-black text-emerald-800 mt-0.5">1,248 Orders</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60">
+                  <span className="text-[10px] font-bold text-amber-800 block uppercase">Avg Order Boost</span>
+                  <div className="text-xl font-black text-amber-900 mt-0.5">+34% Basket Size</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200/60">
+                  <span className="text-[10px] font-bold text-rose-700 block uppercase">Customer Savings</span>
+                  <div className="text-xl font-black text-rose-800 mt-0.5">₹48,500 Saved</div>
+                </div>
+              </div>
+
+              {/* Coupons List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  {
+                    code: 'WELCOME50',
+                    title: '50% Off First Morning Delivery',
+                    discount: '50% OFF (Up to ₹100)',
+                    minOrder: 'Min. Order ₹199',
+                    type: 'B2C Retail',
+                    badge: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+                    validity: 'Valid till 31 Dec 2026',
+                    uses: '540 uses'
+                  },
+                  {
+                    code: 'B2BFREESHIP',
+                    title: 'Free Express Commercial Delivery',
+                    discount: 'Free Logistics Dispatch',
+                    minOrder: 'Min. Order ₹2,000',
+                    type: 'B2B Wholesale',
+                    badge: 'bg-rose-100 text-rose-800 border-rose-300',
+                    validity: 'Permanent Wholesale Partner Benefit',
+                    uses: '312 uses'
+                  },
+                  {
+                    code: 'HEALTHY10',
+                    title: '10% Off All Organic Farm Greens',
+                    discount: 'Flat 10% OFF',
+                    minOrder: 'Min. Order ₹299',
+                    type: 'Vegetables & Fruits',
+                    badge: 'bg-amber-100 text-amber-800 border-amber-300',
+                    validity: 'Valid on fresh greens & fruits',
+                    uses: '215 uses'
+                  },
+                  {
+                    code: 'MILKPASS20',
+                    title: '20% Off Monthly Milk Pass',
+                    discount: '20% OFF 1st Month',
+                    minOrder: '30-Day Subscription',
+                    type: 'Subscriptions',
+                    badge: 'bg-blue-100 text-blue-800 border-blue-300',
+                    validity: 'Applicable on Cow & Buffalo Milk',
+                    uses: '181 uses'
+                  }
+                ].map((cpn, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-2xl border border-[#EDE1D1] bg-[#FAF5EC]/40 hover:bg-[#FAF5EC] transition-all flex flex-col justify-between space-y-3"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-black text-sm px-2.5 py-1 rounded-lg bg-[#3D040A] text-[#F5A623] tracking-wider border border-[#52060E]">
+                            {cpn.code}
+                          </span>
+                          <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${cpn.badge}`}>
+                            {cpn.type}
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-sm text-[#3D040A] mt-2">{cpn.title}</h4>
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">{cpn.discount} • {cpn.minOrder}</p>
+                      </div>
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                        Active
+                      </span>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#EDE1D1] flex items-center justify-between text-[11px] text-slate-500">
+                      <span>📅 {cpn.validity}</span>
+                      <span className="font-bold text-[#7D0A14]">{cpn.uses}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* PAYMENTS & GATEWAY SETTLEMENTS                            */}
+          {/* ========================================================= */}
+          {activeTab === 'payments' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-[#7D0A14]" />
+                    <h3 className="text-xl font-black text-[#3D040A]">
+                      Payments & Gateway Settlements
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    UPI, Net Banking, Razorpay Settlements, Cash on Delivery collections, and B2B Net-30 credit
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Razorpay & UPI Webhook Active</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Payment Methods Breakdown */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-800">UPI & Online Banking</span>
+                    <span className="text-base">⚡</span>
+                  </div>
+                  <div className="text-2xl font-black text-emerald-950">64%</div>
+                  <p className="text-[11px] text-emerald-700">₹1,84,200 settled today via Instant QR & UPI AutoPay</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-200/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-amber-800">Cash on Delivery (COD)</span>
+                    <span className="text-base">💵</span>
+                  </div>
+                  <div className="text-2xl font-black text-amber-950">21%</div>
+                  <p className="text-[11px] text-amber-700">₹58,400 collected by morning route delivery riders</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-200/80 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-purple-800">B2B Corporate Net-30</span>
+                    <span className="text-base">🏢</span>
+                  </div>
+                  <div className="text-2xl font-black text-purple-950">15%</div>
+                  <p className="text-[11px] text-purple-700">₹44,150 invoiced with 30-day payment cycle</p>
+                </div>
+              </div>
+
+              {/* Transactions Ledger */}
+              <div className="space-y-3">
+                <h4 className="font-extrabold text-sm text-[#3D040A]">Recent Gateway Transactions</h4>
+                <div className="rounded-2xl border border-slate-200 overflow-hidden text-xs">
+                  <table className="w-full text-left">
+                    <thead className="bg-[#FAF5EC] text-slate-600 font-bold border-b border-slate-200">
+                      <tr>
+                        <th className="p-3">Transaction ID</th>
+                        <th className="p-3">Customer</th>
+                        <th className="p-3">Method</th>
+                        <th className="p-3">Amount</th>
+                        <th className="p-3">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {[
+                        { id: 'TXN-98412', name: 'Verified Citizen User', method: 'UPI Instant (GPay)', amount: '₹480', status: 'Captured' },
+                        { id: 'TXN-98411', name: 'B2B Food & Catering Partner', method: 'Net-30 Invoiced', amount: '₹8,400', status: 'Invoiced' },
+                        { id: 'TXN-98410', name: 'Monthly Milk Subscriber', method: 'UPI AutoPay Recurring', amount: '₹1,950', status: 'Captured' },
+                        { id: 'TXN-98409', name: 'Retail Customer', method: 'Cash on Delivery', amount: '₹340', status: 'Collected' }
+                      ].map((t, idx) => (
+                        <tr key={idx} className="hover:bg-slate-50/80">
+                          <td className="p-3 font-mono font-bold text-slate-700">{t.id}</td>
+                          <td className="p-3 font-semibold text-slate-900">{t.name}</td>
+                          <td className="p-3 text-slate-600">{t.method}</td>
+                          <td className="p-3 font-mono font-black text-slate-900">{t.amount}</td>
+                          <td className="p-3">
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                              ✓ {t.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* REPORTS & OPERATIONS ANALYTICS                            */}
+          {/* ========================================================= */}
+          {activeTab === 'reports' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-[#7D0A14]" />
+                    <h3 className="text-xl font-black text-[#3D040A]">
+                      Operations, GMV & Sales Analytics
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Live performance reports across morning doorstep dispatches, commercial bulk sales & repeat rates
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.print();
+                    showToast('Generating official analytics report...');
+                  }}
+                  className="px-4 py-2 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] text-xs font-bold border border-[#EDE1D1] flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Export Report PDF</span>
+                </button>
+              </div>
+
+              {/* KPI Ribbon */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div className="p-3.5 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1]">
+                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Monthly GMV</span>
+                  <div className="text-xl font-black text-[#3D040A] mt-0.5">₹4,82,600</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/60">
+                  <span className="text-[10px] font-bold text-emerald-700 block uppercase">On-Time Dispatch Rate</span>
+                  <div className="text-xl font-black text-emerald-800 mt-0.5">99.4% &lt; 7:00 AM</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60">
+                  <span className="text-[10px] font-bold text-amber-800 block uppercase">Repeat Customer Rate</span>
+                  <div className="text-xl font-black text-amber-900 mt-0.5">78.2% Retention</div>
+                </div>
+                <div className="p-3.5 rounded-2xl bg-purple-50/70 border border-purple-200/60">
+                  <span className="text-[10px] font-bold text-purple-700 block uppercase">B2B Wholesale Share</span>
+                  <div className="text-xl font-black text-purple-800 mt-0.5">32.6% of Volume</div>
+                </div>
+              </div>
+
+              {/* Category Sales Breakdown */}
+              <div className="space-y-3">
+                <h4 className="font-extrabold text-sm text-[#3D040A]">Category Demand & Sales Volume</h4>
+                <div className="space-y-2">
+                  {[
+                    { name: '🥛 Dairy Products (Milk, Ghee, Paneer)', share: 44, color: 'bg-emerald-500' },
+                    { name: '🥬 Fresh Vegetables & Leafy Greens', share: 26, color: 'bg-green-600' },
+                    { name: '🌾 Rice, Atta and Dals', share: 15, color: 'bg-amber-500' },
+                    { name: '🍎 Fresh Fruits', share: 9, color: 'bg-rose-500' },
+                    { name: '🍿 Munchies & Popular Dishes', share: 6, color: 'bg-purple-500' }
+                  ].map((cat, idx) => (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between text-xs font-bold text-slate-700">
+                        <span>{cat.name}</span>
+                        <span className="font-mono">{cat.share}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div className={`h-full ${cat.color} rounded-full`} style={{ width: `${cat.share}%` }}></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* REVIEWS & QUALITY RATINGS                                 */}
+          {/* ========================================================= */}
+          {activeTab === 'reviews' && (
+            <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-6 shadow-xs animate-in fade-in duration-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Star className="w-5 h-5 text-amber-500 fill-amber-400" />
+                    <h3 className="text-xl font-black text-[#3D040A]">
+                      Customer Quality Reviews & Feedback (4.9 ★)
+                    </h3>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Verified feedback from daily milk subscribers, organic produce buyers, and B2B kitchen partners
+                  </p>
+                </div>
+              </div>
+
+              {/* Review Highlights */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  {
+                    author: 'Ananya Sharma (Koramangala, Bangalore)',
+                    rating: 5,
+                    title: 'Best Cow Milk in Bangalore!',
+                    text: 'The milk is delivered sharp at 6:15 AM every single morning. The cream layer is thick and tastes just like village farm milk.',
+                    badge: 'Verified Daily Subscriber'
+                  },
+                  {
+                    author: 'Chef Raghuveer (South Grand Catering)',
+                    rating: 5,
+                    title: 'Top Wholesale Paneer Quality',
+                    text: 'We order 20kg fresh malai paneer blocks every alternate day. Consistency, softness, and moisture level are world-class.',
+                    badge: 'Verified B2B Partner'
+                  },
+                  {
+                    author: 'Suresh Kumar (Indiranagar, Bangalore)',
+                    rating: 5,
+                    title: 'Fresh Crisp Vegetables',
+                    text: 'Never had spinach and tomatoes this fresh. Delivered in hygienic temperature-controlled crates.',
+                    badge: 'Verified Customer'
+                  }
+                ].map((rev, idx) => (
+                  <div
+                    key={idx}
+                    className="p-4 rounded-2xl border border-[#EDE1D1] bg-[#FAF5EC]/40 space-y-3 flex flex-col justify-between"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-1 text-amber-500 text-sm">
+                        {'★'.repeat(rev.rating)}
+                      </div>
+                      <h4 className="font-bold text-sm text-[#3D040A]">{rev.title}</h4>
+                      <p className="text-xs text-slate-600 leading-relaxed">{rev.text}</p>
+                    </div>
+
+                    <div className="pt-2 border-t border-[#EDE1D1]">
+                      <span className="font-bold text-[11px] text-[#7D0A14] block">{rev.author}</span>
+                      <span className="text-[10px] text-emerald-700 font-semibold">{rev.badge}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </main>
@@ -4617,6 +5367,138 @@ export const AdminPage = () => {
                 >
                   <Save className="w-3.5 h-3.5 text-amber-300" />
                   <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* ADD / EDIT CATEGORY MODAL                                     */}
+      {/* ------------------------------------------------------------- */}
+      {isCategoryModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <LayoutGrid className="w-5 h-5 text-[#7D0A14]" />
+                <h3 className="font-black text-base text-slate-900">
+                  {editingCategory ? `Edit Category: ${editingCategory.name}` : 'Add New Category Aisle'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsCategoryModalOpen(false);
+                  setEditingCategory(null);
+                }}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveCategory} className="space-y-4 text-xs">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="col-span-2">
+                  <label className="font-bold text-slate-700 block mb-1">Category Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={categoryForm.name}
+                    onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    placeholder="e.g. Organic Dairy & Ghee"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Emoji Icon</label>
+                  <input
+                    type="text"
+                    value={categoryForm.emoji}
+                    onChange={(e) => setCategoryForm({ ...categoryForm, emoji: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-center text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    placeholder="🥛"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Banner Image URL</label>
+                <input
+                  type="url"
+                  value={categoryForm.image}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, image: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  placeholder="https://images.unsplash.com/..."
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Description</label>
+                <textarea
+                  rows="2"
+                  value={categoryForm.description}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  placeholder="Short description shown to customers..."
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Subcategories (Comma separated)</label>
+                <input
+                  type="text"
+                  value={categoryForm.subCategories}
+                  onChange={(e) => setCategoryForm({ ...categoryForm, subCategories: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  placeholder="e.g. A2 Milk, Paneer Blocks, Bilona Ghee"
+                />
+              </div>
+
+              <div className="flex items-center gap-6 pt-2">
+                <label className="flex items-center gap-2 font-bold text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={categoryForm.featured}
+                    onChange={(e) => setCategoryForm({ ...categoryForm, featured: e.target.checked })}
+                    className="w-4 h-4 accent-[#7D0A14] rounded"
+                  />
+                  <span>Featured on Storefront</span>
+                </label>
+
+                <label className="flex items-center gap-2 font-bold text-slate-700 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={categoryForm.active}
+                    onChange={(e) => setCategoryForm({ ...categoryForm, active: e.target.checked })}
+                    className="w-4 h-4 accent-emerald-600 rounded"
+                  />
+                  <span>Active in Store</span>
+                </label>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCategoryModalOpen(false);
+                    setEditingCategory(null);
+                  }}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                >
+                  <Save className="w-3.5 h-3.5 text-amber-300" />
+                  <span>{editingCategory ? 'Save Category' : 'Create Category'}</span>
                 </button>
               </div>
             </form>
