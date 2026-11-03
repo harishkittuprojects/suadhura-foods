@@ -619,34 +619,6 @@ export const AdminPage = () => {
   // Inventory Editor Modals
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
-  const [isCustomCategory, setIsCustomCategory] = useState(false);
-  const [customCategoryInput, setCustomCategoryInput] = useState('');
-  const [isEditCustomCategory, setIsEditCustomCategory] = useState(false);
-  const [editCustomCategoryInput, setEditCustomCategoryInput] = useState('');
-
-  const availableCategoryNames = React.useMemo(() => {
-    const set = new Set([
-      'Dairy',
-      'Vegetables',
-      'Fruits',
-      'Staples',
-      'Oils & Ghee',
-      'Bakery',
-      'Spices & Dry Fruits',
-      'Beverages'
-    ]);
-    if (Array.isArray(categoriesList)) {
-      categoriesList.forEach((c) => {
-        if (c.name) set.add(c.name);
-      });
-    }
-    if (Array.isArray(inventoryList)) {
-      inventoryList.forEach((p) => {
-        if (p.category) set.add(p.category);
-      });
-    }
-    return Array.from(set);
-  }, [categoriesList, inventoryList]);
   const [newProductForm, setNewProductForm] = useState({
     name: '',
     category: 'Dairy',
@@ -900,6 +872,35 @@ export const AdminPage = () => {
       return DEFAULT_CATEGORIES;
     }
   });
+
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
+  const [isEditCustomCategory, setIsEditCustomCategory] = useState(false);
+  const [editCustomCategoryInput, setEditCustomCategoryInput] = useState('');
+
+  const availableCategoryNames = React.useMemo(() => {
+    const set = new Set([
+      'Dairy',
+      'Vegetables',
+      'Fruits',
+      'Staples',
+      'Oils & Ghee',
+      'Bakery',
+      'Spices & Dry Fruits',
+      'Beverages'
+    ]);
+    if (Array.isArray(categoriesList)) {
+      categoriesList.forEach((c) => {
+        if (c.name) set.add(c.name);
+      });
+    }
+    if (Array.isArray(inventoryList)) {
+      inventoryList.forEach((p) => {
+        if (p.category) set.add(p.category);
+      });
+    }
+    return Array.from(set);
+  }, [categoriesList, inventoryList]);
 
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
