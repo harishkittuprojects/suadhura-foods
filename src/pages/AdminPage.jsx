@@ -607,12 +607,12 @@ export const AdminPage = () => {
   const [inventoryCategoryFilter, setInventoryCategoryFilter] = useState('All');
 
   const handleResetInventory = () => {
-    if (window.confirm('Reset inventory catalog to default core SKUs?')) {
+    if (window.confirm('Reset inventory catalog to default core products?')) {
       setInventoryList(DEFAULT_INVENTORY);
       try {
         localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(DEFAULT_INVENTORY));
       } catch {}
-      showToast('Reset inventory catalog to default core SKUs');
+      showToast('Reset inventory catalog to default core products');
     }
   };
 
@@ -3632,7 +3632,7 @@ export const AdminPage = () => {
                 <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/60">
                   <span className="text-[10px] font-bold text-amber-800 block uppercase">Catalog Items</span>
                   <div className="text-xl font-black text-amber-900 mt-0.5">
-                    {inventoryList.length} SKUs Mapped
+                    {inventoryList.length} Products Mapped
                   </div>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200/60">
@@ -3684,7 +3684,7 @@ export const AdminPage = () => {
                             <span>{cat.name}</span>
                           </h4>
                           <span className="text-[10px] text-amber-200 font-mono font-medium drop-shadow-sm">
-                            /{cat.slug} • {matchingProducts.length} SKUs in stock
+                            /{cat.slug} • {matchingProducts.length} in stock
                           </span>
                         </div>
                       </div>
@@ -3801,7 +3801,7 @@ export const AdminPage = () => {
                     className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                   >
                     <Plus className="w-3.5 h-3.5 text-amber-300" />
-                    <span>+ Add Product SKU</span>
+                    <span>+ Add Product</span>
                   </button>
                 </div>
               </div>
@@ -3809,19 +3809,19 @@ export const AdminPage = () => {
               {/* Inventory Quick KPI Ribbon */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1]">
-                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Total SKUs</span>
-                  <div className="text-xl font-black text-[#3D040A] mt-0.5">{inventoryList.length} Items</div>
+                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Total Products</span>
+                  <div className="text-xl font-black text-[#3D040A] mt-0.5">{inventoryList.length}</div>
                 </div>
                 <div className="p-3 rounded-2xl bg-emerald-50/70 border border-emerald-200/60">
                   <span className="text-[10px] font-bold text-emerald-700 block uppercase">In Stock (Active)</span>
                   <div className="text-xl font-black text-emerald-800 mt-0.5">
-                    {inventoryList.filter((p) => p.inStock).length} SKUs
+                    {inventoryList.filter((p) => p.inStock).length}
                   </div>
                 </div>
                 <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-200/60">
                   <span className="text-[10px] font-bold text-rose-700 block uppercase">Out of Stock</span>
                   <div className="text-xl font-black text-rose-800 mt-0.5">
-                    {inventoryList.filter((p) => !p.inStock).length} SKUs
+                    {inventoryList.filter((p) => !p.inStock).length}
                   </div>
                 </div>
                 <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/60">
@@ -3838,7 +3838,7 @@ export const AdminPage = () => {
                     type="text"
                     value={inventorySearch}
                     onChange={(e) => setInventorySearch(e.target.value)}
-                    placeholder="Search SKU by name, category, stock..."
+                    placeholder="Search products by name, category, stock..."
                     className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 bg-[#FAF5EC]/40 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
                   />
                 </div>
@@ -3931,7 +3931,7 @@ export const AdminPage = () => {
                             <button
                               onClick={() => handleDeleteProduct(prod.id)}
                               className="p-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 border border-rose-200 transition-colors shadow-2xs"
-                              title="Delete SKU from catalog"
+                              title="Delete product from catalog"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -4942,7 +4942,7 @@ export const AdminPage = () => {
       )}
 
       {/* ------------------------------------------------------------- */}
-      {/* EDIT PRODUCT SKU MODAL                                        */}
+      {/* EDIT PRODUCT MODAL                                        */}
       {/* ------------------------------------------------------------- */}
       {editingProduct && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -4954,7 +4954,7 @@ export const AdminPage = () => {
               <div className="flex items-center gap-2">
                 <Pencil className="w-5 h-5 text-[#7D0A14]" />
                 <h3 className="font-black text-base text-slate-900">
-                  Edit SKU: {editingProduct.name}
+                  Edit Product: {editingProduct.name}
                 </h3>
               </div>
               <button
@@ -5075,7 +5075,7 @@ export const AdminPage = () => {
                   className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                 >
                   <Save className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Save SKU Changes</span>
+                  <span>Save Product Changes</span>
                 </button>
               </div>
             </form>
@@ -5204,7 +5204,7 @@ export const AdminPage = () => {
         </div>
       )}
 
-            {/* ADD NEW PRODUCT SKU MODAL                                     */}
+            {/* ADD NEW PRODUCT MODAL                                     */}
       {/* ------------------------------------------------------------- */}
       {isAddProductModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -5216,7 +5216,7 @@ export const AdminPage = () => {
               <div className="flex items-center gap-2">
                 <Plus className="w-5 h-5 text-[#7D0A14]" />
                 <h3 className="font-black text-base text-slate-900">
-                  Add New Product SKU
+                  Add New Product
                 </h3>
               </div>
               <button
@@ -5327,7 +5327,7 @@ export const AdminPage = () => {
                   className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                 >
                   <Plus className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Create SKU</span>
+                  <span>Create Product</span>
                 </button>
               </div>
             </form>

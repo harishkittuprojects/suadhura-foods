@@ -496,7 +496,7 @@ export const B2BPage = () => {
             href="#b2b-quote"
             className="text-xs sm:text-sm font-extrabold text-[#7D0A14] hover:underline flex items-center gap-1 self-start sm:self-auto"
           >
-            <span>Need full 400+ SKU price list? Request Quote</span>
+            <span>Need full wholesale price list? Request Quote</span>
             <ChevronRight className="w-4 h-4" />
           </a>
         </div>
