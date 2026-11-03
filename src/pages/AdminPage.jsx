@@ -619,6 +619,34 @@ export const AdminPage = () => {
   // Inventory Editor Modals
   const [editingProduct, setEditingProduct] = useState(null);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
+  const [isEditCustomCategory, setIsEditCustomCategory] = useState(false);
+  const [editCustomCategoryInput, setEditCustomCategoryInput] = useState('');
+
+  const availableCategoryNames = React.useMemo(() => {
+    const set = new Set([
+      'Dairy',
+      'Vegetables',
+      'Fruits',
+      'Staples',
+      'Oils & Ghee',
+      'Bakery',
+      'Spices & Dry Fruits',
+      'Beverages'
+    ]);
+    if (Array.isArray(categoriesList)) {
+      categoriesList.forEach((c) => {
+        if (c.name) set.add(c.name);
+      });
+    }
+    if (Array.isArray(inventoryList)) {
+      inventoryList.forEach((p) => {
+        if (p.category) set.add(p.category);
+      });
+    }
+    return Array.from(set);
+  }, [categoriesList, inventoryList]);
   const [newProductForm, setNewProductForm] = useState({
     name: '',
     category: 'Dairy',
@@ -634,12 +662,49 @@ export const AdminPage = () => {
   const saveEditedProduct = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!editingProduct) return;
-    const updated = inventoryList.map((p) => (p.id === editingProduct.id ? editingProduct : p));
+
+    const finalCategory = (isEditCustomCategory && editCustomCategoryInput.trim())
+      ? editCustomCategoryInput.trim()
+      : (editingProduct.category || 'Dairy');
+
+    if (finalCategory) {
+      const exists = categoriesList.some(
+        c => c.name.toLowerCase() === finalCategory.toLowerCase()
+      );
+      if (!exists) {
+        const newCat = {
+          id: `cat-${Date.now()}`,
+          name: finalCategory,
+          slug: finalCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          emoji: '🛒',
+          image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80',
+          description: `${finalCategory} fresh products`,
+          subCategories: ['General'],
+          featured: false,
+          active: true,
+          sortOrder: categoriesList.length + 1
+        };
+        const updatedCats = [...categoriesList, newCat];
+        setCategoriesList(updatedCats);
+        try {
+          localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updatedCats));
+        } catch {}
+      }
+    }
+
+    const productToSave = {
+      ...editingProduct,
+      category: finalCategory
+    };
+
+    const updated = inventoryList.map((p) => (p.id === editingProduct.id ? productToSave : p));
     setInventoryList(updated);
     try {
       localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
     } catch {}
     setEditingProduct(null);
+    setIsEditCustomCategory(false);
+    setEditCustomCategoryInput('');
     showToast(`✅ Saved changes for ${editingProduct.name}`);
   };
 
@@ -649,10 +714,40 @@ export const AdminPage = () => {
       showToast('Please enter product name and retail price', 'error');
       return;
     }
+
+    const finalCategory = (isCustomCategory && customCategoryInput.trim())
+      ? customCategoryInput.trim()
+      : (newProductForm.category || 'Dairy');
+
+    if (finalCategory) {
+      const exists = categoriesList.some(
+        c => c.name.toLowerCase() === finalCategory.toLowerCase()
+      );
+      if (!exists) {
+        const newCat = {
+          id: `cat-${Date.now()}`,
+          name: finalCategory,
+          slug: finalCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          emoji: '🛒',
+          image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80',
+          description: `${finalCategory} fresh products`,
+          subCategories: ['General'],
+          featured: false,
+          active: true,
+          sortOrder: categoriesList.length + 1
+        };
+        const updatedCats = [...categoriesList, newCat];
+        setCategoriesList(updatedCats);
+        try {
+          localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updatedCats));
+        } catch {}
+      }
+    }
+
     const newProd = {
       id: `p-${Date.now().toString().slice(-4)}`,
       name: newProductForm.name,
-      category: newProductForm.category,
+      category: finalCategory,
       stock: newProductForm.stock || '100 Units',
       retailPrice: Number(newProductForm.retailPrice) || 0,
       retailUnit: newProductForm.retailUnit || 'Per Unit',
@@ -667,6 +762,8 @@ export const AdminPage = () => {
       localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
     } catch {}
     setIsAddProductModalOpen(false);
+    setIsCustomCategory(false);
+    setCustomCategoryInput('');
     setNewProductForm({
       name: '',
       category: 'Dairy',
@@ -678,7 +775,7 @@ export const AdminPage = () => {
       moq: '10 units',
       inStock: true
     });
-    showToast(`✅ Added new product: ${newProd.name}`);
+    showToast(`✅ Added new product: ${newProd.name} (${finalCategory})`);
   };
 
   const handleDeleteProduct = (prodId) => {
@@ -4979,18 +5076,62 @@ export const AdminPage = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Category</label>
-                  <select
-                    value={editingProduct.category}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold"
-                  >
-                    <option value="Dairy">Dairy</option>
-                    <option value="Vegetables">Vegetables</option>
-                    <option value="Staples">Staples</option>
-                    <option value="Oils & Ghee">Oils & Ghee</option>
-                    <option value="Bakery">Bakery</option>
-                  </select>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-slate-700">Category *</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditCustomCategory(!isEditCustomCategory);
+                        if (!isEditCustomCategory) setEditCustomCategoryInput('');
+                      }}
+                      className="text-[11px] font-extrabold text-[#7D0A14] hover:underline"
+                    >
+                      {isEditCustomCategory ? '← Choose from list' : '+ Add Custom'}
+                    </button>
+                  </div>
+                  {isEditCustomCategory ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={editCustomCategoryInput}
+                        onChange={(e) => setEditCustomCategoryInput(e.target.value)}
+                        placeholder="e.g. Fruits, Beverages, Sweets"
+                        className="w-full px-3 py-2 rounded-xl border-2 border-[#7D0A14] font-semibold text-xs bg-amber-50/20 focus:outline-none"
+                        autoFocus
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsEditCustomCategory(false)}
+                        className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                        title="Back to list"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      value={editingProduct.category}
+                      onChange={(e) => {
+                        if (e.target.value === '__add_custom__') {
+                          setIsEditCustomCategory(true);
+                          setEditCustomCategoryInput('');
+                        } else {
+                          setEditingProduct({ ...editingProduct, category: e.target.value });
+                        }
+                      }}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold text-xs bg-white"
+                    >
+                      {availableCategoryNames.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                      <option value="__add_custom__" className="font-bold text-[#7D0A14]">
+                        ➕ + Add Custom Category...
+                      </option>
+                    </select>
+                  )}
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Current Stock Count</label>
@@ -5242,18 +5383,62 @@ export const AdminPage = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Category</label>
-                  <select
-                    value={newProductForm.category}
-                    onChange={(e) => setNewProductForm({ ...newProductForm, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold"
-                  >
-                    <option value="Dairy">Dairy</option>
-                    <option value="Vegetables">Vegetables</option>
-                    <option value="Staples">Staples</option>
-                    <option value="Oils & Ghee">Oils & Ghee</option>
-                    <option value="Bakery">Bakery</option>
-                  </select>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-slate-700">Category *</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsCustomCategory(!isCustomCategory);
+                        if (!isCustomCategory) setCustomCategoryInput('');
+                      }}
+                      className="text-[11px] font-extrabold text-[#7D0A14] hover:underline"
+                    >
+                      {isCustomCategory ? '← Choose from list' : '+ Add Custom'}
+                    </button>
+                  </div>
+                  {isCustomCategory ? (
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={customCategoryInput}
+                        onChange={(e) => setCustomCategoryInput(e.target.value)}
+                        placeholder="e.g. Fruits, Beverages, Sweets"
+                        className="w-full px-3 py-2 rounded-xl border-2 border-[#7D0A14] font-semibold text-xs bg-amber-50/20 focus:outline-none"
+                        autoFocus
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsCustomCategory(false)}
+                        className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+                        title="Back to list"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <select
+                      value={newProductForm.category}
+                      onChange={(e) => {
+                        if (e.target.value === '__add_custom__') {
+                          setIsCustomCategory(true);
+                          setCustomCategoryInput('');
+                        } else {
+                          setNewProductForm({ ...newProductForm, category: e.target.value });
+                        }
+                      }}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold text-xs bg-white"
+                    >
+                      {availableCategoryNames.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                      <option value="__add_custom__" className="font-bold text-[#7D0A14]">
+                        ➕ + Add Custom Category...
+                      </option>
+                    </select>
+                  )}
                 </div>
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Initial Stock</label>
