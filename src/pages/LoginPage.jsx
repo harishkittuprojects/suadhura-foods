@@ -24,7 +24,8 @@ import {
   Headphones,
   CreditCard,
   Percent,
-  Trash2
+  Trash2,
+  Store
 } from 'lucide-react';
 
 export const LoginPage = () => {
@@ -85,40 +86,44 @@ export const LoginPage = () => {
     if (accountType === 'business') {
       if (tab === 'login') {
         login({
-          name: contactPerson || 'Procurement Officer',
-          companyName: companyName || (businessIdentifier.includes('@') ? businessIdentifier.split('@')[1].split('.')[0].toUpperCase() : 'Commercial Enterprise'),
+          name: contactPerson || 'Shopkeeper',
+          companyName: companyName || (businessIdentifier.includes('@') ? businessIdentifier.split('@')[1].split('.')[0].toUpperCase() : 'Kirana Store'),
           email: businessIdentifier.includes('@') ? businessIdentifier : `${businessIdentifier}@business.com`,
           phone: businessPhone || '+91 98450 99888',
           gstin: gstin || '36AABCU9603R1ZM',
-          businessType: businessType || 'Restaurant & Hotel',
-          isBusiness: true
+          businessType: businessType || 'Kirana & General Store',
+          isBusiness: true,
+          customerType: 'Shopkeeper'
         });
       } else {
         login({
-          name: contactPerson || 'Business Partner',
-          companyName: companyName || 'Commercial Enterprise Partner',
+          name: contactPerson || companyName || 'Shopkeeper',
+          companyName: companyName || 'Kirana Store',
           email: businessIdentifier,
           phone: businessPhone,
-          gstin: gstin || '36AABCU9603R1ZM',
+          gstin: gstin || '',
           businessType: businessType,
-          isBusiness: true
+          isBusiness: true,
+          customerType: 'Shopkeeper'
         });
       }
     } else {
-      // Personal User
+      // Personal User (Daily Customer)
       if (tab === 'login') {
         login({
-          name: identifier.includes('@') ? identifier.split('@')[0].replace(/[._]/g, ' ') : 'Customer',
+          name: identifier.includes('@') ? identifier.split('@')[0].replace(/[._]/g, ' ') : 'Daily Customer',
           email: identifier.includes('@') ? identifier : `${identifier}@customer.com`,
           phone: identifier.includes('@') ? '+91 98450 12345' : identifier,
-          isBusiness: false
+          isBusiness: false,
+          customerType: 'Daily Customer'
         });
       } else {
         login({
-          name: name || 'Customer',
+          name: name || 'Daily Customer',
           email: identifier,
           phone: phone,
-          isBusiness: false
+          isBusiness: false,
+          customerType: 'Daily Customer'
         });
       }
     }
@@ -508,14 +513,14 @@ export const LoginPage = () => {
   // ----------------------------------------------------
   return (
     <div className="max-w-md mx-auto px-4 py-8 space-y-4">
-      {/* 1. Account Type Switcher: B2C vs B2B */}
+      {/* 1. Account Type Switcher */}
       <div className="bg-white p-2 rounded-2xl border border-[#EDE1D1] shadow-2xs space-y-1.5">
         <div className="flex items-center justify-between px-1">
           <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-            Select Portal
+            Select Account Portal
           </span>
           <span className="text-[10px] font-bold text-[#7D0A14]">
-            {accountType === 'user' ? 'Retail / Household' : 'Wholesale / Commercial'}
+            {accountType === 'user' ? 'Daily Customer (Home)' : 'Shopkeeper (Wholesale)'}
           </span>
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -523,7 +528,6 @@ export const LoginPage = () => {
             type="button"
             onClick={() => {
               setAccountType('user');
-              setTab('login');
             }}
             className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
               accountType === 'user'
@@ -533,9 +537,9 @@ export const LoginPage = () => {
           >
             <User className="w-4 h-4" />
             <div className="text-left">
-              <div className="leading-tight font-black">B2C Login</div>
+              <div className="leading-tight font-black">Daily Customer</div>
               <div className={`text-[9px] font-normal ${accountType === 'user' ? 'text-amber-200' : 'text-slate-500'}`}>
-                Retail Customer
+                Home Milk & Groceries
               </div>
             </div>
           </button>
@@ -544,7 +548,6 @@ export const LoginPage = () => {
             type="button"
             onClick={() => {
               setAccountType('business');
-              setTab('login');
             }}
             className={`py-2.5 px-3 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
               accountType === 'business'
@@ -552,11 +555,11 @@ export const LoginPage = () => {
                 : 'bg-[#FAF5EC] text-slate-700 hover:text-slate-900 hover:bg-[#F3EAD9]'
             }`}
           >
-            <Building2 className="w-4 h-4 text-amber-300" />
+            <Store className="w-4 h-4 text-amber-300" />
             <div className="text-left">
-              <div className="leading-tight font-black">B2B Login</div>
+              <div className="leading-tight font-black">Shopkeeper</div>
               <div className={`text-[9px] font-normal ${accountType === 'business' ? 'text-amber-200' : 'text-slate-500'}`}>
-                Wholesale Business
+                Kirana & Wholesale
               </div>
             </div>
           </button>
@@ -568,17 +571,23 @@ export const LoginPage = () => {
         <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-6 text-white text-center border-b border-[#8B121C]">
           <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-3 shadow-inner">
             {accountType === 'business' ? (
-              <Building2 className="w-6 h-6 text-amber-300" />
+              <Store className="w-6 h-6 text-amber-300" />
             ) : (
-              <ShieldCheck className="w-6 h-6 text-amber-300" />
+              <User className="w-6 h-6 text-amber-300" />
             )}
           </div>
           <h1 className="text-xl font-black">
-            {accountType === 'business' ? 'B2B Wholesale Portal' : 'B2C Customer Login'}
+            {tab === 'register'
+              ? accountType === 'business'
+                ? 'Shopkeeper Registration'
+                : 'Daily Customer Registration'
+              : accountType === 'business'
+              ? 'Shopkeeper Wholesale Portal'
+              : 'Daily Customer Login'}
           </h1>
           <p className="text-xs text-amber-100/90 mt-1 max-w-sm mx-auto leading-relaxed">
             {accountType === 'business'
-              ? 'Wholesale bulk pricing, GST tax invoices & recurring morning kitchen supplies for hotels, restaurants & caterers'
+              ? 'Wholesale bulk pricing, GST tax invoices & recurring morning kitchen supplies for kirana stores, hotels & caterers'
               : 'Sign in to track orders, manage daily milk subscriptions & save your favorites'}
           </p>
 
@@ -663,9 +672,55 @@ export const LoginPage = () => {
                     : 'text-slate-600 hover:text-slate-900'
                   }`}
               >
-                {accountType === 'business' ? 'Register Business' : 'Create Account'}
+                Create Account
               </button>
             </div>
+
+            {/* Registration Account Type Selector */}
+            {tab === 'register' && (
+              <div className="mb-5">
+                <label className="block text-xs font-black text-slate-700 mb-1.5 uppercase tracking-wide">
+                  I want to register as:
+                </label>
+                <div className="grid grid-cols-2 gap-2 bg-[#FAF5EC] p-1.5 rounded-2xl border border-[#EDE1D1]">
+                  <button
+                    type="button"
+                    onClick={() => setAccountType('user')}
+                    className={`py-2.5 px-2 rounded-xl text-xs transition-all flex flex-col items-center justify-center text-center gap-1 ${
+                      accountType === 'user'
+                        ? 'bg-[#7D0A14] text-white shadow-xs font-extrabold scale-[1.01]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-4 h-4 text-amber-300" />
+                      <span className="font-extrabold text-xs">Daily Customer</span>
+                    </div>
+                    <span className={`text-[10px] font-normal leading-tight ${accountType === 'user' ? 'text-amber-100' : 'text-slate-500'}`}>
+                      Home Milk & Veggies
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setAccountType('business')}
+                    className={`py-2.5 px-2 rounded-xl text-xs transition-all flex flex-col items-center justify-center text-center gap-1 ${
+                      accountType === 'business'
+                        ? 'bg-[#7D0A14] text-white shadow-xs font-extrabold scale-[1.01]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Store className="w-4 h-4 text-amber-300" />
+                      <span className="font-extrabold text-xs">Shopkeeper</span>
+                    </div>
+                    <span className={`text-[10px] font-normal leading-tight ${accountType === 'business' ? 'text-amber-100' : 'text-slate-500'}`}>
+                      Kirana & Wholesale
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* BUSINESS SPECIFIC FIELDS */}
@@ -920,29 +975,18 @@ export const LoginPage = () => {
                 className="w-full py-3.5 bg-[#7D0A14] hover:bg-[#680811] active:scale-98 text-white font-bold text-sm rounded-xl shadow-lg shadow-[#7D0A14]/25 transition-all flex items-center justify-center gap-2"
               >
                 <span>
-                  {accountType === 'business'
-                    ? tab === 'login'
-                      ? 'Sign In to Business Portal'
-                      : 'Register Business Account'
-                    : tab === 'login'
-                      ? 'Sign In to Account'
-                      : 'Create My Account'}
+                  {tab === 'register'
+                    ? accountType === 'business'
+                      ? 'Register as Shopkeeper'
+                      : 'Register as Daily Customer'
+                    : accountType === 'business'
+                      ? 'Sign In as Shopkeeper'
+                      : 'Sign In as Daily Customer'}
                 </span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              {/* Quick Demo Autofill Helpers */}
-              <div className="pt-2 text-center">
-                <button
-                  type="button"
-                  onClick={accountType === 'business' ? fillBusinessDemo : fillCustomerDemo}
-                  className="text-[11px] text-slate-500 hover:text-[#7D0A14] underline font-medium"
-                >
-                  ⚡ Quick Demo: {accountType === 'business' ? 'Sri Krishna Grand (B2B)' : 'Rajesh Sharma (Customer)'}
-                </button>
-              </div>
-
-              <div className="text-center pt-1 border-t border-slate-100">
+              <div className="text-center pt-2 border-t border-slate-100">
                 <p className="text-xs text-slate-500">
                   {tab === 'login' ? "Don't have an account? " : 'Already registered? '}
                   <button

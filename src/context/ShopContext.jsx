@@ -689,18 +689,20 @@ export const ShopProvider = ({ children }) => {
       let list = saved ? JSON.parse(saved) : [];
       const email = userData.email || '';
       const phone = userData.phone || '';
+      const isShop = Boolean(userData.isBusiness || userData.customerType === 'Shopkeeper');
       const idx = list.findIndex(
         (c) => (email && c.email === email) || (phone && c.phone === phone)
       );
       const record = {
-        id: userData.id || `CUST-${userData.isBusiness ? 'B2B' : 'B2C'}-${Math.floor(100 + Math.random() * 900)}`,
-        name: userData.name || (userData.isBusiness ? userData.companyName : 'Customer'),
+        id: userData.id || `CUST-${isShop ? 'SHOP' : 'DAILY'}-${Math.floor(100 + Math.random() * 900)}`,
+        name: userData.name || (isShop ? userData.companyName : 'Customer'),
         email,
         phone,
-        isBusiness: Boolean(userData.isBusiness),
+        isBusiness: isShop,
+        customerType: isShop ? 'Shopkeeper' : 'Daily Customer',
         companyName: userData.companyName || null,
         gstin: userData.gstin || null,
-        businessType: userData.businessType || null,
+        businessType: userData.businessType || (isShop ? 'Kirana & General Store' : null),
         registeredAt: userData.registeredAt || new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
         lastLogin: new Date().toLocaleDateString('en-IN', {
           day: 'numeric',
@@ -717,6 +719,11 @@ export const ShopProvider = ({ children }) => {
         list.unshift(record);
       }
       localStorage.setItem('sumadhura_registered_customers', JSON.stringify(list));
+      try {
+        const channel = new BroadcastChannel('sumadhura_sync_channel');
+        channel.postMessage({ type: 'SYNC_CUSTOMERS', data: list });
+        channel.close();
+      } catch (err) {}
     } catch (e) {
       console.error(e);
     }
@@ -731,21 +738,49 @@ export const ShopProvider = ({ children }) => {
 
   // User auth simulation
   const login = (userData) => {
-    setUser(userData);
+    // Check if customer already exists in registry to preserve shopkeeper/customer type
+    let resolvedData = { ...userData };
     try {
-      localStorage.setItem('sumadhura_user', JSON.stringify(userData));
+      const saved = localStorage.getItem('sumadhura_registered_customers');
+      if (saved) {
+        const list = JSON.parse(saved);
+        const match = list.find(
+          (c) =>
+            (userData.email && c.email === userData.email) ||
+            (userData.phone && c.phone === userData.phone)
+        );
+        if (match) {
+          resolvedData = {
+            ...match,
+            ...userData,
+            isBusiness: match.isBusiness ?? userData.isBusiness,
+            customerType: match.customerType ?? (match.isBusiness ? 'Shopkeeper' : 'Daily Customer'),
+            companyName: match.companyName || userData.companyName,
+            businessType: match.businessType || userData.businessType
+          };
+        }
+      }
+    } catch (e) {}
+
+    const isShop = Boolean(resolvedData.isBusiness || resolvedData.customerType === 'Shopkeeper');
+    resolvedData.isBusiness = isShop;
+    resolvedData.customerType = isShop ? 'Shopkeeper' : 'Daily Customer';
+
+    setUser(resolvedData);
+    try {
+      localStorage.setItem('sumadhura_user', JSON.stringify(resolvedData));
     } catch (e) {
       console.error(e);
     }
-    saveCustomerToRegistry(userData);
-    if (userData.isBusiness) {
+    saveCustomerToRegistry(resolvedData);
+    if (isShop) {
       setPricingMode('wholesale');
     }
     setIsAuthModalOpen(false);
     showToast(
-      userData.isBusiness
-        ? `Welcome, ${userData.companyName || userData.name}! B2B Wholesale Portal Active 🏢`
-        : `Welcome back, ${userData.name}! 🌟`
+      isShop
+        ? `Welcome, ${resolvedData.companyName || resolvedData.name}! Shopkeeper Wholesale Portal Active 🏪`
+        : `Welcome back, ${resolvedData.name}! 🌟`
     );
   };
 

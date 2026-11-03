@@ -11,7 +11,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   ArrowRight,
-  Building2
+  Building2,
+  Store
 } from 'lucide-react';
 
 export const AuthModal = () => {
@@ -24,7 +25,7 @@ export const AuthModal = () => {
     showToast
   } = useShop();
 
-  // Mode: 'user' | 'business'
+  // Mode: 'user' (Daily Customer) | 'business' (Shopkeeper)
   const [accountType, setAccountType] = useState(
     authModalTab === 'business' ? 'business' : 'user'
   );
@@ -35,20 +36,20 @@ export const AuthModal = () => {
     }
   }, [authModalTab]);
 
-  // Personal user fields
+  // Personal user fields (Daily Customer)
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
 
-  // Business user fields
+  // Business user fields (Shopkeeper)
   const [businessIdentifier, setBusinessIdentifier] = useState('');
   const [businessPassword, setBusinessPassword] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [contactPerson, setContactPerson] = useState('');
   const [businessPhone, setBusinessPhone] = useState('');
   const [gstin, setGstin] = useState('');
-  const [businessType, setBusinessType] = useState('Restaurant & Commercial Kitchen');
+  const [businessType, setBusinessType] = useState('Kirana & General Store');
 
   const [showPassword, setShowPassword] = useState(false);
   const [forgotPasswordView, setForgotPasswordView] = useState(false);
@@ -59,44 +60,66 @@ export const AuthModal = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (accountType === 'business') {
-      if (authModalTab === 'login') {
-        login({
-          name: contactPerson || 'Procurement Officer',
-          companyName: companyName || 'Commercial Partner',
-          email: businessIdentifier.includes('@') ? businessIdentifier : `${businessIdentifier}@business.com`,
-          phone: businessPhone || '+91 98450 99888',
-          gstin: gstin || '36AABCU9603R1ZM',
-          businessType: businessType || 'Restaurant & Hotel',
-          isBusiness: true
-        });
+    if (authModalTab === 'register') {
+      if (accountType === 'business') {
+        const shopkeeperUser = {
+          id: `CUST-SHOP-${Date.now().toString().slice(-4)}`,
+          name: contactPerson || companyName || 'Shopkeeper',
+          companyName: companyName || 'Kirana Store',
+          email: businessIdentifier.includes('@') ? businessIdentifier : `${businessPhone || 'shop'}@sumadhura.com`,
+          phone: businessPhone || phone || identifier || '+91 98450 99888',
+          gstin: gstin || '',
+          businessType: businessType || 'Kirana & General Store',
+          isBusiness: true,
+          customerType: 'Shopkeeper',
+          registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        };
+        login(shopkeeperUser);
       } else {
-        login({
-          name: contactPerson || 'Business Partner',
-          companyName: companyName || 'New Commercial Enterprise',
-          email: businessIdentifier,
-          phone: businessPhone,
-          gstin: gstin || '36AABCU9603R1ZM',
-          businessType: businessType,
-          isBusiness: true
-        });
+        const dailyCustomerUser = {
+          id: `CUST-DAILY-${Date.now().toString().slice(-4)}`,
+          name: name || 'Daily Customer',
+          email: identifier.includes('@') ? identifier : `${phone || 'customer'}@sumadhura.com`,
+          phone: phone || identifier || '+91 98450 12345',
+          isBusiness: false,
+          customerType: 'Daily Customer',
+          registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        };
+        login(dailyCustomerUser);
       }
     } else {
-      if (authModalTab === 'login') {
-        login({
-          name: identifier.includes('@') ? identifier.split('@')[0].replace('.', ' ') : 'Customer',
-          email: identifier.includes('@') ? identifier : `${identifier}@customer.com`,
-          phone: identifier.includes('@') ? '+91 98450 12345' : identifier,
-          isBusiness: false
-        });
-      } else {
-        login({
-          name: name || 'New Shopper',
-          email: identifier,
-          phone: phone,
-          isBusiness: false
-        });
-      }
+      // Login mode - authenticate and resolve customer type automatically from registry
+      const rawIdentifier = identifier || businessIdentifier;
+      const isEmail = rawIdentifier.includes('@');
+      const cleanPhone = isEmail ? '+91 98450 12345' : rawIdentifier;
+      const cleanEmail = isEmail ? rawIdentifier : `${rawIdentifier}@customer.com`;
+
+      let existingType = 'Daily Customer';
+      let isBusinessUser = false;
+      let matchedCustomer = null;
+
+      try {
+        const saved = localStorage.getItem('sumadhura_registered_customers');
+        if (saved) {
+          const list = JSON.parse(saved);
+          matchedCustomer = list.find(
+            (c) => (c.email && c.email === rawIdentifier) || (c.phone && c.phone === rawIdentifier)
+          );
+          if (matchedCustomer) {
+            isBusinessUser = Boolean(matchedCustomer.isBusiness || matchedCustomer.customerType === 'Shopkeeper');
+            existingType = matchedCustomer.customerType || (isBusinessUser ? 'Shopkeeper' : 'Daily Customer');
+          }
+        }
+      } catch (err) {}
+
+      login({
+        ...(matchedCustomer || {}),
+        name: matchedCustomer?.name || (isEmail ? rawIdentifier.split('@')[0].replace(/[._]/g, ' ') : (isBusinessUser ? 'Shopkeeper' : 'Daily Customer')),
+        email: matchedCustomer?.email || cleanEmail,
+        phone: matchedCustomer?.phone || cleanPhone,
+        isBusiness: isBusinessUser,
+        customerType: existingType
+      });
     }
   };
 
@@ -128,19 +151,29 @@ export const AuthModal = () => {
         {/* Brand Banner */}
         <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-6 text-white text-center border-b border-[#8B121C]">
           <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mx-auto mb-3 shadow-inner">
-            {accountType === 'business' ? (
-              <Building2 className="w-6 h-6 text-amber-300" />
+            {authModalTab === 'register' ? (
+              accountType === 'business' ? (
+                <Store className="w-6 h-6 text-amber-300" />
+              ) : (
+                <User className="w-6 h-6 text-amber-300" />
+              )
             ) : (
               <ShieldCheck className="w-6 h-6 text-amber-300" />
             )}
           </div>
           <h2 className="text-xl font-black">
-            {accountType === 'business' ? 'B2B Wholesale Portal' : 'Customer Login'}
+            {authModalTab === 'register'
+              ? accountType === 'business'
+                ? 'Shopkeeper Registration'
+                : 'Daily Customer Registration'
+              : 'Sign In to Sumadhura Foods'}
           </h2>
           <p className="text-xs text-amber-100/90 mt-1 max-w-xs mx-auto">
-            {accountType === 'business'
-              ? 'Wholesale bulk rates, GST invoices & commercial recurring supplies'
-              : 'Access fresh dairy, farm veggies, express delivery & exclusive discounts'}
+            {authModalTab === 'register'
+              ? accountType === 'business'
+                ? 'Wholesale prices, bulk orders & daily morning supplies for your shop'
+                : 'Pure dairy, farm milk & fresh veggies delivered at your doorstep by 7:00 AM'
+              : 'Enter your phone number or email to access your account'}
           </p>
         </div>
 
@@ -149,7 +182,7 @@ export const AuthModal = () => {
           <div className="p-6">
             <h3 className="font-extrabold text-slate-900 text-base mb-1">Reset Your Password</h3>
             <p className="text-xs text-slate-500 mb-4">
-              Enter your {accountType === 'business' ? 'work email or business phone' : 'registered email address or mobile number'} to receive a secure login link.
+              Enter your registered mobile number or email address to receive a secure login link.
             </p>
 
             {resetSent ? (
@@ -161,18 +194,17 @@ export const AuthModal = () => {
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    {accountType === 'business' ? 'Work Email or Business Mobile' : 'Email or Mobile Number'}
+                    Email or Mobile Number
                   </label>
                   <input
                     type="text"
                     required
                     placeholder="e.g. yourname@example.com or 9876543210"
-                    value={accountType === 'business' ? businessIdentifier : identifier}
-                    onChange={(e) =>
-                      accountType === 'business'
-                        ? setBusinessIdentifier(e.target.value)
-                        : setIdentifier(e.target.value)
-                    }
+                    value={identifier || businessIdentifier}
+                    onChange={(e) => {
+                      setIdentifier(e.target.value);
+                      setBusinessIdentifier(e.target.value);
+                    }}
                     className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none"
                   />
                 </div>
@@ -195,14 +227,14 @@ export const AuthModal = () => {
         ) : (
           /* Main Login / Register View */
           <div className="p-6">
-            {/* Tabs */}
+            {/* Tabs: Sign In / Create Account */}
             <div className="grid grid-cols-2 bg-slate-100 p-1 rounded-2xl mb-4">
               <button
                 type="button"
                 onClick={() => setAuthModalTab('login')}
                 className={`py-2 text-xs font-bold rounded-xl transition-all ${
                   authModalTab === 'login'
-                    ? 'bg-white text-[#7D0A14] shadow-xs'
+                    ? 'bg-white text-[#7D0A14] shadow-xs font-extrabold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -213,73 +245,152 @@ export const AuthModal = () => {
                 onClick={() => setAuthModalTab('register')}
                 className={`py-2 text-xs font-bold rounded-xl transition-all ${
                   authModalTab === 'register'
-                    ? 'bg-white text-[#7D0A14] shadow-xs'
+                    ? 'bg-white text-[#7D0A14] shadow-xs font-extrabold'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {accountType === 'business' ? 'Register Business' : 'Create Account'}
+                Create Account
               </button>
             </div>
 
+            {/* Account Type Selection: ONLY when creating an account */}
+            {authModalTab === 'register' && (
+              <div className="mb-4">
+                <label className="block text-xs font-black text-slate-700 mb-1.5 uppercase tracking-wide">
+                  I want to register as:
+                </label>
+                <div className="grid grid-cols-2 gap-2 bg-[#FAF5EC] p-1.5 rounded-2xl border border-[#EDE1D1]">
+                  <button
+                    type="button"
+                    onClick={() => setAccountType('user')}
+                    className={`py-2.5 px-2 rounded-xl text-xs transition-all flex flex-col items-center justify-center text-center gap-1 ${
+                      accountType === 'user'
+                        ? 'bg-[#7D0A14] text-white shadow-xs font-extrabold scale-[1.01]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-4 h-4 text-amber-300" />
+                      <span className="font-extrabold text-xs">Daily Customer</span>
+                    </div>
+                    <span className={`text-[10px] font-normal leading-tight ${accountType === 'user' ? 'text-amber-100' : 'text-slate-500'}`}>
+                      Home Milk & Veggies
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setAccountType('business')}
+                    className={`py-2.5 px-2 rounded-xl text-xs transition-all flex flex-col items-center justify-center text-center gap-1 ${
+                      accountType === 'business'
+                        ? 'bg-[#7D0A14] text-white shadow-xs font-extrabold scale-[1.01]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60 font-semibold'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <Store className="w-4 h-4 text-amber-300" />
+                      <span className="font-extrabold text-xs">Shopkeeper</span>
+                    </div>
+                    <span className={`text-[10px] font-normal leading-tight ${accountType === 'business' ? 'text-amber-100' : 'text-slate-500'}`}>
+                      Kirana & Wholesale
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-3.5">
-              {accountType === 'business' ? (
-                /* Business Modal Fields */
+              {/* Form Fields: In Register mode, branch by Shopkeeper vs Daily Customer */}
+              {authModalTab === 'register' && accountType === 'business' ? (
+                /* SHOPKEEPER REGISTRATION FIELDS */
                 <>
-                  {authModalTab === 'register' && (
-                    <>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">Company / Business Name *</label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            required
-                            placeholder="e.g. Sri Krishna Grand Hotels"
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
-                            className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
-                          />
-                          <Building2 className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">Business Type</label>
-                          <select
-                            value={businessType}
-                            onChange={(e) => setBusinessType(e.target.value)}
-                            className="w-full px-2.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:outline-none"
-                          >
-                            <option>Restaurant & Hotel</option>
-                            <option>Catering & Banquets</option>
-                            <option>Cloud Kitchen</option>
-                            <option>Corporate Office</option>
-                            <option>Supermarket</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-bold text-slate-700 mb-1">GSTIN (Optional)</label>
-                          <input
-                            type="text"
-                            placeholder="36AABCU9603R1ZM"
-                            value={gstin}
-                            onChange={(e) => setGstin(e.target.value.toUpperCase())}
-                            className="w-full px-2.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] uppercase"
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
-
                   <div>
                     <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Work Email or Business Mobile *
+                      Shop / Business Name *
                     </label>
                     <div className="relative">
                       <input
                         type="text"
                         required
-                        placeholder="e.g. procurement@srikrishnagrand.com"
+                        placeholder="e.g. Sri Krishna Kirana & General Store"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
+                      />
+                      <Store className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Shopkeeper / Owner Name *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Ramesh Reddy"
+                        value={contactPerson}
+                        onChange={(e) => setContactPerson(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
+                      />
+                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">Store Type</label>
+                      <select
+                        value={businessType}
+                        onChange={(e) => setBusinessType(e.target.value)}
+                        className="w-full px-2.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:outline-none"
+                      >
+                        <option>Kirana & General Store</option>
+                        <option>Supermarket / Retail Mart</option>
+                        <option>Restaurant & Hotel Kitchen</option>
+                        <option>Tea Stall & Dairy Parlour</option>
+                        <option>Caterer & Event Kitchen</option>
+                        <option>Cloud Kitchen & Fast Food</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-1">GSTIN (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="36AABCU9603R1ZM"
+                        value={gstin}
+                        onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                        className="w-full px-2.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] uppercase"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Shop Mobile Phone Number *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        required
+                        placeholder="+91 98450 99888"
+                        value={businessPhone}
+                        onChange={(e) => setBusinessPhone(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
+                      />
+                      <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Shop / Work Email (Optional)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        placeholder="e.g. krishnakirana@gmail.com"
                         value={businessIdentifier}
                         onChange={(e) => setBusinessIdentifier(e.target.value)}
                         className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
@@ -289,23 +400,12 @@ export const AuthModal = () => {
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-bold text-slate-700">Password</label>
-                      {authModalTab === 'login' && (
-                        <button
-                          type="button"
-                          onClick={() => setForgotPasswordView(true)}
-                          className="text-[11px] font-semibold text-[#7D0A14] hover:underline"
-                        >
-                          Forgot password?
-                        </button>
-                      )}
-                    </div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Create Password *</label>
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
                         required
-                        placeholder="Enter password"
+                        placeholder="Create strong password"
                         value={businessPassword}
                         onChange={(e) => setBusinessPassword(e.target.value)}
                         className="w-full pl-9 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
@@ -321,35 +421,49 @@ export const AuthModal = () => {
                     </div>
                   </div>
                 </>
-              ) : (
-                /* Personal User Modal Fields */
+              ) : authModalTab === 'register' ? (
+                /* DAILY CUSTOMER REGISTRATION FIELDS */
                 <>
-                  {authModalTab === 'register' && (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          required
-                          placeholder="Enter your name"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
-                        />
-                        <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      </div>
-                    </div>
-                  )}
-
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
-                      Email or Mobile Number
-                    </label>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
                     <div className="relative">
                       <input
                         type="text"
                         required
-                        placeholder="Enter email or 10-digit mobile"
+                        placeholder="e.g. Ramesh Reddy"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
+                      />
+                      <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Mobile Phone Number *
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="tel"
+                        required
+                        placeholder="+91 98450 12345"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
+                      />
+                      <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Email Address (Optional)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="email"
+                        placeholder="e.g. ramesh@example.com"
                         value={identifier}
                         onChange={(e) => setIdentifier(e.target.value)}
                         className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
@@ -358,43 +472,64 @@ export const AuthModal = () => {
                     </div>
                   </div>
 
-                  {authModalTab === 'register' && (
-                    <div>
-                      <label className="block text-xs font-bold text-slate-700 mb-1">
-                        Mobile Phone Number
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="tel"
-                          required
-                          placeholder="+91 98450 12345"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
-                        />
-                        <Phone className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                      </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Create Password *</label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Create strong password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full pl-9 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
+                      />
+                      <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
-                  )}
+                  </div>
+                </>
+              ) : (
+                /* SIGN IN FIELDS (UNIVERSAL FOR BOTH DAILY CUSTOMERS & SHOPKEEPERS) */
+                <>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                      Mobile Number or Email
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter 10-digit mobile or email"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
+                        className="w-full pl-9 pr-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
+                      />
+                      <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    </div>
+                  </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-1">
                       <label className="block text-xs font-bold text-slate-700">Password</label>
-                      {authModalTab === 'login' && (
-                        <button
-                          type="button"
-                          onClick={() => setForgotPasswordView(true)}
-                          className="text-[11px] font-semibold text-[#7D0A14] hover:underline"
-                        >
-                          Forgot password?
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setForgotPasswordView(true)}
+                        className="text-[11px] font-semibold text-[#7D0A14] hover:underline"
+                      >
+                        Forgot password?
+                      </button>
                     </div>
                     <div className="relative">
                       <input
                         type={showPassword ? 'text' : 'password'}
                         required
-                        placeholder="Enter password"
+                        placeholder="Enter your password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full pl-9 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium"
@@ -417,13 +552,11 @@ export const AuthModal = () => {
                 className="w-full py-3.5 bg-[#7D0A14] hover:bg-[#680811] active:scale-98 text-white font-bold text-sm rounded-xl shadow-lg shadow-[#7D0A14]/25 transition-all flex items-center justify-center gap-2 mt-2"
               >
                 <span>
-                  {accountType === 'business'
-                    ? authModalTab === 'login'
-                      ? 'Sign In to Business Portal'
-                      : 'Register Business Account'
-                    : authModalTab === 'login'
-                    ? 'Sign In to Account'
-                    : 'Create My Account'}
+                  {authModalTab === 'register'
+                    ? accountType === 'business'
+                      ? 'Register as Shopkeeper'
+                      : 'Register as Daily Customer'
+                    : 'Sign In to Account'}
                 </span>
                 <ArrowRight className="w-4 h-4" />
               </button>

@@ -1197,21 +1197,21 @@ export const AdminPage = () => {
     },
     {
       id: 'b2c-customers',
-      label: 'B2C Customers',
+      label: 'Daily Customers',
       icon: User,
       badge: null,
       customBadge: {
-        text: 'B2C Retail',
+        text: 'Daily Customer',
         className: 'bg-[#FEF08A] text-[#854D0E] border border-amber-300'
       }
     },
     {
       id: 'b2b-customers',
-      label: 'B2B Customers',
-      icon: Users,
+      label: 'Shopkeepers',
+      icon: Store,
       badge: null,
       customBadge: {
-        text: 'B2B Wholesale',
+        text: 'Shopkeeper',
         className: 'bg-[#F43F5E] text-white'
       }
     },
@@ -2556,7 +2556,7 @@ export const AdminPage = () => {
                       {b2cCustomerCount.toLocaleString('en-IN')}
                     </div>
                     <div className="text-xs font-bold text-slate-500 mt-0.5">
-                      B2C Customers
+                      Daily Customers
                     </div>
                   </div>
                   <User className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
@@ -2572,7 +2572,7 @@ export const AdminPage = () => {
                       {b2bCustomerCount.toLocaleString('en-IN')}
                     </div>
                     <div className="text-xs font-bold text-slate-500 mt-0.5">
-                      B2B Customers
+                      Shopkeepers
                     </div>
                   </div>
                   <Building2 className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
@@ -2609,7 +2609,7 @@ export const AdminPage = () => {
                         : 'text-[#5A070E] hover:bg-[#FAF5EC]'
                     }`}
                   >
-                    B2C Customers (Individual)
+                    Daily Customers
                   </button>
                   <button
                     onClick={() => {
@@ -2622,7 +2622,7 @@ export const AdminPage = () => {
                         : 'text-[#5A070E] hover:bg-[#FAF5EC]'
                     }`}
                   >
-                    B2B Customers (Business)
+                    Shopkeepers
                   </button>
                   <button
                     onClick={() => {
@@ -2799,13 +2799,15 @@ export const AdminPage = () => {
 
                               {/* Type Badge */}
                               <td className="py-4 px-4 whitespace-nowrap">
-                                {c.isBusiness ? (
-                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEF3C7] text-[#92400E] border border-amber-200">
-                                    B2B
+                                {(c.isBusiness || c.customerType === 'Shopkeeper') ? (
+                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEF3C7] text-[#92400E] border border-amber-200 inline-flex items-center gap-1">
+                                    <Store className="w-3 h-3 text-[#92400E]" />
+                                    <span>Shopkeeper</span>
                                   </span>
                                 ) : (
-                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEE2E2]/70 text-[#991B1B] border border-rose-200">
-                                    B2C
+                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEE2E2]/70 text-[#991B1B] border border-rose-200 inline-flex items-center gap-1">
+                                    <User className="w-3 h-3 text-[#991B1B]" />
+                                    <span>Daily Customer</span>
                                   </span>
                                 )}
                               </td>
