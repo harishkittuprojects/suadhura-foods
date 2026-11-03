@@ -1,6 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { Heart, Plus, Minus, Star, Eye, Clock, Sparkles, Lock, Building2 } from 'lucide-react';
+import { Heart, Plus, Minus, Star, Eye, Clock, Sparkles, Lock, Building2, Share2 } from 'lucide-react';
 
 export const ProductCard = ({ product, priority = false }) => {
   const {
@@ -35,9 +35,38 @@ export const ProductCard = ({ product, priority = false }) => {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
+  const handleShareProduct = async (e, prod) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${prod.id}`;
+    const shareText = `Check out fresh ${prod.name} (₹${activePrice}/${activeUnit}) on Sumadhura Foods! 10-15 Min Express Delivery 🚚`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${prod.name} | Sumadhura Foods`,
+          text: shareText,
+          url: shareUrl
+        });
+        return;
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err);
+        }
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showToast(`Link to ${prod.name} copied to clipboard! 📋`);
+    } catch {
+      showToast(`Product URL: ${shareUrl}`);
+    }
+  };
+
   return (
     <div
-      className={`group relative bg-white rounded-2xl border shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1 ${
+      onClick={() => setQuickViewProduct(product)}
+      className={`group relative bg-white rounded-2xl border shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden hover:-translate-y-1 cursor-pointer ${
         isWholesale
           ? 'border-[#E0CDB8] hover:border-[#7D0A14] ring-1 ring-[#7D0A14]/10'
           : 'border-[#EDE1D1] hover:border-[#D5C2AC]'
@@ -52,7 +81,7 @@ export const ProductCard = ({ product, priority = false }) => {
           </span>
         ) : (
           discountPercent > 0 && (
-            <span className="absolute top-2.5 left-2.5 z-10 bg-blue-700 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">
+            <span className="absolute top-2.5 left-2.5 z-10 bg-[#7D0A14] text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow-sm">
               {discountPercent}% OFF
             </span>
           )
@@ -75,12 +104,25 @@ export const ProductCard = ({ product, priority = false }) => {
           <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 stroke-rose-500' : ''}`} />
         </button>
 
+        {/* Quick Share Button */}
+        <button
+          onClick={(e) => handleShareProduct(e, product)}
+          className="absolute top-2.5 right-10 z-10 p-1.5 rounded-full bg-white/90 text-slate-400 hover:text-[#7D0A14] hover:bg-white transition-all duration-200 shadow-sm"
+          aria-label="Share product"
+          title="Share product"
+        >
+          <Share2 className="w-3.5 h-3.5" />
+        </button>
+
         {/* Quick View overlay button */}
         <button
-          onClick={() => setQuickViewProduct(product)}
-          className="absolute inset-0 m-auto w-9 h-9 rounded-full bg-white/95 text-slate-700 opacity-0 group-hover:opacity-100 flex items-center justify-center shadow-lg transition-all duration-200 hover:bg-blue-600 hover:text-white transform group-hover:scale-100 scale-75 z-10"
-          title="Quick View"
-          aria-label="Quick View"
+          onClick={(e) => {
+            e.stopPropagation();
+            setQuickViewProduct(product);
+          }}
+          className="absolute inset-0 m-auto w-9 h-9 rounded-full bg-white/95 text-slate-700 opacity-0 group-hover:opacity-100 flex items-center justify-center shadow-lg transition-all duration-200 hover:bg-[#7D0A14] hover:text-white transform group-hover:scale-100 scale-75 z-10"
+          title="Open Full Details"
+          aria-label="Open Full Details"
         >
           <Eye className="w-4 h-4" />
         </button>
@@ -90,8 +132,7 @@ export const ProductCard = ({ product, priority = false }) => {
           src={product.image}
           alt={product.name}
           loading="lazy"
-          onClick={() => setQuickViewProduct(product)}
-          className="w-full h-full object-cover object-center rounded-xl cursor-pointer group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover object-center rounded-xl group-hover:scale-105 transition-transform duration-300"
         />
 
         {/* ETA Tag Overlay */}
@@ -107,11 +148,15 @@ export const ProductCard = ({ product, priority = false }) => {
           {/* Green Veg Dot Indicator & Category */}
           <div className="flex items-center justify-between gap-1 text-xs mb-1">
             <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
-              {/* Indian Food Safety Green Veg Dot Square */}
-              <div className="w-3 h-3 sm:w-3.5 sm:h-3.5 border border-emerald-600 rounded-sm flex items-center justify-center p-0.5 flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+              {/* Indian Food Safety Green Veg Dot Square or Red Non-Veg Triangle */}
+              <div className={`w-3 h-3 sm:w-3.5 sm:h-3.5 border rounded-sm flex items-center justify-center p-0.5 flex-shrink-0 ${
+                product.isVeg === false ? 'border-rose-600' : 'border-emerald-600'
+              }`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  product.isVeg === false ? 'bg-rose-600' : 'bg-emerald-600'
+                }`} />
               </div>
-              <span className="text-[9px] sm:text-[10px] font-extrabold text-blue-600 uppercase tracking-wider truncate max-w-[65px] sm:max-w-[110px]">
+              <span className="text-[9px] sm:text-[10px] font-extrabold text-[#7D0A14] uppercase tracking-wider truncate max-w-[65px] sm:max-w-[110px]">
                 {product.category}
               </span>
             </div>
@@ -127,8 +172,7 @@ export const ProductCard = ({ product, priority = false }) => {
 
           {/* Product Name */}
           <h3
-            onClick={() => setQuickViewProduct(product)}
-            className="font-bold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-2 hover:text-[#7D0A14] cursor-pointer transition-colors"
+            className="font-bold text-slate-900 text-xs sm:text-sm leading-snug line-clamp-2 hover:text-[#7D0A14] transition-colors"
             title={product.name}
           >
             {product.name}
@@ -176,24 +220,24 @@ export const ProductCard = ({ product, priority = false }) => {
 
           {/* Signature ADD Button or Quantity Stepper */}
           {quantityInCart > 0 ? (
-            <div className={`flex items-center rounded-lg sm:rounded-xl p-0.5 text-white shadow-sm flex-shrink-0 ${
-              isWholesale ? 'bg-[#7D0A14]' : 'bg-blue-600'
-            }`}>
+            <div className="flex items-center rounded-lg sm:rounded-xl p-0.5 text-white shadow-sm flex-shrink-0 bg-[#7D0A14]">
               <button
-                onClick={() => updateQuantity(product.id, -1)}
-                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-colors ${
-                  isWholesale ? 'bg-[#5A070E] hover:bg-[#3D040A]' : 'bg-blue-700/80 hover:bg-blue-800'
-                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateQuantity(product.id, -1);
+                }}
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-colors bg-[#5A070E] hover:bg-[#3D040A]"
                 aria-label="Decrease quantity"
               >
                 <Minus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
               </button>
               <span className="w-5 sm:w-6 text-center font-black text-[11px] sm:text-xs">{quantityInCart}</span>
               <button
-                onClick={() => updateQuantity(product.id, 1)}
-                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-colors ${
-                  isWholesale ? 'bg-[#5A070E] hover:bg-[#3D040A]' : 'bg-blue-700/80 hover:bg-blue-800'
-                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  updateQuantity(product.id, 1);
+                }}
+                className="w-5 h-5 sm:w-6 sm:h-6 rounded-md sm:rounded-lg flex items-center justify-center transition-colors bg-[#5A070E] hover:bg-[#3D040A]"
                 aria-label="Increase quantity"
               >
                 <Plus className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
@@ -201,11 +245,14 @@ export const ProductCard = ({ product, priority = false }) => {
             </div>
           ) : (
             <button
-              onClick={() => addToCart(product, 1)}
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart(product, 1);
+              }}
               className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-xl font-black text-[11px] sm:text-xs shadow-xs hover:shadow-sm transition-all duration-150 active:scale-95 flex items-center justify-center gap-1 flex-shrink-0 ${
                 isWholesale
                   ? 'bg-[#7D0A14] hover:bg-[#60060E] text-white border border-[#91131E]'
-                  : 'border border-blue-600 hover:bg-blue-600 hover:text-white text-blue-600 bg-white'
+                  : 'border border-[#7D0A14] hover:bg-[#7D0A14] hover:text-white text-[#7D0A14] bg-white'
               }`}
               aria-label={`Add ${product.name} to Cart`}
             >

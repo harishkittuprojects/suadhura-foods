@@ -301,7 +301,7 @@ export const CategoriesPage = () => {
               onClick={() => setSelectedCategoryFilter(opt.name)}
               className={`px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 flex-shrink-0 ${
                 isSelected
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 scale-[1.02]'
+                  ? 'bg-[#7D0A14] text-white shadow-md shadow-[#7D0A14]/20 scale-[1.02]'
                   : 'bg-white text-slate-700 hover:bg-[#FAF5EC] border border-[#E8DDCF]'
               }`}
             >
@@ -330,9 +330,9 @@ export const CategoriesPage = () => {
               placeholder={searchPlaceholders[placeholderIndex]}
               value={searchFilter}
               onChange={(e) => setSearchFilter(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-[#FAF5EC]/50 border border-[#E8DDCF] rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white focus:outline-none font-medium text-slate-800 placeholder:text-slate-400 transition-all"
+              className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-[#FAF5EC]/50 border border-[#E8DDCF] rounded-xl focus:ring-2 focus:ring-[#7D0A14] focus:bg-white focus:outline-none font-medium text-slate-800 placeholder:text-slate-400 transition-all"
             />
-            <Search className="w-4 h-4 text-blue-600 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#7D0A14] absolute left-3 top-1/2 -translate-y-1/2" />
             {searchFilter && (
               <button
                 onClick={() => {
@@ -355,7 +355,7 @@ export const CategoriesPage = () => {
                   onClick={() => setPricingMode('retail')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all ${
                     pricingMode === 'retail'
-                      ? 'bg-blue-600 text-white shadow-2xs'
+                      ? 'bg-[#7D0A14] text-white shadow-2xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -380,7 +380,7 @@ export const CategoriesPage = () => {
                 type="checkbox"
                 checked={organicOnly}
                 onChange={(e) => setOrganicOnly(e.target.checked)}
-                className="rounded text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
+                className="rounded text-[#7D0A14] focus:ring-[#7D0A14] w-3.5 h-3.5"
               />
               <span>Organic</span>
             </label>
@@ -401,7 +401,7 @@ export const CategoriesPage = () => {
               }}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all border flex-shrink-0 ${
                 searchFilter.toLowerCase() === tag.query.toLowerCase()
-                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                  ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-xs'
                   : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200/80 shadow-2xs'
               }`}
             >
@@ -414,7 +414,7 @@ export const CategoriesPage = () => {
         {hasSearch && (
           <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#7D0A14] animate-pulse" />
               <span className="font-bold text-slate-800">
                 Found {filtered.length} products for "{searchFilter}"
               </span>
@@ -426,7 +426,7 @@ export const CategoriesPage = () => {
                 onClick={() => setSearchScope('all')}
                 className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all ${
                   searchScope === 'all'
-                    ? 'bg-blue-600 text-white shadow-xs'
+                    ? 'bg-[#7D0A14] text-white shadow-xs'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
@@ -437,7 +437,7 @@ export const CategoriesPage = () => {
                   onClick={() => setSearchScope('current')}
                   className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all ${
                     searchScope === 'current'
-                      ? 'bg-blue-600 text-white shadow-xs'
+                      ? 'bg-[#7D0A14] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -449,7 +449,7 @@ export const CategoriesPage = () => {
                   setSearchFilter('');
                   setSearchQuery?.('');
                 }}
-                className="text-blue-600 hover:underline text-[11px] font-bold ml-1"
+                className="text-[#7D0A14] hover:underline text-[11px] font-bold ml-1"
               >
                 Clear
               </button>
@@ -499,7 +499,7 @@ export const CategoriesPage = () => {
           </div>
         ) : (
           <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-200 space-y-3">
-            <div className="w-14 h-14 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center mx-auto text-2xl">
+            <div className="w-14 h-14 rounded-full bg-amber-50 text-[#7D0A14] flex items-center justify-center mx-auto text-2xl">
               🔍
             </div>
             <h3 className="font-bold text-slate-800 text-sm sm:text-base">No items found</h3>
@@ -512,7 +512,7 @@ export const CategoriesPage = () => {
                 setSelectedCategoryFilter('All');
                 setOrganicOnly(false);
               }}
-              className="px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-[#7D0A14] text-white font-bold text-xs rounded-xl shadow-md hover:bg-[#680811] transition-colors cursor-pointer"
             >
               Reset Filters & Show All
             </button>

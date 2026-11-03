@@ -7,7 +7,8 @@ import {
   Trash2,
   ArrowRight,
   Sparkles,
-  ShoppingBag
+  ShoppingBag,
+  Share2
 } from 'lucide-react';
 
 export const WishlistPage = () => {
@@ -16,13 +17,43 @@ export const WishlistPage = () => {
     toggleWishlist,
     addToCart,
     navigateTo,
-    setQuickViewProduct
+    setQuickViewProduct,
+    showToast
   } = useShop();
 
   const savedProducts = products.filter((p) => wishlist.includes(p.id));
 
   const handleMoveAllToCart = () => {
     savedProducts.forEach((p) => addToCart(p, 1));
+    showToast(`Added all ${savedProducts.length} items to your cart! 🛒`);
+  };
+
+  const handleShareProduct = async (e, prod) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${prod.id}`;
+    const shareText = `Check out fresh ${prod.name} (₹${prod.price}/${prod.unit}) on Sumadhura Foods! 10-15 Min Express Delivery 🚚`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `${prod.name} | Sumadhura Foods`,
+          text: shareText,
+          url: shareUrl
+        });
+        return;
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err);
+        }
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      showToast(`Link to ${prod.name} copied to clipboard! 📋`);
+    } catch {
+      showToast(`Product URL: ${shareUrl}`);
+    }
   };
 
   return (
@@ -46,7 +77,7 @@ export const WishlistPage = () => {
         {savedProducts.length > 0 && (
           <button
             onClick={handleMoveAllToCart}
-            className="px-6 py-3.5 rounded-2xl bg-[#F5A623] text-[#3D040A] hover:bg-[#E09215] active:scale-95 font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all flex-shrink-0"
+            className="px-6 py-3.5 rounded-2xl bg-[#F5A623] text-[#3D040A] hover:bg-[#E09215] active:scale-95 font-black text-xs flex items-center justify-center gap-2 shadow-md transition-all flex-shrink-0 cursor-pointer"
           >
             <ShoppingCart className="w-4 h-4" />
             <span>Add All to Cart</span>
@@ -56,7 +87,7 @@ export const WishlistPage = () => {
 
       {/* Wishlist Items Grid */}
       {savedProducts.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-dashed border-slate-200 p-12 sm:p-16 text-center space-y-4">
+        <div className="bg-white rounded-3xl border border-dashed border-[#EDE1D1] p-12 sm:p-16 text-center space-y-4">
           <div className="w-20 h-20 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto shadow-sm">
             <Heart className="w-10 h-10 fill-rose-400/30 text-rose-500 stroke-[1.5]" />
           </div>
@@ -67,7 +98,7 @@ export const WishlistPage = () => {
           <div className="pt-2">
             <button
               onClick={() => navigateTo('categories')}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition-all inline-flex items-center gap-2"
+              className="px-6 py-3 bg-[#7D0A14] hover:bg-[#680811] text-white font-bold text-xs rounded-xl shadow-md transition-all inline-flex items-center gap-2 cursor-pointer"
             >
               <span>Explore All Products</span>
               <ArrowRight className="w-4 h-4" />
@@ -80,20 +111,33 @@ export const WishlistPage = () => {
             <div
               key={prod.id}
               data-aos="fade-up"
-              className="group bg-white rounded-2xl border border-slate-100 shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden"
+              onClick={() => setQuickViewProduct(prod)}
+              className="group bg-white rounded-2xl border border-[#EDE1D1] shadow-soft hover:shadow-card-hover transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer"
             >
               {/* Product Image */}
-              <div className="relative aspect-square w-full bg-slate-50 overflow-hidden p-3">
+              <div className="relative aspect-square w-full bg-[#FAF5EC]/60 overflow-hidden p-3">
                 <img
                   src={prod.image}
                   alt={prod.name}
-                  onClick={() => setQuickViewProduct(prod)}
-                  className="w-full h-full object-cover rounded-xl cursor-pointer group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover rounded-xl group-hover:scale-105 transition-transform duration-300"
                 />
+
+                {/* Share button */}
+                <button
+                  onClick={(e) => handleShareProduct(e, prod)}
+                  className="absolute top-2.5 right-11 p-2 rounded-full bg-white/90 text-slate-400 hover:text-[#7D0A14] hover:bg-white shadow-sm transition-colors cursor-pointer"
+                  title="Share product"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                </button>
+
                 {/* Remove button */}
                 <button
-                  onClick={() => toggleWishlist(prod)}
-                  className="absolute top-2.5 right-2.5 p-2 rounded-full bg-white/90 text-rose-500 hover:bg-rose-50 shadow-sm transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleWishlist(prod);
+                  }}
+                  className="absolute top-2.5 right-2.5 p-2 rounded-full bg-white/90 text-rose-500 hover:bg-rose-50 shadow-sm transition-colors cursor-pointer"
                   title="Remove from wishlist"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -104,31 +148,33 @@ export const WishlistPage = () => {
               <div className="p-4 flex-1 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
-                    <span className="font-bold text-blue-600 uppercase text-[10px]">
+                    <span className="font-bold text-[#7D0A14] uppercase text-[10px]">
                       {prod.category}
                     </span>
                     <span className="text-slate-400 text-[11px]">{prod.unit}</span>
                   </div>
                   <h3
-                    onClick={() => setQuickViewProduct(prod)}
-                    className="font-bold text-slate-900 text-sm line-clamp-2 hover:text-blue-600 cursor-pointer"
+                    className="font-bold text-slate-900 text-sm line-clamp-2 hover:text-[#7D0A14] transition-colors"
                   >
                     {prod.name}
                   </h3>
                 </div>
 
                 {/* Price & Add to Cart button */}
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                <div className="mt-4 pt-3 border-t border-[#EDE1D1] flex items-center justify-between gap-2">
                   <div className="flex items-baseline gap-1.5">
-                    <span className="text-lg font-black text-slate-900">₹{prod.price}</span>
+                    <span className="text-lg font-black text-[#7D0A14]">₹{prod.price}</span>
                     {prod.originalPrice && (
                       <span className="text-xs text-slate-400 line-through">₹{prod.originalPrice}</span>
                     )}
                   </div>
 
                   <button
-                    onClick={() => addToCart(prod, 1)}
-                    className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-500/20 transition-all"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(prod, 1);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#680811] active:scale-95 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
                   >
                     <ShoppingCart className="w-3.5 h-3.5" />
                     <span>Add to Cart</span>
