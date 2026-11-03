@@ -124,23 +124,25 @@ export const WishlistPage = () => {
 
                 {/* Share button */}
                 <button
+                  type="button"
                   onClick={(e) => handleShareProduct(e, prod)}
-                  className="absolute top-2.5 right-11 p-2 rounded-full bg-white/90 text-slate-400 hover:text-[#7D0A14] hover:bg-white shadow-sm transition-colors cursor-pointer"
+                  className="absolute top-11 right-2.5 p-1.5 sm:p-2 rounded-xl bg-[#FAF5EC] hover:bg-[#F2E8DC] text-[#7D0A14] border border-[#EDE1D1] shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center cursor-pointer"
                   title="Share product"
                 >
-                  <Share2 className="w-3.5 h-3.5" />
+                  <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#7D0A14] stroke-[2.2]" />
                 </button>
 
                 {/* Remove button */}
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleWishlist(prod);
                   }}
-                  className="absolute top-2.5 right-2.5 p-2 rounded-full bg-white/90 text-rose-500 hover:bg-rose-50 shadow-sm transition-colors cursor-pointer"
+                  className="absolute top-2.5 right-2.5 p-1.5 sm:p-2 rounded-xl bg-[#FAF5EC]/95 hover:bg-white text-rose-500 border border-[#EDE1D1] shadow-sm transition-all duration-200 cursor-pointer"
                   title="Remove from wishlist"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </button>
               </div>
 

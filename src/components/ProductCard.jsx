@@ -1,6 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useShop } from '../context/ShopContext';
-import { Heart, Plus, Minus, Star, Eye, Clock, Sparkles, Lock, Building2, Share2 } from 'lucide-react';
+import {
+  Heart,
+  Plus,
+  Minus,
+  Star,
+  Eye,
+  Clock,
+  Sparkles,
+  Lock,
+  Building2,
+  Share2,
+  Check,
+  Copy
+} from 'lucide-react';
 
 export const ProductCard = ({ product, priority = false }) => {
   const {
@@ -17,6 +30,9 @@ export const ProductCard = ({ product, priority = false }) => {
     setAuthModalTab,
     showToast
   } = useShop();
+
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   const isLiked = isInWishlist(product.id);
   const cartItem = cart.find((item) => item.id === product.id);
@@ -35,15 +51,15 @@ export const ProductCard = ({ product, priority = false }) => {
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
     : 0;
 
-  const handleShareProduct = async (e, prod) => {
+  const handleShareProduct = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
-    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${prod.id}`;
-    const shareText = `Check out fresh ${prod.name} (₹${activePrice}/${activeUnit}) on Sumadhura Foods! 10-15 Min Express Delivery 🚚`;
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+    const shareText = `Check out fresh "${product.name}" (₹${activePrice}/${activeUnit}) on Sumadhura Foods! 10-15 Min Express Delivery 🚚`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${prod.name} | Sumadhura Foods`,
+          title: `${product.name} | Sumadhura Foods`,
           text: shareText,
           url: shareUrl
         });
@@ -55,11 +71,34 @@ export const ProductCard = ({ product, priority = false }) => {
       }
     }
 
+    setIsShareOpen((prev) => !prev);
+  };
+
+  const handleWhatsAppShare = (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+    const shareText = `Check out fresh "${product.name}" (₹${activePrice}/${activeUnit}) on Sumadhura Foods! 10-15 Min Express Delivery 🚚`;
+    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
+      `${shareText}\n\n👉 Order here: ${shareUrl}`
+    )}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+    setIsShareOpen(false);
+  };
+
+  const handleCopyLink = async (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const shareUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
-      showToast(`Link to ${prod.name} copied to clipboard! 📋`);
+      setCopiedLink(true);
+      showToast(`Link to ${product.name} copied to clipboard! 📋`);
+      setTimeout(() => {
+        setCopiedLink(false);
+        setIsShareOpen(false);
+      }, 2000);
     } catch {
       showToast(`Product URL: ${shareUrl}`);
+      setIsShareOpen(false);
     }
   };
 
@@ -87,32 +126,62 @@ export const ProductCard = ({ product, priority = false }) => {
           )
         )}
 
-        {/* Wishlist Button */}
+        {/* Wishlist Button - Top Right */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             toggleWishlist(product);
           }}
-          className={`absolute top-2.5 right-2.5 z-10 p-1.5 rounded-full transition-all duration-200 shadow-sm ${
+          className={`absolute top-2.5 right-2.5 z-10 p-1.5 sm:p-2 rounded-xl transition-all duration-200 shadow-sm border ${
             isLiked
-              ? 'bg-rose-50 text-rose-500 scale-110 shadow-rose-200'
-              : 'bg-white/90 text-slate-400 hover:text-rose-500 hover:bg-white'
+              ? 'bg-rose-50 border-rose-200 text-rose-500 scale-105'
+              : 'bg-[#FAF5EC]/95 border-[#EDE1D1] text-slate-400 hover:text-rose-500 hover:bg-white'
           }`}
           aria-label={isLiked ? 'Remove from wishlist' : 'Add to wishlist'}
           title="Wishlist"
         >
-          <Heart className={`w-4 h-4 ${isLiked ? 'fill-rose-500 stroke-rose-500' : ''}`} />
+          <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isLiked ? 'fill-rose-500 stroke-rose-500' : ''}`} />
         </button>
 
-        {/* Quick Share Button */}
-        <button
-          onClick={(e) => handleShareProduct(e, product)}
-          className="absolute top-2.5 right-10 z-10 p-1.5 rounded-full bg-white/90 text-slate-400 hover:text-[#7D0A14] hover:bg-white transition-all duration-200 shadow-sm"
-          aria-label="Share product"
-          title="Share product"
-        >
-          <Share2 className="w-3.5 h-3.5" />
-        </button>
+        {/* Quick Share Button - Exactly matches user's screenshot */}
+        <div className="absolute top-11 right-2.5 z-20">
+          <button
+            type="button"
+            onClick={handleShareProduct}
+            className="p-1.5 sm:p-2 rounded-xl bg-[#FAF5EC] hover:bg-[#F2E8DC] text-[#7D0A14] border border-[#EDE1D1] shadow-sm transition-all duration-200 active:scale-95 flex items-center justify-center cursor-pointer"
+            aria-label="Share product"
+            title="Share product"
+          >
+            <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#7D0A14] stroke-[2.2]" />
+          </button>
+
+          {/* Quick Share Popover */}
+          {isShareOpen && (
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="absolute right-0 mt-1.5 w-44 bg-white rounded-2xl shadow-xl border border-[#EDE1D1] p-2 z-30 space-y-1 animate-in fade-in zoom-in-95 duration-150"
+            >
+              <div className="text-[10px] font-black text-slate-800 uppercase tracking-wider px-2 py-0.5">
+                Share Product
+              </div>
+              <button
+                type="button"
+                onClick={handleWhatsAppShare}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-emerald-50 text-emerald-800 text-[11px] font-bold transition-colors cursor-pointer text-left"
+              >
+                <span>💬 WhatsApp</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-amber-50 text-slate-800 text-[11px] font-bold transition-colors cursor-pointer text-left"
+              >
+                {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-[#7D0A14]" />}
+                <span>{copiedLink ? 'Copied!' : 'Copy Link'}</span>
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Quick View overlay button */}
         <button
@@ -149,23 +218,29 @@ export const ProductCard = ({ product, priority = false }) => {
           <div className="flex items-center justify-between gap-1 text-xs mb-1">
             <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
               {/* Indian Food Safety Green Veg Dot Square or Red Non-Veg Triangle */}
-              <div className={`w-3 h-3 sm:w-3.5 sm:h-3.5 border rounded-sm flex items-center justify-center p-0.5 flex-shrink-0 ${
-                product.isVeg === false ? 'border-rose-600' : 'border-emerald-600'
-              }`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${
-                  product.isVeg === false ? 'bg-rose-600' : 'bg-emerald-600'
-                }`} />
+              <div
+                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 border rounded-sm flex items-center justify-center p-0.5 flex-shrink-0 ${
+                  product.isVeg === false ? 'border-rose-600' : 'border-emerald-600'
+                }`}
+              >
+                <div
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    product.isVeg === false ? 'bg-rose-600' : 'bg-emerald-600'
+                  }`}
+                />
               </div>
               <span className="text-[9px] sm:text-[10px] font-extrabold text-[#7D0A14] uppercase tracking-wider truncate max-w-[65px] sm:max-w-[110px]">
                 {product.category}
               </span>
             </div>
 
-            <span className={`font-semibold text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded whitespace-nowrap flex-shrink-0 ${
-              isWholesale
-                ? 'bg-amber-100/80 text-[#7D0A14] font-black border border-amber-300/60'
-                : 'text-slate-500 bg-slate-100'
-            }`}>
+            <span
+              className={`font-semibold text-[10px] sm:text-[11px] px-1.5 py-0.5 rounded whitespace-nowrap flex-shrink-0 ${
+                isWholesale
+                  ? 'bg-amber-100/80 text-[#7D0A14] font-black border border-amber-300/60'
+                  : 'text-slate-500 bg-slate-100'
+              }`}
+            >
               {activeUnit}
             </span>
           </div>
