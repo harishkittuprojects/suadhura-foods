@@ -241,33 +241,34 @@ export const SubscriptionModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-hidden">
       <div
-        className="relative bg-white rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200"
+        className="relative bg-white rounded-3xl max-w-xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-[#EDE1D1] overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header Banner */}
-        <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-5 sm:p-6 text-white flex items-center justify-between border-b border-[#8B121C]">
+        {/* Header Banner - Fixed at top */}
+        <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-4 sm:p-5 text-white flex items-center justify-between border-b border-[#8B121C] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-inner flex-shrink-0">
-              <Sun className="w-6 h-6 text-amber-300" />
+            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-inner shrink-0">
+              <Sun className="w-5 h-5 text-amber-300" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-black bg-[#F5A623] text-[#3D040A] px-2 py-0.2 rounded-full uppercase">
+                <span className="text-[10px] font-black bg-[#F5A623] text-[#3D040A] px-2 py-0.5 rounded-full uppercase">
                   Daily Morning Sourcing
                 </span>
-                <span className="text-xs text-amber-100">6:00 AM - 7:00 AM</span>
+                <span className="text-xs text-amber-100 font-semibold">6:00 AM - 7:00 AM</span>
               </div>
-              <h3 className="text-xl font-black mt-0.5">Subscription Order</h3>
-              <p className="text-xs text-amber-100/90">
-                Fresh cow milk & vegetables at your doorstep daily. Pause anytime.
+              <h3 className="text-lg sm:text-xl font-black mt-0.5">Morning Milk & Veggie Subscription</h3>
+              <p className="text-xs text-amber-100/90 leading-tight">
+                Doorstep delivery before 7:00 AM daily. Pause or resume anytime.
               </p>
             </div>
           </div>
           <button
             onClick={() => setIsSubscriptionModalOpen(false)}
-            className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Close"
           >
             <X className="w-5 h-5" />
           </button>
@@ -275,271 +276,285 @@ export const SubscriptionModal = () => {
 
         {/* View 1: Configure & Start Subscription */}
         {step === 1 && (
-          <form onSubmit={handleStartSubscription} className="p-5 sm:p-6 space-y-5">
-            {/* Step 1: Select Products */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                  1. Select Daily Morning Items
-                </label>
-                <span className="text-[11px] text-blue-600 font-bold">100% Farm Bottled</span>
-              </div>
+          <>
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+              {/* Step 1: Select Products */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                    1. Select Daily Morning Items
+                  </label>
+                  <span className="text-[11px] text-[#7D0A14] font-black">100% Farm Fresh</span>
+                </div>
 
-              <div className="space-y-2.5">
-                {subItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-3 rounded-2xl border border-slate-200 bg-slate-50/60 flex items-center justify-between gap-3"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center flex-shrink-0">
-                        <item.icon className="w-4 h-4" />
+                <div className="space-y-2">
+                  {subItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-3 rounded-2xl border border-[#EDE1D1] bg-[#FAF5EC]/40 hover:bg-[#FAF5EC] flex items-center justify-between gap-3 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-amber-100 text-[#7D0A14] flex items-center justify-center shrink-0">
+                          <item.icon className="w-4 h-4" />
+                        </div>
+                        <div className="truncate">
+                          <div className="font-extrabold text-xs text-slate-900 truncate">
+                            {item.name}
+                          </div>
+                          <div className="text-[11px] text-slate-500 font-medium">
+                            ₹{item.unitPrice} per day • <span className="text-emerald-700 font-bold">{item.badge}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="truncate">
-                        <div className="font-extrabold text-xs text-slate-900 truncate">
-                          {item.name}
-                        </div>
-                        <div className="text-[11px] text-slate-500">
-                          ₹{item.unitPrice} per day • <span className="text-emerald-600 font-semibold">{item.badge}</span>
-                        </div>
+
+                      {/* Quantity Stepper */}
+                      <div className="flex items-center bg-white border border-[#EDE1D1] rounded-xl p-0.5 shadow-2xs">
+                        <button
+                          type="button"
+                          onClick={() => updateItemQty(item.id, -1)}
+                          className="w-7 h-7 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors"
+                        >
+                          <Minus className="w-3.5 h-3.5" />
+                        </button>
+                        <span className="w-7 text-center font-black text-xs text-slate-900">
+                          {item.qty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateItemQty(item.id, 1)}
+                          className="w-7 h-7 rounded-lg bg-[#7D0A14] hover:bg-[#680811] text-white flex items-center justify-center transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-
-                    {/* Quantity Stepper */}
-                    <div className="flex items-center bg-white border border-slate-200 rounded-xl p-0.5 shadow-sm">
-                      <button
-                        type="button"
-                        onClick={() => updateItemQty(item.id, -1)}
-                        className="w-7 h-7 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="w-7 text-center font-black text-xs text-slate-900">
-                        {item.qty}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateItemQty(item.id, 1)}
-                        className="w-7 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Step 2: Delivery Frequency */}
-            <div>
-              <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">
-                2. Delivery Frequency
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFrequency('daily')}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border-2 transition-all ${
-                    frequency === 'daily'
-                      ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-sm'
-                      : 'border-slate-200 text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="font-black">Daily</div>
-                  <span className="text-[10px] text-slate-500 font-normal">7 days/week</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setFrequency('alternate')}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border-2 transition-all ${
-                    frequency === 'alternate'
-                      ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-sm'
-                      : 'border-slate-200 text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="font-black">Alternate Days</div>
-                  <span className="text-[10px] text-slate-500 font-normal">Mon, Wed, Fri...</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setFrequency('weekdays')}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border-2 transition-all ${
-                    frequency === 'weekdays'
-                      ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-sm'
-                      : 'border-slate-200 text-slate-700 hover:border-slate-300'
-                  }`}
-                >
-                  <div className="font-black">Weekdays Only</div>
-                  <span className="text-[10px] text-slate-500 font-normal">Mon to Fri</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Step 3: Morning Delivery Slot & Plan Duration */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Step 2: Delivery Frequency */}
               <div>
-                <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
-                  Morning Time Slot
+                <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-2">
+                  2. Delivery Frequency
                 </label>
-                <select
-                  value={slot}
-                  onChange={(e) => setSlot(e.target.value)}
-                  className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-600 font-bold"
-                >
-                  <option value="6am-7am">6:00 AM – 7:00 AM (Early)</option>
-                  <option value="7am-8am">7:00 AM – 8:00 AM</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
-                  Plan Duration
-                </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
-                    onClick={() => setDurationDays(7)}
-                    className={`py-2 text-xs font-bold rounded-xl border ${
-                      durationDays === 7
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                        : 'bg-slate-50 border-slate-200 text-slate-700'
+                    onClick={() => setFrequency('daily')}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border-2 transition-all ${
+                      frequency === 'daily'
+                        ? 'border-[#7D0A14] bg-[#FAF5EC] text-[#3D040A] ring-2 ring-[#7D0A14]/15 shadow-xs'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    7-Day Trial (10% Off)
+                    <div className="font-black">Daily</div>
+                    <span className="text-[10px] text-slate-500 font-normal">7 days/week</span>
                   </button>
+
                   <button
                     type="button"
-                    onClick={() => setDurationDays(30)}
-                    className={`py-2 text-xs font-bold rounded-xl border ${
-                      durationDays === 30
-                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                        : 'bg-slate-50 border-slate-200 text-slate-700'
+                    onClick={() => setFrequency('alternate')}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border-2 transition-all ${
+                      frequency === 'alternate'
+                        ? 'border-[#7D0A14] bg-[#FAF5EC] text-[#3D040A] ring-2 ring-[#7D0A14]/15 shadow-xs'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
                     }`}
                   >
-                    30 Days (15% Off)
+                    <div className="font-black">Alternate Days</div>
+                    <span className="text-[10px] text-slate-500 font-normal">Mon, Wed, Fri...</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setFrequency('weekdays')}
+                    className={`py-2 px-3 rounded-xl text-xs font-bold border-2 transition-all ${
+                      frequency === 'weekdays'
+                        ? 'border-[#7D0A14] bg-[#FAF5EC] text-[#3D040A] ring-2 ring-[#7D0A14]/15 shadow-xs'
+                        : 'border-slate-200 text-slate-700 hover:border-slate-300 bg-white'
+                    }`}
+                  >
+                    <div className="font-black">Weekdays Only</div>
+                    <span className="text-[10px] text-slate-500 font-normal">Mon to Fri</span>
                   </button>
                 </div>
               </div>
-            </div>
 
-            {/* Vacation / Pause Guarantee */}
-            <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-900 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span>
-                <strong>Vacation Guarantee:</strong> Going out of town? Pause or modify your milk and vegetable delivery anytime without charges.
-              </span>
-            </div>
+              {/* Step 3: Morning Delivery Slot & Plan Duration */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
+                    Morning Time Slot
+                  </label>
+                  <select
+                    value={slot}
+                    onChange={(e) => setSlot(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-[#FAF5EC]/50 border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-bold text-slate-800"
+                  >
+                    <option value="6am-7am">6:00 AM – 7:00 AM (Early Morning)</option>
+                    <option value="7am-8am">7:00 AM – 8:00 AM (Morning)</option>
+                  </select>
+                </div>
 
-            {/* Customer Details & Delivery Contact */}
-            <div className="bg-[#FAF5EC] border border-[#EDE1D1] rounded-2xl p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-black text-[#3D040A] uppercase tracking-wider flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5 text-[#7D0A14]" />
-                  <span>Doorstep Delivery Contact</span>
+                <div>
+                  <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
+                    Plan Duration
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setDurationDays(7)}
+                      className={`py-2 text-xs rounded-xl border transition-all ${
+                        durationDays === 7
+                          ? 'bg-[#7D0A14] text-white border-[#7D0A14] font-black shadow-xs'
+                          : 'bg-white border-slate-200 text-slate-700 font-bold hover:bg-slate-50'
+                      }`}
+                    >
+                      7 Days (10% Off)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDurationDays(30)}
+                      className={`py-2 text-xs rounded-xl border transition-all ${
+                        durationDays === 30
+                          ? 'bg-[#7D0A14] text-white border-[#7D0A14] font-black shadow-xs'
+                          : 'bg-white border-slate-200 text-slate-700 font-bold hover:bg-slate-50'
+                      }`}
+                    >
+                      30 Days (15% Off)
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vacation / Pause Guarantee */}
+              <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-900 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>
+                  <strong>Vacation Guarantee:</strong> Going out of town? Pause or modify your milk and vegetable delivery anytime without charges.
                 </span>
-                {user ? (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
-                    Logged In as {user.name}
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
-                    className="text-[11px] font-bold text-[#7D0A14] hover:underline cursor-pointer"
-                  >
-                    Already have account? Sign In
-                  </button>
-                )}
               </div>
 
-              {user ? (
-                <div className="text-xs text-slate-700 bg-white p-3 rounded-xl border border-[#EDE1D1] space-y-1">
-                  <div className="font-extrabold text-[#3D040A] text-sm">{user.name || user.companyName}</div>
-                  <div className="text-slate-500">{user.phone} • {user.email || 'Doorstep Delivery'}</div>
-                  <div className="text-slate-600 font-medium truncate pt-1 border-t border-slate-100 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-[#7D0A14] shrink-0" />
-                    <span>{guestAddress || (selectedAddress ? `${selectedAddress.title}, ${selectedAddress.area}` : 'Madhapur / Hitec City, Hyderabad')}</span>
-                  </div>
+              {/* Customer Details & Delivery Contact */}
+              <div className="bg-[#FAF5EC] border border-[#EDE1D1] rounded-2xl p-3.5 sm:p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-[#3D040A] uppercase tracking-wider flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-[#7D0A14]" />
+                    <span>Doorstep Delivery Contact</span>
+                  </span>
+                  {user ? (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      Logged In as {user.name}
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
+                      className="text-[11px] font-bold text-[#7D0A14] hover:underline cursor-pointer"
+                    >
+                      Already have account? Sign In
+                    </button>
+                  )}
                 </div>
-              ) : (
-                <div className="space-y-2.5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+
+                {user ? (
+                  <div className="text-xs text-slate-700 bg-white p-3 rounded-xl border border-[#EDE1D1] space-y-1">
+                    <div className="font-extrabold text-[#3D040A] text-sm">{user.name || user.companyName}</div>
+                    <div className="text-slate-500">{user.phone} • {user.email || 'Doorstep Delivery'}</div>
+                    <div className="text-slate-600 font-medium truncate pt-1 border-t border-slate-100 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-[#7D0A14] shrink-0" />
+                      <span>{guestAddress || (selectedAddress ? `${selectedAddress.title}, ${selectedAddress.area}` : 'Madhapur / Hitec City, Hyderabad')}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-700 block mb-1">Your Full Name *</label>
+                        <input
+                          type="text"
+                          required
+                          value={guestName}
+                          onChange={(e) => setGuestName(e.target.value)}
+                          placeholder="e.g. Ramesh Kumar"
+                          className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-slate-700 block mb-1">Mobile / WhatsApp Number *</label>
+                        <input
+                          type="tel"
+                          required
+                          value={guestPhone}
+                          onChange={(e) => setGuestPhone(e.target.value)}
+                          placeholder="+91 98765 43210"
+                          className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
+                        />
+                      </div>
+                    </div>
                     <div>
-                      <label className="text-[11px] font-bold text-slate-700 block mb-1">Your Full Name *</label>
+                      <label className="text-[11px] font-bold text-slate-700 block mb-1">Doorstep Apartment / Flat / Address *</label>
                       <input
                         type="text"
                         required
-                        value={guestName}
-                        onChange={(e) => setGuestName(e.target.value)}
-                        placeholder="e.g. Ramesh Kumar"
-                        className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-bold text-slate-700 block mb-1">Mobile / WhatsApp Number *</label>
-                      <input
-                        type="tel"
-                        required
-                        value={guestPhone}
-                        onChange={(e) => setGuestPhone(e.target.value)}
-                        placeholder="+91 98765 43210"
+                        value={guestAddress}
+                        onChange={(e) => setGuestAddress(e.target.value)}
+                        placeholder="e.g. Flat 302, Sai Residency, Madhapur, Hyderabad"
                         className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="text-[11px] font-bold text-slate-700 block mb-1">Doorstep Apartment / Flat / Address *</label>
-                    <input
-                      type="text"
-                      required
-                      value={guestAddress}
-                      onChange={(e) => setGuestAddress(e.target.value)}
-                      placeholder="e.g. Flat 302, Sai Residency, Madhapur, Hyderabad"
-                      className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
-                    />
-                  </div>
+                )}
+              </div>
+
+              {/* Estimated Price Summary breakdown */}
+              <div className="bg-[#FAF5EC]/70 p-3.5 rounded-2xl border border-[#EDE1D1] space-y-1.5 text-xs text-slate-600">
+                <div className="flex justify-between">
+                  <span>Daily Basket Cost</span>
+                  <span className="font-bold text-slate-900">₹{dailyTotal} / day</span>
                 </div>
-              )}
-            </div>
-
-            {/* Estimated Price Summary */}
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1.5 text-xs text-slate-600">
-              <div className="flex justify-between">
-                <span>Daily Basket Cost</span>
-                <span className="font-bold text-slate-900">₹{dailyTotal} / day</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Delivery Days ({deliveryDaysCount} mornings)</span>
-                <span>₹{grossTotal}</span>
-              </div>
-              <div className="flex justify-between text-emerald-600 font-bold">
-                <span>Subscriber Savings ({durationDays === 30 ? '15%' : '10%'})</span>
-                <span>-₹{discountAmount}</span>
-              </div>
-              <div className="flex justify-between pt-2 border-t border-slate-200 text-base font-black text-slate-900">
-                <span>Total Payable</span>
-                <span className="text-blue-700">₹{netPayable}</span>
+                <div className="flex justify-between">
+                  <span>Delivery Days ({deliveryDaysCount} mornings)</span>
+                  <span>₹{grossTotal}</span>
+                </div>
+                <div className="flex justify-between text-emerald-700 font-bold">
+                  <span>Subscriber Savings ({durationDays === 30 ? '15%' : '10%'})</span>
+                  <span>-₹{discountAmount}</span>
+                </div>
+                <div className="flex justify-between pt-1.5 border-t border-[#EDE1D1] text-sm font-black text-slate-900">
+                  <span>Total Subscription Cost</span>
+                  <span className="text-[#7D0A14]">₹{netPayable}</span>
+                </div>
               </div>
             </div>
 
-            {/* CTA */}
-            <button
-              type="button"
-              onClick={handleStartSubscription}
-              disabled={dailyTotal === 0}
-              className="w-full py-3.5 bg-[#7D0A14] hover:bg-[#680811] active:scale-98 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-lg shadow-[#7D0A14]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <span>Start Morning Subscription (₹{netPayable})</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
+            {/* Sticky Bottom Footer CTA */}
+            <div className="shrink-0 p-3.5 sm:p-4 bg-white border-t border-[#EDE1D1] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+              <div className="flex items-center justify-between sm:justify-start w-full sm:w-auto gap-3">
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-500 block">Total Payable</span>
+                  <span className="text-xl font-black text-[#7D0A14]">₹{netPayable}</span>
+                </div>
+                <div className="text-right sm:text-left text-[11px] text-slate-500 font-medium">
+                  <span>({deliveryDaysCount} drops • ₹{dailyTotal}/day)</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleStartSubscription}
+                disabled={dailyTotal === 0}
+                className="w-full sm:w-auto px-6 py-3 bg-[#7D0A14] hover:bg-[#680811] active:scale-98 disabled:opacity-50 text-white font-black text-xs sm:text-sm rounded-xl shadow-lg shadow-[#7D0A14]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <span>Start Morning Subscription</span>
+                <ArrowRight className="w-4 h-4 text-amber-300" />
+              </button>
+            </div>
+          </>
         )}
 
         {/* View 2: Active Subscription Dashboard */}
         {step === 2 && currentSubscription && (
-          <div className="p-5 sm:p-6 space-y-5">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 p-4 rounded-2xl flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold">
@@ -551,7 +566,7 @@ export const SubscriptionModal = () => {
                       Subscription #{currentSubscription.id}
                     </span>
                     <span
-                      className={`text-[10px] font-black px-2 py-0.2 rounded-full ${
+                      className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                         isPaused
                           ? 'bg-amber-100 text-amber-800'
                           : 'bg-emerald-100 text-emerald-800'
@@ -598,7 +613,7 @@ export const SubscriptionModal = () => {
                 {(currentSubscription?.itemsList || (Array.isArray(currentSubscription?.items) ? currentSubscription.items : [])).map((item, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-between text-xs"
+                    className="p-3 rounded-xl border border-[#EDE1D1] bg-[#FAF5EC]/40 flex items-center justify-between text-xs"
                   >
                     <span className="font-bold text-slate-800">
                       {item.qty}x {item.name}
@@ -609,7 +624,7 @@ export const SubscriptionModal = () => {
                   </div>
                 ))}
                 {(!currentSubscription?.itemsList && typeof currentSubscription?.items === 'string') && (
-                  <div className="p-3 rounded-xl border border-slate-100 bg-slate-50 text-xs font-bold text-slate-800">
+                  <div className="p-3 rounded-xl border border-[#EDE1D1] bg-[#FAF5EC]/40 text-xs font-bold text-slate-800">
                     {currentSubscription.items}
                   </div>
                 )}
@@ -617,7 +632,7 @@ export const SubscriptionModal = () => {
             </div>
 
             {/* Delivery Details */}
-            <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs text-slate-600 space-y-1">
+            <div className="bg-[#FAF5EC]/60 p-4 rounded-2xl border border-[#EDE1D1] text-xs text-slate-600 space-y-1">
               <div>
                 <strong>Delivery Address:</strong> {currentSubscription?.address || 'Default Address'}
               </div>
