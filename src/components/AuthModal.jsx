@@ -135,49 +135,13 @@ export const AuthModal = () => {
             )}
           </div>
           <h2 className="text-xl font-black">
-            {accountType === 'business' ? 'B2B Wholesale Portal' : 'B2C Customer Login'}
+            {accountType === 'business' ? 'B2B Wholesale Portal' : 'Customer Login'}
           </h2>
           <p className="text-xs text-amber-100/90 mt-1 max-w-xs mx-auto">
             {accountType === 'business'
               ? 'Wholesale bulk rates, GST invoices & commercial recurring supplies'
               : 'Access fresh dairy, farm veggies, express delivery & exclusive discounts'}
           </p>
-        </div>
-
-        {/* Account Type Toggle */}
-        <div className="px-6 pt-4">
-          <div className="grid grid-cols-2 bg-[#FAF5EC] p-1.5 rounded-2xl border border-[#EDE1D1] gap-1.5">
-            <button
-              type="button"
-              onClick={() => {
-                setAccountType('user');
-                setAuthModalTab('login');
-              }}
-              className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-                accountType === 'user'
-                  ? 'bg-[#7D0A14] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>B2C Customer</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAccountType('business');
-                setAuthModalTab('login');
-              }}
-              className={`py-2 px-2 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 ${
-                accountType === 'business'
-                  ? 'bg-[#7D0A14] text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>B2B Wholesale</span>
-            </button>
-          </div>
         </div>
 
         {forgotPasswordView ? (
@@ -230,7 +194,7 @@ export const AuthModal = () => {
           </div>
         ) : (
           /* Main Login / Register View */
-          <div className="p-6 pt-3">
+          <div className="p-6">
             {/* Tabs */}
             <div className="grid grid-cols-2 bg-slate-100 p-1 rounded-2xl mb-4">
               <button
