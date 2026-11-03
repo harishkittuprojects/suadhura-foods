@@ -15,7 +15,9 @@ import {
   PauseCircle,
   PlayCircle,
   ArrowRight,
-  Sun
+  Sun,
+  User,
+  MapPin
 } from 'lucide-react';
 
 export const SubscriptionModal = () => {
@@ -27,8 +29,14 @@ export const SubscriptionModal = () => {
     addSubscription,
     selectedAddress,
     user,
+    login,
+    setIsAuthModalOpen,
     showToast
   } = useShop();
+
+  const [guestName, setGuestName] = useState('');
+  const [guestPhone, setGuestPhone] = useState('');
+  const [guestAddress, setGuestAddress] = useState('');
 
   // Subscription plan items
   const [subItems, setSubItems] = useState([
@@ -76,6 +84,16 @@ export const SubscriptionModal = () => {
     }
   }, [activeSubscription, isSubscriptionModalOpen]);
 
+  useEffect(() => {
+    if (user) {
+      setGuestName(user.name || user.companyName || '');
+      setGuestPhone(user.phone || '');
+      if (selectedAddress) {
+        setGuestAddress(`${selectedAddress.title}, ${selectedAddress.area}`);
+      }
+    }
+  }, [user, selectedAddress]);
+
   if (!isSubscriptionModalOpen) return null;
 
   const updateItemQty = (id, delta) => {
@@ -107,14 +125,35 @@ export const SubscriptionModal = () => {
       return;
     }
 
-    const addrStr = selectedAddress
-      ? `${selectedAddress.title}, ${selectedAddress.area}`
-      : 'Madhapur / Hitec City, Hyderabad';
+    const finalCustomerName = (user?.name || user?.companyName || guestName || '').trim();
+    const finalPhone = (user?.phone || guestPhone || '').trim();
+    const fallbackAddr = selectedAddress ? `${selectedAddress.title}, ${selectedAddress.area}` : 'Madhapur / Hitec City, Hyderabad';
+    const finalAddress = (guestAddress || fallbackAddr).trim();
+
+    if (!finalCustomerName || !finalPhone) {
+      showToast('Please enter your full name and mobile number for morning milk delivery', 'error');
+      return;
+    }
+
+    // Auto-create/authenticate live customer session if not already logged in
+    if (!user && login) {
+      const newCustomerUser = {
+        id: `CUST-B2C-${Date.now()}`,
+        name: finalCustomerName,
+        phone: finalPhone,
+        email: `${finalPhone.replace(/\D/g, '')}@customer.com`,
+        isBusiness: false,
+        address: finalAddress,
+        registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+        status: 'Active'
+      };
+      login(newCustomerUser);
+    }
 
     const newSub = {
       id: `SUB-${Math.floor(100 + Math.random() * 900)}`,
-      customer: user?.name || user?.companyName || 'Subscribed Customer',
-      phone: user?.phone || '+91 98450 12345',
+      customer: finalCustomerName,
+      phone: finalPhone,
       email: user?.email || '',
       isBusiness: Boolean(user?.isBusiness),
       companyName: user?.companyName || null,
@@ -126,8 +165,8 @@ export const SubscriptionModal = () => {
       dailyCost: dailyTotal,
       totalPaid: netPayable,
       startDate: 'Tomorrow Morning',
-      address: addrStr,
-      apartment: addrStr,
+      address: finalAddress,
+      apartment: finalAddress,
       since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
       status: 'Active'
     };
@@ -147,7 +186,7 @@ export const SubscriptionModal = () => {
     }
 
     setStep(2);
-    showToast('Subscription Order activated! Delivery starts tomorrow 6:00 AM 🥛');
+    showToast(`Milk subscription activated for ${finalCustomerName}! Delivery starts tomorrow 6:00 AM 🥛`);
 
     try {
       confetti({
@@ -391,6 +430,78 @@ export const SubscriptionModal = () => {
               <span>
                 <strong>Vacation Guarantee:</strong> Going out of town? Pause or modify your milk and vegetable delivery anytime without charges.
               </span>
+            </div>
+
+            {/* Customer Details & Delivery Contact */}
+            <div className="bg-[#FAF5EC] border border-[#EDE1D1] rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-[#3D040A] uppercase tracking-wider flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-[#7D0A14]" />
+                  <span>Doorstep Delivery Contact</span>
+                </span>
+                {user ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    Logged In as {user.name}
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
+                    className="text-[11px] font-bold text-[#7D0A14] hover:underline cursor-pointer"
+                  >
+                    Already have account? Sign In
+                  </button>
+                )}
+              </div>
+
+              {user ? (
+                <div className="text-xs text-slate-700 bg-white p-3 rounded-xl border border-[#EDE1D1] space-y-1">
+                  <div className="font-extrabold text-[#3D040A] text-sm">{user.name || user.companyName}</div>
+                  <div className="text-slate-500">{user.phone} • {user.email || 'Doorstep Delivery'}</div>
+                  <div className="text-slate-600 font-medium truncate pt-1 border-t border-slate-100 flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-[#7D0A14] shrink-0" />
+                    <span>{guestAddress || (selectedAddress ? `${selectedAddress.title}, ${selectedAddress.area}` : 'Madhapur / Hitec City, Hyderabad')}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 block mb-1">Your Full Name *</label>
+                      <input
+                        type="text"
+                        required
+                        value={guestName}
+                        onChange={(e) => setGuestName(e.target.value)}
+                        placeholder="e.g. Ramesh Kumar"
+                        className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-700 block mb-1">Mobile / WhatsApp Number *</label>
+                      <input
+                        type="tel"
+                        required
+                        value={guestPhone}
+                        onChange={(e) => setGuestPhone(e.target.value)}
+                        placeholder="+91 98765 43210"
+                        className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 block mb-1">Doorstep Apartment / Flat / Address *</label>
+                    <input
+                      type="text"
+                      required
+                      value={guestAddress}
+                      onChange={(e) => setGuestAddress(e.target.value)}
+                      placeholder="e.g. Flat 302, Sai Residency, Madhapur, Hyderabad"
+                      className="w-full px-3 py-2 text-xs bg-white border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-semibold text-slate-900"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Estimated Price Summary */}

@@ -109,6 +109,93 @@ export const AdminPage = () => {
   // Selected invoice for Modal viewing
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
+  // Manual Subscription Modal State (Admin create for real customer)
+  const [isManualSubModalOpen, setIsManualSubModalOpen] = useState(false);
+  const [manualSubForm, setManualSubForm] = useState({
+    customerName: '',
+    phone: '',
+    email: '',
+    items: 'Farm Fresh Pure Cow Milk (500ml) (2)',
+    address: 'Madhapur / Hitec City, Hyderabad',
+    frequency: 'daily',
+    slot: '6:00 AM - 7:00 AM',
+    durationDays: 30,
+    dailyCost: 68
+  });
+
+  // Real-time synchronization: live customer subscriptions appear instantly without page reload
+  React.useEffect(() => {
+    const reloadAdminLiveFeed = () => {
+      try {
+        const savedSubs = localStorage.getItem('sumadhura_subscriptions');
+        if (savedSubs) {
+          const parsed = JSON.parse(savedSubs);
+          setSubscriptions(parsed);
+        }
+        const savedCusts = localStorage.getItem('sumadhura_registered_customers');
+        if (savedCusts) {
+          const parsedC = JSON.parse(savedCusts);
+          setCustomers(parsedC.filter(c => !isFakeCustomer(c)));
+        }
+        const savedOrders = localStorage.getItem('sumadhura_orders');
+        if (savedOrders) {
+          setOrders(JSON.parse(savedOrders));
+        }
+      } catch {}
+    };
+
+    window.addEventListener('focus', reloadAdminLiveFeed);
+    window.addEventListener('storage', reloadAdminLiveFeed);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') reloadAdminLiveFeed();
+    });
+
+    let bc = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bc = new BroadcastChannel('sumadhura_sync_channel');
+        bc.onmessage = () => reloadAdminLiveFeed();
+      }
+    } catch {}
+
+    return () => {
+      window.removeEventListener('focus', reloadAdminLiveFeed);
+      window.removeEventListener('storage', reloadAdminLiveFeed);
+      if (bc) bc.close();
+    };
+  }, []);
+
+  const handleCreateManualSub = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!manualSubForm.customerName.trim() || !manualSubForm.phone.trim()) {
+      showToast('Please provide customer name and phone number', 'error');
+      return;
+    }
+    const days = Number(manualSubForm.durationDays) || 30;
+    const daily = Number(manualSubForm.dailyCost) || 68;
+    const total = Math.round(days * daily * (days === 30 ? 0.85 : 0.9));
+    const newSub = {
+      id: `SUB-${Math.floor(100 + Math.random() * 900)}`,
+      customer: manualSubForm.customerName.trim(),
+      phone: manualSubForm.phone.trim(),
+      email: manualSubForm.email.trim(),
+      items: manualSubForm.items,
+      frequency: manualSubForm.frequency,
+      slot: manualSubForm.slot,
+      durationDays: days,
+      dailyCost: daily,
+      totalPaid: total,
+      startDate: 'Tomorrow Morning',
+      address: manualSubForm.address.trim(),
+      apartment: manualSubForm.address.trim(),
+      since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
+      status: 'Active'
+    };
+    addSubscription(newSub);
+    setIsManualSubModalOpen(false);
+    showToast(`🔔 Morning subscription ${newSub.id} activated for ${newSub.customer}!`);
+  };
+
       // -------------------------------------------------------------------
   // ZERO FAKE CUSTOMERS POLICY: REAL AUTHENTIC LOGGED-IN CUSTOMERS ONLY
   // -------------------------------------------------------------------
@@ -3046,52 +3133,58 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              {/* Active Logged-In Customer Status Banner */}
-              <div className="bg-[#FAF5EC] p-4 rounded-2xl border border-[#EDE1D1] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#7D0A14] text-white flex items-center justify-center font-black text-sm flex-shrink-0">
-                    {user ? (user.name ? user.name[0].toUpperCase() : 'U') : <User className="w-5 h-5 text-amber-300" />}
+              {/* Live Customer Subscriptions Hub Banner */}
+              <div className="bg-[#FAF5EC] p-4 sm:p-5 rounded-2xl border border-[#EDE1D1] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-11 h-11 rounded-2xl bg-[#7D0A14] text-white flex items-center justify-center font-black text-xl flex-shrink-0 shadow-xs">
+                    🥛
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-sm text-[#3D040A]">
-                        {user ? (user.name || user.companyName) : 'No Customer Logged In'}
+                      <span className="font-extrabold text-sm sm:text-base text-[#3D040A]">
+                        Live Customer Subscriptions Registry
                       </span>
-                      {user ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          Online Customer Session
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-800 border border-amber-200">
-                          Signed Out / Guest Mode
-                        </span>
-                      )}
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Live Feed Active
+                      </span>
                     </div>
-                    <div className="text-xs text-slate-500">
-                      {user ? (
-                        <span>{user.phone} {user.email ? `• ${user.email}` : ''} • {user.isBusiness ? 'B2B Wholesale' : 'B2C Retail'}</span>
-                      ) : (
-                        <span>Sign in on the storefront to register a real customer morning milk subscription.</span>
-                      )}
+                    <div className="text-xs text-slate-500 mt-0.5">
+                      Subscribed customers receive automatic morning dispatch before 7:00 AM daily.
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-auto">
-                  {!user ? (
-                    <button
-                      onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
-                      className="px-3.5 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-colors"
-                    >
-                      <User className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Log In as Customer</span>
-                    </button>
-                  ) : (
-                    <span className="text-xs font-bold text-slate-600">
-                      Subscriptions: <strong className="text-[#7D0A14]">{subscriptions.length} active</strong>
-                    </span>
-                  )}
+                <div className="flex items-center gap-2.5 self-end sm:self-auto">
+                  <div className="text-right hidden md:block pr-2 border-r border-[#EDE1D1]">
+                    <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Live Active</div>
+                    <div className="font-black text-sm text-[#7D0A14]">{subscriptions.filter(s => s.status === 'Active').length} Subscribers</div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      try {
+                        const savedSubs = localStorage.getItem('sumadhura_subscriptions');
+                        if (savedSubs) setSubscriptions(JSON.parse(savedSubs));
+                        const savedCusts = localStorage.getItem('sumadhura_registered_customers');
+                        if (savedCusts) setCustomers(JSON.parse(savedCusts));
+                        showToast('🔄 Real-time customer subscriptions refreshed!', 'success');
+                      } catch {}
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-white border border-[#EDE1D1] hover:bg-slate-50 text-[#3D040A] text-xs font-black flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                    title="Force refresh live feed"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 text-[#7D0A14]" />
+                    <span>Sync Live Feed</span>
+                  </button>
+
+                  <button
+                    onClick={() => setIsManualSubModalOpen(true)}
+                    className="px-3.5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-amber-300" />
+                    <span>+ New Subscription</span>
+                  </button>
                 </div>
               </div>
 
@@ -3166,30 +3259,28 @@ export const AdminPage = () => {
                   ))}
                 </div>
               ) : (
-                <div className="py-12 text-center bg-[#FAF5EC]/50 rounded-2xl border border-dashed border-[#EDE1D1] p-6 space-y-3">
+                <div className="py-14 text-center bg-[#FAF5EC]/50 rounded-2xl border border-dashed border-[#EDE1D1] p-6 space-y-3">
                   <Clock className="w-12 h-12 text-[#7D0A14]/30 mx-auto" />
-                  <h4 className="font-black text-[#3D040A] text-base">No Customer Subscriptions Active</h4>
+                  <h4 className="font-black text-[#3D040A] text-base">No Customer Subscriptions Placed Yet</h4>
                   <p className="text-xs text-slate-500 max-w-md mx-auto">
-                    All mock demo customers (Rajesh Sharma, Sunita Venkatesh, Karthik Balan, Deepa Kulkarni) have been completely removed.
-                    Only real logged-in customers who subscribe will appear here.
+                    When a customer logs into the live storefront website and activates a morning milk or veggie subscription, their order and delivery run-sheet will automatically appear here in real time.
                   </p>
-                  {user ? (
+                  <div className="flex items-center justify-center gap-2 pt-2">
                     <button
-                      onClick={() => createSubscriptionForUser(user)}
-                      className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
+                      onClick={() => navigateTo('home')}
+                      className="px-4 py-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] text-xs font-bold hover:bg-[#F3EAD9] transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Store className="w-3.5 h-3.5" />
+                      <span>Open Customer Storefront</span>
+                    </button>
+                    <button
+                      onClick={() => setIsManualSubModalOpen(true)}
+                      className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5 cursor-pointer"
                     >
                       <Plus className="w-4 h-4 text-amber-300" />
-                      <span>Activate Morning Milk Delivery for {user.name || user.companyName}</span>
+                      <span>+ Create Subscription for Customer</span>
                     </button>
-                  ) : (
-                    <button
-                      onClick={() => setIsAuthModalOpen && setIsAuthModalOpen(true)}
-                      className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
-                    >
-                      <User className="w-4 h-4 text-amber-300" />
-                      <span>Log In as Customer to Subscribe</span>
-                    </button>
-                  )}
+                  </div>
                 </div>
               )}
             </div>
@@ -4991,7 +5082,127 @@ export const AdminPage = () => {
       )}
 
       {/* ------------------------------------------------------------- */}
-      {/* ADD NEW PRODUCT SKU MODAL                                     */}
+{/* Manual Subscription Creation Modal (Admin to Customer) */}
+      {isManualSubModalOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <div className="relative bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="bg-[#7D0A14] p-5 text-white flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-amber-300" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base">Create Morning Subscription</h3>
+                  <p className="text-xs text-amber-100/90">Manually enroll customer into daily 6 AM doorstep milk delivery</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsManualSubModalOpen(false)}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateManualSub} className="p-5 sm:p-6 space-y-4 text-xs font-bold text-slate-700">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block mb-1 text-slate-900 font-extrabold">Customer Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={manualSubForm.customerName}
+                    onChange={(e) => setManualSubForm({ ...manualSubForm, customerName: e.target.value })}
+                    placeholder="e.g. Ramesh Kumar"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#EDE1D1] rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#7D0A14]"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-slate-900 font-extrabold">Mobile / WhatsApp *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={manualSubForm.phone}
+                    onChange={(e) => setManualSubForm({ ...manualSubForm, phone: e.target.value })}
+                    placeholder="+91 98765 43210"
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#EDE1D1] rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#7D0A14]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block mb-1 text-slate-900 font-extrabold">Delivery Items & Quantity *</label>
+                <select
+                  value={manualSubForm.items}
+                  onChange={(e) => setManualSubForm({ ...manualSubForm, items: e.target.value })}
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#EDE1D1] rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#7D0A14]"
+                >
+                  <option value="Farm Fresh Pure Cow Milk (500ml) (2)">Farm Fresh Pure Cow Milk (500ml) × 2</option>
+                  <option value="A2 Buffalo Milk (500ml) (2) + Curd (400g) (1)">A2 Buffalo Milk (500ml) × 2 + Curd (400g) × 1</option>
+                  <option value="Morning Fresh Veggie Harvest Basket (1.5 kg)">Morning Fresh Veggie Harvest Basket (1.5 kg)</option>
+                  <option value="Farm Fresh Cow Milk (1L) + Farm Veggie Basket (1.5kg)">Combo: Cow Milk (1L) + Veggie Basket</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block mb-1 text-slate-900 font-extrabold">Delivery Address & Apartment *</label>
+                <input
+                  type="text"
+                  required
+                  value={manualSubForm.address}
+                  onChange={(e) => setManualSubForm({ ...manualSubForm, address: e.target.value })}
+                  placeholder="e.g. Flat 302, Sai Residency, Madhapur, Hyderabad"
+                  className="w-full px-3 py-2 bg-slate-50 border border-[#EDE1D1] rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-[#7D0A14]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block mb-1 text-slate-900 font-extrabold">Frequency</label>
+                  <select
+                    value={manualSubForm.frequency}
+                    onChange={(e) => setManualSubForm({ ...manualSubForm, frequency: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#EDE1D1] rounded-xl text-xs font-bold text-slate-900"
+                  >
+                    <option value="daily">Daily Morning</option>
+                    <option value="alternate">Alternate Days</option>
+                    <option value="weekdays">Weekdays Only (Mon-Fri)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block mb-1 text-slate-900 font-extrabold">Time Slot</label>
+                  <select
+                    value={manualSubForm.slot}
+                    onChange={(e) => setManualSubForm({ ...manualSubForm, slot: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-50 border border-[#EDE1D1] rounded-xl text-xs font-bold text-slate-900"
+                  >
+                    <option value="6:00 AM - 7:00 AM">6:00 AM - 7:00 AM (Early)</option>
+                    <option value="7:00 AM - 8:00 AM">7:00 AM - 8:00 AM</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsManualSubModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black shadow-xs cursor-pointer"
+                >
+                  Activate Subscription
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+            {/* ADD NEW PRODUCT SKU MODAL                                     */}
       {/* ------------------------------------------------------------- */}
       {isAddProductModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">

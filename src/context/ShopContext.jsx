@@ -3,6 +3,11 @@ import { products } from '../data/products';
 
 const ShopContext = createContext();
 
+// Cross-tab real-time communication channel for instant Storefront <-> Admin sync
+const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
+  ? new BroadcastChannel('sumadhura_sync_channel')
+  : null;
+
 export const ShopProvider = ({ children }) => {
   // Cart state persisted to localStorage
   const [cart, setCart] = useState(() => {
@@ -248,13 +253,59 @@ export const ShopProvider = ({ children }) => {
       return updated;
     });
     setActiveSubscription(newSub);
+
+    // Sync customer record into sumadhura_registered_customers
+    try {
+      const savedCusts = localStorage.getItem('sumadhura_registered_customers');
+      let custs = savedCusts ? JSON.parse(savedCusts) : [];
+      const matchIdx = custs.findIndex(c => 
+        (newSub.email && c.email === newSub.email) || 
+        (newSub.phone && c.phone === newSub.phone) ||
+        (newSub.customer && c.name === newSub.customer)
+      );
+      if (matchIdx >= 0) {
+        custs[matchIdx] = {
+          ...custs[matchIdx],
+          subscription: newSub.items,
+          subscriptionId: newSub.id,
+          subscriptionStatus: 'Active',
+          status: 'Active',
+          totalSpent: (custs[matchIdx].totalSpent || 0) + (newSub.totalPaid || 0),
+          ordersCount: (custs[matchIdx].ordersCount || 0) + 1
+        };
+      } else {
+        custs.unshift({
+          id: `CUST-B2C-${Date.now()}`,
+          name: newSub.customer || 'Customer',
+          phone: newSub.phone || '',
+          email: newSub.email || '',
+          type: newSub.isBusiness ? 'B2B' : 'B2C',
+          isBusiness: Boolean(newSub.isBusiness),
+          subscription: newSub.items,
+          subscriptionId: newSub.id,
+          status: 'Active',
+          totalSpent: newSub.totalPaid || 0,
+          ordersCount: 1,
+          registeredAt: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+        });
+      }
+      localStorage.setItem('sumadhura_registered_customers', JSON.stringify(custs));
+    } catch {}
+
+    // Broadcast live event across all open tabs (Instant Admin UI update)
+    try {
+      if (syncChannel) {
+        syncChannel.postMessage({ type: 'SUBSCRIPTION_ADDED', newSub });
+      }
+    } catch {}
   };
 
   const toggleSubscriptionStatus = (subId) => {
+    let nextStatus = 'Active';
     setSubscriptions((prev) => {
       const updated = prev.map((s) => {
         if (s.id === subId) {
-          const nextStatus = s.status === 'Active' ? 'Paused' : 'Active';
+          nextStatus = s.status === 'Active' ? 'Paused' : 'Active';
           return { ...s, status: nextStatus };
         }
         return s;
@@ -269,6 +320,12 @@ export const ShopProvider = ({ children }) => {
       } catch {}
       return updated;
     });
+
+    try {
+      if (syncChannel) {
+        syncChannel.postMessage({ type: 'SUBSCRIPTION_STATUS_CHANGED', subId, nextStatus });
+      }
+    } catch {}
   };
 
   const cancelSubscription = (subId) => {
@@ -283,6 +340,12 @@ export const ShopProvider = ({ children }) => {
       } catch {}
       return updated;
     });
+
+    try {
+      if (syncChannel) {
+        syncChannel.postMessage({ type: 'SUBSCRIPTION_CANCELLED', subId });
+      }
+    } catch {}
   };
 
   const deleteOrder = (orderId) => {
@@ -401,6 +464,19 @@ export const ShopProvider = ({ children }) => {
 
   // Real-time synchronization across browser tabs (Admin <-> Storefront)
   useEffect(() => {
+    const reloadFromStorage = () => {
+      try {
+        const subs = localStorage.getItem('sumadhura_subscriptions');
+        if (subs) setSubscriptions(JSON.parse(subs));
+        const actSub = localStorage.getItem('sumadhura_subscription');
+        if (actSub) setActiveSubscription(JSON.parse(actSub));
+        const ords = localStorage.getItem('sumadhura_orders');
+        if (ords) setOrders(JSON.parse(ords));
+        const usr = localStorage.getItem('sumadhura_user');
+        if (usr) setUser(JSON.parse(usr));
+      } catch {}
+    };
+
     const handleStorage = (e) => {
       if (e.key === 'sumadhura_subscriptions') {
         try {
@@ -423,8 +499,23 @@ export const ShopProvider = ({ children }) => {
         } catch {}
       }
     };
+
+    if (syncChannel) {
+      syncChannel.onmessage = () => {
+        reloadFromStorage();
+      };
+    }
+
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener('focus', reloadFromStorage);
+    window.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') reloadFromStorage();
+    });
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', reloadFromStorage);
+    };
   }, []);
 
   const toggleOneMember = () => {
