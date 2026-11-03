@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
 import { products } from '../data/products';
 import confetti from 'canvas-confetti';
@@ -24,6 +24,8 @@ import {
   Package,
   ThumbsUp,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   MessageSquare
 } from 'lucide-react';
 
@@ -45,11 +47,13 @@ export const ProductQuickViewModal = () => {
 
   const isB2B = Boolean(user && user.isBusiness);
 
+  const scrollContainerRef = useRef(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedPackMultiplier, setSelectedPackMultiplier] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showScrollDownHint, setShowScrollDownHint] = useState(true);
 
   // Check URL on mount for ?product=... parameter to support direct shared links
   useEffect(() => {
@@ -77,6 +81,12 @@ export const ProductQuickViewModal = () => {
       setActiveImageIndex(0);
       setIsShareOpen(false);
       setCopiedLink(false);
+      setShowScrollDownHint(true);
+
+      // Reset scroll position to top
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = 0;
+      }
 
       try {
         const url = new URL(window.location.href);
@@ -195,18 +205,39 @@ export const ProductQuickViewModal = () => {
     setQuickViewProduct(null);
   };
 
+  // Scroll Helpers
+  const handleScroll = (e) => {
+    if (e.target.scrollTop > 80) {
+      setShowScrollDownHint(false);
+    } else {
+      setShowScrollDownHint(true);
+    }
+  };
+
+  const handleScrollDown = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ top: 320, behavior: 'smooth' });
+    }
+  };
+
+  const handleScrollToTop = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-hidden"
       onClick={() => setQuickViewProduct(null)}
     >
       <div
-        className="relative bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl border border-[#EDE1D1] overflow-hidden animate-in zoom-in-95 duration-200"
+        className="relative bg-white rounded-3xl max-w-4xl w-full h-[92vh] sm:h-auto max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl border border-[#EDE1D1] overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* 1. STICKY TOP HEADER BAR - Pinned above scroll */}
-        <div className="bg-gradient-to-r from-[#FAF5EC] via-white to-[#FAF5EC] px-4 sm:px-6 py-3.5 border-b border-[#EDE1D1] flex items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="bg-gradient-to-r from-[#FAF5EC] via-white to-[#FAF5EC] px-3.5 sm:px-6 py-3 border-b border-[#EDE1D1] flex items-center justify-between gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
             {/* Indian FSSAI Veg / Non-Veg Indicator */}
             <div
               className={`w-4 h-4 border rounded-sm flex items-center justify-center p-0.5 shrink-0 ${
@@ -232,13 +263,24 @@ export const ProductQuickViewModal = () => {
             </div>
           </div>
 
-          {/* Action Icons: Share, Wishlist, Close */}
+          {/* Action Icons: Scroll Helper, Share, Wishlist, Close */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Quick Scroll Indicator Button */}
+            <button
+              type="button"
+              onClick={handleScrollDown}
+              className="px-2.5 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#EDE1D1] text-[#7D0A14] border border-[#EDE1D1] text-[11px] font-black flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+              title="Scroll down for details, nutrition & reviews"
+            >
+              <span>Scroll</span>
+              <ChevronDown className="w-3.5 h-3.5" />
+            </button>
+
             {/* Share Dropdown Button */}
             <div className="relative">
               <button
                 onClick={() => setIsShareOpen(!isShareOpen)}
-                className="px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F2E8DC] text-[#7D0A14] border border-[#EDE1D1] text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F2E8DC] text-[#7D0A14] border border-[#EDE1D1] text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                 title="Share product with friends & family"
               >
                 <Share2 className="w-3.5 h-3.5 text-[#7D0A14]" />
@@ -319,23 +361,27 @@ export const ProductQuickViewModal = () => {
           </div>
         </div>
 
-        {/* 2. DEDICATED SCROLLABLE BODY CONTENT */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7 space-y-6">
-          {/* SECTION A: Product Overview (2-Column Grid on md+ screens) */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-            {/* Left Column: Image Showcase & Gallery (5 cols) */}
-            <div className="md:col-span-5 space-y-3">
-              {/* Main Image Box */}
-              <div className="relative aspect-square w-full bg-[#FAF5EC]/70 rounded-2xl border border-[#EDE1D1] overflow-hidden flex items-center justify-center p-3 shadow-inner group">
+        {/* 2. DEDICATED ALWAYS-SCROLLABLE BODY CONTAINER (min-h-0 + product-modal-scroll) */}
+        <div
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          className="flex-1 min-h-0 overflow-y-scroll overscroll-contain product-modal-scroll p-4 sm:p-6 lg:p-7 space-y-5"
+        >
+          {/* SECTION A: Product Overview (Responsive Grid: mobile image is compact, desktop is 2-col) */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-6">
+            {/* Left Column: Image Showcase & Gallery (5 cols on md) */}
+            <div className="md:col-span-5 space-y-2.5">
+              {/* Main Image Box (Compact h-44 to h-60 on mobile so title & price are immediately visible) */}
+              <div className="relative h-48 sm:h-64 md:h-80 w-full bg-[#FAF5EC]/70 rounded-2xl border border-[#EDE1D1] overflow-hidden flex items-center justify-center p-2.5 shadow-inner group">
                 {/* Discount Badge */}
                 {discountPercent > 0 && (
-                  <span className="absolute top-3 left-3 z-10 bg-[#7D0A14] text-white text-xs font-black px-2.5 py-1 rounded-lg shadow-sm">
+                  <span className="absolute top-2.5 left-2.5 z-10 bg-[#7D0A14] text-white text-xs font-black px-2 py-0.5 rounded-lg shadow-sm">
                     {discountPercent}% OFF
                   </span>
                 )}
 
                 {/* Delivery Time Badge */}
-                <div className="absolute top-3 right-3 z-10 bg-slate-900/85 backdrop-blur-sm text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+                <div className="absolute top-2.5 right-2.5 z-10 bg-slate-900/85 backdrop-blur-sm text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
                   <Clock className="w-3 h-3 text-amber-300" />
                   <span>{quickViewProduct.deliveryTime || '10-15 MINS'}</span>
                 </div>
@@ -343,16 +389,16 @@ export const ProductQuickViewModal = () => {
                 <img
                   src={galleryImages[activeImageIndex] || quickViewProduct.image}
                   alt={quickViewProduct.name}
-                  className="w-full h-full object-cover rounded-xl transition-all duration-300 group-hover:scale-105"
+                  className="w-full h-full object-contain md:object-cover rounded-xl transition-all duration-300 group-hover:scale-105"
                 />
 
                 {/* Direct Sourcing Pill */}
-                <div className="absolute bottom-3 inset-x-3 bg-white/95 backdrop-blur-md border border-[#EDE1D1] rounded-xl px-2.5 py-1.5 flex items-center justify-between text-[11px] text-[#3D040A] font-bold shadow-xs">
-                  <span className="flex items-center gap-1">
-                    <Leaf className="w-3 h-3 text-emerald-600" />
+                <div className="absolute bottom-2.5 inset-x-2.5 bg-white/95 backdrop-blur-md border border-[#EDE1D1] rounded-xl px-2 py-1 flex items-center justify-between text-[10px] sm:text-[11px] text-[#3D040A] font-bold shadow-xs">
+                  <span className="flex items-center gap-1 truncate">
+                    <Leaf className="w-3 h-3 text-emerald-600 shrink-0" />
                     <span>Direct Farm Source</span>
                   </span>
-                  <span className="text-emerald-700 font-black">100% Pesticide Tested</span>
+                  <span className="text-emerald-700 font-black shrink-0">100% Pesticide Tested</span>
                 </div>
               </div>
 
@@ -363,7 +409,7 @@ export const ProductQuickViewModal = () => {
                     key={idx}
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-16 h-16 rounded-xl overflow-hidden border-2 transition-all p-0.5 bg-white cursor-pointer ${
+                    className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 transition-all p-0.5 bg-white cursor-pointer ${
                       activeImageIndex === idx
                         ? 'border-[#7D0A14] ring-2 ring-[#7D0A14]/20 scale-102 shadow-xs'
                         : 'border-[#EDE1D1] opacity-70 hover:opacity-100'
@@ -377,34 +423,34 @@ export const ProductQuickViewModal = () => {
               {/* Freshness Badges */}
               <div className="grid grid-cols-3 gap-2 pt-1">
                 <div className="p-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-center">
-                  <div className="text-base">❄️</div>
+                  <div className="text-sm">❄️</div>
                   <div className="text-[10px] font-black text-slate-800 mt-0.5">Cold Chain</div>
                   <div className="text-[9px] text-slate-500 font-medium">Stored at 4°C</div>
                 </div>
                 <div className="p-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-center">
-                  <div className="text-base">🌿</div>
+                  <div className="text-sm">🌿</div>
                   <div className="text-[10px] font-black text-slate-800 mt-0.5">Zero Wax</div>
                   <div className="text-[9px] text-slate-500 font-medium">Naturally Ripened</div>
                 </div>
                 <div className="p-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-center">
-                  <div className="text-base">🛡️</div>
+                  <div className="text-sm">🛡️</div>
                   <div className="text-[10px] font-black text-slate-800 mt-0.5">Quality Pass</div>
                   <div className="text-[9px] text-slate-500 font-medium">3-Level Check</div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Complete Product Details & Pack Selection (7 cols) */}
-            <div className="md:col-span-7 flex flex-col justify-between space-y-4">
+            {/* Right Column: Complete Product Details & Pack Selection (7 cols on md) */}
+            <div className="md:col-span-7 flex flex-col justify-between space-y-3.5">
               <div>
                 {/* Title & Category */}
-                <h1 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
+                <h1 className="text-lg sm:text-2xl font-black text-slate-900 leading-snug">
                   {quickViewProduct.name}
                 </h1>
 
                 {/* Rating & Reviews */}
-                <div className="flex items-center gap-2.5 mt-2">
-                  <div className="flex items-center gap-1 font-black text-xs text-amber-700 bg-amber-100/90 px-2.5 py-1 rounded-lg">
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                  <div className="flex items-center gap-1 font-black text-xs text-amber-700 bg-amber-100/90 px-2 py-0.5 rounded-lg">
                     <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                     <span>{quickViewProduct.rating || 4.9}</span>
                   </div>
@@ -417,8 +463,8 @@ export const ProductQuickViewModal = () => {
                 </div>
 
                 {/* Price Display */}
-                <div className="mt-3.5 p-3.5 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1] flex flex-wrap items-baseline justify-between gap-2">
-                  <div className="flex items-baseline gap-2.5">
+                <div className="mt-3 p-3 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1] flex flex-wrap items-baseline justify-between gap-2">
+                  <div className="flex items-baseline gap-2">
                     <span className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
                       ₹{effectiveUnitPrice}
                     </span>
@@ -434,13 +480,13 @@ export const ProductQuickViewModal = () => {
                     )}
                   </div>
 
-                  <span className="text-xs font-bold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-[#EDE1D1]">
+                  <span className="text-xs font-bold text-slate-600 bg-white px-2 py-0.5 rounded-lg border border-[#EDE1D1]">
                     Unit: {quickViewProduct.unit} {selectedPackMultiplier > 1 && `(x${selectedPackMultiplier} Pack)`}
                   </span>
                 </div>
 
                 {/* Pack Size / Quantity Selector */}
-                <div className="mt-4 space-y-1.5">
+                <div className="mt-3.5 space-y-1.5">
                   <label className="block text-[11px] font-black text-slate-700 uppercase tracking-wider">
                     Select Pack Size / Quantity
                   </label>
@@ -456,7 +502,7 @@ export const ProductQuickViewModal = () => {
                     >
                       <div className="text-xs font-black text-slate-900">Standard Pack</div>
                       <div className="text-[11px] text-slate-500 font-medium">1x {quickViewProduct.unit}</div>
-                      <div className="text-xs font-extrabold text-[#7D0A14] mt-1">₹{baseUnitPrice}</div>
+                      <div className="text-xs font-extrabold text-[#7D0A14] mt-0.5">₹{baseUnitPrice}</div>
                     </button>
 
                     <button
@@ -473,7 +519,7 @@ export const ProductQuickViewModal = () => {
                         <span className="text-[9px] font-black bg-emerald-100 text-emerald-800 px-1 rounded">5% OFF</span>
                       </div>
                       <div className="text-[11px] text-slate-500 font-medium">2x {quickViewProduct.unit}</div>
-                      <div className="text-xs font-extrabold text-[#7D0A14] mt-1">₹{Math.round(baseUnitPrice * 1.9)}</div>
+                      <div className="text-xs font-extrabold text-[#7D0A14] mt-0.5">₹{Math.round(baseUnitPrice * 1.9)}</div>
                     </button>
 
                     <button
@@ -490,7 +536,7 @@ export const ProductQuickViewModal = () => {
                         <span className="text-[9px] font-black bg-emerald-100 text-emerald-800 px-1 rounded">8% OFF</span>
                       </div>
                       <div className="text-[11px] text-slate-500 font-medium">3x {quickViewProduct.unit}</div>
-                      <div className="text-xs font-extrabold text-[#7D0A14] mt-1">₹{Math.round(baseUnitPrice * 2.75)}</div>
+                      <div className="text-xs font-extrabold text-[#7D0A14] mt-0.5">₹{Math.round(baseUnitPrice * 2.75)}</div>
                     </button>
                   </div>
                 </div>
@@ -515,8 +561,8 @@ export const ProductQuickViewModal = () => {
                 )}
 
                 {/* Product Description */}
-                <div className="mt-4">
-                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
+                <div className="mt-3.5">
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider mb-1">
                     Product Description
                   </h3>
                   <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
@@ -683,6 +729,27 @@ export const ProductQuickViewModal = () => {
             </div>
           </div>
         </div>
+
+        {/* Floating Scroll Down / Top Badge */}
+        {showScrollDownHint ? (
+          <button
+            type="button"
+            onClick={handleScrollDown}
+            className="absolute bottom-20 right-4 z-20 bg-[#7D0A14] hover:bg-[#680811] active:scale-95 text-white text-[11px] font-black px-3.5 py-1.5 rounded-full shadow-xl border border-amber-300/40 flex items-center gap-1.5 transition-all cursor-pointer"
+          >
+            <span>Scroll for Details</span>
+            <ChevronDown className="w-3.5 h-3.5 animate-bounce" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleScrollToTop}
+            className="absolute bottom-20 right-4 z-20 bg-white hover:bg-[#FAF5EC] active:scale-95 text-[#7D0A14] text-[11px] font-black px-3 py-1.5 rounded-full shadow-lg border border-[#EDE1D1] flex items-center gap-1 transition-all cursor-pointer"
+          >
+            <ChevronUp className="w-3.5 h-3.5" />
+            <span>Top</span>
+          </button>
+        )}
 
         {/* 3. STICKY BOTTOM ACTION FOOTER - Pinned below scroll */}
         <div className="shrink-0 p-3.5 sm:p-4 bg-white border-t border-[#EDE1D1] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">

@@ -37,6 +37,36 @@
   background: #BFAFA0;
 }
 
+/* Dedicated Always-Visible Product Modal Scrollbar */
+.product-modal-scroll {
+  scrollbar-width: thin !important;
+  scrollbar-color: #7D0A14 #EDE1D1 !important;
+  -webkit-overflow-scrolling: touch !important;
+  overflow-y: scroll !important;
+}
+
+.product-modal-scroll::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+  display: block !important;
+}
+
+.product-modal-scroll::-webkit-scrollbar-track {
+  background: #FAF5EC !important;
+  border-radius: 9999px !important;
+  border: 1px solid #EDE1D1 !important;
+}
+
+.product-modal-scroll::-webkit-scrollbar-thumb {
+  background: #7D0A14 !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid #FAF5EC !important;
+}
+
+.product-modal-scroll::-webkit-scrollbar-thumb:hover {
+  background: #52060E !important;
+}
+
 /* Smooth badges and effects */
 .gradient-primary {
   background: linear-gradient(135deg, #680811 0%, #7D0A14 50%, #9E1B26 100%);
