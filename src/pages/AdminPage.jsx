@@ -4275,7 +4275,7 @@ export const AdminPage = () => {
                       <th className="p-3">Current Stock</th>
                       <th className="p-3">B2C Retail Price</th>
                       <th className="p-3">B2B Wholesale Price</th>
-                      <th className="p-3">B2B Min Order (&gt; 5 units)</th>
+                      <th className="p-3">Available Quantity</th>
                       <th className="p-3 text-right">Stock Status</th>
                       <th className="p-3 rounded-r-xl text-center">Actions</th>
                     </tr>
@@ -5556,13 +5556,13 @@ export const AdminPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">B2B Minimum Order (&gt; 5 units)</label>
+                  <label className="font-bold text-slate-700 block mb-1">Available Quantity</label>
                   <input
                     type="text"
                     value={editingProduct.moq}
                     onChange={(e) => setEditingProduct({ ...editingProduct, moq: e.target.value })}
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
-                    placeholder="e.g. > 5 units"
+                    placeholder="e.g. 50 units / 100 kg"
                   />
                 </div>
               </div>
@@ -6213,13 +6213,13 @@ export const AdminPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">B2B Minimum Order (&gt; 5 units)</label>
+                  <label className="font-bold text-slate-700 block mb-1">Available Quantity</label>
                   <input
                     type="text"
                     value={newProductForm.moq}
                     onChange={(e) => setNewProductForm({ ...newProductForm, moq: e.target.value })}
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
-                    placeholder="e.g. > 5 units"
+                    placeholder="e.g. 50 units / 100 kg"
                   />
                 </div>
               </div>
