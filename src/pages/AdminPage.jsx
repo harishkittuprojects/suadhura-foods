@@ -5485,7 +5485,7 @@ export const AdminPage = () => {
                     value={newProductForm.wholesalePrice}
                     onChange={(e) => setNewProductForm({ ...newProductForm, wholesalePrice: e.target.value })}
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-[#7D0A14]"
-                    placeholder="Auto-calculated (25% off)"
+                    placeholder="e.g. 45"
                   />
                 </div>
                 <div>
