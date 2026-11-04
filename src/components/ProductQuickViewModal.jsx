@@ -78,7 +78,8 @@ export const ProductQuickViewModal = () => {
   // Sync URL query param when modal opens/closes so users can copy the current browser address bar directly
   useEffect(() => {
     if (quickViewProduct) {
-      setQuantity(1);
+      const isWholesale = Boolean(pricingMode === 'wholesale' || (user && user.isBusiness));
+      setQuantity(isWholesale ? 5 : 1);
       setSelectedPackMultiplier(1);
       setActiveImageIndex(0);
       setIsShareOpen(false);
@@ -834,7 +835,14 @@ export const ProductQuickViewModal = () => {
             <div className="flex items-center bg-[#FAF5EC] border border-[#EDE1D1] rounded-2xl p-1 shadow-2xs">
               <button
                 type="button"
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                onClick={() => {
+                  const isWholesale = Boolean(pricingMode === 'wholesale' || (user && user.isBusiness));
+                  if (isWholesale && quantity <= 5) {
+                    showToast('⚠️ B2B Wholesale requires a minimum order of 5 units', 'warning');
+                    return;
+                  }
+                  setQuantity(Math.max(1, quantity - 1));
+                }}
                 className="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 flex items-center justify-center text-slate-700 transition-colors shadow-2xs cursor-pointer"
                 aria-label="Decrease quantity"
               >

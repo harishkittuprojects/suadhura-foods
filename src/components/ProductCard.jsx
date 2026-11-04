@@ -276,7 +276,7 @@ export const ProductCard = ({ product, priority = false }) => {
                   </span>
                 </div>
                 <span className="text-[9px] font-extrabold text-amber-800 truncate block">
-                  MOQ: {product.wholesaleMoq || 'Bulk Pack'}
+                  MOQ: {product.wholesaleMoq || product.moq || '> 5 units'}
                 </span>
               </div>
             ) : (
@@ -331,7 +331,7 @@ export const ProductCard = ({ product, priority = false }) => {
               }`}
               aria-label={`Add ${product.name} to Cart`}
             >
-              <span>{isWholesale ? 'BULK ADD' : 'ADD'}</span>
+              <span>{isWholesale ? 'ADD (Min 5)' : 'ADD'}</span>
               <Plus className="w-3 h-3 stroke-[2.5]" />
             </button>
           )}

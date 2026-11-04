@@ -49,6 +49,17 @@ export const CheckoutModal = () => {
 
   const handlePlaceOrder = (e) => {
     e.preventDefault();
+    const isB2bOrder = pricingMode === 'wholesale' || Boolean(user?.isBusiness);
+
+    // Validate minimum B2B order of 5 units per wholesale item
+    if (isB2bOrder) {
+      const underMin = cart.find((i) => i.quantity < 5);
+      if (underMin) {
+        showToast(`⚠️ B2B Wholesale requires a minimum of 5 units for "${underMin.name}" (currently ${underMin.quantity})`, 'error');
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     setTimeout(() => {

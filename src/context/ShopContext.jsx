@@ -277,12 +277,14 @@ export const ShopProvider = ({ children }) => {
     setCart((prevCart) =>
       prevCart.map((item) => {
         const prod = allProducts.find((p) => p.id === item.id) || item;
-        const newPrice = mode === 'wholesale' ? prod.wholesalePrice : prod.price;
-        const newUnit = mode === 'wholesale' ? prod.wholesaleUnit : prod.unit;
+        const newPrice = mode === 'wholesale' ? (prod.wholesalePrice || Math.round(prod.price * 0.74)) : prod.price;
+        const newUnit = mode === 'wholesale' ? (prod.wholesaleUnit || prod.unit) : prod.unit;
+        const newQty = mode === 'wholesale' ? Math.max(5, item.quantity) : item.quantity;
         return {
           ...item,
           price: newPrice,
           unit: newUnit,
+          quantity: newQty,
           isWholesale: mode === 'wholesale'
         };
       })
@@ -737,9 +739,25 @@ export const ShopProvider = ({ children }) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
+
+  // Helper to extract minimum required B2B order quantity (minimum 5)
+  const getProductMinOrderQty = (product) => {
+    if (!product) return 5;
+    if (product.moq) {
+      const match = String(product.moq).match(/\d+/);
+      if (match) {
+        const parsed = parseInt(match[0], 10);
+        if (!isNaN(parsed) && parsed > 0) return Math.max(5, parsed);
+      }
+    }
+    return 5;
+  };
+
   // Cart operations
   const addToCart = (product, quantity = 1) => {
-    const isWholesale = Boolean(user && user.isBusiness && pricingMode === 'wholesale');
+    const isWholesale = Boolean((user && user.isBusiness) || pricingMode === 'wholesale');
+    const minQty = isWholesale ? getProductMinOrderQty(product) : 1;
+    const finalQuantity = isWholesale && quantity === 1 ? minQty : Math.max(isWholesale ? minQty : 1, quantity);
     const activePrice = isWholesale
       ? product.wholesalePrice || Math.round(product.price * 0.74)
       : product.price;
@@ -750,9 +768,10 @@ export const ShopProvider = ({ children }) => {
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.id === product.id);
       if (existing) {
+        const addedQty = isWholesale && quantity === 1 ? minQty : quantity;
         return prevCart.map((item) =>
           item.id === product.id
-            ? { ...item, price: activePrice, unit: activeUnit, quantity: item.quantity + quantity }
+            ? { ...item, price: activePrice, unit: activeUnit, quantity: item.quantity + addedQty }
             : item
         );
       }
@@ -765,23 +784,34 @@ export const ShopProvider = ({ children }) => {
           retailPrice: product.price,
           wholesalePrice: product.wholesalePrice || Math.round(product.price * 0.74),
           isWholesale,
-          quantity
+          quantity: finalQuantity
         }
       ];
     });
     showToast(
       isWholesale
-        ? `Added ${product.name} at Wholesale Rate (₹${activePrice})!`
+        ? `Added ${product.name} (B2B Min. ${finalQuantity} units • ₹${activePrice}/unit)`
         : `Added ${product.name} to cart!`
     );
   };
 
   const updateQuantity = (productId, delta) => {
     setCart((prevCart) => {
+      const targetItem = prevCart.find((i) => i.id === productId);
+      if (!targetItem) return prevCart;
+
+      const isWholesale = Boolean(targetItem.isWholesale || pricingMode === 'wholesale' || (user && user.isBusiness));
+      const minQty = isWholesale ? getProductMinOrderQty(targetItem) : 1;
+      const newQty = targetItem.quantity + delta;
+
+      if (isWholesale && delta < 0 && newQty < minQty) {
+        showToast(`⚠️ B2B Wholesale requires a minimum order of ${minQty} units for ${targetItem.name}`, 'warning');
+        return prevCart;
+      }
+
       return prevCart
         .map((item) => {
           if (item.id === productId) {
-            const newQty = item.quantity + delta;
             return newQty > 0 ? { ...item, quantity: newQty } : null;
           }
           return item;
