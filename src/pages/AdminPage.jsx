@@ -689,6 +689,7 @@ export const AdminPage = () => {
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [newProductForm, setNewProductForm] = useState({
     name: '',
+    image: '',
     category: 'Dairy',
     stock: '50 Units',
     retailPrice: '',
@@ -799,6 +800,9 @@ export const AdminPage = () => {
 
     const categoryObj = categoriesList.find(c => c.name.toLowerCase() === finalCategory.toLowerCase());
     const fallbackCategoryImg = categoryObj?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
+    const finalProductImg = (newProductForm.image && String(newProductForm.image).trim())
+      ? String(newProductForm.image).trim()
+      : fallbackCategoryImg;
 
     const newProd = {
       id: `p-${Date.now()}`,
@@ -819,7 +823,7 @@ export const AdminPage = () => {
       badge: 'Fresh Arrival',
       deliveryTime: '10-15 mins',
       isVeg: true,
-      image: fallbackCategoryImg,
+      image: finalProductImg,
       description: `${newProductForm.name.trim()} - Premium quality sourced daily and delivered fresh to your doorstep.`,
       organic: true,
       inStock: newProductForm.inStock !== false,
@@ -846,6 +850,7 @@ export const AdminPage = () => {
     setCustomCategoryInput('');
     setNewProductForm({
       name: '',
+      image: '',
       category: 'Dairy',
       stock: '50 Units',
       retailPrice: '',
@@ -5378,6 +5383,73 @@ export const AdminPage = () => {
                 />
               </div>
 
+              {/* Product Image Input with Live Preview & File Upload */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">
+                  Product Image (Upload File or Paste Image Link)
+                </label>
+                <div className="flex items-center gap-3 p-3 rounded-2xl border border-dashed border-[#EDE1D1] bg-[#FAF5EC]/40">
+                  {/* Image Preview Box */}
+                  <div className="w-16 h-16 rounded-xl border border-[#EDE1D1] bg-white overflow-hidden shrink-0 flex items-center justify-center relative shadow-xs">
+                    {editingProduct.image ? (
+                      <>
+                        <img
+                          src={editingProduct.image}
+                          alt="Product Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setEditingProduct({ ...editingProduct, image: '' })}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-[#7D0A14] text-white rounded-full flex items-center justify-center text-[10px] shadow-xs cursor-pointer"
+                          title="Remove image"
+                        >
+                          ✕
+                        </button>
+                      </>
+                    ) : (
+                      <div className="text-center p-1 text-slate-400">
+                        <ImageIcon className="w-5 h-5 mx-auto text-[#7D0A14]" />
+                        <span className="text-[8px] font-bold block mt-0.5">No image</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload from Device & URL input */}
+                  <div className="flex-1 space-y-1.5">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EDE1D1] text-[#7D0A14] font-bold text-xs hover:bg-[#FAF5EC] cursor-pointer shadow-2xs transition-colors">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Choose Photo from Device</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (uploadEvent) => {
+                              setEditingProduct({
+                                ...editingProduct,
+                                image: uploadEvent.target.result
+                              });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <input
+                      type="url"
+                      value={editingProduct.image || ''}
+                      onChange={(e) => setEditingProduct({ ...editingProduct, image: e.target.value })}
+                      placeholder="Or paste image web link (https://...)"
+                      className="w-full px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-[11px] placeholder:text-slate-400 text-slate-700 focus:outline-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -5965,6 +6037,73 @@ export const AdminPage = () => {
                   placeholder="e.g. Pure Buffalo Milk (1L)"
                   required
                 />
+              </div>
+
+              {/* Product Image Input with Live Preview & File Upload */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">
+                  Product Image (Upload File or Paste Image Link)
+                </label>
+                <div className="flex items-center gap-3 p-3 rounded-2xl border border-dashed border-[#EDE1D1] bg-[#FAF5EC]/40">
+                  {/* Image Preview Box */}
+                  <div className="w-16 h-16 rounded-xl border border-[#EDE1D1] bg-white overflow-hidden shrink-0 flex items-center justify-center relative shadow-xs">
+                    {newProductForm.image ? (
+                      <>
+                        <img
+                          src={newProductForm.image}
+                          alt="Product Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setNewProductForm({ ...newProductForm, image: '' })}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-[#7D0A14] text-white rounded-full flex items-center justify-center text-[10px] shadow-xs cursor-pointer"
+                          title="Remove image"
+                        >
+                          ✕
+                        </button>
+                      </>
+                    ) : (
+                      <div className="text-center p-1 text-slate-400">
+                        <ImageIcon className="w-5 h-5 mx-auto text-[#7D0A14]" />
+                        <span className="text-[8px] font-bold block mt-0.5">No image</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload from Device & URL input */}
+                  <div className="flex-1 space-y-1.5">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EDE1D1] text-[#7D0A14] font-bold text-xs hover:bg-[#FAF5EC] cursor-pointer shadow-2xs transition-colors">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Choose Photo from Device</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (uploadEvent) => {
+                              setNewProductForm({
+                                ...newProductForm,
+                                image: uploadEvent.target.result
+                              });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <input
+                      type="url"
+                      value={newProductForm.image || ''}
+                      onChange={(e) => setNewProductForm({ ...newProductForm, image: e.target.value })}
+                      placeholder="Or paste image web link (https://...)"
+                      className="w-full px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-[11px] placeholder:text-slate-400 text-slate-700 focus:outline-none"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
