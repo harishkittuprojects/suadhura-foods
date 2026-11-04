@@ -24,6 +24,7 @@ import {
   Package,
   ThumbsUp,
   ChevronRight,
+  ChevronLeft,
   ChevronDown,
   ChevronUp,
   MessageSquare
@@ -372,8 +373,21 @@ export const ProductQuickViewModal = () => {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-5 lg:gap-6">
             {/* Left Column: Image Showcase & Gallery (5 cols on md) */}
             <div className="md:col-span-5 space-y-2.5">
-              {/* Main Image Box (Compact h-44 to h-60 on mobile so title & price are immediately visible) */}
-              <div className="relative h-48 sm:h-64 md:h-80 w-full bg-[#FAF5EC]/70 rounded-2xl border border-[#EDE1D1] overflow-hidden flex items-center justify-center p-2.5 shadow-inner group">
+              {/* Main Image Box with Touch Swipe & Floating Side Arrows (Matches User Reference Image) */}
+              <div
+                className="relative h-48 sm:h-64 md:h-80 w-full bg-[#FAF5EC]/70 rounded-2xl border border-[#EDE1D1] overflow-hidden flex items-center justify-center p-2.5 shadow-inner group select-none"
+                onTouchStart={(e) => {
+                  touchStartX.current = e.touches[0].clientX;
+                }}
+                onTouchEnd={(e) => {
+                  const diff = touchStartX.current - e.changedTouches[0].clientX;
+                  if (diff > 35) {
+                    setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
+                  } else if (diff < -35) {
+                    setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+                  }
+                }}
+              >
                 {/* Discount Badge */}
                 {discountPercent > 0 && (
                   <span className="absolute top-2.5 left-2.5 z-10 bg-[#7D0A14] text-white text-xs font-black px-2 py-0.5 rounded-lg shadow-sm">
@@ -387,14 +401,45 @@ export const ProductQuickViewModal = () => {
                   <span>{quickViewProduct.deliveryTime || '10-15 MINS'}</span>
                 </div>
 
+                {/* Floating Left Arrow (Previous Image Option) */}
+                {galleryImages.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+                    }}
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-12 sm:w-8 sm:h-14 bg-white/95 hover:bg-white text-slate-800 rounded-xl shadow-lg border border-slate-200/90 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    title="Previous option"
+                  >
+                    <ChevronLeft className="w-5 h-5 text-slate-800 stroke-[2.5]" />
+                  </button>
+                )}
+
+                {/* Main Product Image */}
                 <img
                   src={galleryImages[activeImageIndex] || quickViewProduct.image}
                   alt={quickViewProduct.name}
                   className="w-full h-full object-contain md:object-cover rounded-xl transition-all duration-300 group-hover:scale-105"
                 />
 
+                {/* Floating Right Arrow (Next Image Option - Matches User Cropped Reference) */}
+                {galleryImages.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
+                    }}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-12 sm:w-8 sm:h-14 bg-white/95 hover:bg-white text-slate-800 rounded-xl shadow-lg border border-slate-200/90 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    title="Next option"
+                  >
+                    <ChevronRight className="w-5 h-5 text-slate-800 stroke-[2.5]" />
+                  </button>
+                )}
+
                 {/* Direct Sourcing Pill */}
-                <div className="absolute bottom-2.5 inset-x-2.5 bg-white/95 backdrop-blur-md border border-[#EDE1D1] rounded-xl px-2 py-1 flex items-center justify-between text-[10px] sm:text-[11px] text-[#3D040A] font-bold shadow-xs">
+                <div className="absolute bottom-2.5 inset-x-2.5 bg-white/95 backdrop-blur-md border border-[#EDE1D1] rounded-xl px-2 py-1 flex items-center justify-between text-[10px] sm:text-[11px] text-[#3D040A] font-bold shadow-xs pointer-events-none">
                   <span className="flex items-center gap-1 truncate">
                     <Leaf className="w-3 h-3 text-emerald-600 shrink-0" />
                     <span>Direct Farm Source</span>
@@ -403,20 +448,39 @@ export const ProductQuickViewModal = () => {
                 </div>
               </div>
 
-              {/* Gallery Image Thumbnails */}
-              <div className="flex items-center gap-2">
+              {/* Slider Pagination Indicator Dots (Matches User Reference Image [==] • • •) */}
+              {galleryImages.length > 1 && (
+                <div className="flex items-center justify-center gap-1.5 py-1">
+                  {galleryImages.map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`h-2 transition-all duration-300 rounded-full cursor-pointer ${
+                        activeImageIndex === idx
+                          ? 'w-7 bg-[#7D0A14] shadow-xs'
+                          : 'w-2 bg-slate-300 hover:bg-slate-400'
+                      }`}
+                      title={`View option ${idx + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Gallery Image Thumbnails with Horizontal Scroll */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
                 {galleryImages.map((imgUrl, idx) => (
                   <button
                     key={idx}
                     type="button"
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 transition-all p-0.5 bg-white cursor-pointer ${
+                    className={`relative shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden border-2 transition-all p-0.5 bg-white cursor-pointer ${
                       activeImageIndex === idx
                         ? 'border-[#7D0A14] ring-2 ring-[#7D0A14]/20 scale-102 shadow-xs'
                         : 'border-[#EDE1D1] opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={imgUrl} alt={`View ${idx + 1}`} className="w-full h-full object-cover rounded-lg" />
+                    <img src={imgUrl} alt={`Option ${idx + 1}`} className="w-full h-full object-cover rounded-lg" />
                   </button>
                 ))}
               </div>
