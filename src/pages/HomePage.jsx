@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
-import { categories, products, servicesList, customerTestimonials } from '../data/products';
+import { categories as defaultCategories, products as defaultProducts, servicesList, customerTestimonials } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import {
   ArrowRight,
@@ -127,8 +127,13 @@ export const HomePage = () => {
     user,
     setIsAuthModalOpen,
     setAuthModalTab,
-    showToast
+    showToast,
+    products: shopProducts,
+    categories: shopCategories
   } = useShop();
+
+  const products = shopProducts || defaultProducts;
+  const categories = shopCategories || defaultCategories;
 
   const [activeBestSellerTab, setActiveBestSellerTab] = useState('All');
   const [heroSlide, setHeroSlide] = useState(0);

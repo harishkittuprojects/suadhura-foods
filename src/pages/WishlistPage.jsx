@@ -1,6 +1,6 @@
 import React from 'react';
 import { useShop } from '../context/ShopContext';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 import {
   Heart,
   ShoppingCart,

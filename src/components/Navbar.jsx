@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 import {
   Search,
   ShoppingCart,
@@ -75,8 +75,11 @@ export const Navbar = () => {
     setSelectedCategoryFilter,
     pricingMode,
     setPricingMode,
-    togglePricingMode
+    togglePricingMode,
+    products: shopProducts
   } = useShop();
+
+  const products = shopProducts || defaultProducts;
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');

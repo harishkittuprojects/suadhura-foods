@@ -86,7 +86,9 @@ export const AdminPage = () => {
     addSubscription,
     toggleSubscriptionStatus,
     cancelSubscription,
-    deleteOrder
+    deleteOrder,
+    addProduct,
+    deleteProduct: contextDeleteProduct
   } = useShop();
 
   const orders = contextOrders || [];
@@ -673,6 +675,19 @@ export const AdminPage = () => {
     setInventoryList(updated);
     try {
       localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
+      const savedCustom = localStorage.getItem('sumadhura_custom_products');
+      if (savedCustom) {
+        const customList = JSON.parse(savedCustom);
+        const updatedCustom = customList.map((p) =>
+          p.id === editingProduct.id
+            ? { ...p, ...productToSave, price: productToSave.retailPrice, unit: productToSave.retailUnit }
+            : p
+        );
+        localStorage.setItem('sumadhura_custom_products', JSON.stringify(updatedCustom));
+      }
+      const bc = new BroadcastChannel('sumadhura_sync_channel');
+      bc.postMessage({ type: 'PRODUCTS_UPDATED' });
+      bc.close();
     } catch {}
     setEditingProduct(null);
     setIsEditCustomCategory(false);
@@ -716,23 +731,50 @@ export const AdminPage = () => {
       }
     }
 
+    const categoryObj = categoriesList.find(c => c.name.toLowerCase() === finalCategory.toLowerCase());
+    const fallbackCategoryImg = categoryObj?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80';
+
     const newProd = {
-      id: `p-${Date.now().toString().slice(-4)}`,
-      name: newProductForm.name,
+      id: `p-${Date.now()}`,
+      name: newProductForm.name.trim(),
       category: finalCategory,
-      stock: newProductForm.stock || '100 Units',
+      subCategory: 'Daily Fresh Harvest',
+      price: Number(newProductForm.retailPrice) || 0,
       retailPrice: Number(newProductForm.retailPrice) || 0,
+      originalPrice: Math.round((Number(newProductForm.retailPrice) || 0) * 1.25),
+      unit: newProductForm.retailUnit || 'Per Unit',
       retailUnit: newProductForm.retailUnit || 'Per Unit',
       wholesalePrice: Number(newProductForm.wholesalePrice) || Math.round(Number(newProductForm.retailPrice) * 0.75),
       wholesaleUnit: newProductForm.wholesaleUnit || 'Bulk Pack',
       moq: newProductForm.moq || '10 Units',
-      inStock: newProductForm.inStock
+      stock: newProductForm.stock || '100 Units',
+      rating: 4.9,
+      reviewsCount: 1,
+      badge: 'Fresh Arrival',
+      deliveryTime: '10-15 mins',
+      isVeg: true,
+      image: fallbackCategoryImg,
+      description: `${newProductForm.name.trim()} - Premium quality sourced daily and delivered fresh to your doorstep.`,
+      organic: true,
+      inStock: newProductForm.inStock !== false,
+      tags: ['fresh', 'popular', finalCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-')],
+      aisles: [finalCategory.toLowerCase().replace(/[^a-z0-9]+/g, '-'), 'all']
     };
     const updated = [newProd, ...inventoryList];
     setInventoryList(updated);
     try {
       localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
+      const savedCustom = localStorage.getItem('sumadhura_custom_products');
+      const customList = savedCustom ? JSON.parse(savedCustom) : [];
+      const updatedCustom = [newProd, ...customList.filter(p => p.id !== newProd.id)];
+      localStorage.setItem('sumadhura_custom_products', JSON.stringify(updatedCustom));
+      const bc = new BroadcastChannel('sumadhura_sync_channel');
+      bc.postMessage({ type: 'PRODUCTS_UPDATED' });
+      bc.close();
     } catch {}
+    if (typeof addProduct === 'function') {
+      addProduct(newProd);
+    }
     setIsAddProductModalOpen(false);
     setIsCustomCategory(false);
     setCustomCategoryInput('');
@@ -757,7 +799,19 @@ export const AdminPage = () => {
       setInventoryList(updated);
       try {
         localStorage.setItem('sumadhura_admin_inventory', JSON.stringify(updated));
+        const savedCustom = localStorage.getItem('sumadhura_custom_products');
+        if (savedCustom) {
+          const customList = JSON.parse(savedCustom);
+          const updatedCustom = customList.filter((p) => p.id !== prodId);
+          localStorage.setItem('sumadhura_custom_products', JSON.stringify(updatedCustom));
+        }
+        const bc = new BroadcastChannel('sumadhura_sync_channel');
+        bc.postMessage({ type: 'PRODUCTS_UPDATED' });
+        bc.close();
       } catch {}
+      if (typeof contextDeleteProduct === 'function') {
+        contextDeleteProduct(prodId);
+      }
       showToast(`Removed product from catalog`);
     }
   };
@@ -955,7 +1009,12 @@ export const AdminPage = () => {
       };
       const updated = [...categoriesList, newCat];
       setCategoriesList(updated);
-      try { localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updated)); } catch {}
+      try {
+        localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updated));
+        const bc = new BroadcastChannel('sumadhura_sync_channel');
+        bc.postMessage({ type: 'CATEGORIES_UPDATED' });
+        bc.close();
+      } catch {}
       showToast(`🎉 Category "${newCat.name}" created successfully`);
     }
     setIsCategoryModalOpen(false);
@@ -2854,7 +2913,7 @@ export const AdminPage = () => {
                           </td>
                         </tr>
                       ) : (
-                        filteredCustomers.map((c) => {
+                        filteredCustomers.slice((customerPage - 1) * 10, customerPage * 10).map((c) => {
                           const isCurrentUser = user && ((user.email && user.email === c.email) || (user.phone && user.phone === c.phone));
                           return (
                             <tr
@@ -3027,63 +3086,45 @@ export const AdminPage = () => {
               </div>
 
               {/* 6. Pagination Footer Bar */}
+              {/* Dynamic Customer Pagination (No fake 568) */}
               <div className="p-4 sm:p-5 bg-white rounded-2xl border border-[#EDE1D1] shadow-2xs flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="text-sm font-semibold text-slate-600">
-                  Showing 1 – {filteredCustomers.length} of {totalCustomerCount.toLocaleString('en-IN')} customers
+                  {filteredCustomers.length === 0 ? (
+                    'Showing 0 customers'
+                  ) : (
+                    <>
+                      Showing {((customerPage - 1) * 10) + 1} – {Math.min(filteredCustomers.length, customerPage * 10)} of {filteredCustomers.length} customer{filteredCustomers.length === 1 ? '' : 's'}
+                    </>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => setCustomerPage((p) => Math.max(1, p - 1))}
                     disabled={customerPage === 1}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-30"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Previous page"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
+                  {Array.from({ length: Math.max(1, Math.ceil(filteredCustomers.length / 10)) }, (_, i) => i + 1).map((pageNum) => (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCustomerPage(pageNum)}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-all ${
+                        customerPage === pageNum
+                          ? 'bg-[#5A070E] text-white shadow-xs'
+                          : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  ))}
                   <button
-                    onClick={() => setCustomerPage(1)}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-all ${
-                      customerPage === 1
-                        ? 'bg-[#5A070E] text-white shadow-xs'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    1
-                  </button>
-                  <button
-                    onClick={() => setCustomerPage(2)}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-all ${
-                      customerPage === 2
-                        ? 'bg-[#5A070E] text-white shadow-xs'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    2
-                  </button>
-                  <button
-                    onClick={() => setCustomerPage(3)}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-all ${
-                      customerPage === 3
-                        ? 'bg-[#5A070E] text-white shadow-xs'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    3
-                  </button>
-                  <span className="px-1 text-slate-400 font-bold text-xs">...</span>
-                  <button
-                    onClick={() => setCustomerPage(568)}
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-all ${
-                      customerPage === 568
-                        ? 'bg-[#5A070E] text-white shadow-xs'
-                        : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                  >
-                    568
-                  </button>
-                  <button
-                    onClick={() => setCustomerPage((p) => Math.min(568, p + 1))}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                    onClick={() => setCustomerPage((p) => Math.min(Math.max(1, Math.ceil(filteredCustomers.length / 10)), p + 1))}
+                    disabled={customerPage >= Math.max(1, Math.ceil(filteredCustomers.length / 10))}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    title="Next page"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -3967,7 +4008,7 @@ export const AdminPage = () => {
                       <th className="p-3">Current Stock</th>
                       <th className="p-3">B2C Retail Price</th>
                       <th className="p-3">B2B Wholesale Price</th>
-                      <th className="p-3">Wholesale MOQ</th>
+                      <th className="p-3">Total Quantity Available</th>
                       <th className="p-3 text-right">Stock Status</th>
                       <th className="p-3 rounded-r-xl text-center">Actions</th>
                     </tr>
@@ -5181,13 +5222,13 @@ export const AdminPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Wholesale MOQ</label>
+                  <label className="font-bold text-slate-700 block mb-1">Total Quantity Available</label>
                   <input
                     type="text"
                     value={editingProduct.moq}
                     onChange={(e) => setEditingProduct({ ...editingProduct, moq: e.target.value })}
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
-                    placeholder="e.g. 20L / 15kg Tin"
+                    placeholder="e.g. 50 Units / 100 kg"
                   />
                 </div>
               </div>
@@ -5489,13 +5530,13 @@ export const AdminPage = () => {
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Wholesale MOQ</label>
+                  <label className="font-bold text-slate-700 block mb-1">Total Quantity Available</label>
                   <input
                     type="text"
                     value={newProductForm.moq}
                     onChange={(e) => setNewProductForm({ ...newProductForm, moq: e.target.value })}
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
-                    placeholder="e.g. 20 Litres"
+                    placeholder="e.g. 50 Units / 100 kg"
                   />
                 </div>
               </div>

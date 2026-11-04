@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { products } from '../data/products';
+import { products as rawCatalogProducts, categories as rawCatalogCategories } from '../data/products';
 
 const ShopContext = createContext();
 
@@ -8,25 +8,217 @@ const syncChannel = typeof window !== 'undefined' && 'BroadcastChannel' in windo
   ? new BroadcastChannel('sumadhura_sync_channel')
   : null;
 
+
+const normalizeProduct = (item, idx = 0) => {
+  const retailPrice = Number(item.retailPrice ?? item.price ?? 0);
+  const wholesalePrice = Number(item.wholesalePrice ?? Math.round(retailPrice * 0.75));
+  const categoryName = item.category || 'Dairy Products';
+  const slug = (item.slug || categoryName).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+  const categoryImages = {
+    dairy: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
+    vegetables: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
+    fruits: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=800&q=80',
+    groceries: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80',
+    staples: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=800&q=80',
+    dishes: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
+    snacks: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=800&q=80',
+    munchies: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=800&q=80',
+    oils: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80',
+    masalas: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=800&q=80'
+  };
+
+  const matchedCatKey = Object.keys(categoryImages).find((k) => slug.includes(k)) || 'groceries';
+  const fallbackImage = categoryImages[matchedCatKey];
+
+  return {
+    ...item,
+    id: item.id || ('p-custom-' + idx + '-' + Date.now()),
+    name: item.name || 'Fresh Item',
+    category: categoryName,
+    subCategory: item.subCategory || 'Daily Fresh',
+    price: retailPrice,
+    retailPrice: retailPrice,
+    originalPrice: Number(item.originalPrice) || Math.round(retailPrice * 1.25),
+    unit: item.retailUnit || item.unit || 'Per Unit',
+    retailUnit: item.retailUnit || item.unit || 'Per Unit',
+    wholesalePrice: wholesalePrice,
+    wholesaleUnit: item.wholesaleUnit || 'Bulk Pack',
+    moq: item.moq || '1 Unit',
+    stock: item.stock || '50 Units',
+    rating: item.rating || 4.9,
+    reviewsCount: item.reviewsCount || 1,
+    badge: item.badge || 'Fresh',
+    deliveryTime: item.deliveryTime || '10-15 mins',
+    isVeg: item.isVeg !== undefined ? item.isVeg : true,
+    image: item.image && String(item.image).startsWith('http') ? item.image : fallbackImage,
+    description: item.description || (item.name || 'Fresh farm-direct product') + ' delivered fresh within 10-15 minutes.',
+    organic: item.organic !== undefined ? item.organic : true,
+    inStock: item.inStock !== undefined ? item.inStock : true,
+    tags: Array.isArray(item.tags) ? item.tags : ['fresh', 'popular', slug],
+    aisles: Array.isArray(item.aisles) && item.aisles.length > 0 ? item.aisles : [slug, 'all', categoryName.toLowerCase()]
+  };
+};
+
 export const ShopProvider = ({ children }) => {
   // Cart state persisted to localStorage
   const [cart, setCart] = useState(() => {
     try {
       const saved = localStorage.getItem('sumadhura_cart');
       return saved ? JSON.parse(saved) : [
-        { ...products[0], quantity: 2 }, // Nandini Cow Milk default
-        { ...products[6], quantity: 1 }, // Farm Fresh Tomatoes default
+        { ...rawCatalogProducts[0], quantity: 2 }, // Nandini Cow Milk default
+        { ...rawCatalogProducts[6], quantity: 1 }, // Farm Fresh Tomatoes default
       ];
     } catch {
       return [];
     }
   });
 
+
+  // Dynamic Products and Categories synced with Admin & LocalStorage
+  const [customProducts, setCustomProducts] = useState(() => {
+    try {
+      const savedCustom = localStorage.getItem('sumadhura_custom_products');
+      const customList = savedCustom ? JSON.parse(savedCustom) : [];
+      const savedInv = localStorage.getItem('sumadhura_admin_inventory');
+      const invList = savedInv ? JSON.parse(savedInv) : [];
+
+      const map = new Map();
+      customList.forEach((p, idx) => map.set(p.id, normalizeProduct(p, idx)));
+      invList.forEach((p, idx) => {
+        if (!map.has(p.id)) map.set(p.id, normalizeProduct(p, idx));
+      });
+      return Array.from(map.values());
+    } catch {
+      return [];
+    }
+  });
+
+  const [customCategories, setCustomCategories] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_admin_categories');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const allProducts = React.useMemo(() => {
+    const map = new Map();
+    rawCatalogProducts.forEach((p, idx) => {
+      map.set(p.id, normalizeProduct(p, idx));
+    });
+    customProducts.forEach((p, idx) => {
+      map.set(p.id, normalizeProduct(p, idx));
+    });
+    return Array.from(map.values());
+  }, [customProducts]);
+
+  const allCategories = React.useMemo(() => {
+    const map = new Map();
+    rawCatalogCategories.forEach((c) => map.set(c.name.toLowerCase(), c));
+    if (Array.isArray(customCategories)) {
+      customCategories.forEach((c) => {
+        if (!c || !c.name) return;
+        const key = c.name.toLowerCase();
+        if (!map.has(key)) {
+          map.set(key, {
+            id: c.id || ('cat-' + (c.slug || key)),
+            name: c.name,
+            slug: c.slug || key.replace(/[^a-z0-9]+/g, '-'),
+            description: c.description || (c.name + ' fresh products'),
+            image: c.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80',
+            itemCount: 'Fresh Daily',
+            deliveryTime: '10-15 mins',
+            icon: 'ShoppingBasket',
+            subCategories: c.subCategories || ['General'],
+            color: 'from-amber-600/20 to-amber-800/40',
+            badgeColor: 'bg-[#7D0A14] text-white',
+            cardBorder: 'hover:border-[#7D0A14]',
+            featured: c.featured !== undefined ? c.featured : true,
+            active: c.active !== undefined ? c.active : true,
+            emoji: c.emoji || '🛒'
+          });
+        } else {
+          const existing = map.get(key);
+          map.set(key, { ...existing, ...c });
+        }
+      });
+    }
+    return Array.from(map.values()).filter((c) => c.active !== false);
+  }, [customCategories]);
+
+  // Listen to cross-tab & admin changes
+  useEffect(() => {
+    const handleSync = (e) => {
+      const data = e.data || {};
+      if (
+        data.type === 'PRODUCTS_UPDATED' ||
+        e.key === 'sumadhura_custom_products' ||
+        e.key === 'sumadhura_admin_inventory'
+      ) {
+        try {
+          const savedCustom = localStorage.getItem('sumadhura_custom_products');
+          const customList = savedCustom ? JSON.parse(savedCustom) : [];
+          const savedInv = localStorage.getItem('sumadhura_admin_inventory');
+          const invList = savedInv ? JSON.parse(savedInv) : [];
+          const map = new Map();
+          customList.forEach((p, idx) => map.set(p.id, normalizeProduct(p, idx)));
+          invList.forEach((p, idx) => {
+            if (!map.has(p.id)) map.set(p.id, normalizeProduct(p, idx));
+          });
+          setCustomProducts(Array.from(map.values()));
+        } catch {}
+      }
+      if (data.type === 'CATEGORIES_UPDATED' || e.key === 'sumadhura_admin_categories') {
+        try {
+          const saved = localStorage.getItem('sumadhura_admin_categories');
+          if (saved) setCustomCategories(JSON.parse(saved));
+        } catch {}
+      }
+    };
+
+    if (syncChannel) {
+      syncChannel.onmessage = handleSync;
+    }
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
+
+  const addProduct = (newProd) => {
+    const normalized = normalizeProduct(newProd, customProducts.length);
+    setCustomProducts((prev) => {
+      const updated = [normalized, ...prev.filter((p) => p.id !== normalized.id)];
+      try {
+        localStorage.setItem('sumadhura_custom_products', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    if (syncChannel) {
+      syncChannel.postMessage({ type: 'PRODUCTS_UPDATED' });
+    }
+  };
+
+  const deleteProduct = (prodId) => {
+    setCustomProducts((prev) => {
+      const updated = prev.filter((p) => p.id !== prodId);
+      try {
+        localStorage.setItem('sumadhura_custom_products', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    if (syncChannel) {
+      syncChannel.postMessage({ type: 'PRODUCTS_UPDATED' });
+    }
+  };
+
   // Wishlist state persisted to localStorage
   const [wishlist, setWishlist] = useState(() => {
     try {
       const saved = localStorage.getItem('sumadhura_wishlist');
-      return saved ? JSON.parse(saved) : [products[1].id, products[8].id];
+      return saved ? JSON.parse(saved) : [rawCatalogProducts[1].id, rawCatalogProducts[8].id];
     } catch {
       return [];
     }
@@ -84,7 +276,7 @@ export const ShopProvider = ({ children }) => {
     // Dynamically update existing cart item prices to match selected pricing rate
     setCart((prevCart) =>
       prevCart.map((item) => {
-        const prod = products.find((p) => p.id === item.id) || item;
+        const prod = allProducts.find((p) => p.id === item.id) || item;
         const newPrice = mode === 'wholesale' ? prod.wholesalePrice : prod.price;
         const newUnit = mode === 'wholesale' ? prod.wholesaleUnit : prod.unit;
         return {
@@ -796,7 +988,7 @@ export const ShopProvider = ({ children }) => {
     // Revert existing cart items to retail rates
     setCart((prevCart) =>
       prevCart.map((item) => {
-        const prod = products.find((p) => p.id === item.id) || item;
+        const prod = allProducts.find((p) => p.id === item.id) || item;
         return {
           ...item,
           price: prod.price,
@@ -899,6 +1091,12 @@ export const ShopProvider = ({ children }) => {
         login,
         logout,
         navigateTo,
+        products: allProducts,
+        categories: allCategories,
+        addProduct,
+        deleteProduct,
+        customCategories,
+        setCustomCategories,
       }}
     >
       {children}

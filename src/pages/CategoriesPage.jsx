@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import {
   ArrowLeft,
@@ -27,8 +27,13 @@ export const CategoriesPage = () => {
     user,
     setIsAuthModalOpen,
     setAuthModalTab,
-    showToast
+    showToast,
+    products: shopProducts,
+    categories: shopCategories
   } = useShop();
+
+  const products = shopProducts || defaultProducts;
+  const categories = shopCategories || [];
 
   const [searchFilter, setSearchFilter] = useState(searchQuery || '');
   const [searchScope, setSearchScope] = useState('all'); // 'all' (Fast Search for ALL items) | 'current' (Only in current category)
@@ -54,6 +59,32 @@ export const CategoriesPage = () => {
     'Fast Search all items (e.g. "Crunchy Banana Chips")...'
   ];
 
+  // Dynamically include custom categories added from Admin
+  const aisleOptions = React.useMemo(() => {
+    const list = [...baseAisleOptions];
+    if (Array.isArray(categories)) {
+      categories.forEach((cat) => {
+        if (!cat || !cat.name) return;
+        const exists = list.some(
+          (o) =>
+            o.name.toLowerCase() === cat.name.toLowerCase() ||
+            o.shortName?.toLowerCase() === cat.name.toLowerCase() ||
+            o.aliases?.some((a) => a.toLowerCase() === cat.name.toLowerCase())
+        );
+        if (!exists) {
+          list.push({
+            name: cat.name,
+            emoji: cat.emoji || '🛒',
+            shortName: cat.name,
+            image: cat.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=120&q=80',
+            aliases: [cat.name, cat.slug, cat.name.toLowerCase()]
+          });
+        }
+      });
+    }
+    return list;
+  }, [categories]);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setPlaceholderIndex((prev) => (prev + 1) % searchPlaceholders.length);
@@ -76,7 +107,7 @@ export const CategoriesPage = () => {
   const activeCategory = selectedCategoryFilter || 'All';
 
   // All category / aisle options for the quick switcher
-  const aisleOptions = [
+  const baseAisleOptions = [
     { name: 'All', emoji: '🛒', shortName: 'All', aliases: ['All', 'all'] },
     {
       name: 'Popular Dishes',
@@ -201,6 +232,16 @@ export const CategoriesPage = () => {
     // Generic Groceries fallback
     if (activeCategory === 'Groceries' || activeCategory === 'Daily Groceries') {
       return prod.category === 'Groceries' || prod.aisles?.includes('rice-atta-dals');
+    }
+
+    // Direct match for any category or subcategory (including custom categories added in Admin)
+    const pCat = (prod.category || '').toLowerCase().trim();
+    const pSub = (prod.subCategory || '').toLowerCase().trim();
+    const tLower = target.toLowerCase().trim();
+    const aLower = activeCategory.toLowerCase().trim();
+
+    if (pCat === tLower || pCat === aLower || pSub === tLower || pSub === aLower) {
+      return true;
     }
 
     return prod.category === activeCategory || prod.subCategory === activeCategory;

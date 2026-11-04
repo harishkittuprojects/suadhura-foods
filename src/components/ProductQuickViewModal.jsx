@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
-import { products } from '../data/products';
+import { products as defaultProducts } from '../data/products';
 import confetti from 'canvas-confetti';
 import {
   X,
@@ -38,6 +38,7 @@ export const ProductQuickViewModal = () => {
     updateQuantity,
     toggleWishlist,
     isInWishlist,
+    products: shopProducts,
     pricingMode,
     setPricingMode,
     user,
