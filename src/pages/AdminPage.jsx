@@ -108,6 +108,72 @@ export const AdminPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
 
+  // Daily-Wise Calendar Date Filter State: 'all' | 'today' | 'yesterday' | 'week' | 'custom'
+  const [orderDateRange, setOrderDateRange] = useState('all');
+  const [selectedCustomDate, setSelectedCustomDate] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
+  const [isCalendarDropdownOpen, setIsCalendarDropdownOpen] = useState(false);
+  const [isDailyOrdersModalOpen, setIsDailyOrdersModalOpen] = useState(false);
+
+  // Helper to extract a normalized YYYY-MM-DD date from an order
+  const getOrderDateString = (o) => {
+    if (!o) return '';
+    if (o.createdAt) {
+      try {
+        const d = new Date(o.createdAt);
+        if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+      } catch {}
+    }
+    if (o.timestamp && o.timestamp !== 'Just now') {
+      try {
+        const d = new Date(o.timestamp);
+        if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+      } catch {}
+    }
+    if (o.date) {
+      if (o.date === 'Today' || o.date === 'Just now') {
+        return new Date().toISOString().split('T')[0];
+      }
+      try {
+        const d = new Date(o.date);
+        if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+      } catch {}
+    }
+    return new Date().toISOString().split('T')[0];
+  };
+
+  const matchesOrderDate = (order, range, customDateStr) => {
+    if (range === 'all') return true;
+    const orderDateStr = getOrderDateString(order);
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+
+    if (range === 'today') {
+      return orderDateStr === todayStr || order.date === 'Today' || order.date === 'Just now' || order.timestamp === 'Just now';
+    }
+
+    if (range === 'yesterday') {
+      const yesterday = new Date();
+      yesterday.setDate(now.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+      return orderDateStr === yesterdayStr;
+    }
+
+    if (range === 'week') {
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      const weekAgoStr = weekAgo.toISOString().split('T')[0];
+      return orderDateStr >= weekAgoStr && orderDateStr <= todayStr;
+    }
+
+    if (range === 'custom') {
+      return orderDateStr === customDateStr;
+    }
+
+    return true;
+  };
+
   // Selected invoice for Modal viewing
   const [selectedInvoice, setSelectedInvoice] = useState(null);
 
@@ -1302,17 +1368,21 @@ export const AdminPage = () => {
   // -------------------------------------------------------------------
   // FILTERING LOGIC
   // -------------------------------------------------------------------
+  // Orders matching the selected Calendar Date filter
+  const dateFilteredOrders = orders.filter((o) => matchesOrderDate(o, orderDateRange, selectedCustomDate));
+
   const filteredOrders = orders.filter((o) => {
     if (adminMode === 'b2c' && o.type !== 'b2c') return false;
     if (adminMode === 'b2b' && o.type !== 'b2b') return false;
     if (statusFilter !== 'All' && o.status !== statusFilter) return false;
+    if (!matchesOrderDate(o, orderDateRange, selectedCustomDate)) return false;
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
-        o.id.toLowerCase().includes(q) ||
-        o.customer.toLowerCase().includes(q) ||
-        o.address.toLowerCase().includes(q)
+        (o.id && o.id.toLowerCase().includes(q)) ||
+        (o.customer && o.customer.toLowerCase().includes(q)) ||
+        (o.address && o.address.toLowerCase().includes(q))
       );
     }
     return true;
@@ -1743,14 +1813,182 @@ export const AdminPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-start sm:self-auto">
+                {/* Calendar Daily-Wise Order Filter & Manifest Launcher */}
+                <div className="relative flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                  {/* Calendar Filter Dropdown Button */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsCalendarDropdownOpen((prev) => !prev)}
+                      className="flex items-center gap-2 px-3.5 py-2 bg-[#FAF5EC] border border-[#EDE1D1] rounded-xl text-xs font-bold text-[#3D040A] hover:bg-amber-100/60 shadow-2xs transition-colors cursor-pointer"
+                      title="Filter orders daily-wise by date"
+                    >
+                      <Calendar className="w-3.5 h-3.5 text-[#7D0A14]" />
+                      <span>
+                        {orderDateRange === 'today'
+                          ? `Today (${new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })})`
+                          : orderDateRange === 'yesterday'
+                          ? 'Yesterday'
+                          : orderDateRange === 'week'
+                          ? 'This Week'
+                          : orderDateRange === 'custom'
+                          ? `Date: ${selectedCustomDate}`
+                          : 'Last 30 Days'}
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded-full bg-[#7D0A14] text-white text-[10px] font-black">
+                        {dateFilteredOrders.length}
+                      </span>
+                      <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    </button>
+
+                    {/* Interactive Calendar Dropdown Menu */}
+                    {isCalendarDropdownOpen && (
+                      <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-xl border border-[#EDE1D1] p-4 z-50 space-y-3 animate-in fade-in duration-150">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <div className="text-xs font-black text-[#3D040A] flex items-center gap-1.5">
+                            <Calendar className="w-4 h-4 text-[#7D0A14]" />
+                            <span>Daily Order Filter & Calendar</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setIsCalendarDropdownOpen(false)}
+                            className="text-slate-400 hover:text-slate-600 p-1"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Quick Presets */}
+                        <div className="grid grid-cols-2 gap-1.5 text-xs">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOrderDateRange('today');
+                              setIsCalendarDropdownOpen(false);
+                              showToast("Showing Today's Live Orders");
+                            }}
+                            className={`py-2 px-2.5 rounded-xl font-bold text-left transition-colors flex items-center justify-between ${
+                              orderDateRange === 'today'
+                                ? 'bg-[#7D0A14] text-white shadow-xs'
+                                : 'bg-[#FAF5EC] text-slate-700 hover:bg-[#F3EAD9]'
+                            }`}
+                          >
+                            <span>📅 Today</span>
+                            <span className="text-[10px] opacity-80">
+                              {orders.filter((o) => matchesOrderDate(o, 'today', selectedCustomDate)).length} ords
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOrderDateRange('yesterday');
+                              setIsCalendarDropdownOpen(false);
+                              showToast("Showing Yesterday's Orders");
+                            }}
+                            className={`py-2 px-2.5 rounded-xl font-bold text-left transition-colors flex items-center justify-between ${
+                              orderDateRange === 'yesterday'
+                                ? 'bg-[#7D0A14] text-white shadow-xs'
+                                : 'bg-[#FAF5EC] text-slate-700 hover:bg-[#F3EAD9]'
+                            }`}
+                          >
+                            <span>⏱️ Yesterday</span>
+                            <span className="text-[10px] opacity-80">
+                              {orders.filter((o) => matchesOrderDate(o, 'yesterday', selectedCustomDate)).length} ords
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOrderDateRange('week');
+                              setIsCalendarDropdownOpen(false);
+                              showToast("Showing This Week's Orders");
+                            }}
+                            className={`py-2 px-2.5 rounded-xl font-bold text-left transition-colors flex items-center justify-between ${
+                              orderDateRange === 'week'
+                                ? 'bg-[#7D0A14] text-white shadow-xs'
+                                : 'bg-[#FAF5EC] text-slate-700 hover:bg-[#F3EAD9]'
+                            }`}
+                          >
+                            <span>📊 This Week</span>
+                            <span className="text-[10px] opacity-80">
+                              {orders.filter((o) => matchesOrderDate(o, 'week', selectedCustomDate)).length} ords
+                            </span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setOrderDateRange('all');
+                              setIsCalendarDropdownOpen(false);
+                              showToast('Showing Last 30 Days (All Orders)');
+                            }}
+                            className={`py-2 px-2.5 rounded-xl font-bold text-left transition-colors flex items-center justify-between ${
+                              orderDateRange === 'all'
+                                ? 'bg-[#7D0A14] text-white shadow-xs'
+                                : 'bg-[#FAF5EC] text-slate-700 hover:bg-[#F3EAD9]'
+                            }`}
+                          >
+                            <span>🗓️ Last 30 Days</span>
+                            <span className="text-[10px] opacity-80">{orders.length} ords</span>
+                          </button>
+                        </div>
+
+                        {/* Pick Specific Calendar Date */}
+                        <div className="pt-2 border-t border-slate-100 space-y-1.5">
+                          <label className="text-[11px] font-bold text-slate-600 block">
+                            Pick Calendar Date to Check Orders:
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="date"
+                              value={selectedCustomDate}
+                              onChange={(e) => {
+                                setSelectedCustomDate(e.target.value);
+                                setOrderDateRange('custom');
+                              }}
+                              className="flex-1 px-3 py-1.5 text-xs rounded-xl border border-[#EDE1D1] bg-[#FAF5EC] font-semibold text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#7D0A14]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setOrderDateRange('custom');
+                                setIsCalendarDropdownOpen(false);
+                                showToast(`Filtered to Orders on ${selectedCustomDate}`);
+                              }}
+                              className="px-3 py-1.5 bg-[#7D0A14] hover:bg-[#60060E] text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                            >
+                              Check
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Open Daily Order Manifest Modal Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCalendarDropdownOpen(false);
+                            setIsDailyOrdersModalOpen(true);
+                          }}
+                          className="w-full py-2 bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] rounded-xl text-xs font-black flex items-center justify-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          <span>View Daily Manifest ({dateFilteredOrders.length} orders)</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 1-Click Open Daily Order Check Modal */}
                   <button
-                    onClick={() => showToast('Filtered period: Last 30 Days (Oct 02 - Nov 02)')}
-                    className="flex items-center gap-2 px-3.5 py-2 bg-[#FAF5EC] border border-[#EDE1D1] rounded-xl text-xs font-bold text-[#3D040A] hover:bg-amber-100/60 shadow-2xs transition-colors"
+                    type="button"
+                    onClick={() => setIsDailyOrdersModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-[#7D0A14] hover:bg-[#60060E] text-white rounded-xl text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+                    title="Check daily orders manifest"
                   >
-                    <Calendar className="w-3.5 h-3.5 text-[#7D0A14]" />
-                    <span>Last 30 Days</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    <FileText className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Daily Order Check</span>
                   </button>
                 </div>
               </div>
@@ -2473,6 +2711,30 @@ export const AdminPage = () => {
                     <option value="Dispatched">Dispatched</option>
                     <option value="Delivered">Delivered</option>
                   </select>
+
+                  {/* Date Filter in Orders Console */}
+                  <div className="flex items-center gap-1.5 bg-[#FAF5EC] px-2 py-1 rounded-xl border border-[#EDE1D1] text-xs">
+                    <Calendar className="w-3.5 h-3.5 text-[#7D0A14]" />
+                    <select
+                      value={orderDateRange}
+                      onChange={(e) => setOrderDateRange(e.target.value)}
+                      className="bg-transparent font-bold text-slate-700 focus:outline-none text-xs cursor-pointer"
+                    >
+                      <option value="all">Last 30 Days (All)</option>
+                      <option value="today">Today Only</option>
+                      <option value="yesterday">Yesterday</option>
+                      <option value="week">This Week</option>
+                      <option value="custom">Specific Date</option>
+                    </select>
+                    {orderDateRange === 'custom' && (
+                      <input
+                        type="date"
+                        value={selectedCustomDate}
+                        onChange={(e) => setSelectedCustomDate(e.target.value)}
+                        className="px-2 py-0.5 rounded-lg border border-[#EDE1D1] bg-white text-xs font-semibold text-slate-800"
+                      />
+                    )}
+                  </div>
 
                   {orders.length > 0 && (
                     <button
@@ -5267,7 +5529,289 @@ export const AdminPage = () => {
       )}
 
       {/* ------------------------------------------------------------- */}
-{/* Manual Subscription Creation Modal (Admin to Customer) */}
+      {/* DAILY ORDERS CHECK MODAL */}
+      {isDailyOrdersModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-4xl w-full p-5 sm:p-6 space-y-4 border border-[#EDE1D1] shadow-2xl relative max-h-[92vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-[#7D0A14] text-[#F5A623] flex items-center justify-center font-black shadow-xs">
+                  <Calendar className="w-5 h-5 text-[#F5A623]" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-[#3D040A]">
+                    Daily Orders Manifest
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Order check and dispatch review for{' '}
+                    <span className="font-bold text-[#7D0A14]">
+                      {orderDateRange === 'today'
+                        ? `Today (${new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })})`
+                        : orderDateRange === 'yesterday'
+                        ? 'Yesterday'
+                        : orderDateRange === 'week'
+                        ? 'This Week'
+                        : orderDateRange === 'custom'
+                        ? selectedCustomDate
+                        : 'Last 30 Days'}
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDailyOrdersModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Quick Date Switcher Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1] shrink-0 text-xs font-bold">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-slate-500 text-[11px] font-semibold">Select Day:</span>
+                <button
+                  type="button"
+                  onClick={() => setOrderDateRange('today')}
+                  className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+                    orderDateRange === 'today'
+                      ? 'bg-[#7D0A14] text-white shadow-xs'
+                      : 'bg-white text-slate-700 hover:bg-amber-100 border border-[#EDE1D1]'
+                  }`}
+                >
+                  Today
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderDateRange('yesterday')}
+                  className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+                    orderDateRange === 'yesterday'
+                      ? 'bg-[#7D0A14] text-white shadow-xs'
+                      : 'bg-white text-slate-700 hover:bg-amber-100 border border-[#EDE1D1]'
+                  }`}
+                >
+                  Yesterday
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderDateRange('week')}
+                  className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+                    orderDateRange === 'week'
+                      ? 'bg-[#7D0A14] text-white shadow-xs'
+                      : 'bg-white text-slate-700 hover:bg-amber-100 border border-[#EDE1D1]'
+                  }`}
+                >
+                  This Week
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderDateRange('all')}
+                  className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+                    orderDateRange === 'all'
+                      ? 'bg-[#7D0A14] text-white shadow-xs'
+                      : 'bg-white text-slate-700 hover:bg-amber-100 border border-[#EDE1D1]'
+                  }`}
+                >
+                  All (30D)
+                </button>
+              </div>
+
+              {/* Custom Date Picker */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] text-slate-500">Pick Date:</span>
+                <input
+                  type="date"
+                  value={selectedCustomDate}
+                  onChange={(e) => {
+                    setSelectedCustomDate(e.target.value);
+                    setOrderDateRange('custom');
+                  }}
+                  className="px-2.5 py-1 text-xs rounded-xl border border-[#EDE1D1] bg-white font-semibold text-slate-800"
+                />
+              </div>
+            </div>
+
+            {/* Daily KPI Badges */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 shrink-0 text-xs">
+              <div className="p-3 bg-white rounded-xl border border-[#EDE1D1] shadow-2xs">
+                <div className="text-[11px] font-bold text-slate-500">Total Orders</div>
+                <div className="text-lg font-black text-[#3D040A] mt-0.5">{dateFilteredOrders.length}</div>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-[#EDE1D1] shadow-2xs">
+                <div className="text-[11px] font-bold text-slate-500">Day Revenue</div>
+                <div className="text-lg font-black text-[#7D0A14] mt-0.5">
+                  ₹{dateFilteredOrders.reduce((sum, o) => sum + (o.total || 0), 0).toLocaleString('en-IN')}
+                </div>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-[#EDE1D1] shadow-2xs">
+                <div className="text-[11px] font-bold text-slate-500">B2C Retail</div>
+                <div className="text-lg font-black text-amber-900 mt-0.5">
+                  {dateFilteredOrders.filter((o) => o.type !== 'b2b').length}
+                </div>
+              </div>
+              <div className="p-3 bg-white rounded-xl border border-[#EDE1D1] shadow-2xs">
+                <div className="text-[11px] font-bold text-slate-500">B2B Wholesale</div>
+                <div className="text-lg font-black text-blue-900 mt-0.5">
+                  {dateFilteredOrders.filter((o) => o.type === 'b2b').length}
+                </div>
+              </div>
+            </div>
+
+            {/* Daily Orders Table Content */}
+            <div className="flex-1 overflow-y-auto border border-[#EDE1D1] rounded-2xl">
+              {dateFilteredOrders.length === 0 ? (
+                <div className="py-12 px-4 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center mx-auto text-xl">
+                    📅
+                  </div>
+                  <h4 className="text-sm font-bold text-[#3D040A]">
+                    No Orders Recorded for This Selected Date
+                  </h4>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                    There are no customer orders on this date. Switch to Today or pick another date to inspect orders.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setOrderDateRange('today')}
+                    className="px-4 py-2 bg-[#7D0A14] hover:bg-[#60060E] text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    View Today's Orders
+                  </button>
+                </div>
+              ) : (
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-[#FAF5EC] text-slate-600 font-extrabold sticky top-0 border-b border-[#EDE1D1]">
+                    <tr>
+                      <th className="p-3">Order ID & Type</th>
+                      <th className="p-3">Customer Details</th>
+                      <th className="p-3">Ordered Items</th>
+                      <th className="p-3">Amount</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium">
+                    {dateFilteredOrders.map((order) => {
+                      const isB2B = order.type === 'b2b';
+                      return (
+                        <tr key={order.id} className="hover:bg-[#FAF5EC]/40 transition-colors">
+                          <td className="p-3">
+                            <div className="font-mono font-bold text-[#7D0A14]">{order.id}</div>
+                            <span className={`inline-block px-1.5 py-0.2 rounded text-[9px] font-black uppercase mt-1 ${
+                              isB2B ? 'bg-[#7D0A14] text-white' : 'bg-amber-100 text-amber-900'
+                            }`}>
+                              {isB2B ? 'B2B Wholesale' : 'B2C Retail'}
+                            </span>
+                            <div className="text-[10px] text-slate-400 mt-0.5">
+                              {order.date || order.timestamp || 'Today'}
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="font-bold text-slate-800">
+                              {order.customer || order.name || 'Customer'}
+                            </div>
+                            <div className="text-[11px] text-slate-500">{order.contact || order.phone || '+91 98450 12345'}</div>
+                            <div className="text-[10px] text-slate-400 truncate max-w-xs">{order.address}</div>
+                          </td>
+                          <td className="p-3">
+                            {Array.isArray(order.items) ? (
+                              <div className="space-y-0.5">
+                                {order.items.slice(0, 3).map((it, idx) => (
+                                  <div key={idx} className="text-[11px] text-slate-700">
+                                    • {typeof it === 'string' ? it : `${it.name || it.title} × ${it.qty || it.quantity || 1}`}
+                                  </div>
+                                ))}
+                                {order.items.length > 3 && (
+                                  <div className="text-[10px] text-slate-400">
+                                    +{order.items.length - 3} more items
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-slate-600">{order.items || 'Standard Basket'}</span>
+                            )}
+                          </td>
+                          <td className="p-3 font-black text-[#3D040A]">
+                            ₹{(order.total || 0).toLocaleString('en-IN')}
+                            <div className="text-[10px] text-slate-400 font-normal">
+                              {order.paymentMethod || 'UPI • Paid'}
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              order.status === 'Delivered'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                : order.status === 'Dispatched'
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                                : 'bg-amber-100 text-amber-800 border border-amber-200'
+                            }`}>
+                              {order.status || 'Packing'}
+                            </span>
+                          </td>
+                          <td className="p-3 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {order.status !== 'Delivered' && (
+                                <button
+                                  type="button"
+                                  onClick={() => updateOrderStatus(order.id, 'Delivered')}
+                                  className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold shadow-2xs transition-colors cursor-pointer"
+                                  title="Mark order Delivered"
+                                >
+                                  Delivered
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setSelectedInvoice({
+                                    invoiceNo: `INV-${order.id}`,
+                                    date: order.date || 'Today',
+                                    client: order.customer || 'Customer',
+                                    gstin: order.gstin || '36AABCU9603R1ZM',
+                                    orderId: order.id,
+                                    taxableAmount: Math.round(((order.total || 0) / 1.05) * 100) / 100,
+                                    cgst: Math.round((((order.total || 0) - (order.total || 0) / 1.05) / 2) * 100) / 100,
+                                    sgst: Math.round((((order.total || 0) - (order.total || 0) / 1.05) / 2) * 100) / 100,
+                                    totalAmount: order.total || 0,
+                                    status: 'Paid',
+                                    dueDate: 'Immediate'
+                                  });
+                                }}
+                                className="p-1 rounded-lg border border-[#EDE1D1] text-slate-600 hover:bg-amber-50 cursor-pointer"
+                                title="View Order Bill"
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-between pt-2 border-t border-slate-100 shrink-0 text-xs">
+              <div className="text-slate-500 font-medium">
+                Showing {dateFilteredOrders.length} orders for selected date
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDailyOrdersModalOpen(false)}
+                className="px-4 py-2 bg-[#7D0A14] hover:bg-[#60060E] text-white rounded-xl font-bold transition-colors cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Manual Subscription Creation Modal (Admin to Customer) */}
       {isManualSubModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
           <div className="relative bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
