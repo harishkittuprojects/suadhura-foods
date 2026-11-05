@@ -168,27 +168,29 @@ export const Navbar = () => {
   return (
     <header className="sticky top-0 z-40 bg-[#FAF5EC]/95 backdrop-blur-md border-b border-[#E8DDCF] shadow-sm transition-all duration-200 w-full overflow-visible">
       {/* 1. Top Ribbon: Services & VIP Membership */}
-      <div className="bg-[#4D060D] text-white text-xs py-1 sm:py-1.5 px-2.5 sm:px-4 font-medium border-b border-[#3D040A]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+      <div className="bg-[#4D060D] text-white text-xs py-1 sm:py-1.5 px-2 sm:px-4 font-medium border-b border-[#3D040A]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2">
           {/* 10-15 Min Express Delivery Badge */}
-          <div className="flex items-center gap-1.5 text-slate-300 text-[11px] sm:text-xs font-medium shrink-0">
+          <div className="flex items-center gap-1.5 text-slate-300 text-[10.5px] sm:text-xs font-medium shrink-0">
             <span className="flex items-center gap-1 text-amber-300 font-bold">
               <Zap className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-              <span>10-15 Min Express Delivery</span>
+              <span className="hidden sm:inline">10-15 Min Express Delivery</span>
+              <span className="sm:hidden">10-15 Min</span>
             </span>
             <span className="text-amber-500/50 hidden md:inline">•</span>
             <span className="text-amber-100 hidden md:inline">Free delivery above ₹99</span>
           </div>
 
           {/* B2B Wholesale Rate Status / Subscription Order */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            {/* Show B2B Wholesale badge ONLY when a B2B customer is logged in - No Retail Switch */}
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            {/* Show B2B Wholesale badge ONLY when a B2B customer is logged in */}
             {user?.isBusiness && (
-              <div className="flex items-center gap-1.5 bg-[#F5A623] text-[#3D040A] px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black shadow-xs shrink-0">
+              <div className="flex items-center gap-1 bg-[#F5A623] text-[#3D040A] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black shadow-xs shrink-0">
                 <Building2 className="w-3 h-3 text-[#3D040A] shrink-0" />
-                <span>B2B Wholesale</span>
+                <span className="hidden sm:inline">B2B Wholesale</span>
+                <span className="sm:hidden">Wholesale</span>
                 {user.gstin && (
-                  <span className="bg-[#7D0A14] text-white text-[8.5px] px-1 py-0.2 rounded hidden sm:inline font-mono">
+                  <span className="bg-[#7D0A14] text-white text-[8px] sm:text-[8.5px] px-1 py-0.2 rounded hidden sm:inline font-mono">
                     GST
                   </span>
                 )}
@@ -197,7 +199,7 @@ export const Navbar = () => {
 
             <button
               onClick={() => setIsSubscriptionModalOpen(true)}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-extrabold transition-all shrink-0 cursor-pointer ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-extrabold transition-all shrink-0 cursor-pointer ${
                 activeSubscription
                   ? 'bg-[#F5A623] text-[#3D040A] shadow-sm ring-2 ring-amber-300/60 font-black'
                   : 'bg-gradient-to-r from-[#D98207] to-[#F5A623] text-[#3D040A] hover:brightness-105 shadow-sm active:scale-95'
@@ -205,8 +207,9 @@ export const Navbar = () => {
               title="Set up daily morning milk & grocery subscription"
             >
               <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#3D040A] shrink-0" />
-              <span className="hidden sm:inline">{activeSubscription ? 'Daily Subscription (Active)' : 'Subscription Order'}</span>
-              <span className="sm:hidden">{activeSubscription ? 'Subscribed' : 'Subscription'}</span>
+              <span className="hidden md:inline">{activeSubscription ? 'Daily Subscription (Active)' : 'Subscription Order'}</span>
+              <span className="hidden sm:inline md:hidden">{activeSubscription ? 'Subscribed' : 'Subscription'}</span>
+              <span className="sm:hidden">{activeSubscription ? 'Active' : 'Subscribe'}</span>
             </button>
           </div>
         </div>
