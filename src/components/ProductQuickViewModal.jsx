@@ -534,14 +534,19 @@ export const ProductQuickViewModal = () => {
                     <span className="text-2xl sm:text-3xl font-black text-[#7D0A14]">
                       ₹{effectiveUnitPrice}
                     </span>
-                    {quickViewProduct.originalPrice && (
+                    {!isWholesale && quickViewProduct.originalPrice && (
                       <span className="text-sm text-slate-400 line-through font-bold">
                         ₹{quickViewProduct.originalPrice * selectedPackMultiplier}
                       </span>
                     )}
-                    {discountPercent > 0 && (
+                    {!isWholesale && discountPercent > 0 && (
                       <span className="text-xs font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
                         Save ₹{(quickViewProduct.originalPrice - quickViewProduct.price) * selectedPackMultiplier}
+                      </span>
+                    )}
+                    {isWholesale && (
+                      <span className="text-xs font-black text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300/80">
+                        B2B Wholesale
                       </span>
                     )}
                   </div>

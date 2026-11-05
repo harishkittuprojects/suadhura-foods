@@ -271,9 +271,6 @@ export const ProductCard = ({ product, priority = false }) => {
               <div>
                 <div className="flex items-baseline gap-1">
                   <span className="text-base sm:text-lg font-black text-[#7D0A14]">₹{activePrice}</span>
-                  <span className="text-[10px] sm:text-[11px] text-slate-400 line-through">
-                    ₹{product.price}
-                  </span>
                 </div>
                 <span className="text-[9px] font-extrabold text-amber-800 truncate block">
                   MOQ: {product.wholesaleMoq || product.moq || '> 5 units'}

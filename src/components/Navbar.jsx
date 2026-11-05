@@ -169,63 +169,42 @@ export const Navbar = () => {
     <header className="sticky top-0 z-40 bg-[#FAF5EC]/95 backdrop-blur-md border-b border-[#E8DDCF] shadow-sm transition-all duration-200 w-full overflow-visible">
       {/* 1. Top Ribbon: Services & VIP Membership */}
       <div className="bg-[#4D060D] text-white text-xs py-1 sm:py-1.5 px-2.5 sm:px-4 font-medium border-b border-[#3D040A]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 overflow-x-auto hide-scrollbar flex-nowrap">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           {/* 10-15 Min Express Delivery Badge */}
-          <div className="flex items-center gap-1.5 text-slate-300 text-[11px] sm:text-xs font-medium flex-shrink-0">
+          <div className="flex items-center gap-1.5 text-slate-300 text-[11px] sm:text-xs font-medium shrink-0">
             <span className="flex items-center gap-1 text-amber-300 font-bold">
-              <Zap className="w-3.5 h-3.5 text-amber-300" />
+              <Zap className="w-3.5 h-3.5 text-amber-300 shrink-0" />
               <span>10-15 Min Express Delivery</span>
             </span>
             <span className="text-amber-500/50 hidden md:inline">•</span>
             <span className="text-amber-100 hidden md:inline">Free delivery above ₹99</span>
           </div>
 
-          {/* B2B Wholesale Rate Status / B2B Login & Subscription Order */}
-          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            {/* Show B2B Wholesale option ONLY when a B2B customer is logged in */}
+          {/* B2B Wholesale Rate Status / Subscription Order */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Show B2B Wholesale badge ONLY when a B2B customer is logged in - No Retail Switch */}
             {user?.isBusiness && (
-              <div className="flex items-center bg-[#290306] p-0.5 rounded-full border border-amber-400/50 text-[10px] sm:text-[11px] font-black">
-                <button
-                  onClick={() => setPricingMode('retail')}
-                  className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all flex items-center gap-1 ${
-                    pricingMode === 'retail'
-                      ? 'bg-[#FAF5EC] text-[#3D040A] shadow-xs'
-                      : 'text-amber-200/70 hover:text-white'
-                  }`}
-                  title="Switch to standard retail pricing"
-                >
-                  <span>🛍️ Retail</span>
-                </button>
-                <button
-                  onClick={() => setPricingMode('wholesale')}
-                  className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full transition-all flex items-center gap-1 ${
-                    pricingMode === 'wholesale'
-                      ? 'bg-[#F5A623] text-[#3D040A] shadow-xs'
-                      : 'text-amber-200/70 hover:text-white'
-                  }`}
-                  title="Commercial B2B wholesale rates active"
-                >
-                  <Building2 className="w-3 h-3 text-[#3D040A]" />
-                  <span>B2B Wholesale</span>
-                  {user.gstin && (
-                    <span className="bg-[#7D0A14] text-white text-[8.5px] px-1 rounded hidden lg:inline font-mono">
-                      GST
-                    </span>
-                  )}
-                </button>
+              <div className="flex items-center gap-1.5 bg-[#F5A623] text-[#3D040A] px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black shadow-xs shrink-0">
+                <Building2 className="w-3 h-3 text-[#3D040A] shrink-0" />
+                <span>B2B Wholesale</span>
+                {user.gstin && (
+                  <span className="bg-[#7D0A14] text-white text-[8.5px] px-1 py-0.2 rounded hidden sm:inline font-mono">
+                    GST
+                  </span>
+                )}
               </div>
             )}
 
             <button
               onClick={() => setIsSubscriptionModalOpen(true)}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-extrabold transition-all ${
+              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-extrabold transition-all shrink-0 cursor-pointer ${
                 activeSubscription
                   ? 'bg-[#F5A623] text-[#3D040A] shadow-sm ring-2 ring-amber-300/60 font-black'
                   : 'bg-gradient-to-r from-[#D98207] to-[#F5A623] text-[#3D040A] hover:brightness-105 shadow-sm active:scale-95'
               }`}
               title="Set up daily morning milk & grocery subscription"
             >
-              <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#3D040A]" />
+              <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#3D040A] shrink-0" />
               <span className="hidden sm:inline">{activeSubscription ? 'Daily Subscription (Active)' : 'Subscription Order'}</span>
               <span className="sm:hidden">{activeSubscription ? 'Subscribed' : 'Subscription'}</span>
             </button>
@@ -647,45 +626,22 @@ export const Navbar = () => {
                 </div>
               </button>
 
-              {/* Pricing Rate Tier Switcher (Mobile: Shown only for B2B users) */}
+              {/* B2B Status (Mobile: Shown for B2B users - strictly Wholesale) */}
               {user?.isBusiness && (
-                <div className="mt-3 p-2.5 bg-white rounded-xl border border-[#DECDBD]">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-600 px-1">
-                      <span>B2B Commercial Account</span>
-                      <span className="text-emerald-700 font-bold flex items-center gap-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-1 text-xs font-bold text-center">
-                      <button
-                        onClick={() => {
-                          setPricingMode('retail');
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`py-1.5 rounded-lg transition-all ${
-                          pricingMode === 'retail'
-                            ? 'bg-[#7D0A14] text-white font-black shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 bg-[#FAF5EC]'
-                        }`}
-                      >
-                        🛍️ Retail
-                      </button>
-                      <button
-                        onClick={() => {
-                          setPricingMode('wholesale');
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`py-1.5 rounded-lg transition-all ${
-                          pricingMode === 'wholesale'
-                            ? 'bg-[#7D0A14] text-white font-black shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 bg-[#FAF5EC]'
-                        }`}
-                      >
-                        🏢 Wholesale
-                      </button>
-                    </div>
+                <div className="mt-3 p-3 bg-white rounded-xl border border-[#DECDBD]">
+                  <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                    <span className="flex items-center gap-1.5 text-[#7D0A14] font-black">
+                      <Building2 className="w-4 h-4 text-[#7D0A14]" /> B2B Commercial Wholesale
+                    </span>
+                    <span className="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active
+                    </span>
                   </div>
+                  {user.gstin && (
+                    <div className="mt-1 text-[11px] text-slate-500 font-mono">
+                      GSTIN: {user.gstin}
+                    </div>
+                  )}
                 </div>
               )}
 
