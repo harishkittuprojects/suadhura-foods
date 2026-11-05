@@ -173,7 +173,7 @@ const rawProducts = [
     badge: 'Fresh Daily',
     deliveryTime: '10 mins',
     isVeg: true,
-    image: 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?auto=format&fit=crop&w=800&q=80',
+    image: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80',
     description: 'Ultra-soft, melt-in-the-mouth paneer made from pure cow milk with zero preservatives. High in protein and calcium.',
     organic: true,
     inStock: true,

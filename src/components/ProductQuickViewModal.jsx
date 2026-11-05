@@ -27,7 +27,8 @@ import {
   ChevronLeft,
   ChevronDown,
   ChevronUp,
-  MessageSquare
+  MessageSquare,
+  ArrowLeft
 } from 'lucide-react';
 
 export const ProductQuickViewModal = () => {
@@ -76,7 +77,22 @@ export const ProductQuickViewModal = () => {
     }
   }, [products, quickViewProduct, setQuickViewProduct]);
 
-  // Sync URL query param when modal opens/closes so users can copy the current browser address bar directly
+  const handleCloseModal = () => {
+    if (window.history.state?.isProductModal) {
+      window.history.back();
+    } else {
+      setQuickViewProduct(null);
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has('product')) {
+          url.searchParams.delete('product');
+          window.history.replaceState({}, '', url.toString());
+        }
+      } catch (err) {}
+    }
+  };
+
+  // Sync URL query param and handle Back button navigation via popstate
   useEffect(() => {
     if (quickViewProduct) {
       const isWholesale = Boolean(pricingMode === 'wholesale' || (user && user.isBusiness));
@@ -92,13 +108,35 @@ export const ProductQuickViewModal = () => {
         scrollContainerRef.current.scrollTop = 0;
       }
 
+      // Push history state so the phone's Back button or browser Back button closes the modal
       try {
         const url = new URL(window.location.href);
         url.searchParams.set('product', quickViewProduct.id);
-        window.history.replaceState({}, '', url.toString());
+        if (!window.history.state?.isProductModal) {
+          window.history.pushState({ isProductModal: true }, '', url.toString());
+        }
       } catch (err) {
         console.error(err);
       }
+
+      const handlePopState = () => {
+        // When user taps device Back button, close the modal!
+        setQuickViewProduct(null);
+      };
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          handleCloseModal();
+        }
+      };
+
+      window.addEventListener('popstate', handlePopState);
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       try {
         const url = new URL(window.location.href);
@@ -106,54 +144,74 @@ export const ProductQuickViewModal = () => {
           url.searchParams.delete('product');
           window.history.replaceState({}, '', url.toString());
         }
-      } catch (err) {
-        console.error(err);
-      }
+      } catch (err) {}
     }
+  }, [quickViewProduct, setQuickViewProduct]);
+
+  // Image Gallery Angles / Previews (Distinct high-res angles, zero duplicates)
+  const galleryImages = React.useMemo(() => {
+    if (!quickViewProduct) return [];
+    if (Array.isArray(quickViewProduct.images) && quickViewProduct.images.length > 0) {
+      return Array.from(new Set(quickViewProduct.images.filter(Boolean)));
+    }
+
+    const mainImg = quickViewProduct.image;
+    const cat = (quickViewProduct.category || '').toLowerCase();
+    const name = (quickViewProduct.name || '').toLowerCase();
+
+    let extraAngles = [];
+    if (name.includes('paneer') || name.includes('cottage cheese')) {
+      extraAngles = [
+        'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=800&q=80'
+      ];
+    } else if (cat.includes('fruit')) {
+      extraAngles = [
+        'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80'
+      ];
+    } else if (cat.includes('veg')) {
+      extraAngles = [
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=800&q=80'
+      ];
+    } else if (cat.includes('dairy') || cat.includes('milk') || cat.includes('ghee')) {
+      extraAngles = [
+        'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=800&q=80'
+      ];
+    } else if (cat.includes('dish') || cat.includes('popular')) {
+      extraAngles = [
+        'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80'
+      ];
+    } else {
+      extraAngles = [
+        'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80'
+      ];
+    }
+
+    const combined = [mainImg, ...extraAngles].filter(Boolean);
+    return Array.from(new Set(combined)).slice(0, 4);
   }, [quickViewProduct]);
 
-  if (!quickViewProduct) return null;
+  const handlePrevImage = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
 
-  const isLiked = isInWishlist(quickViewProduct.id);
-  const cartItem = cart.find((item) => item.id === quickViewProduct.id);
-  const quantityInCart = cartItem ? cartItem.quantity : 0;
-
-  const isWholesale = Boolean(isB2B && pricingMode === 'wholesale');
-  const baseUnitPrice = isWholesale
-    ? quickViewProduct.wholesalePrice || Math.round(quickViewProduct.price * 0.74)
-    : quickViewProduct.price;
-
-  // Price calculation based on pack multiplier
-  const effectiveUnitPrice =
-    selectedPackMultiplier === 1
-      ? baseUnitPrice
-      : selectedPackMultiplier === 2
-      ? Math.round(baseUnitPrice * 1.9) // 5% savings on 2x
-      : Math.round(baseUnitPrice * 2.75); // ~8% savings on 3x
-
-  const discountPercent = quickViewProduct.originalPrice
-    ? Math.round(
-        ((quickViewProduct.originalPrice - quickViewProduct.price) /
-          quickViewProduct.originalPrice) *
-          100
-      )
-    : 0;
-
-  const totalPayable = effectiveUnitPrice * quantity;
-
-  // Image Gallery Angles / Previews
-  const galleryImages = [
-    quickViewProduct.image,
-    // Contextual farm harvest and natural fresh images based on category
-    quickViewProduct.category?.toLowerCase().includes('fruit')
-      ? 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=800&q=80'
-      : quickViewProduct.category?.toLowerCase().includes('veg')
-      ? 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80'
-      : quickViewProduct.category?.toLowerCase().includes('dish')
-      ? 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=800&q=80'
-      : 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1589927986089-35812388d1f4?auto=format&fit=crop&w=800&q=80'
-  ];
+  const handleNextImage = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
+  };
 
   // Sharing handlers
   const productShareUrl = `${window.location.origin}${window.location.pathname}?product=${quickViewProduct.id}`;
@@ -233,7 +291,7 @@ export const ProductQuickViewModal = () => {
   return (
     <div
       className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 overflow-hidden"
-      onClick={() => setQuickViewProduct(null)}
+      onClick={handleCloseModal}
     >
       <div
         className="relative bg-white rounded-3xl max-w-4xl w-full h-[92vh] sm:h-auto max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-2xl border border-[#EDE1D1] overflow-hidden animate-in zoom-in-95 duration-200"
@@ -242,6 +300,17 @@ export const ProductQuickViewModal = () => {
         {/* 1. STICKY TOP HEADER BAR - Pinned above scroll */}
         <div className="bg-gradient-to-r from-[#FAF5EC] via-white to-[#FAF5EC] px-3.5 sm:px-6 py-3 border-b border-[#EDE1D1] flex items-center justify-between gap-2 sm:gap-3 shrink-0">
           <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            {/* Back Button (Mobile & Desktop) */}
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="p-1.5 sm:p-2 rounded-xl bg-white hover:bg-[#FAF5EC] text-[#7D0A14] border border-[#EDE1D1] flex items-center justify-center transition-all cursor-pointer shadow-2xs shrink-0 active:scale-95"
+              title="Go Back"
+              aria-label="Go Back"
+            >
+              <ArrowLeft className="w-4 h-4 text-[#7D0A14] stroke-[2.5]" />
+            </button>
+
             {/* Indian FSSAI Veg / Non-Veg Indicator */}
             <div
               className={`w-4 h-4 border rounded-sm flex items-center justify-center p-0.5 shrink-0 ${
@@ -355,7 +424,7 @@ export const ProductQuickViewModal = () => {
 
             {/* Close Button */}
             <button
-              onClick={() => setQuickViewProduct(null)}
+              onClick={handleCloseModal}
               className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
               aria-label="Close"
               title="Close modal"
@@ -403,16 +472,16 @@ export const ProductQuickViewModal = () => {
                   <span>{quickViewProduct.deliveryTime || '10-15 MINS'}</span>
                 </div>
 
-                {/* Floating Left Arrow (Previous Image Option) */}
+                {/* Floating Left Arrow (Previous Image Option - Back) */}
                 {galleryImages.length > 1 && (
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
-                    }}
-                    className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-12 sm:w-8 sm:h-14 bg-white/95 hover:bg-white text-slate-800 rounded-xl shadow-lg border border-slate-200/90 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                    title="Previous option"
+                    onClick={handlePrevImage}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onTouchEnd={(e) => e.stopPropagation()}
+                    className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-12 sm:w-9 sm:h-14 bg-white/95 hover:bg-white text-slate-800 rounded-xl shadow-lg border border-slate-200/90 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    title="Previous photo (Back)"
+                    aria-label="Previous photo"
                   >
                     <ChevronLeft className="w-5 h-5 text-slate-800 stroke-[2.5]" />
                   </button>
@@ -425,16 +494,16 @@ export const ProductQuickViewModal = () => {
                   className="w-full h-full object-contain md:object-cover rounded-xl transition-all duration-300 group-hover:scale-105"
                 />
 
-                {/* Floating Right Arrow (Next Image Option - Matches User Cropped Reference) */}
+                {/* Floating Right Arrow (Next Image Option) */}
                 {galleryImages.length > 1 && (
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
-                    }}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-7 h-12 sm:w-8 sm:h-14 bg-white/95 hover:bg-white text-slate-800 rounded-xl shadow-lg border border-slate-200/90 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                    title="Next option"
+                    onClick={handleNextImage}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onTouchEnd={(e) => e.stopPropagation()}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-12 sm:w-9 sm:h-14 bg-white/95 hover:bg-white text-slate-800 rounded-xl shadow-lg border border-slate-200/90 flex items-center justify-center hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                    title="Next photo"
+                    aria-label="Next photo"
                   >
                     <ChevronRight className="w-5 h-5 text-slate-800 stroke-[2.5]" />
                   </button>
