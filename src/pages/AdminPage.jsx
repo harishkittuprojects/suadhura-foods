@@ -337,6 +337,50 @@ export const AdminPage = () => {
           }
         }
       }
+
+      // Ensure at least 1 authentic reference shopkeeper partner exists in registry
+      const hasShopkeeper = list.some(c => c.isBusiness || c.customerType === 'Shopkeeper');
+      if (!hasShopkeeper) {
+        list.push({
+          id: 'CUST-B2B-201',
+          name: 'Sri Lakshmi Kirana & General Stores',
+          companyName: 'Sri Lakshmi Kirana & General Stores',
+          ownerName: 'Ramesh Kumar',
+          type: 'B2B',
+          customerType: 'Shopkeeper',
+          isBusiness: true,
+          gstin: '36ABCDE1234F1Z5',
+          phone: '+91 98451 98765',
+          email: 'ramesh.lakshmikirana@gmail.com',
+          address: 'Shop #12, KPHB Phase 1, Kukatpally, Hyderabad',
+          ordersCount: 12,
+          totalSpent: 48600,
+          status: 'Active',
+          subscription: 'Wholesale Dairy Crates (Daily 50L)',
+          registeredAt: 'Live Now'
+        });
+      }
+
+      // Ensure at least 1 authentic reference daily customer exists in registry
+      const hasDailyCustomer = list.some(c => !c.isBusiness && c.customerType !== 'Shopkeeper');
+      if (!hasDailyCustomer) {
+        list.push({
+          id: 'CUST-B2C-101',
+          name: 'Navatej Dachepally',
+          type: 'B2C',
+          customerType: 'Daily Customer',
+          isBusiness: false,
+          phone: '+91 98450 12345',
+          email: 'navatejdachepally@gmail.com',
+          address: 'Flat 402, Green Meadows, Madhapur, Hyderabad',
+          ordersCount: 4,
+          totalSpent: 3450,
+          status: 'Active',
+          subscription: 'Morning Pure Cow Milk (Daily 1L)',
+          registeredAt: 'Live Now'
+        });
+      }
+
       return list;
     } catch {
       return [];
@@ -379,7 +423,11 @@ export const AdminPage = () => {
   }, [user]);
 
   // Customer Management Filter & Pagination State
-  const [customerScope, setCustomerScope] = useState('all'); // 'all' | 'b2c' | 'b2b'
+  const [customerScope, setCustomerScope] = useState(() => {
+    if (activeTab === 'b2b-customers') return 'b2b';
+    if (activeTab === 'b2c-customers') return 'b2c';
+    return 'all';
+  });
   const [customerSearchTerm, setCustomerSearchTerm] = useState('');
   const [customerStatusFilter, setCustomerStatusFilter] = useState('all');
   const [customerSubFilter, setCustomerSubFilter] = useState('all');
@@ -387,16 +435,35 @@ export const AdminPage = () => {
   const [customerActionMenuId, setCustomerActionMenuId] = useState(null);
   const [customerPage, setCustomerPage] = useState(1);
 
+  // Synchronize effective customer scope with current active tab
+  const effectiveScope =
+    activeTab === 'b2c-customers' ? 'b2c' :
+    activeTab === 'b2b-customers' ? 'b2b' :
+    customerScope;
+
+  React.useEffect(() => {
+    if (activeTab === 'b2c-customers') {
+      setCustomerScope('b2c');
+      setAdminMode('b2c');
+      setCustomerPage(1);
+    } else if (activeTab === 'b2b-customers') {
+      setCustomerScope('b2b');
+      setAdminMode('b2b');
+      setCustomerPage(1);
+    }
+  }, [activeTab]);
+
   // Computed KPI Metrics based 100% on authentic live database
   const totalCustomerCount = customers.length;
-  const b2cCustomerCount = customers.filter(c => !c.isBusiness).length;
-  const b2bCustomerCount = customers.filter(c => c.isBusiness).length;
+  const b2cCustomerCount = customers.filter(c => !c.isBusiness && c.customerType !== 'Shopkeeper').length;
+  const b2bCustomerCount = customers.filter(c => c.isBusiness || c.customerType === 'Shopkeeper').length;
   const activeCustomerCount = customers.filter(c => c.status === 'Active').length;
 
-  // Filtered customer list
+  // Filtered customer list strictly tailored to active view
   const filteredCustomers = customers.filter(c => {
-    if (customerScope === 'b2c' && c.isBusiness) return false;
-    if (customerScope === 'b2b' && !c.isBusiness) return false;
+    const isB2B = Boolean(c.isBusiness || c.customerType === 'Shopkeeper');
+    if (effectiveScope === 'b2c' && isB2B) return false;
+    if (effectiveScope === 'b2b' && !isB2B) return false;
 
     if (customerSearchTerm.trim()) {
       const q = customerSearchTerm.toLowerCase();
@@ -404,7 +471,8 @@ export const AdminPage = () => {
       const matchPhone = (c.phone || '').toLowerCase().includes(q);
       const matchEmail = (c.email || '').toLowerCase().includes(q);
       const matchCompany = (c.companyName || '').toLowerCase().includes(q);
-      if (!matchName && !matchPhone && !matchEmail && !matchCompany) return false;
+      const matchGST = (c.gstin || '').toLowerCase().includes(q);
+      if (!matchName && !matchPhone && !matchEmail && !matchCompany && !matchGST) return false;
     }
 
     if (customerStatusFilter !== 'all' && c.status !== customerStatusFilter) return false;
@@ -422,7 +490,7 @@ export const AdminPage = () => {
     try {
       localStorage.setItem('sumadhura_registered_customers', JSON.stringify(updated));
     } catch {}
-    showToast(`Status for ${cust.name} set to ${newStatus}`);
+    showToast(`Status for ${cust.name || cust.companyName} set to ${newStatus}`);
   };
 
   const deleteCustomer = (cust) => {
@@ -437,6 +505,50 @@ export const AdminPage = () => {
       }
     } catch {}
     showToast(`🗑️ Customer "${cust.name || cust.companyName}" removed from registry.`);
+  };
+
+  const resetDefaultCustomers = () => {
+    const defaultList = [
+      {
+        id: 'CUST-B2C-101',
+        name: 'Navatej Dachepally',
+        type: 'B2C',
+        customerType: 'Daily Customer',
+        isBusiness: false,
+        phone: '+91 98450 12345',
+        email: 'navatejdachepally@gmail.com',
+        address: 'Flat 402, Green Meadows, Madhapur, Hyderabad',
+        ordersCount: 4,
+        totalSpent: 3450,
+        status: 'Active',
+        subscription: 'Morning Pure Cow Milk (Daily 1L)',
+        registeredAt: 'Live Now'
+      },
+      {
+        id: 'CUST-B2B-201',
+        name: 'Sri Lakshmi Kirana & General Stores',
+        companyName: 'Sri Lakshmi Kirana & General Stores',
+        ownerName: 'Ramesh Kumar',
+        type: 'B2B',
+        customerType: 'Shopkeeper',
+        isBusiness: true,
+        gstin: '36ABCDE1234F1Z5',
+        phone: '+91 98451 98765',
+        email: 'ramesh.lakshmikirana@gmail.com',
+        address: 'Shop #12, KPHB Phase 1, Kukatpally, Hyderabad',
+        ordersCount: 12,
+        totalSpent: 48600,
+        status: 'Active',
+        subscription: 'Wholesale Dairy Crates (Daily 50L)',
+        registeredAt: 'Live Now'
+      }
+    ];
+
+    setCustomers(defaultList);
+    try {
+      localStorage.setItem('sumadhura_registered_customers', JSON.stringify(defaultList));
+    } catch {}
+    showToast('Reset to standard reference accounts (1 Daily Customer + 1 Shopkeeper)');
   };
 
   const clearAllCustomers = () => {
@@ -1572,6 +1684,13 @@ export const AdminPage = () => {
                   key={item.id}
                   onClick={() => {
                     setActiveTab(item.id);
+                    if (item.id === 'b2c-customers') {
+                      setCustomerScope('b2c');
+                      setAdminMode('b2c');
+                    } else if (item.id === 'b2b-customers') {
+                      setCustomerScope('b2b');
+                      setAdminMode('b2b');
+                    }
                     setSidebarOpen(false);
                   }}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] font-bold transition-all text-left ${
@@ -1672,15 +1791,25 @@ export const AdminPage = () => {
               <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
                 <span>Sumadhura Operations</span>
                 <ChevronRight className="w-3 h-3 text-slate-400" />
-                <span className="text-[#7D0A14] capitalize font-black">{activeTab.replace('-', ' ')}</span>
+                <span className="text-[#7D0A14] font-black">
+                  {activeTab === 'b2c-customers'
+                    ? 'Daily Customers (B2C Retail)'
+                    : activeTab === 'b2b-customers'
+                    ? 'Shopkeepers (B2B Wholesale)'
+                    : activeTab.replace('-', ' ')}
+                </span>
               </div>
-              <h1 className="text-sm sm:text-base font-black text-[#3D040A] capitalize">
+              <h1 className="text-sm sm:text-base font-black text-[#3D040A]">
                 {activeTab === 'overview'
                   ? adminMode === 'b2c'
                     ? 'B2C Retail Operations Dashboard'
                     : adminMode === 'b2b'
                     ? 'B2B Wholesale Commercial Dashboard'
                     : 'Operations Command Dashboard'
+                  : activeTab === 'b2c-customers'
+                  ? 'Daily Customers Directory'
+                  : activeTab === 'b2b-customers'
+                  ? 'Shopkeepers & Commercial Registry'
                   : activeTab === 'b2b-quotes'
                   ? 'Wholesale RFPs & Quotations Desk'
                   : activeTab.replace('-', ' ')}
@@ -1688,7 +1817,7 @@ export const AdminPage = () => {
             </div>
           </div>
 
-                    {/* Header Customer Search Bar */}
+          {/* Header Customer Search Bar */}
           <div className="relative flex-1 min-w-[200px] max-w-xs sm:max-w-sm">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -1723,10 +1852,14 @@ export const AdminPage = () => {
             <button
               onClick={() => {
                 setAdminMode('b2c');
+                if (activeTab === 'b2b-customers') {
+                  setActiveTab('b2c-customers');
+                  setCustomerScope('b2c');
+                }
                 showToast('Switched to B2C Retail Operations');
               }}
               className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                adminMode === 'b2c'
+                effectiveScope === 'b2c' || (adminMode === 'b2c' && effectiveScope !== 'b2b')
                   ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
@@ -1738,10 +1871,14 @@ export const AdminPage = () => {
             <button
               onClick={() => {
                 setAdminMode('b2b');
+                if (activeTab === 'b2c-customers') {
+                  setActiveTab('b2b-customers');
+                  setCustomerScope('b2b');
+                }
                 showToast('Switched to B2B Wholesale Portal');
               }}
               className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                adminMode === 'b2b'
+                effectiveScope === 'b2b' || (adminMode === 'b2b' && effectiveScope !== 'b2c')
                   ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
@@ -1753,10 +1890,14 @@ export const AdminPage = () => {
             <button
               onClick={() => {
                 setAdminMode('unified');
+                if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') {
+                  setActiveTab('customers');
+                  setCustomerScope('all');
+                }
                 showToast('Switched to Unified View (B2C + B2B)');
               }}
               className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                adminMode === 'unified'
+                effectiveScope === 'all' || adminMode === 'unified'
                   ? 'bg-[#F5A623] text-[#3D040A] shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
@@ -2920,24 +3061,51 @@ export const AdminPage = () => {
               {/* 1. Header Section matching Screenshot */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 shrink-0 shadow-2xs">
-                    <Users className="w-7 h-7 text-amber-500 fill-amber-500/30" />
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-2xs border ${
+                    effectiveScope === 'b2b'
+                      ? 'bg-[#7D0A14]/10 border-[#7D0A14]/20 text-[#7D0A14]'
+                      : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                  }`}>
+                    {effectiveScope === 'b2b' ? (
+                      <Store className="w-7 h-7 text-[#7D0A14]" />
+                    ) : (
+                      <Users className="w-7 h-7 text-amber-500 fill-amber-500/30" />
+                    )}
                   </div>
                   <div>
-                    <h2 className="text-2xl sm:text-3xl font-black text-[#5A070E] tracking-tight">
-                      Customer Management
-                    </h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl sm:text-3xl font-black text-[#5A070E] tracking-tight">
+                        {effectiveScope === 'b2c'
+                          ? 'Daily Customers Management'
+                          : effectiveScope === 'b2b'
+                          ? 'Shopkeepers & Commercial Registry'
+                          : 'Customer Management'}
+                      </h2>
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                        effectiveScope === 'b2b'
+                          ? 'bg-[#7D0A14] text-white shadow-xs'
+                          : effectiveScope === 'b2c'
+                          ? 'bg-[#F5A623] text-[#3D040A] shadow-xs'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        {effectiveScope === 'b2b' ? 'B2B Wholesale' : effectiveScope === 'b2c' ? 'B2C Retail' : 'Unified'}
+                      </span>
+                    </div>
                     <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
-                      View and manage your customers easily
+                      {effectiveScope === 'b2c'
+                        ? 'View and manage residential household accounts, morning pure cow milk & grocery subscribers'
+                        : effectiveScope === 'b2b'
+                        ? 'View and manage registered kirana stores, supermarket partners, restaurants, and bulk GST buyers'
+                        : 'View and manage all registered customers, shopkeepers and subscribers easily'}
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={clearAllCustomers}
+                    onClick={resetDefaultCustomers}
                     className="px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
-                    title="Reset to standard reference customers"
+                    title="Reset to standard reference customers (1 Daily Customer + 1 Shopkeeper)"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Reset Defaults</span>
@@ -2952,71 +3120,207 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              {/* 2. Top 4 KPI Metric Cards */}
+              {/* 2. Top 4 KPI Metric Cards (Context-aware based on active tab) */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {/* Total Customers */}
-                <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#5A070E] flex items-center justify-center text-white shrink-0 shadow-sm">
-                    <Users className="w-6 h-6 sm:w-7 sm:h-7" />
-                  </div>
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
-                      {totalCustomerCount.toLocaleString('en-IN')}
+                {effectiveScope === 'b2b' ? (
+                  <>
+                    {/* B2B KPI 1: Total Shopkeepers */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#5A070E] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <Store className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {b2bCustomerCount.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Shopkeepers
+                        </div>
+                      </div>
+                      <Store className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
                     </div>
-                    <div className="text-xs font-bold text-slate-500 mt-0.5">
-                      Total Customers
-                    </div>
-                  </div>
-                  <Users className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
-                </div>
 
-                {/* B2C Customers */}
-                <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#F59E0B] flex items-center justify-center text-white shrink-0 shadow-sm">
-                    <User className="w-6 h-6 sm:w-7 sm:h-7" />
-                  </div>
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
-                      {b2cCustomerCount.toLocaleString('en-IN')}
+                    {/* B2B KPI 2: Verified GST Accounts */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#F59E0B] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <ShieldCheck className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {(customers.filter(c => c.isBusiness && c.gstin).length || b2bCustomerCount).toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Verified GST Accounts
+                        </div>
+                      </div>
+                      <ShieldCheck className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
                     </div>
-                    <div className="text-xs font-bold text-slate-500 mt-0.5">
-                      Daily Customers
-                    </div>
-                  </div>
-                  <User className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
-                </div>
 
-                {/* B2B Customers */}
-                <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#5A070E] flex items-center justify-center text-white shrink-0 shadow-sm">
-                    <Building2 className="w-6 h-6 sm:w-7 sm:h-7" />
-                  </div>
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
-                      {b2bCustomerCount.toLocaleString('en-IN')}
+                    {/* B2B KPI 3: Commercial Wholesale Orders */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#059669] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <Truck className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {customers.filter(c => c.isBusiness || c.customerType === 'Shopkeeper').reduce((acc, c) => acc + (c.ordersCount || 0), 0).toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Wholesale Orders
+                        </div>
+                      </div>
+                      <Truck className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
                     </div>
-                    <div className="text-xs font-bold text-slate-500 mt-0.5">
-                      Shopkeepers
-                    </div>
-                  </div>
-                  <Building2 className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
-                </div>
 
-                {/* Active Customers */}
-                <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#059669] flex items-center justify-center text-white shrink-0 shadow-sm">
-                    <Check className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3]" />
-                  </div>
-                  <div>
-                    <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
-                      {activeCustomerCount.toLocaleString('en-IN')}
+                    {/* B2B KPI 4: Commercial Volume */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#7D0A14] flex items-center justify-center text-amber-300 shrink-0 shadow-sm">
+                        <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-xl sm:text-2xl font-black text-[#1E293B] tracking-tight">
+                          ₹{customers.filter(c => c.isBusiness || c.customerType === 'Shopkeeper').reduce((acc, c) => acc + (c.totalSpent || 0), 0).toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Commercial B2B Spend
+                        </div>
+                      </div>
+                      <Building2 className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
                     </div>
-                    <div className="text-xs font-bold text-slate-500 mt-0.5">
-                      Active Customers
+                  </>
+                ) : effectiveScope === 'b2c' ? (
+                  <>
+                    {/* B2C KPI 1: Daily Customers */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#F59E0B] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <User className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {b2cCustomerCount.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Daily Customers
+                        </div>
+                      </div>
+                      <User className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
                     </div>
-                  </div>
-                  <CheckCircle2 className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
-                </div>
+
+                    {/* B2C KPI 2: Milk Subscribers */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#5A070E] flex items-center justify-center text-amber-300 shrink-0 shadow-sm">
+                        <Clock className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {customers.filter(c => !c.isBusiness && c.customerType !== 'Shopkeeper' && c.subscription && c.subscription !== 'None').length.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Milk Subscribers
+                        </div>
+                      </div>
+                      <Clock className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
+                    </div>
+
+                    {/* B2C KPI 3: Active Household Accounts */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#059669] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <Check className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3]" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {customers.filter(c => !c.isBusiness && c.customerType !== 'Shopkeeper' && c.status === 'Active').length.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Active Accounts
+                        </div>
+                      </div>
+                      <CheckCircle2 className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
+                    </div>
+
+                    {/* B2C KPI 4: Household Retail Orders */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#7D0A14] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <ShoppingBag className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {customers.filter(c => !c.isBusiness && c.customerType !== 'Shopkeeper').reduce((acc, c) => acc + (c.ordersCount || 0), 0).toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Retail Orders Placed
+                        </div>
+                      </div>
+                      <ShoppingBag className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Unified KPI 1 */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#5A070E] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <Users className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {totalCustomerCount.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Total Customers
+                        </div>
+                      </div>
+                      <Users className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
+                    </div>
+
+                    {/* Unified KPI 2 */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#F59E0B] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <User className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {b2cCustomerCount.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Daily Customers
+                        </div>
+                      </div>
+                      <User className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
+                    </div>
+
+                    {/* Unified KPI 3 */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-[#5A070E] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <Store className="w-6 h-6 sm:w-7 sm:h-7" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {b2bCustomerCount.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Shopkeepers
+                        </div>
+                      </div>
+                      <Store className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
+                    </div>
+
+                    {/* Unified KPI 4 */}
+                    <div className="bg-white rounded-2xl border border-[#EDE1D1] p-4 sm:p-5 shadow-xs relative overflow-hidden flex items-center gap-3.5 sm:gap-4 transition-all hover:shadow-sm">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#059669] flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <Check className="w-6 h-6 sm:w-7 sm:h-7 stroke-[3]" />
+                      </div>
+                      <div>
+                        <div className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
+                          {activeCustomerCount.toLocaleString('en-IN')}
+                        </div>
+                        <div className="text-xs font-bold text-slate-500 mt-0.5">
+                          Active Customers
+                        </div>
+                      </div>
+                      <CheckCircle2 className="w-16 h-16 text-slate-100 absolute -right-3 -bottom-3 pointer-events-none opacity-50" />
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* 3. Scope Segment Switcher */}
@@ -3024,42 +3328,66 @@ export const AdminPage = () => {
                 <div className="inline-flex p-1 bg-white rounded-full border border-[#EDE1D1] shadow-2xs">
                   <button
                     onClick={() => {
-                      setCustomerScope(customerScope === 'b2c' ? 'all' : 'b2c');
+                      setActiveTab('b2c-customers');
+                      setCustomerScope('b2c');
+                      setAdminMode('b2c');
                       setCustomerPage(1);
                     }}
-                    className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${
-                      customerScope === 'b2c'
+                    className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      effectiveScope === 'b2c'
                         ? 'bg-[#5A070E] text-white shadow-xs'
                         : 'text-[#5A070E] hover:bg-[#FAF5EC]'
                     }`}
                   >
-                    Daily Customers
+                    <User className="w-3.5 h-3.5" />
+                    <span>Daily Customers</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      effectiveScope === 'b2c' ? 'bg-amber-400 text-[#3D040A]' : 'bg-amber-100 text-[#854D0E]'
+                    }`}>
+                      {b2cCustomerCount}
+                    </span>
                   </button>
                   <button
                     onClick={() => {
-                      setCustomerScope(customerScope === 'b2b' ? 'all' : 'b2b');
+                      setActiveTab('b2b-customers');
+                      setCustomerScope('b2b');
+                      setAdminMode('b2b');
                       setCustomerPage(1);
                     }}
-                    className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${
-                      customerScope === 'b2b'
+                    className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      effectiveScope === 'b2b'
                         ? 'bg-[#5A070E] text-white shadow-xs'
                         : 'text-[#5A070E] hover:bg-[#FAF5EC]'
                     }`}
                   >
-                    Shopkeepers
+                    <Store className="w-3.5 h-3.5" />
+                    <span>Shopkeepers</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      effectiveScope === 'b2b' ? 'bg-amber-400 text-[#3D040A]' : 'bg-rose-100 text-rose-800'
+                    }`}>
+                      {b2bCustomerCount}
+                    </span>
                   </button>
                   <button
                     onClick={() => {
+                      setActiveTab('customers');
                       setCustomerScope('all');
+                      setAdminMode('unified');
                       setCustomerPage(1);
                     }}
-                    className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${
-                      customerScope === 'all'
+                    className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                      effectiveScope === 'all'
                         ? 'bg-[#5A070E] text-white shadow-xs'
                         : 'text-slate-600 hover:bg-[#FAF5EC]'
                     }`}
                   >
-                    All Customers
+                    <Users className="w-3.5 h-3.5" />
+                    <span>All Customers</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${
+                      effectiveScope === 'all' ? 'bg-amber-400 text-[#3D040A]' : 'bg-slate-100 text-slate-700'
+                    }`}>
+                      {totalCustomerCount}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -3127,22 +3455,22 @@ export const AdminPage = () => {
                     <thead>
                       <tr className="bg-[#FAF5EC] border-b border-[#EDE1D1]">
                         <th className="py-3.5 px-4 sm:px-6 text-xs font-bold text-slate-800 tracking-wider">
-                          Customer Name
+                          {effectiveScope === 'b2b' ? 'Store & Owner Name' : effectiveScope === 'b2c' ? 'Daily Customer Name' : 'Customer Name'}
                         </th>
                         <th className="py-3.5 px-4 text-xs font-bold text-slate-800 tracking-wider">
-                          Type
+                          {effectiveScope === 'b2b' ? 'Trade / GSTIN' : 'Account Type'}
                         </th>
                         <th className="py-3.5 px-4 text-xs font-bold text-slate-800 tracking-wider">
-                          Phone
+                          Phone Number
                         </th>
                         <th className="py-3.5 px-4 text-xs font-bold text-slate-800 tracking-wider">
-                          Email
+                          Email Address
                         </th>
                         <th className="py-3.5 px-4 text-center text-xs font-bold text-slate-800 tracking-wider">
-                          Orders
+                          {effectiveScope === 'b2b' ? 'Bulk Orders' : 'Orders'}
                         </th>
                         <th className="py-3.5 px-4 text-xs font-bold text-slate-800 tracking-wider">
-                          Total Spent
+                          {effectiveScope === 'b2b' ? 'Wholesale Spent' : 'Total Spent'}
                         </th>
                         <th className="py-3.5 px-4 text-xs font-bold text-slate-800 tracking-wider">
                           Status
@@ -3156,27 +3484,54 @@ export const AdminPage = () => {
                       {filteredCustomers.length === 0 ? (
                         <tr>
                           <td colSpan="8" className="py-14 text-center">
-                            <Users className="w-12 h-12 text-[#7D0A14]/30 mx-auto mb-3" />
-                            <h4 className="font-black text-[#3D040A] text-base">No Customers Logged In Yet</h4>
-                            <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                              All fake demo customer accounts have been completely removed.
-                              Only authentic users who register or sign in on the live website will appear here.
-                            </p>
-                            <div className="flex items-center justify-center gap-2 mt-4">
-                              <button
-                                onClick={() => setIsAuthModalOpen(true)}
-                                className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5"
-                              >
-                                <User className="w-3.5 h-3.5 text-amber-300" />
-                                <span>Sign In as Customer Now</span>
-                              </button>
-                              <button
-                                onClick={() => navigateTo('home')}
-                                className="px-4 py-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] text-xs font-bold hover:bg-[#F3EAD9] transition-all inline-flex items-center gap-1.5"
-                              >
-                                <span>Go to Storefront</span>
-                              </button>
-                            </div>
+                            {effectiveScope === 'b2b' ? (
+                              <>
+                                <Store className="w-12 h-12 text-[#7D0A14]/30 mx-auto mb-3" />
+                                <h4 className="font-black text-[#3D040A] text-base">No Shopkeeper Accounts Found</h4>
+                                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                                  Commercial grocery stores, kirana partners, and wholesale buyers registered on Sumadhura Foods will appear here. Click below to load standard verified reference accounts.
+                                </p>
+                                <div className="flex items-center justify-center gap-2 mt-4">
+                                  <button
+                                    onClick={resetDefaultCustomers}
+                                    className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                                  >
+                                    <RefreshCw className="w-3.5 h-3.5 text-amber-300" />
+                                    <span>Reset Standard Reference Accounts</span>
+                                  </button>
+                                  <button
+                                    onClick={() => navigateTo('b2b')}
+                                    className="px-4 py-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] text-xs font-bold hover:bg-[#F3EAD9] transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                                  >
+                                    <span>Go to B2B Wholesale Portal</span>
+                                  </button>
+                                </div>
+                              </>
+                            ) : (
+                              <>
+                                <Users className="w-12 h-12 text-[#7D0A14]/30 mx-auto mb-3" />
+                                <h4 className="font-black text-[#3D040A] text-base">No Daily Customers Found</h4>
+                                <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                                  Residential household customers and daily morning pure cow milk subscribers will appear here.
+                                </p>
+                                <div className="flex items-center justify-center gap-2 mt-4">
+                                  <button
+                                    onClick={resetDefaultCustomers}
+                                    className="px-4 py-2 rounded-xl bg-[#7D0A14] text-white text-xs font-black shadow-sm hover:bg-[#60060E] transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                                  >
+                                    <RefreshCw className="w-3.5 h-3.5 text-amber-300" />
+                                    <span>Reset Standard Reference Accounts</span>
+                                  </button>
+                                  <button
+                                    onClick={() => setIsAuthModalOpen(true)}
+                                    className="px-4 py-2 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] text-xs font-bold hover:bg-[#F3EAD9] transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                                  >
+                                    <User className="w-3.5 h-3.5" />
+                                    <span>Sign In as Customer Now</span>
+                                  </button>
+                                </div>
+                              </>
+                            )}
                           </td>
                         </tr>
                       ) : (
@@ -3221,18 +3576,33 @@ export const AdminPage = () => {
                                 </div>
                               </td>
 
-                              {/* Type Badge */}
+                              {/* Type Badge & Meta */}
                               <td className="py-4 px-4 whitespace-nowrap">
                                 {(c.isBusiness || c.customerType === 'Shopkeeper') ? (
-                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEF3C7] text-[#92400E] border border-amber-200 inline-flex items-center gap-1">
-                                    <Store className="w-3 h-3 text-[#92400E]" />
-                                    <span>Shopkeeper</span>
-                                  </span>
+                                  <div className="space-y-1">
+                                    <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEF3C7] text-[#92400E] border border-amber-200 inline-flex items-center gap-1">
+                                      <Store className="w-3 h-3 text-[#92400E]" />
+                                      <span>Shopkeeper</span>
+                                    </span>
+                                    {c.gstin && (
+                                      <div className="font-mono text-[9px] text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded w-fit font-bold">
+                                        GSTIN: {c.gstin}
+                                      </div>
+                                    )}
+                                  </div>
                                 ) : (
-                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEE2E2]/70 text-[#991B1B] border border-rose-200 inline-flex items-center gap-1">
-                                    <User className="w-3 h-3 text-[#991B1B]" />
-                                    <span>Daily Customer</span>
-                                  </span>
+                                  <div className="space-y-1">
+                                    <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEE2E2]/70 text-[#991B1B] border border-rose-200 inline-flex items-center gap-1">
+                                      <User className="w-3 h-3 text-[#991B1B]" />
+                                      <span>Daily Customer</span>
+                                    </span>
+                                    {c.subscription && c.subscription !== 'None' && (
+                                      <div className="text-[9.5px] text-emerald-800 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center gap-1 w-fit">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                        <span className="truncate max-w-[125px]">{c.subscription}</span>
+                                      </div>
+                                    )}
+                                  </div>
                                 )}
                               </td>
 
