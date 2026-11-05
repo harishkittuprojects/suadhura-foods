@@ -423,15 +423,6 @@ export const Navbar = () => {
                     </div>
                     <button
                       onClick={() => {
-                        navigateTo('admin');
-                        setUserDropdownOpen(false);
-                      }}
-                      className="w-full text-left p-2 hover:bg-slate-50 text-slate-800 font-bold rounded-lg flex items-center gap-2"
-                    >
-                      <span>⚙️ Admin Panel (Operations)</span>
-                    </button>
-                    <button
-                      onClick={() => {
                         navigateTo('b2b');
                         setUserDropdownOpen(false);
                       }}
