@@ -18,9 +18,11 @@ export const WishlistPage = () => {
     addToCart,
     navigateTo,
     setQuickViewProduct,
-    showToast
+    showToast,
+    products: shopProducts
   } = useShop();
 
+  const products = shopProducts || defaultProducts || [];
   const savedProducts = products.filter((p) => wishlist.includes(p.id));
 
   const handleMoveAllToCart = () => {

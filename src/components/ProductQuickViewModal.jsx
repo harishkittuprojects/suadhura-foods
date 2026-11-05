@@ -47,6 +47,7 @@ export const ProductQuickViewModal = () => {
     showToast
   } = useShop();
 
+  const products = shopProducts || defaultProducts || [];
   const isB2B = Boolean(user && user.isBusiness);
 
   const scrollContainerRef = useRef(null);
@@ -73,7 +74,7 @@ export const ProductQuickViewModal = () => {
     } catch (err) {
       console.error('Error parsing product URL param:', err);
     }
-  }, []);
+  }, [products, quickViewProduct, setQuickViewProduct]);
 
   // Sync URL query param when modal opens/closes so users can copy the current browser address bar directly
   useEffect(() => {
