@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useShop } from '../context/ShopContext';
 import { products as defaultProducts } from '../data/products';
 import {
@@ -86,6 +87,18 @@ export const Navbar = () => {
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
 
   // Animated search query placeholders
   const searchPlaceholders = [
@@ -587,21 +600,33 @@ export const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Drawer Menu */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm">
-          <div className="fixed inset-y-0 left-0 w-4/5 max-w-xs bg-white shadow-2xl p-6 flex flex-col justify-between z-50 animate-in slide-in-from-left duration-200">
-            <div>
-              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+      {/* Mobile Drawer Menu (Rendered via Portal to avoid stacking context & clipping issues) */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+        <div className="lg:hidden fixed inset-0 z-[100] flex">
+          {/* 1. Dark Backdrop with Click-to-Dismiss */}
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity cursor-pointer"
+            aria-label="Close drawer"
+          />
+
+          {/* 2. Slide Drawer Panel */}
+          <div className="relative w-4/5 max-w-xs bg-[#FAF5EC] shadow-2xl h-full flex flex-col justify-between z-[101] border-r border-[#DECDBD] overflow-y-auto">
+            {/* Top Content */}
+            <div className="p-5">
+              {/* Header with Sumadhura Caterers Branding & Close Button */}
+              <div className="flex items-center justify-between pb-4 border-b border-[#E8DDCF]">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-[#7D0A14] flex items-center justify-center text-white">
-                    <ShoppingBag className="w-4 h-4" />
+                  <SumadhuraCaterersLogo className="w-9 h-9 flex-shrink-0" />
+                  <div className="flex flex-col">
+                    <span className="text-sm font-black text-[#680811] leading-none">Sumadhura</span>
+                    <span className="text-sm font-black text-[#680811] leading-tight">Caterers</span>
                   </div>
-                  <span className="font-black text-slate-900">Sumadhura Foods</span>
                 </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+                  className="p-1.5 rounded-xl bg-white border border-[#EDE1D1] text-slate-500 hover:text-[#7D0A14] hover:border-[#7D0A14] transition-colors cursor-pointer"
+                  aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -613,18 +638,18 @@ export const Navbar = () => {
                   setIsLocationModalOpen(true);
                   setMobileMenuOpen(false);
                 }}
-                className="w-full mt-4 p-2.5 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-slate-900 flex items-center gap-2 text-xs font-semibold text-left"
+                className="w-full mt-4 p-2.5 rounded-xl bg-white border border-[#DECDBD] text-slate-900 flex items-center gap-2.5 text-xs font-semibold text-left shadow-xs hover:border-[#7D0A14] transition-colors cursor-pointer"
               >
-                <MapPin className="w-4 h-4 text-rose-600 flex-shrink-0" />
-                <div className="truncate">
-                  <div className="font-bold">{selectedAddress.tag} Address</div>
+                <MapPin className="w-4 h-4 text-[#7D0A14] flex-shrink-0" />
+                <div className="truncate flex-1">
+                  <div className="font-bold text-slate-800">{selectedAddress.tag} Address</div>
                   <div className="text-[11px] text-slate-500 truncate">{selectedAddress.area}</div>
                 </div>
               </button>
 
               {/* Pricing Rate Tier Switcher (Mobile: Shown only for B2B users) */}
               {user?.isBusiness && (
-                <div className="mt-3 p-2.5 bg-[#FAF5EC] rounded-xl border border-[#E8DDCF]">
+                <div className="mt-3 p-2.5 bg-white rounded-xl border border-[#DECDBD]">
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-600 px-1">
                       <span>B2B Commercial Account</span>
@@ -641,7 +666,7 @@ export const Navbar = () => {
                         className={`py-1.5 rounded-lg transition-all ${
                           pricingMode === 'retail'
                             ? 'bg-[#7D0A14] text-white font-black shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 bg-white'
+                            : 'text-slate-600 hover:text-slate-900 bg-[#FAF5EC]'
                         }`}
                       >
                         🛍️ Retail
@@ -654,7 +679,7 @@ export const Navbar = () => {
                         className={`py-1.5 rounded-lg transition-all ${
                           pricingMode === 'wholesale'
                             ? 'bg-[#7D0A14] text-white font-black shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 bg-white'
+                            : 'text-slate-600 hover:text-slate-900 bg-[#FAF5EC]'
                         }`}
                       >
                         🏢 Wholesale
@@ -665,7 +690,7 @@ export const Navbar = () => {
               )}
 
               {/* Nav links */}
-              <div className="mt-6 space-y-1">
+              <div className="mt-5 space-y-1">
                 {navLinks.map((link) => (
                   <button
                     key={link.id}
@@ -673,10 +698,10 @@ export const Navbar = () => {
                       setMobileMenuOpen(false);
                       navigateTo(link.id);
                     }}
-                    className={`w-full text-left px-4 py-3 rounded-xl font-semibold text-sm flex items-center justify-between transition-colors ${
+                    className={`w-full text-left px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer ${
                       activeTab === link.id
-                        ? 'bg-[#7D0A14] text-white shadow-md shadow-[#7D0A14]/20'
-                        : 'text-slate-700 hover:bg-[#FAF5EC]'
+                        ? 'bg-[#7D0A14] text-white shadow-sm'
+                        : 'text-slate-700 hover:bg-white'
                     }`}
                   >
                     <span>{link.label}</span>
@@ -693,40 +718,57 @@ export const Navbar = () => {
                     )}
                   </button>
                 ))}
+
+                {/* B2B Wholesale Desk Link */}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    navigateTo('b2b');
+                  }}
+                  className={`w-full text-left px-3.5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-between transition-colors cursor-pointer ${
+                    activeTab === 'b2b'
+                      ? 'bg-[#7D0A14] text-white shadow-sm'
+                      : 'text-[#7D0A14] hover:bg-white'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4" /> B2B Wholesale Desk
+                  </span>
+                </button>
               </div>
 
               {/* Quick Subscription Order button in mobile menu */}
-              <div className="mt-3">
+              <div className="mt-4">
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     setIsSubscriptionModalOpen(true);
                   }}
-                  className="w-full py-2.5 px-3.5 rounded-xl bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] text-white font-bold text-xs flex items-center justify-between shadow-sm active:scale-98"
+                  className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] text-white font-bold text-xs flex items-center justify-between shadow-sm active:scale-98 cursor-pointer"
                 >
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-amber-300" />
-                    <span>{activeSubscription ? 'Daily Subscription (Active)' : 'Daily Subscription Order'}</span>
+                  <div className="flex items-center gap-2 truncate">
+                    <Calendar className="w-4 h-4 text-amber-300 flex-shrink-0" />
+                    <span className="truncate">{activeSubscription ? 'Daily Subscription (Active)' : 'Daily Subscription Order'}</span>
                   </div>
-                  <span className="text-[10px] bg-white/25 px-2 py-0.5 rounded-full font-bold">6 AM DROP</span>
+                  <span className="text-[10px] bg-white/25 px-2 py-0.5 rounded-full font-bold flex-shrink-0">6 AM DROP</span>
                 </button>
               </div>
             </div>
 
             {/* Mobile Footer info */}
-            <div className="pt-4 border-t border-slate-100 text-xs text-slate-500">
+            <div className="p-4 border-t border-[#E8DDCF] bg-white text-xs">
               {user ? (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-slate-800">{user.name}</div>
-                    <div className="text-[11px]">{user.email || user.phone}</div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="truncate flex-1">
+                    <div className="font-bold text-slate-800 truncate">{user.name}</div>
+                    <div className="text-[11px] text-slate-500 truncate">{user.email || user.phone}</div>
                   </div>
                   <button
                     onClick={() => {
                       logout();
                       setMobileMenuOpen(false);
                     }}
-                    className="text-rose-600 font-semibold p-2 cursor-pointer"
+                    className="text-rose-600 font-bold px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors flex-shrink-0 cursor-pointer"
                   >
                     Logout
                   </button>
@@ -737,14 +779,15 @@ export const Navbar = () => {
                     setMobileMenuOpen(false);
                     setIsAuthModalOpen(true);
                   }}
-                  className="w-full py-2.5 bg-[#7D0A14] hover:bg-[#680811] text-white rounded-xl font-bold text-center cursor-pointer transition-colors"
+                  className="w-full py-2.5 bg-[#7D0A14] hover:bg-[#680811] text-white rounded-xl font-bold text-center cursor-pointer transition-colors shadow-sm"
                 >
                   Sign In / Register
                 </button>
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
