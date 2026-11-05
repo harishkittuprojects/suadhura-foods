@@ -277,7 +277,7 @@ export const LoginPage = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div className="flex items-center gap-2">
                 <Package className="w-5 h-5 text-[#7D0A14]" />
-                <h2 className="font-extrabold text-slate-900 text-base">Recent Commercial Deliveries</h2>
+                <h2 className="font-extrabold text-slate-900 text-base">Your Orders (Commercial Wholesale)</h2>
               </div>
               <span className="text-xs text-slate-400">
                 {b2bCustomerOrders.length} {b2bCustomerOrders.length === 1 ? 'Shipment' : 'Shipments'}
@@ -326,6 +326,19 @@ export const LoginPage = () => {
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
+                      <button
+                        onClick={() => {
+                          if (setActiveOrder && setIsLiveTrackingOpen) {
+                            setActiveOrder(order);
+                            setIsLiveTrackingOpen(true);
+                          } else {
+                            showToast(`Tracking Wholesale Order #${order.id}...`);
+                          }
+                        }}
+                        className="block text-[11px] text-[#7D0A14] font-bold hover:underline ml-auto mt-0.5"
+                      >
+                        Track Order &rarr;
+                      </button>
                       <button
                         onClick={() => showToast(`Generating official GST Tax Invoice for Order #${order.id}...`)}
                         className="block text-[11px] text-blue-600 font-bold hover:underline ml-auto mt-0.5"
@@ -421,7 +434,7 @@ export const LoginPage = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div className="flex items-center gap-2">
               <Package className="w-5 h-5 text-[#7D0A14]" />
-              <h2 className="font-extrabold text-slate-900 text-base">Recent Household Orders</h2>
+              <h2 className="font-extrabold text-slate-900 text-base">Your Orders</h2>
             </div>
             <span className="text-xs text-slate-400">
               {b2cCustomerOrders.length} {b2cCustomerOrders.length === 1 ? 'Order' : 'Orders'}

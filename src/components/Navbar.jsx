@@ -413,6 +413,17 @@ export const Navbar = () => {
                         {user.email || user.phone}
                       </div>
                     </div>
+                    {/* Your Orders */}
+                    <button
+                      onClick={() => {
+                        navigateTo('login');
+                        setUserDropdownOpen(false);
+                      }}
+                      className="w-full text-left p-2 hover:bg-[#FAF5EC] text-slate-800 font-bold rounded-lg flex items-center gap-2 cursor-pointer transition-colors"
+                    >
+                      <Package className="w-4 h-4 text-[#7D0A14]" />
+                      <span>Your Orders</span>
+                    </button>
                     <button
                       onClick={() => {
                         navigateTo('b2b');
@@ -714,19 +725,31 @@ export const Navbar = () => {
             {/* Mobile Footer info */}
             <div className="p-4 border-t border-[#E8DDCF] bg-white text-xs">
               {user ? (
-                <div className="flex items-center justify-between gap-2">
-                  <div className="truncate flex-1">
-                    <div className="font-bold text-slate-800 truncate">{user.name}</div>
-                    <div className="text-[11px] text-slate-500 truncate">{user.email || user.phone}</div>
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="truncate flex-1">
+                      <div className="font-bold text-slate-800 truncate">{user.name}</div>
+                      <div className="text-[11px] text-slate-500 truncate">{user.email || user.phone}</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        logout();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="text-rose-600 font-bold px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors flex-shrink-0 cursor-pointer"
+                    >
+                      Logout
+                    </button>
                   </div>
                   <button
                     onClick={() => {
-                      logout();
+                      navigateTo('login');
                       setMobileMenuOpen(false);
                     }}
-                    className="text-rose-600 font-bold px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors flex-shrink-0 cursor-pointer"
+                    className="w-full py-2 px-3 rounded-xl bg-[#FAF5EC] border border-[#DECDBD] text-[#7D0A14] font-bold text-xs flex items-center justify-center gap-2 hover:bg-[#F3EAD9] transition-colors cursor-pointer"
                   >
-                    Logout
+                    <Package className="w-4 h-4 text-[#7D0A14]" />
+                    <span>Your Orders & Live Tracking</span>
                   </button>
                 </div>
               ) : (
