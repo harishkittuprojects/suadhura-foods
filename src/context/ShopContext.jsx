@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { products as rawCatalogProducts, categories as rawCatalogCategories } from '../data/products';
 
 const ShopContext = createContext();
@@ -583,7 +583,23 @@ export const ShopProvider = ({ children }) => {
       isDefault: false
     }
   ]);
-  const [selectedAddress, setSelectedAddress] = useState(savedAddresses[0]);
+  const [selectedAddress, setSelectedAddress] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_selected_address');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return savedAddresses[0];
+  });
+
+  useEffect(() => {
+    try {
+      if (selectedAddress) {
+        localStorage.setItem('sumadhura_selected_address', JSON.stringify(selectedAddress));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [selectedAddress]);
 
   // Promo Code
   const [appliedPromo, setAppliedPromo] = useState(null);
@@ -738,6 +754,93 @@ export const ShopProvider = ({ children }) => {
   const removeToast = (id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
+
+  // Live GPS geolocation detection and automatic reverse-geocoding
+  const detectCurrentLocation = useCallback((showNotification = true) => {
+    if (typeof window === 'undefined' || !('geolocation' in navigator)) {
+      if (showNotification) showToast('Geolocation is not supported by your browser', 'info');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
+            { signal: controller.signal }
+          );
+          clearTimeout(timeoutId);
+
+          if (res.ok) {
+            const data = await res.json();
+            const addr = data.address || {};
+            const locality =
+              addr.suburb ||
+              addr.neighbourhood ||
+              addr.residential ||
+              addr.road ||
+              addr.city_district ||
+              'Current Location';
+            const city = addr.city || addr.town || addr.county || addr.state_district || 'Bengaluru';
+            const state = addr.state || 'Karnataka';
+            const pincode = addr.postcode || '';
+
+            const liveAddress = {
+              id: 'addr-gps-auto',
+              tag: 'Current GPS',
+              title: locality,
+              area: `${locality}, ${city}, ${state}`,
+              pincode: pincode,
+              lat: latitude,
+              lng: longitude,
+              isGPS: true
+            };
+
+            setSelectedAddress(liveAddress);
+            if (showNotification) {
+              showToast(`📍 Location detected: ${locality}, ${city}`);
+            }
+            return;
+          }
+        } catch (err) {
+          console.warn('Reverse geocoding fetch error:', err);
+        }
+
+        // Fallback with coordinates
+        const fallbackAddress = {
+          id: 'addr-gps-auto',
+          tag: 'Current GPS',
+          title: 'Current Location',
+          area: `GPS (${latitude.toFixed(3)}°N, ${longitude.toFixed(3)}°E)`,
+          pincode: '',
+          lat: latitude,
+          lng: longitude,
+          isGPS: true
+        };
+        setSelectedAddress(fallbackAddress);
+        if (showNotification) {
+          showToast('📍 Live GPS coordinates detected');
+        }
+      },
+      (error) => {
+        console.log('Location access not granted:', error.message);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000
+      }
+    );
+  }, []);
+
+  // Automatically trace user's current location when opening the site
+  useEffect(() => {
+    detectCurrentLocation(true);
+  }, [detectCurrentLocation]);
 
 
   // Helper to extract minimum required B2B order quantity (minimum 5)
@@ -1106,6 +1209,7 @@ export const ShopProvider = ({ children }) => {
         cancelSubscription,
         deleteOrder,
         setSelectedAddress,
+        detectCurrentLocation,
         setSavedAddresses,
         showToast,
         removeToast,

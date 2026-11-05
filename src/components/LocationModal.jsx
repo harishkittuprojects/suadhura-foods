@@ -9,7 +9,8 @@ export const LocationModal = () => {
     savedAddresses,
     selectedAddress,
     setSelectedAddress,
-    showToast
+    showToast,
+    detectCurrentLocation
   } = useShop();
 
   const [search, setSearch] = useState('');
@@ -32,8 +33,8 @@ export const LocationModal = () => {
   };
 
   const handleDetectGPS = () => {
-    handleSelect(savedAddresses[0]);
-    showToast('GPS Detected: Koramangala 5th Block (Accuracy: 12 meters)');
+    setIsLocationModalOpen(false);
+    detectCurrentLocation(true);
   };
 
   const getTagIcon = (tag) => {
