@@ -120,12 +120,28 @@ export const CategoriesPage = () => {
     'Fast Search all items (e.g. "Crunchy Banana Chips")...'
   ];
 
-  // Dynamically include custom categories added from Admin
+  const isWholesale = Boolean((user && user.isBusiness) || pricingMode === 'wholesale');
+
+  // Dynamically include custom categories added from Admin, respecting B2C / B2B channels
   const aisleOptions = React.useMemo(() => {
-    const list = [...baseAisleOptions];
+    const list = baseAisleOptions.filter((opt) => {
+      const match = categories.find(
+        (c) => c.name?.toLowerCase() === opt.name?.toLowerCase() || c.name?.toLowerCase() === opt.shortName?.toLowerCase()
+      );
+      if (match) {
+        if (match.active === false) return false;
+        if (isWholesale && match.channel === 'b2c') return false;
+        if (!isWholesale && match.channel === 'b2b') return false;
+      }
+      return true;
+    });
+
     if (Array.isArray(categories)) {
       categories.forEach((cat) => {
-        if (!cat || !cat.name) return;
+        if (!cat || !cat.name || cat.active === false) return;
+        if (isWholesale && cat.channel === 'b2c') return;
+        if (!isWholesale && cat.channel === 'b2b') return;
+
         const exists = list.some(
           (o) =>
             o.name.toLowerCase() === cat.name.toLowerCase() ||
@@ -138,13 +154,14 @@ export const CategoriesPage = () => {
             emoji: cat.emoji || '🛒',
             shortName: cat.name,
             image: cat.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=120&q=80',
-            aliases: [cat.name, cat.slug, cat.name.toLowerCase()]
+            aliases: [cat.name, cat.slug, cat.name.toLowerCase()],
+            channel: cat.channel || 'all'
           });
         }
       });
     }
     return list;
-  }, [categories]);
+  }, [categories, isWholesale]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -250,8 +267,17 @@ export const CategoriesPage = () => {
   const hasSearch = searchFilter.trim().length > 0;
   const q = searchFilter.trim().toLowerCase();
 
+  // Filter products by B2C / B2B storefront channel
+  const channelFilteredProducts = React.useMemo(() => {
+    return products.filter((prod) => {
+      if (isWholesale && prod.channel === 'b2c') return false;
+      if (!isWholesale && prod.channel === 'b2b') return false;
+      return true;
+    });
+  }, [products, isWholesale]);
+
   // Filter products
-  let filtered = products.filter((prod) => {
+  let filtered = channelFilteredProducts.filter((prod) => {
     // When user types in search with searchScope === 'all' (Fast Search for ALL items):
     // Search across ALL products across all categories!
     // When search is empty or scope is 'current', strictly isolate to active category
@@ -322,7 +348,7 @@ export const CategoriesPage = () => {
               : 'bg-white/15 hover:bg-white/25 text-white'
           }`}
         >
-          View All Products ({products.length})
+          View All Products ({channelFilteredProducts.length})
         </button>
       </div>
 

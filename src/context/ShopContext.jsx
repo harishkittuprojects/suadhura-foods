@@ -51,10 +51,11 @@ const normalizeProduct = (item, idx = 0) => {
     badge: item.badge || 'Fresh',
     deliveryTime: item.deliveryTime || '10-15 mins',
     isVeg: item.isVeg !== undefined ? item.isVeg : true,
-    image: item.image && String(item.image).startsWith('http') ? item.image : fallbackImage,
+    image: item.image && (String(item.image).startsWith('http') || String(item.image).startsWith('data:')) ? item.image : fallbackImage,
     description: item.description || (item.name || 'Fresh farm-direct product') + ' delivered fresh within 10-15 minutes.',
     organic: item.organic !== undefined ? item.organic : true,
     inStock: item.inStock !== undefined ? item.inStock : true,
+    channel: item.channel || 'all',
     tags: Array.isArray(item.tags) ? item.tags : ['fresh', 'popular', slug],
     aisles: Array.isArray(item.aisles) && item.aisles.length > 0 ? item.aisles : [slug, 'all', categoryName.toLowerCase()]
   };
@@ -137,11 +138,12 @@ export const ShopProvider = ({ children }) => {
             cardBorder: 'hover:border-[#7D0A14]',
             featured: c.featured !== undefined ? c.featured : true,
             active: c.active !== undefined ? c.active : true,
-            emoji: c.emoji || '🛒'
+            emoji: c.emoji || '🛒',
+            channel: c.channel || 'all'
           });
         } else {
           const existing = map.get(key);
-          map.set(key, { ...existing, ...c });
+          map.set(key, { ...existing, ...c, channel: c.channel || existing.channel || 'all' });
         }
       });
     }

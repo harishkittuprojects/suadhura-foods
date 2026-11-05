@@ -356,16 +356,32 @@ export const HomePage = () => {
   ];
 
 
+  const isWholesale = Boolean((user && user.isBusiness) || pricingMode === 'wholesale');
+
+  // Filter categories and products by channel
+  const visibleCategories = categories.filter((c) => {
+    if (c.active === false) return false;
+    if (isWholesale && c.channel === 'b2c') return false;
+    if (!isWholesale && c.channel === 'b2b') return false;
+    return true;
+  });
+
+  const channelProducts = products.filter((p) => {
+    if (isWholesale && p.channel === 'b2c') return false;
+    if (!isWholesale && p.channel === 'b2b') return false;
+    return true;
+  });
+
   // Category-specific product shelves for Home Page
-  const dairyProducts = products.filter((p) => p.category === 'Dairy Products' && !p.name.toLowerCase().includes('egg') && !p.name.toLowerCase().includes('bread')).slice(0, 6);
-  const vegetableProducts = products.filter((p) => p.aisles?.includes('fresh-veg')).slice(0, 6);
-  const groceryProducts = products.filter((p) => p.aisles?.includes('rice-atta-dals')).slice(0, 6);
+  const dairyProducts = channelProducts.filter((p) => p.category === 'Dairy Products' && !p.name.toLowerCase().includes('egg') && !p.name.toLowerCase().includes('bread')).slice(0, 6);
+  const vegetableProducts = channelProducts.filter((p) => p.aisles?.includes('fresh-veg')).slice(0, 6);
+  const groceryProducts = channelProducts.filter((p) => p.aisles?.includes('rice-atta-dals')).slice(0, 6);
 
   // Popular products (first 6)
-  const popularProducts = products.filter((p) => p.tags.includes('popular')).slice(0, 6);
+  const popularProducts = channelProducts.filter((p) => p.tags.includes('popular')).slice(0, 6);
 
   // Best seller products filtered by tab
-  const bestSellers = products
+  const bestSellers = channelProducts
     .filter((p) => p.tags.includes('bestseller'))
     .filter((p) => {
       if (activeBestSellerTab === 'All') return true;
@@ -693,7 +709,7 @@ export const HomePage = () => {
 
         {/* 4-Card Category Grid with High-Res Imagery & Subcategories */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {categories.map((cat) => {
+          {visibleCategories.map((cat) => {
             const Icon = categoryIconMap[cat.icon] || ShoppingBasket;
             return (
               <div

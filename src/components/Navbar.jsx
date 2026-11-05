@@ -138,14 +138,19 @@ export const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter products based on search
+  const isWholesale = Boolean((user && user.isBusiness) || pricingMode === 'wholesale');
+
+  // Filter products based on search and storefront channel
   const filteredProducts = searchInput.trim()
-    ? products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-        p.category.toLowerCase().includes(searchInput.toLowerCase()) ||
-        p.subCategory?.toLowerCase().includes(searchInput.toLowerCase())
-    )
+    ? products.filter((p) => {
+        if (isWholesale && p.channel === 'b2c') return false;
+        if (!isWholesale && p.channel === 'b2b') return false;
+        return (
+          p.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+          p.category.toLowerCase().includes(searchInput.toLowerCase()) ||
+          p.subCategory?.toLowerCase().includes(searchInput.toLowerCase())
+        );
+      })
     : [];
 
   const handleSelectProduct = (prod) => {

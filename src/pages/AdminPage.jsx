@@ -63,7 +63,8 @@ import {
   Warehouse,
   Tag,
   CreditCard,
-  Star
+  Star,
+  Globe
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
@@ -809,7 +810,8 @@ export const AdminPage = () => {
     wholesalePrice: '',
     wholesaleUnit: 'Bulk pack',
     moq: '> 5 units',
-    inStock: true
+    inStock: true,
+    channel: 'all'
   });
 
   const saveEditedProduct = (e) => {
@@ -847,7 +849,8 @@ export const AdminPage = () => {
 
     const productToSave = {
       ...editingProduct,
-      category: finalCategory
+      category: finalCategory,
+      channel: editingProduct.channel || 'all'
     };
 
     const updated = inventoryList.map((p) => (p.id === editingProduct.id ? productToSave : p));
@@ -921,6 +924,7 @@ export const AdminPage = () => {
       name: newProductForm.name.trim(),
       category: finalCategory,
       subCategory: 'Daily Fresh Harvest',
+      channel: newProductForm.channel || 'all',
       price: Number(newProductForm.retailPrice) || 0,
       retailPrice: Number(newProductForm.retailPrice) || 0,
       originalPrice: Math.round((Number(newProductForm.retailPrice) || 0) * 1.25),
@@ -970,7 +974,8 @@ export const AdminPage = () => {
       wholesalePrice: '',
       wholesaleUnit: 'Bulk pack',
       moq: '> 5 units',
-      inStock: true
+      inStock: true,
+      channel: 'all'
     });
     showToast(`✅ Added new product: ${newProd.name} (${finalCategory})`);
   };
@@ -1149,7 +1154,8 @@ export const AdminPage = () => {
     description: '',
     subCategories: '',
     featured: true,
-    active: true
+    active: true,
+    channel: 'all'
   });
 
   const handleSaveCategory = (e) => {
@@ -1172,7 +1178,8 @@ export const AdminPage = () => {
         description: categoryForm.description,
         subCategories: subCats.length > 0 ? subCats : c.subCategories,
         featured: categoryForm.featured,
-        active: categoryForm.active
+        active: categoryForm.active,
+        channel: categoryForm.channel || 'all'
       } : c);
       setCategoriesList(updated);
       try { localStorage.setItem('sumadhura_admin_categories', JSON.stringify(updated)); } catch {}
@@ -1188,6 +1195,7 @@ export const AdminPage = () => {
         subCategories: subCats.length > 0 ? subCats : ['General'],
         featured: categoryForm.featured,
         active: categoryForm.active,
+        channel: categoryForm.channel || 'all',
         sortOrder: categoriesList.length + 1
       };
       const updated = [...categoriesList, newCat];
@@ -4381,7 +4389,8 @@ export const AdminPage = () => {
                         description: '',
                         subCategories: '',
                         featured: true,
-                        active: true
+                        active: true,
+                        channel: 'all'
                       });
                       setIsCategoryModalOpen(true);
                     }}
@@ -4444,6 +4453,19 @@ export const AdminPage = () => {
                           {cat.emoji}
                         </span>
                         <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
+                          {cat.channel === 'b2c' ? (
+                            <span className="px-2 py-0.5 rounded-full bg-blue-600 text-white text-[9px] font-black uppercase shadow-xs">
+                              B2C Retail
+                            </span>
+                          ) : cat.channel === 'b2b' ? (
+                            <span className="px-2 py-0.5 rounded-full bg-purple-600 text-white text-[9px] font-black uppercase shadow-xs">
+                              B2B Wholesale
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full bg-teal-600 text-white text-[9px] font-black uppercase shadow-xs">
+                              All Channels
+                            </span>
+                          )}
                           {cat.featured && (
                             <span className="px-2 py-0.5 rounded-full bg-amber-400 text-[#3D040A] text-[9px] font-black uppercase shadow-xs">
                               Featured
@@ -4509,7 +4531,8 @@ export const AdminPage = () => {
                                 description: cat.description,
                                 subCategories: cat.subCategories?.join(', ') || '',
                                 featured: cat.featured,
-                                active: cat.active
+                                active: cat.active,
+                                channel: cat.channel || 'all'
                               });
                               setIsCategoryModalOpen(true);
                             }}
@@ -4671,7 +4694,23 @@ export const AdminPage = () => {
                       <tr key={prod.id} className="hover:bg-[#FAF5EC]/50 transition-colors">
                         <td className="p-3">
                           <div className="font-bold text-slate-900">{prod.name}</div>
-                          <span className="text-[10px] text-slate-400">{prod.category}</span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] text-slate-400">{prod.category}</span>
+                            <span className="text-slate-300">•</span>
+                            {prod.channel === 'b2c' ? (
+                              <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 text-[9px] font-extrabold">
+                                B2C Retail
+                              </span>
+                            ) : prod.channel === 'b2b' ? (
+                              <span className="px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 text-[9px] font-extrabold">
+                                B2B Wholesale
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-extrabold">
+                                All Channels
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="p-3 font-bold text-slate-800">{prod.stock}</td>
                         <td className="p-3">
@@ -5820,6 +5859,62 @@ export const AdminPage = () => {
                 </div>
               </div>
 
+              {/* Product Storefront Channel Visibility Selector */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1.5">
+                  Storefront Visibility (Select Target Audience) *
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingProduct({ ...editingProduct, channel: 'all' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      (editingProduct.channel || 'all') === 'all'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Globe className={`w-4 h-4 ${(editingProduct.channel || 'all') === 'all' ? 'text-amber-300' : 'text-[#7D0A14]'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">All (B2C & B2B)</span>
+                    <span className={`text-[9px] ${(editingProduct.channel || 'all') === 'all' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Both Storefronts
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setEditingProduct({ ...editingProduct, channel: 'b2c' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      editingProduct.channel === 'b2c'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Users className={`w-4 h-4 ${editingProduct.channel === 'b2c' ? 'text-amber-300' : 'text-blue-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">B2C Retail Only</span>
+                    <span className={`text-[9px] ${editingProduct.channel === 'b2c' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Daily Customers
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setEditingProduct({ ...editingProduct, channel: 'b2b' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      editingProduct.channel === 'b2b'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Building2 className={`w-4 h-4 ${editingProduct.channel === 'b2b' ? 'text-amber-300' : 'text-purple-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">B2B Wholesale Only</span>
+                    <span className={`text-[9px] ${editingProduct.channel === 'b2b' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Shopkeepers
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -6476,6 +6571,62 @@ export const AdminPage = () => {
                 </div>
               </div>
 
+              {/* Product Storefront Channel Visibility Selector */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1.5">
+                  Storefront Visibility (Select Target Audience) *
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setNewProductForm({ ...newProductForm, channel: 'all' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      (newProductForm.channel || 'all') === 'all'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Globe className={`w-4 h-4 ${(newProductForm.channel || 'all') === 'all' ? 'text-amber-300' : 'text-[#7D0A14]'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">All (B2C & B2B)</span>
+                    <span className={`text-[9px] ${(newProductForm.channel || 'all') === 'all' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Both Storefronts
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewProductForm({ ...newProductForm, channel: 'b2c' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      newProductForm.channel === 'b2c'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Users className={`w-4 h-4 ${newProductForm.channel === 'b2c' ? 'text-amber-300' : 'text-blue-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">B2C Retail Only</span>
+                    <span className={`text-[9px] ${newProductForm.channel === 'b2c' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Daily Customers
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setNewProductForm({ ...newProductForm, channel: 'b2b' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      newProductForm.channel === 'b2b'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Building2 className={`w-4 h-4 ${newProductForm.channel === 'b2b' ? 'text-amber-300' : 'text-purple-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">B2B Wholesale Only</span>
+                    <span className={`text-[9px] ${newProductForm.channel === 'b2b' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Shopkeepers
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <div className="flex items-center justify-between mb-1">
@@ -7110,15 +7261,127 @@ export const AdminPage = () => {
                 </div>
               </div>
 
+              {/* Category Image Upload & Preview */}
               <div>
-                <label className="font-bold text-slate-700 block mb-1">Banner Image URL</label>
-                <input
-                  type="url"
-                  value={categoryForm.image}
-                  onChange={(e) => setCategoryForm({ ...categoryForm, image: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
-                  placeholder="https://images.unsplash.com/..."
-                />
+                <label className="font-bold text-slate-700 block mb-1">
+                  Category Banner Image (Upload from Device or Web URL)
+                </label>
+                <div className="flex items-center gap-3 p-3 rounded-2xl border border-dashed border-[#EDE1D1] bg-[#FAF5EC]/40">
+                  {/* Live Preview Box */}
+                  <div className="w-16 h-16 rounded-xl border border-[#EDE1D1] bg-white overflow-hidden shrink-0 flex items-center justify-center relative shadow-xs">
+                    {categoryForm.image ? (
+                      <>
+                        <img
+                          src={categoryForm.image}
+                          alt="Category Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setCategoryForm({ ...categoryForm, image: '' })}
+                          className="absolute -top-1 -right-1 w-5 h-5 bg-[#7D0A14] text-white rounded-full flex items-center justify-center text-[10px] shadow-xs cursor-pointer hover:bg-rose-700"
+                          title="Remove image"
+                        >
+                          ✕
+                        </button>
+                      </>
+                    ) : (
+                      <div className="text-center p-1 text-slate-400">
+                        <ImageIcon className="w-5 h-5 mx-auto text-[#7D0A14]" />
+                        <span className="text-[8px] font-bold block mt-0.5">No image</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload from Device & URL input */}
+                  <div className="flex-1 space-y-1.5">
+                    <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-[#EDE1D1] text-[#7D0A14] font-bold text-xs hover:bg-[#FAF5EC] cursor-pointer shadow-2xs transition-colors">
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Choose Photo from Device</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (uploadEvent) => {
+                              setCategoryForm({
+                                ...categoryForm,
+                                image: uploadEvent.target.result
+                              });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+                    <input
+                      type="url"
+                      value={categoryForm.image || ''}
+                      onChange={(e) => setCategoryForm({ ...categoryForm, image: e.target.value })}
+                      placeholder="Or paste image web link (https://...)"
+                      className="w-full px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-medium text-[11px] placeholder:text-slate-400 text-slate-700 focus:outline-none focus:ring-1 focus:ring-[#7D0A14]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Target Channel / Storefront Visibility Selector */}
+              <div>
+                <label className="font-bold text-slate-700 block mb-1.5">
+                  Storefront Visibility (Select B2C, B2B or All) *
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCategoryForm({ ...categoryForm, channel: 'all' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      (categoryForm.channel || 'all') === 'all'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Globe className={`w-4 h-4 ${(categoryForm.channel || 'all') === 'all' ? 'text-amber-300' : 'text-[#7D0A14]'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">All (B2C & B2B)</span>
+                    <span className={`text-[9px] ${(categoryForm.channel || 'all') === 'all' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Both Storefronts
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCategoryForm({ ...categoryForm, channel: 'b2c' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      categoryForm.channel === 'b2c'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Users className={`w-4 h-4 ${categoryForm.channel === 'b2c' ? 'text-amber-300' : 'text-blue-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">B2C Retail Only</span>
+                    <span className={`text-[9px] ${categoryForm.channel === 'b2c' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Daily Customers
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCategoryForm({ ...categoryForm, channel: 'b2b' })}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      categoryForm.channel === 'b2b'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Building2 className={`w-4 h-4 ${categoryForm.channel === 'b2b' ? 'text-amber-300' : 'text-purple-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">B2B Wholesale Only</span>
+                    <span className={`text-[9px] ${categoryForm.channel === 'b2b' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      Shopkeepers
+                    </span>
+                  </button>
+                </div>
               </div>
 
               <div>
