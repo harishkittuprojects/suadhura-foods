@@ -28,7 +28,8 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquare,
-  ArrowLeft
+  ArrowLeft,
+  Zap
 } from 'lucide-react';
 
 export const ProductQuickViewModal = () => {
@@ -45,7 +46,8 @@ export const ProductQuickViewModal = () => {
     setPricingMode,
     user,
     setIsAuthModalOpen,
-    showToast
+    showToast,
+    setIsCheckoutModalOpen
   } = useShop();
 
   const products = shopProducts || defaultProducts || [];
@@ -197,6 +199,35 @@ export const ProductQuickViewModal = () => {
     return Array.from(new Set(combined)).slice(0, 4);
   }, [quickViewProduct]);
 
+  if (!quickViewProduct) return null;
+
+  const isLiked = isInWishlist(quickViewProduct.id);
+  const cartItem = cart.find((item) => item.id === quickViewProduct.id);
+  const quantityInCart = cartItem ? cartItem.quantity : 0;
+
+  const isWholesale = Boolean(isB2B && pricingMode === 'wholesale');
+  const baseUnitPrice = isWholesale
+    ? quickViewProduct.wholesalePrice || Math.round(quickViewProduct.price * 0.74)
+    : quickViewProduct.price;
+
+  // Price calculation based on pack multiplier
+  const effectiveUnitPrice =
+    selectedPackMultiplier === 1
+      ? baseUnitPrice
+      : selectedPackMultiplier === 2
+      ? Math.round(baseUnitPrice * 1.9) // 5% savings on 2x
+      : Math.round(baseUnitPrice * 2.75); // ~8% savings on 3x
+
+  const discountPercent = quickViewProduct.originalPrice
+    ? Math.round(
+        ((quickViewProduct.originalPrice - quickViewProduct.price) /
+          quickViewProduct.originalPrice) *
+          100
+      )
+    : 0;
+
+  const totalPayable = effectiveUnitPrice * quantity;
+
   const handlePrevImage = (e) => {
     if (e) {
       e.preventDefault();
@@ -255,7 +286,13 @@ export const ProductQuickViewModal = () => {
   };
 
   const handleAddToCart = () => {
-    addToCart(quickViewProduct, quantity);
+    const productToAdd = {
+      ...quickViewProduct,
+      price: effectiveUnitPrice,
+      selectedMultiplier: selectedPackMultiplier,
+      unit: selectedPackMultiplier > 1 ? `${selectedPackMultiplier}x Pack (${quickViewProduct.unit})` : quickViewProduct.unit
+    };
+    addToCart(productToAdd, quantity);
     showToast(`Added ${quantity}x ${quickViewProduct.name} to cart! 🛍️`);
     try {
       confetti({
@@ -264,7 +301,38 @@ export const ProductQuickViewModal = () => {
         origin: { y: 0.8 }
       });
     } catch {}
-    setQuickViewProduct(null);
+    handleCloseModal();
+  };
+
+  const handleBuyNow = () => {
+    const isWholesaleMode = Boolean(pricingMode === 'wholesale' || (user && user.isBusiness));
+    if (isWholesaleMode && quantity < 5) {
+      showToast('⚠️ B2B Wholesale requires a minimum order of 5 units', 'warning');
+      return;
+    }
+    const productToAdd = {
+      ...quickViewProduct,
+      price: effectiveUnitPrice,
+      selectedMultiplier: selectedPackMultiplier,
+      unit: selectedPackMultiplier > 1 ? `${selectedPackMultiplier}x Pack (${quickViewProduct.unit})` : quickViewProduct.unit
+    };
+    addToCart(productToAdd, quantity);
+
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.75 }
+      });
+    } catch {}
+
+    handleCloseModal();
+
+    setTimeout(() => {
+      setIsCheckoutModalOpen(true);
+    }, 120);
+
+    showToast(`⚡ Instant Buy: Proceeding directly to Express Checkout! 🚀`, 'success');
   };
 
   // Scroll Helpers
@@ -935,17 +1003,30 @@ export const ProductQuickViewModal = () => {
             </div>
           </div>
 
-          {/* Add to Cart CTA */}
-          <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          {/* Dual Action CTAs: Add to Cart + Direct Buy Now */}
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            {/* Add to Cart CTA */}
             <button
               type="button"
               onClick={handleAddToCart}
-              className="flex-1 sm:flex-initial px-7 py-3.5 rounded-2xl bg-[#7D0A14] hover:bg-[#680811] active:scale-98 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#7D0A14]/25 transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-4 sm:px-6 py-3 sm:py-3.5 rounded-2xl bg-[#FAF5EC] hover:bg-[#F3EAD9] active:scale-98 text-[#7D0A14] font-black text-xs sm:text-sm border border-[#EDE1D1] hover:border-[#7D0A14]/30 flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+              title="Add this product to your cart"
             >
-              <ShoppingCart className="w-4 h-4 text-amber-300" />
+              <ShoppingCart className="w-4 h-4 text-[#7D0A14]" />
               <span>
-                {quantityInCart > 0 ? `Update Cart (₹${totalPayable})` : `Add to Cart • ₹${totalPayable}`}
+                {quantityInCart > 0 ? `Update Cart` : `Add to Cart`}
               </span>
+            </button>
+
+            {/* Direct Buy Now CTA */}
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              className="flex-1 sm:flex-initial px-5 sm:px-7 py-3 sm:py-3.5 rounded-2xl bg-[#7D0A14] hover:bg-[#680811] active:scale-98 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#7D0A14]/25 hover:shadow-xl transition-all cursor-pointer"
+              title="Buy now with 1-click express checkout"
+            >
+              <Zap className="w-4 h-4 text-amber-300 fill-amber-300 animate-pulse" />
+              <span>Direct Buy Now • ₹{totalPayable}</span>
             </button>
           </div>
         </div>
