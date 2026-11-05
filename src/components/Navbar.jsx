@@ -166,14 +166,14 @@ export const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF5EC]/95 backdrop-blur-md border-b border-[#E8DDCF] shadow-sm transition-all duration-200 w-full overflow-visible">
+    <header className="sticky top-0 z-40 bg-[#FAF5EC]/95 backdrop-blur-md border-b border-[#E8DDCF] shadow-sm transition-all duration-200 w-full overflow-hidden">
       {/* 1. Top Ribbon: Services & VIP Membership */}
-      <div className="bg-[#4D060D] text-white text-xs py-1 sm:py-1.5 px-2 sm:px-4 font-medium border-b border-[#3D040A]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-1.5 sm:gap-2">
+      <div className="bg-[#4D060D] text-white text-xs py-1 px-2 sm:px-4 font-medium border-b border-[#3D040A]">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-1 sm:gap-2">
           {/* 10-15 Min Express Delivery Badge */}
-          <div className="flex items-center gap-1.5 text-slate-300 text-[10.5px] sm:text-xs font-medium shrink-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 text-slate-300 text-[10px] sm:text-xs font-medium shrink-0">
             <span className="flex items-center gap-1 text-amber-300 font-bold">
-              <Zap className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+              <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-300 shrink-0" />
               <span className="hidden sm:inline">10-15 Min Express Delivery</span>
               <span className="sm:hidden">10-15 Min</span>
             </span>
@@ -182,11 +182,11 @@ export const Navbar = () => {
           </div>
 
           {/* B2B Wholesale Rate Status / Subscription Order */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             {/* Show B2B Wholesale badge ONLY when a B2B customer is logged in */}
             {user?.isBusiness && (
-              <div className="flex items-center gap-1 bg-[#F5A623] text-[#3D040A] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black shadow-xs shrink-0">
-                <Building2 className="w-3 h-3 text-[#3D040A] shrink-0" />
+              <div className="flex items-center gap-1 bg-[#F5A623] text-[#3D040A] px-1.5 sm:px-2.5 py-0.5 rounded-full text-[9.5px] sm:text-[11px] font-black shadow-xs shrink-0">
+                <Building2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#3D040A] shrink-0" />
                 <span className="hidden sm:inline">B2B Wholesale</span>
                 <span className="sm:hidden">Wholesale</span>
                 {user.gstin && (
@@ -216,14 +216,14 @@ export const Navbar = () => {
       </div>
 
       {/* 2. Main Header Bar: Address, Search, Actions */}
-      <div className="max-w-7xl mx-auto px-2.5 sm:px-6 py-2 sm:py-2.5">
-        <div className="flex items-center justify-between gap-1.5 sm:gap-4 lg:gap-6 w-full">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 py-1.5 sm:py-2.5">
+        <div className="flex items-center justify-between gap-1 sm:gap-4 lg:gap-6 w-full">
           {/* Logo & Address Selector */}
-          <div className="flex items-center gap-1 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2.5 flex-shrink-0">
             {/* Mobile Hamburger toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 text-slate-700 hover:text-[#7D0A14] hover:bg-[#FAF5EC] rounded-lg flex-shrink-0"
+              className="lg:hidden p-1 sm:p-1.5 text-slate-700 hover:text-[#7D0A14] hover:bg-[#FAF5EC] rounded-lg flex-shrink-0"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -232,14 +232,14 @@ export const Navbar = () => {
             {/* Brand Logo & Title (Matching Sumadhura Caterers Reference) */}
             <button
               onClick={() => navigateTo('home')}
-              className="flex items-center gap-2 group text-left flex-shrink-0"
+              className="flex items-center gap-1.5 sm:gap-2 group text-left flex-shrink-0"
             >
-              <SumadhuraCaterersLogo className="w-10 h-10 sm:w-11 sm:h-11 flex-shrink-0 group-hover:scale-105 transition-transform" />
+              <SumadhuraCaterersLogo className="w-8 h-8 sm:w-11 sm:h-11 flex-shrink-0 group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
-                <span className="text-sm sm:text-base lg:text-lg font-black tracking-tight text-[#680811] leading-none">
+                <span className="text-xs sm:text-base lg:text-lg font-black tracking-tight text-[#680811] leading-none">
                   Sumadhura
                 </span>
-                <span className="text-sm sm:text-base lg:text-lg font-black tracking-tight text-[#680811] leading-tight">
+                <span className="text-[10px] sm:text-base lg:text-lg font-black tracking-tight text-[#680811] leading-tight">
                   Caterers
                 </span>
               </div>
@@ -248,11 +248,11 @@ export const Navbar = () => {
             {/* Address / Location Selector Badge (📍 Hyderabad ∨) */}
             <button
               onClick={() => setIsLocationModalOpen(true)}
-              className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full border border-[#D5C2AC] bg-white hover:bg-[#FAF5EC] text-[#7D0A14] text-xs font-extrabold shadow-2xs transition-all duration-150 text-left flex-shrink-0 ml-1"
+              className="flex items-center gap-0.5 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-[#D5C2AC] bg-white hover:bg-[#FAF5EC] text-[#7D0A14] text-[10.5px] sm:text-xs font-extrabold shadow-2xs transition-all duration-150 text-left flex-shrink-0"
             >
-              <MapPin className="w-3.5 h-3.5 text-[#7D0A14] fill-[#7D0A14]/15 flex-shrink-0" />
-              <span className="truncate max-w-[85px] sm:max-w-[130px]">{selectedAddress?.tag || 'Hyderabad'}</span>
-              <ChevronDown className="w-3 h-3 text-[#7D0A14] flex-shrink-0" />
+              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#7D0A14] fill-[#7D0A14]/15 flex-shrink-0" />
+              <span className="truncate max-w-[62px] sm:max-w-[130px]">{selectedAddress?.tag || 'Hyderabad'}</span>
+              <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#7D0A14] flex-shrink-0" />
             </button>
           </div>
 
@@ -349,16 +349,16 @@ export const Navbar = () => {
           </div>
 
           {/* Action Icons */}
-          <div className="flex items-center gap-1 sm:gap-2.5 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {/* Notification Bell (Matching Reference with red badge '2') */}
             <div className="relative">
               <button
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
-                className="w-9 h-9 sm:w-10 sm:h-10 text-[#7D0A14] hover:bg-[#FAF5EC] rounded-full transition-colors relative flex items-center justify-center flex-shrink-0"
+                className="w-8 h-8 sm:w-10 sm:h-10 text-[#7D0A14] hover:bg-[#FAF5EC] rounded-full transition-colors relative flex items-center justify-center flex-shrink-0"
                 aria-label="Notifications"
               >
-                <Bell className="w-5 h-5 text-[#7D0A14]" />
-                <span className="absolute top-1 right-1 w-4 h-4 bg-[#7D0A14] text-white text-[9px] font-black rounded-full ring-2 ring-[#FAF5EC] flex items-center justify-center">
+                <Bell className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#7D0A14]" />
+                <span className="absolute top-0.5 right-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[#7D0A14] text-white text-[8px] sm:text-[9px] font-black rounded-full ring-2 ring-[#FAF5EC] flex items-center justify-center">
                   2
                 </span>
               </button>
@@ -385,11 +385,11 @@ export const Navbar = () => {
             {/* Cart Button (Matching Reference with red badge '1') */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 text-[#7D0A14] hover:bg-[#FAF5EC] rounded-full transition-all flex items-center justify-center flex-shrink-0"
+              className="w-8 h-8 sm:w-10 sm:h-10 text-[#7D0A14] hover:bg-[#FAF5EC] rounded-full transition-all relative flex items-center justify-center flex-shrink-0"
               aria-label="Cart"
             >
-              <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-[#7D0A14]" />
-              <span className="absolute top-0.5 right-0.5 bg-[#7D0A14] text-white text-[9px] font-black rounded-full min-w-4 h-4 px-1 flex items-center justify-center ring-2 ring-[#FAF5EC]">
+              <ShoppingCart className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-[#7D0A14]" />
+              <span className="absolute top-0.5 right-0.5 bg-[#7D0A14] text-white text-[8px] sm:text-[9px] font-black rounded-full min-w-3.5 h-3.5 sm:min-w-4 sm:h-4 px-1 flex items-center justify-center ring-2 ring-[#FAF5EC]">
                 {totalCartCount > 0 ? totalCartCount : 1}
               </span>
             </button>
@@ -399,7 +399,7 @@ export const Navbar = () => {
               <div className="relative flex-shrink-0">
                 <button
                   onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-1.5 p-1 sm:px-3 sm:py-1.5 rounded-full border border-[#EDE1D1] hover:border-[#7D0A14] text-slate-700 text-xs font-semibold bg-[#FAF5EC]/80 transition-colors cursor-pointer"
+                  className="flex items-center gap-1 sm:gap-1.5 p-0.5 sm:px-3 sm:py-1.5 rounded-full border border-[#EDE1D1] hover:border-[#7D0A14] text-slate-700 text-xs font-semibold bg-[#FAF5EC]/80 transition-colors cursor-pointer"
                   aria-label="User Account"
                 >
                   <div className="w-6 h-6 sm:w-6 sm:h-6 rounded-full bg-[#7D0A14] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">

@@ -14,6 +14,67 @@ import {
   Building2
 } from 'lucide-react';
 
+// All category / aisle options for the quick switcher (Declared outside component to avoid Temporal Dead Zone)
+const baseAisleOptions = [
+  { name: 'All', emoji: '🛒', shortName: 'All', aliases: ['All', 'all'] },
+  {
+    name: 'Popular Dishes',
+    emoji: '🍛',
+    shortName: 'Popular Dishes',
+    image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Popular Dishes', 'Dishes', 'Biryani', 'Meals', 'dishes', 'hot-meals']
+  },
+  {
+    name: 'Fresh Vegetables',
+    emoji: '🥬',
+    shortName: 'Vegetables',
+    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Fresh Vegetables', 'Vegetables', 'Fresh Veggies', 'vegetables', 'fresh-veg']
+  },
+  {
+    name: 'Fresh Fruits',
+    emoji: '🍎',
+    shortName: 'Fruits',
+    image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Fresh Fruits', 'Fruits', 'fruits', 'Fresh Fruit', 'fresh-fruits']
+  },
+  {
+    name: 'Dairy Products',
+    emoji: '🥛',
+    shortName: 'Dairy Products',
+    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Dairy Products', 'Dairy, Bread and Eggs', 'Dairy & Eggs', 'Dairy & Milk', 'dairy', 'dairy-products', 'dairy-bread-eggs']
+  },
+  {
+    name: 'Rice, Atta and Dals',
+    emoji: '🌾',
+    shortName: 'Rice & Atta',
+    image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Rice, Atta and Dals', 'Rice & Atta', 'Atta & Flours', 'Rice & Dals', 'rice-atta-dals', 'Groceries', 'groceries']
+  },
+  {
+    name: 'Masalas and Dry Fruits',
+    emoji: '🌶️',
+    shortName: 'Masalas & Nuts',
+    image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Masalas and Dry Fruits', 'Masalas & Nuts', 'Spices & Masalas', 'Dry Fruits & Nuts', 'Dry Fruits', 'dry-fruits', 'masalas-dry-fruits']
+  },
+  {
+    name: 'Oils and Ghee',
+    emoji: '🫒',
+    shortName: 'Oils & Ghee',
+    image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Oils and Ghee', 'Oils & Ghee', 'Cold Pressed Oils', 'oils-ghee']
+  },
+  {
+    name: 'Munchies and Snacks',
+    emoji: '🍿',
+    shortName: 'Munchies',
+    image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=120&q=80',
+    aliases: ['Munchies and Snacks', 'Munchies', 'Snacks', 'munchies', 'Munchies & Snacks']
+  }
+];
+
 export const CategoriesPage = () => {
   const {
     selectedCategoryFilter,
@@ -105,67 +166,6 @@ export const CategoriesPage = () => {
   ];
 
   const activeCategory = selectedCategoryFilter || 'All';
-
-  // All category / aisle options for the quick switcher
-  const baseAisleOptions = [
-    { name: 'All', emoji: '🛒', shortName: 'All', aliases: ['All', 'all'] },
-    {
-      name: 'Popular Dishes',
-      emoji: '🍛',
-      shortName: 'Popular Dishes',
-      image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Popular Dishes', 'Dishes', 'Biryani', 'Meals', 'dishes', 'hot-meals']
-    },
-    {
-      name: 'Fresh Vegetables',
-      emoji: '🥬',
-      shortName: 'Vegetables',
-      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Fresh Vegetables', 'Vegetables', 'Fresh Veggies', 'vegetables', 'fresh-veg']
-    },
-    {
-      name: 'Fresh Fruits',
-      emoji: '🍎',
-      shortName: 'Fruits',
-      image: 'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Fresh Fruits', 'Fruits', 'fruits', 'Fresh Fruit', 'fresh-fruits']
-    },
-    {
-      name: 'Dairy Products',
-      emoji: '🥛',
-      shortName: 'Dairy Products',
-      image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Dairy Products', 'Dairy, Bread and Eggs', 'Dairy & Eggs', 'Dairy & Milk', 'dairy', 'dairy-products', 'dairy-bread-eggs']
-    },
-    {
-      name: 'Rice, Atta and Dals',
-      emoji: '🌾',
-      shortName: 'Rice & Atta',
-      image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Rice, Atta and Dals', 'Rice & Atta', 'Atta & Flours', 'Rice & Dals', 'rice-atta-dals', 'Groceries', 'groceries']
-    },
-    {
-      name: 'Masalas and Dry Fruits',
-      emoji: '🌶️',
-      shortName: 'Masalas & Nuts',
-      image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Masalas and Dry Fruits', 'Masalas & Nuts', 'Spices & Masalas', 'Dry Fruits & Nuts', 'Dry Fruits', 'dry-fruits', 'masalas-dry-fruits']
-    },
-    {
-      name: 'Oils and Ghee',
-      emoji: '🫒',
-      shortName: 'Oils & Ghee',
-      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Oils and Ghee', 'Oils & Ghee', 'Cold Pressed Oils', 'oils-ghee']
-    },
-    {
-      name: 'Munchies and Snacks',
-      emoji: '🍿',
-      shortName: 'Munchies',
-      image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?auto=format&fit=crop&w=120&q=80',
-      aliases: ['Munchies and Snacks', 'Munchies', 'Snacks', 'munchies', 'Munchies & Snacks']
-    }
-  ];
 
   // Helper to match products strictly to selected category or aisle
   const matchesCategory = (prod) => {
