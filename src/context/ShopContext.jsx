@@ -323,6 +323,12 @@ export const ShopProvider = ({ children }) => {
   const [noContactDelivery, setNoContactDelivery] = useState(false);
   const [deliveryInstructions, setDeliveryInstructions] = useState(['dont-ring-bell']);
 
+  // Order Delivery Schedule Settings: Instant vs Daily Scheduled Slot (Morning, Afternoon, Evening)
+  const [deliveryTiming, setDeliveryTiming] = useState('instant'); // 'instant' | 'scheduled'
+  const [scheduledDay, setScheduledDay] = useState('tomorrow'); // 'today' | 'tomorrow' | 'day_after'
+  const [scheduledSlot, setScheduledSlot] = useState('morning'); // 'morning' | 'afternoon' | 'evening'
+  const [isDailyRecurring, setIsDailyRecurring] = useState(false);
+
   // Active Order for Live Order Tracking simulation
   const [activeOrder, setActiveOrder] = useState(() => {
     try {
@@ -1259,6 +1265,14 @@ export const ShopProvider = ({ children }) => {
         deliveryPartnerTip,
         noContactDelivery,
         deliveryInstructions,
+        deliveryTiming,
+        setDeliveryTiming,
+        scheduledDay,
+        setScheduledDay,
+        scheduledSlot,
+        setScheduledSlot,
+        isDailyRecurring,
+        setIsDailyRecurring,
         activeOrder,
         orders,
         setOrders,

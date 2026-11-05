@@ -16,7 +16,12 @@ import {
   PhoneOff,
   Home,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  Calendar,
+  Sunrise,
+  Sun,
+  Moon,
+  Clock
 } from 'lucide-react';
 
 export const CartDrawer = () => {
@@ -48,7 +53,11 @@ export const CartDrawer = () => {
     navigateTo,
     pricingMode,
     totalWholesaleSavings,
-    user
+    user,
+    deliveryTiming,
+    setDeliveryTiming,
+    scheduledSlot,
+    setScheduledSlot
   } = useShop();
 
   const isWholesaleActive = Boolean(user && user.isBusiness && pricingMode === 'wholesale');
@@ -193,6 +202,92 @@ export const CartDrawer = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+
+                {/* Delivery Timing & Daily Slot Selector */}
+                <div className="pt-4 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-[#7D0A14]" />
+                      <span>Delivery Timing</span>
+                    </h4>
+                    <span className="text-[10px] font-extrabold text-[#7D0A14] bg-[#FAF5EC] px-2 py-0.5 rounded-full border border-[#EDE1D1]">
+                      {deliveryTiming === 'instant' ? '⚡ 10-15 Mins' : '📅 Scheduled Slot'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryTiming('instant')}
+                      className={`py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                        deliveryTiming === 'instant'
+                          ? 'bg-white text-slate-900 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Zap className={`w-3 h-3 ${deliveryTiming === 'instant' ? 'text-amber-500 fill-amber-500' : 'text-slate-400'}`} />
+                      <span>Instant (10-15m)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeliveryTiming('scheduled')}
+                      className={`py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                        deliveryTiming === 'scheduled'
+                          ? 'bg-[#7D0A14] text-white shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Calendar className={`w-3 h-3 ${deliveryTiming === 'scheduled' ? 'text-amber-300' : 'text-slate-400'}`} />
+                      <span>Schedule Daily</span>
+                    </button>
+                  </div>
+
+                  {deliveryTiming === 'scheduled' && (
+                    <div className="grid grid-cols-3 gap-1.5 pt-1 animate-in fade-in-50 duration-200">
+                      <button
+                        type="button"
+                        onClick={() => setScheduledSlot('morning')}
+                        className={`p-1.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                          scheduledSlot === 'morning'
+                            ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                        }`}
+                      >
+                        <Sunrise className={`w-3.5 h-3.5 ${scheduledSlot === 'morning' ? 'text-amber-300' : 'text-amber-500'}`} />
+                        <span className="text-[10px] font-extrabold mt-0.5">Morning</span>
+                        <span className={`text-[8px] ${scheduledSlot === 'morning' ? 'text-amber-100' : 'text-slate-400'}`}>6-9 AM</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setScheduledSlot('afternoon')}
+                        className={`p-1.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                          scheduledSlot === 'afternoon'
+                            ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                        }`}
+                      >
+                        <Sun className={`w-3.5 h-3.5 ${scheduledSlot === 'afternoon' ? 'text-amber-300' : 'text-amber-600'}`} />
+                        <span className="text-[10px] font-extrabold mt-0.5">Afternoon</span>
+                        <span className={`text-[8px] ${scheduledSlot === 'afternoon' ? 'text-amber-100' : 'text-slate-400'}`}>12-2 PM</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setScheduledSlot('evening')}
+                        className={`p-1.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                          scheduledSlot === 'evening'
+                            ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-xs'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                        }`}
+                      >
+                        <Moon className={`w-3.5 h-3.5 ${scheduledSlot === 'evening' ? 'text-amber-300' : 'text-indigo-600'}`} />
+                        <span className="text-[10px] font-extrabold mt-0.5">Evening</span>
+                        <span className={`text-[8px] ${scheduledSlot === 'evening' ? 'text-amber-100' : 'text-slate-400'}`}>6-9 PM</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Delivery Instructions */}

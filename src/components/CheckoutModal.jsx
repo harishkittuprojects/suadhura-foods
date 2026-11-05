@@ -13,7 +13,13 @@ import {
   MapPin,
   Clock,
   Bike,
-  ArrowRight
+  ArrowRight,
+  Sunrise,
+  Sun,
+  Moon,
+  Calendar,
+  Repeat,
+  Check
 } from 'lucide-react';
 
 export const CheckoutModal = () => {
@@ -37,7 +43,15 @@ export const CheckoutModal = () => {
     addOrder,
     setIsLiveTrackingOpen,
     navigateTo,
-    pricingMode
+    pricingMode,
+    deliveryTiming,
+    setDeliveryTiming,
+    scheduledDay,
+    setScheduledDay,
+    scheduledSlot,
+    setScheduledSlot,
+    isDailyRecurring,
+    setIsDailyRecurring
   } = useShop();
 
   const [step, setStep] = useState(1); // 1: Address & Tip, 2: Payment, 3: Success Confirmation
@@ -64,6 +78,24 @@ export const CheckoutModal = () => {
 
     setTimeout(() => {
       const isB2bOrder = pricingMode === 'wholesale' || user?.isBusiness;
+      const dayOptions = [
+        { id: 'today', label: 'Today', date: new Date().toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' }) },
+        { id: 'tomorrow', label: 'Tomorrow', date: new Date(Date.now() + 86400000).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' }) },
+        { id: 'day_after', label: new Date(Date.now() + 172800000).toLocaleDateString('en-IN', { weekday: 'short' }), date: new Date(Date.now() + 172800000).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' }) }
+      ];
+      const selectedDayObj = dayOptions.find(d => d.id === scheduledDay) || dayOptions[1];
+
+      const slotLabels = {
+        morning: { name: 'Morning Slot', time: '6:00 AM – 9:00 AM' },
+        afternoon: { name: 'Afternoon Slot', time: '12:00 PM – 2:00 PM' },
+        evening: { name: 'Evening Slot', time: '6:00 PM – 9:00 PM' }
+      };
+      const selectedSlotObj = slotLabels[scheduledSlot] || slotLabels.morning;
+
+      const deliverySlotText = deliveryTiming === 'instant'
+        ? (isB2bOrder ? '5:00 AM Morning Loading Bay Dispatch' : '⚡ Instant 10-15 Min Express Delivery')
+        : `📅 Scheduled: ${selectedDayObj.label} (${selectedDayObj.date}) • ${selectedSlotObj.name} (${selectedSlotObj.time})${isDailyRecurring ? ' • Recurring Daily' : ''}`;
+
       const placedOrder = {
         id: isB2bOrder
           ? `B2B-${Math.floor(1000 + Math.random() * 9000)}`
@@ -89,7 +121,13 @@ export const CheckoutModal = () => {
           minute: '2-digit'
         }),
         address: `${selectedAddress.title}, ${selectedAddress.area}`,
-        slot: isB2bOrder ? '5:00 AM Morning Loading Bay Dispatch' : 'Instant 10-15 Min Express Delivery',
+        slot: deliverySlotText,
+        deliveryTiming: deliveryTiming || 'instant',
+        scheduledDay: selectedDayObj.label,
+        scheduledDate: selectedDayObj.date,
+        scheduledSlot: selectedSlotObj.name,
+        scheduledTime: selectedSlotObj.time,
+        isDailyRecurring: Boolean(isDailyRecurring),
         paymentMethod: paymentMethod.toUpperCase(),
         partner: 'Ramesh Kumar (★ 4.9)',
         status: 'Packing'
@@ -201,14 +239,171 @@ export const CheckoutModal = () => {
               </div>
             </div>
 
-            {/* Delivery Promise Card */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 p-3.5 rounded-2xl flex items-center gap-3 text-xs text-blue-950">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
-                <Bike className="w-4 h-4" />
+            {/* Delivery Timing: Instant vs Daily Scheduled Slot */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-800">
+                  Delivery Timing & Schedule
+                </label>
+                <span className="text-[10px] font-extrabold text-[#7D0A14] bg-[#FAF5EC] px-2 py-0.5 rounded-full border border-[#EDE1D1]">
+                  {deliveryTiming === 'instant' ? '⚡ Express 10-15m' : '📅 Scheduled Daily Slot'}
+                </span>
               </div>
-              <div>
-                <strong>Sumadhura On-Time Guarantee:</strong> Arriving in 10-15 mins from our nearest store.
+
+              {/* Instant vs Scheduled Switcher */}
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-2xl">
+                <button
+                  type="button"
+                  onClick={() => setDeliveryTiming('instant')}
+                  className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    deliveryTiming === 'instant'
+                      ? 'bg-white text-slate-900 shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Bike className={`w-3.5 h-3.5 ${deliveryTiming === 'instant' ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <span>Instant (10-15 Mins)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDeliveryTiming('scheduled')}
+                  className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                    deliveryTiming === 'scheduled'
+                      ? 'bg-[#7D0A14] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Calendar className={`w-3.5 h-3.5 ${deliveryTiming === 'scheduled' ? 'text-amber-300' : 'text-slate-400'}`} />
+                  <span>Schedule Daily Slot</span>
+                </button>
               </div>
+
+              {/* Conditional Scheduled Controls */}
+              {deliveryTiming === 'scheduled' ? (
+                <div className="p-3.5 rounded-2xl border border-[#EDE1D1] bg-[#FAF5EC]/60 space-y-3 animate-in fade-in-50 duration-200">
+                  {/* Select Day */}
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                      1. Select Delivery Day
+                    </label>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[
+                        { id: 'today', label: 'Today', sub: 'Today' },
+                        { id: 'tomorrow', label: 'Tomorrow', sub: 'Recommended' },
+                        { id: 'day_after', label: 'Day After', sub: 'Advance' }
+                      ].map((day) => {
+                        const isSelected = scheduledDay === day.id;
+                        return (
+                          <button
+                            key={day.id}
+                            type="button"
+                            onClick={() => setScheduledDay(day.id)}
+                            className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                              isSelected
+                                ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-xs'
+                                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                            }`}
+                          >
+                            <span className="text-xs font-black">{day.label}</span>
+                            <span className={`text-[9px] ${isSelected ? 'text-amber-200' : 'text-slate-400'}`}>
+                              {day.sub}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Select Daily Time Slot */}
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 block mb-1.5">
+                      2. Select Daily Time Slot (Morning, Afternoon, Evening)
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {/* Morning */}
+                      <button
+                        type="button"
+                        onClick={() => setScheduledSlot('morning')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                          scheduledSlot === 'morning'
+                            ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                        }`}
+                      >
+                        <Sunrise className={`w-4 h-4 ${scheduledSlot === 'morning' ? 'text-amber-300' : 'text-amber-500'}`} />
+                        <span className="text-[11px] font-black leading-tight">Morning</span>
+                        <span className={`text-[9px] font-semibold ${scheduledSlot === 'morning' ? 'text-amber-100' : 'text-slate-500'}`}>
+                          6:00 AM – 9:00 AM
+                        </span>
+                      </button>
+
+                      {/* Afternoon */}
+                      <button
+                        type="button"
+                        onClick={() => setScheduledSlot('afternoon')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                          scheduledSlot === 'afternoon'
+                            ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                        }`}
+                      >
+                        <Sun className={`w-4 h-4 ${scheduledSlot === 'afternoon' ? 'text-amber-300' : 'text-amber-600'}`} />
+                        <span className="text-[11px] font-black leading-tight">Afternoon</span>
+                        <span className={`text-[9px] font-semibold ${scheduledSlot === 'afternoon' ? 'text-amber-100' : 'text-slate-500'}`}>
+                          12:00 PM – 2:00 PM
+                        </span>
+                      </button>
+
+                      {/* Evening */}
+                      <button
+                        type="button"
+                        onClick={() => setScheduledSlot('evening')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                          scheduledSlot === 'evening'
+                            ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                            : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                        }`}
+                      >
+                        <Moon className={`w-4 h-4 ${scheduledSlot === 'evening' ? 'text-amber-300' : 'text-indigo-600'}`} />
+                        <span className="text-[11px] font-black leading-tight">Evening</span>
+                        <span className={`text-[9px] font-semibold ${scheduledSlot === 'evening' ? 'text-amber-100' : 'text-slate-500'}`}>
+                          6:00 PM – 9:00 PM
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Daily Repeat Option */}
+                  <label className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white border border-[#EDE1D1] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isDailyRecurring}
+                      onChange={(e) => setIsDailyRecurring(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 accent-[#7D0A14] rounded"
+                    />
+                    <div className="text-left">
+                      <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <Repeat className="w-3.5 h-3.5 text-[#7D0A14]" />
+                        <span>Repeat this order daily at this slot</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500">
+                        Automate your fresh milk & daily veggies. Modify or pause anytime.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              ) : (
+                /* Instant Delivery Guarantee Card */
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200/80 p-3.5 rounded-2xl flex items-center gap-3 text-xs text-blue-950">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
+                    <Bike className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <strong>Sumadhura Express Guarantee:</strong> Arriving in 10-15 mins from our nearest dark store.
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Bill Preview */}
@@ -402,16 +597,37 @@ export const CheckoutModal = () => {
               </p>
             </div>
 
-            {/* Delivery Partner Assigned Card */}
+            {/* Delivery Details Card */}
             <div className="bg-blue-50/70 border border-blue-200 p-4 rounded-2xl text-left text-xs space-y-2">
               <div className="flex items-center justify-between font-bold text-blue-900">
                 <span className="flex items-center gap-1.5">
-                  <Bike className="w-4 h-4 text-blue-600" /> Driver Assigned: {orderSummary.partner}
+                  {orderSummary.deliveryTiming === 'scheduled' ? (
+                    <>
+                      <Calendar className="w-4 h-4 text-[#7D0A14]" />
+                      <span>{orderSummary.scheduledSlot || 'Scheduled Slot'} ({orderSummary.scheduledTime || 'Confirmed'})</span>
+                    </>
+                  ) : (
+                    <>
+                      <Bike className="w-4 h-4 text-blue-600" /> Driver Assigned: {orderSummary.partner}
+                    </>
+                  )}
                 </span>
-                <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px] font-bold">
-                  ⚡ 11 Mins
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  orderSummary.deliveryTiming === 'scheduled'
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-emerald-100 text-emerald-700'
+                }`}>
+                  {orderSummary.deliveryTiming === 'scheduled' ? `📅 ${orderSummary.scheduledDay}` : '⚡ 11 Mins'}
                 </span>
               </div>
+
+              {orderSummary.isDailyRecurring && (
+                <div className="text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200 flex items-center gap-1.5">
+                  <Repeat className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Daily Recurring Dispatch: Delivering every day at this slot</span>
+                </div>
+              )}
+
               <div className="text-slate-600">
                 <strong>Delivering to:</strong> {orderSummary.address}
               </div>
@@ -425,10 +641,19 @@ export const CheckoutModal = () => {
             <div className="space-y-2 pt-2">
               <button
                 onClick={handleTrackLive}
-                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all"
+                className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-sm rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
-                <Bike className="w-4 h-4 animate-bounce" />
-                <span>Track Live Order on Map (11 Mins)</span>
+                {orderSummary.deliveryTiming === 'scheduled' ? (
+                  <>
+                    <Calendar className="w-4 h-4" />
+                    <span>View Scheduled Order Status</span>
+                  </>
+                ) : (
+                  <>
+                    <Bike className="w-4 h-4 animate-bounce" />
+                    <span>Track Live Order on Map (11 Mins)</span>
+                  </>
+                )}
               </button>
 
               <button

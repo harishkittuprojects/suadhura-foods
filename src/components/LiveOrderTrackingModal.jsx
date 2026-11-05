@@ -56,15 +56,19 @@ export const LiveOrderTrackingModal = () => {
         <div className="bg-gradient-to-r from-[#4A060C] via-[#680811] to-[#7D0A14] p-5 text-white flex items-center justify-between border-b border-[#8B121C]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-              <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
-                Live Express Delivery
+              <span className={`w-2.5 h-2.5 rounded-full ${activeOrder?.deliveryTiming === 'scheduled' ? 'bg-amber-400' : 'bg-emerald-400 animate-ping'}`} />
+              <span className={`text-xs font-bold uppercase tracking-wider ${activeOrder?.deliveryTiming === 'scheduled' ? 'text-amber-300' : 'text-emerald-300'}`}>
+                {activeOrder?.deliveryTiming === 'scheduled' ? 'Daily Scheduled Delivery' : 'Live Express Delivery'}
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black mt-1">
-              Arriving in {etaMinutes} Mins ⚡
+              {activeOrder?.deliveryTiming === 'scheduled'
+                ? `${activeOrder?.scheduledSlot || 'Scheduled'} (${activeOrder?.scheduledTime || 'Slot Confirmed'})`
+                : `Arriving in ${etaMinutes} Mins ⚡`}
             </h2>
-            <p className="text-xs text-blue-200">Order #{activeOrder.id} • On time guarantee</p>
+            <p className="text-xs text-amber-100">
+              Order #{activeOrder?.id} • {activeOrder?.deliveryTiming === 'scheduled' ? `Scheduled for ${activeOrder?.scheduledDay || 'Upcoming'} (${activeOrder?.scheduledDate || 'Confirmed'})` : 'On time guarantee'}
+            </p>
           </div>
           <button
             onClick={() => setIsLiveTrackingOpen(false)}

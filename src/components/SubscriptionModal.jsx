@@ -16,6 +16,8 @@ import {
   PlayCircle,
   ArrowRight,
   Sun,
+  Sunrise,
+  Moon,
   User,
   MapPin
 } from 'lucide-react';
@@ -67,7 +69,7 @@ export const SubscriptionModal = () => {
   ]);
 
   const [frequency, setFrequency] = useState('daily'); // daily | alternate | weekdays
-  const [slot, setSlot] = useState('6am-7am'); // 6am-7am | 7am-8am
+  const [slot, setSlot] = useState('morning'); // morning | afternoon | evening
   const [durationDays, setDurationDays] = useState(30); // 7 | 30
   const [isPaused, setIsPaused] = useState(false);
   const [step, setStep] = useState(activeSubscription ? 2 : 1);
@@ -150,6 +152,12 @@ export const SubscriptionModal = () => {
       login(newCustomerUser);
     }
 
+    let formattedSlot = 'Morning (6:00 AM – 8:00 AM)';
+    if (slot === 'afternoon') formattedSlot = 'Afternoon (12:00 PM – 2:00 PM)';
+    else if (slot === 'evening') formattedSlot = 'Evening (6:00 PM – 9:00 PM)';
+    else if (slot === '6am-7am') formattedSlot = 'Early Morning (6:00 AM – 7:00 AM)';
+    else if (slot === '7am-8am') formattedSlot = 'Morning (7:00 AM – 8:00 AM)';
+
     const newSub = {
       id: `SUB-${Math.floor(100 + Math.random() * 900)}`,
       customer: finalCustomerName,
@@ -160,11 +168,11 @@ export const SubscriptionModal = () => {
       items: subItems.filter((i) => i.qty > 0).map(i => `${i.name} (${i.qty})`).join(' + '),
       itemsList: subItems.filter((i) => i.qty > 0),
       frequency,
-      slot: slot === '6am-7am' ? '6:00 AM - 7:00 AM' : '7:00 AM - 8:00 AM',
+      slot: formattedSlot,
       durationDays,
       dailyCost: dailyTotal,
       totalPaid: netPayable,
-      startDate: 'Tomorrow Morning',
+      startDate: slot === 'evening' ? 'Today / Tomorrow Evening' : slot === 'afternoon' ? 'Tomorrow Afternoon' : 'Tomorrow Morning',
       address: finalAddress,
       apartment: finalAddress,
       since: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }),
@@ -379,27 +387,68 @@ export const SubscriptionModal = () => {
                 </div>
               </div>
 
-              {/* Step 3: Morning Delivery Slot & Plan Duration */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
-                    Morning Time Slot
-                  </label>
-                  <select
-                    value={slot}
-                    onChange={(e) => setSlot(e.target.value)}
-                    className="w-full px-3 py-2 text-xs bg-[#FAF5EC]/50 border border-[#EDE1D1] rounded-xl focus:ring-2 focus:ring-[#7D0A14] font-bold text-slate-800"
+              {/* Step 3: Daily Delivery Time Slot */}
+              <div className="space-y-2">
+                <label className="block text-xs font-black text-slate-900 uppercase tracking-wider">
+                  3. Daily Delivery Slot (Morning, Afternoon, Evening)
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSlot('morning')}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      slot === 'morning' || slot === '6am-7am' || slot === '7am-8am'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
                   >
-                    <option value="6am-7am">6:00 AM – 7:00 AM (Early Morning)</option>
-                    <option value="7am-8am">7:00 AM – 8:00 AM (Morning)</option>
-                  </select>
-                </div>
+                    <Sunrise className={`w-4 h-4 ${slot === 'morning' || slot === '6am-7am' || slot === '7am-8am' ? 'text-amber-300' : 'text-amber-500'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">Morning</span>
+                    <span className={`text-[9px] ${slot === 'morning' || slot === '6am-7am' || slot === '7am-8am' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      6:00 AM – 8:00 AM
+                    </span>
+                  </button>
 
-                <div>
-                  <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
-                    Plan Duration
-                  </label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSlot('afternoon')}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      slot === 'afternoon'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Sun className={`w-4 h-4 ${slot === 'afternoon' ? 'text-amber-300' : 'text-amber-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">Afternoon</span>
+                    <span className={`text-[9px] ${slot === 'afternoon' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      12:00 PM – 2:00 PM
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSlot('evening')}
+                    className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-1 ${
+                      slot === 'evening'
+                        ? 'bg-[#7D0A14] text-white border-[#7D0A14] shadow-sm font-bold'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-[#FAF5EC]'
+                    }`}
+                  >
+                    <Moon className={`w-4 h-4 ${slot === 'evening' ? 'text-amber-300' : 'text-indigo-600'}`} />
+                    <span className="text-[11px] font-extrabold leading-tight">Evening</span>
+                    <span className={`text-[9px] ${slot === 'evening' ? 'text-amber-100' : 'text-slate-400'}`}>
+                      6:00 PM – 9:00 PM
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Step 4: Plan Duration */}
+              <div>
+                <label className="block text-xs font-black text-slate-900 uppercase tracking-wider mb-1.5">
+                  4. Plan Duration
+                </label>
+                <div className="grid grid-cols-2 gap-2">
                     <button
                       type="button"
                       onClick={() => setDurationDays(7)}
@@ -424,7 +473,6 @@ export const SubscriptionModal = () => {
                     </button>
                   </div>
                 </div>
-              </div>
 
               {/* Vacation / Pause Guarantee */}
               <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-900 flex items-center gap-2">
@@ -576,7 +624,7 @@ export const SubscriptionModal = () => {
                     </span>
                   </div>
                   <p className="text-xs text-slate-500">
-                    Next Morning Drop: Tomorrow between {currentSubscription.slot}
+                    Next Scheduled Drop: Tomorrow ({currentSubscription.slot})
                   </p>
                 </div>
               </div>

@@ -6251,6 +6251,11 @@ export const AdminPage = () => {
                             </div>
                             <div className="text-[11px] text-slate-500">{order.contact || order.phone || '+91 98450 12345'}</div>
                             <div className="text-[10px] text-slate-400 truncate max-w-xs">{order.address}</div>
+                            {(order.slot || order.deliverySlot) && (
+                              <div className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-bold">
+                                <span>⏰ {order.slot || order.deliverySlot}</span>
+                              </div>
+                            )}
                           </td>
                           <td className="p-3">
                             {Array.isArray(order.items) ? (
