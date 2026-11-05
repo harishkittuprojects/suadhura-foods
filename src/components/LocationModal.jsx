@@ -18,18 +18,26 @@ export const LocationModal = () => {
   if (!isLocationModalOpen) return null;
 
   const popularAreas = [
-    { tag: 'Other', title: '5th Block', area: 'Koramangala, Bengaluru', pincode: '560034' },
-    { tag: 'Other', title: '100ft Road', area: 'Indiranagar, Bengaluru', pincode: '560038' },
-    { tag: 'Other', title: 'Sector 3', area: 'HSR Layout, Bengaluru', pincode: '560102' },
-    { tag: 'Other', title: 'ITPL Main Rd', area: 'Whitefield, Bengaluru', pincode: '560066' },
-    { tag: 'Other', title: 'Madhapur', area: 'Hitec City, Hyderabad', pincode: '500081' },
-    { tag: 'Other', title: 'Gachibowli', area: 'Financial District, Hyderabad', pincode: '500032' },
+    { tag: 'Madhapur', title: 'Madhapur', area: 'Hitec City, Hyderabad', pincode: '500081' },
+    { tag: 'Gachibowli', title: 'Gachibowli', area: 'Financial District, Hyderabad', pincode: '500032' },
+    { tag: 'Kukatpally', title: 'Kukatpally', area: 'KPHB Colony, Hyderabad', pincode: '500072' },
+    { tag: 'Banjara Hills', title: 'Banjara Hills', area: 'Road No. 12, Hyderabad', pincode: '500034' },
+    { tag: 'Jubilee Hills', title: 'Jubilee Hills', area: 'Check Post, Hyderabad', pincode: '500033' },
+    { tag: 'Secunderabad', title: 'Secunderabad', area: 'Clock Tower, Telangana', pincode: '500003' },
+    { tag: 'Koramangala', title: 'Koramangala', area: '5th Block, Bengaluru', pincode: '560034' },
+    { tag: 'Indiranagar', title: 'Indiranagar', area: '100ft Road, Bengaluru', pincode: '560038' },
+    { tag: 'HSR Layout', title: 'HSR Layout', area: 'Sector 3, Bengaluru', pincode: '560102' },
+    { tag: 'Whitefield', title: 'Whitefield', area: 'ITPL Main Rd, Bengaluru', pincode: '560066' }
   ];
 
   const handleSelect = (addr) => {
-    setSelectedAddress(addr);
+    const cleanTag = addr.tag || addr.title || 'Hyderabad';
+    setSelectedAddress({
+      ...addr,
+      tag: cleanTag
+    });
     setIsLocationModalOpen(false);
-    showToast(`Delivery location set to ${addr.title || addr.tag}, ${addr.area}`);
+    showToast(`Delivery location set to ${cleanTag}, ${addr.area}`);
   };
 
   const handleDetectGPS = () => {

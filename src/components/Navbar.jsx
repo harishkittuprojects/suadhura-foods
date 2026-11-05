@@ -82,6 +82,13 @@ export const Navbar = () => {
 
   const products = shopProducts || defaultProducts;
 
+  const displayLocationName =
+    selectedAddress?.tag && !selectedAddress.tag.toLowerCase().includes('current')
+      ? selectedAddress.tag
+      : selectedAddress?.title && !selectedAddress.title.toLowerCase().includes('current')
+      ? selectedAddress.title
+      : selectedAddress?.city || 'Hyderabad';
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -248,10 +255,11 @@ export const Navbar = () => {
             {/* Address / Location Selector Badge (📍 Hyderabad ∨) */}
             <button
               onClick={() => setIsLocationModalOpen(true)}
-              className="flex items-center gap-0.5 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full border border-[#D5C2AC] bg-white hover:bg-[#FAF5EC] text-[#7D0A14] text-[10.5px] sm:text-xs font-extrabold shadow-2xs transition-all duration-150 text-left flex-shrink-0"
+              className="flex items-center gap-0.5 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-[#D5C2AC] bg-white hover:bg-[#FAF5EC] text-[#7D0A14] text-[10.5px] sm:text-xs font-extrabold shadow-2xs transition-all duration-150 text-left flex-shrink-0 cursor-pointer"
+              title={selectedAddress?.area || displayLocationName}
             >
               <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#7D0A14] fill-[#7D0A14]/15 flex-shrink-0" />
-              <span className="truncate max-w-[62px] sm:max-w-[130px]">{selectedAddress?.tag || 'Hyderabad'}</span>
+              <span className="truncate max-w-[85px] sm:max-w-[140px]">{displayLocationName}</span>
               <ChevronDown className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#7D0A14] flex-shrink-0" />
             </button>
           </div>
@@ -635,7 +643,7 @@ export const Navbar = () => {
               >
                 <MapPin className="w-4 h-4 text-[#7D0A14] flex-shrink-0" />
                 <div className="truncate flex-1">
-                  <div className="font-bold text-slate-800">{selectedAddress.tag} Address</div>
+                  <div className="font-bold text-slate-800">{displayLocationName} Address</div>
                   <div className="text-[11px] text-slate-500 truncate">{selectedAddress.area}</div>
                 </div>
               </button>

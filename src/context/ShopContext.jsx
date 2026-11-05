@@ -586,7 +586,13 @@ export const ShopProvider = ({ children }) => {
   const [selectedAddress, setSelectedAddress] = useState(() => {
     try {
       const saved = localStorage.getItem('sumadhura_selected_address');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.tag && (parsed.tag.toLowerCase().includes('current gps') || parsed.tag.toLowerCase().includes('current location'))) {
+          parsed.tag = parsed.title && !parsed.title.toLowerCase().includes('current') ? parsed.title : (parsed.city || 'Hyderabad');
+        }
+        return parsed;
+      }
     } catch {}
     return savedAddresses[0];
   });
@@ -756,7 +762,42 @@ export const ShopProvider = ({ children }) => {
   };
 
   // Live GPS geolocation detection and automatic reverse-geocoding
-  const detectCurrentLocation = useCallback((showNotification = true) => {
+  const detectCurrentLocation = useCallback((showNotification = false) => {
+    // 1. Instant IP-based City Resolution (Works immediately without GPS prompt)
+    const resolveFromIP = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch('https://api.bigdatacloud.net/data/reverse-geocode-client', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const d = await res.json();
+          const cityName = d.city || d.locality || d.principalSubdivision || 'Hyderabad';
+          const areaName = d.locality || cityName;
+          setSelectedAddress((prev) => {
+            // Only update if not already precise GPS
+            if (prev && prev.isPreciseGPS) return prev;
+            return {
+              id: 'addr-ip-auto',
+              tag: cityName,
+              title: areaName,
+              city: cityName,
+              area: `${areaName}, ${cityName}, ${d.principalSubdivision || 'Telangana'}`,
+              pincode: d.postcode || '',
+              lat: d.latitude,
+              lng: d.longitude,
+              isGPS: false
+            };
+          });
+        }
+      } catch (err) {
+        console.warn('IP geocoding fallback error:', err);
+      }
+    };
+
+    resolveFromIP();
+
+    // 2. High-precision browser GPS
     if (typeof window === 'undefined' || !('geolocation' in navigator)) {
       if (showNotification) showToast('Geolocation is not supported by your browser', 'info');
       return;
@@ -765,10 +806,65 @@ export const ShopProvider = ({ children }) => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+
+        // Coordinate city bounds detection
+        const inferCityFromCoords = (lat, lng) => {
+          if (lat >= 17.0 && lat <= 17.8 && lng >= 78.0 && lng <= 78.8) return 'Hyderabad';
+          if (lat >= 12.6 && lat <= 13.3 && lng >= 77.3 && lng <= 77.9) return 'Bengaluru';
+          if (lat >= 18.7 && lat <= 19.4 && lng >= 72.6 && lng <= 73.2) return 'Mumbai';
+          if (lat >= 28.3 && lat <= 29.0 && lng >= 76.8 && lng <= 77.5) return 'Delhi';
+          if (lat >= 12.8 && lat <= 13.3 && lng >= 80.0 && lng <= 80.5) return 'Chennai';
+          return 'Hyderabad';
+        };
+
+        const defaultCity = inferCityFromCoords(latitude, longitude);
+
+        // Try BigDataCloud reverse geocoding first (CORS friendly, fast, accurate)
         try {
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 6000);
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          const res = await fetch(
+            `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`,
+            { signal: controller.signal }
+          );
+          clearTimeout(timeoutId);
 
+          if (res.ok) {
+            const data = await res.json();
+            const locality = data.locality || data.neighbourhood || data.suburb || '';
+            const city = data.city || defaultCity;
+            const state = data.principalSubdivision || 'Telangana';
+            const pincode = data.postcode || '';
+
+            const chosenTag = locality && locality !== city ? locality : city;
+
+            const liveAddress = {
+              id: 'addr-gps-auto',
+              tag: chosenTag,
+              title: locality || city,
+              city: city,
+              area: locality ? `${locality}, ${city}, ${state}` : `${city}, ${state}`,
+              pincode: pincode,
+              lat: latitude,
+              lng: longitude,
+              isGPS: true,
+              isPreciseGPS: true
+            };
+
+            setSelectedAddress(liveAddress);
+            if (showNotification) {
+              showToast(`📍 Location detected: ${chosenTag}`);
+            }
+            return;
+          }
+        } catch (err) {
+          console.warn('BigDataCloud reverse geocoding error:', err);
+        }
+
+        // Try OpenStreetMap Nominatim as secondary fallback
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
             { signal: controller.signal }
@@ -784,46 +880,52 @@ export const ShopProvider = ({ children }) => {
               addr.residential ||
               addr.road ||
               addr.city_district ||
-              'Current Location';
-            const city = addr.city || addr.town || addr.county || addr.state_district || 'Bengaluru';
-            const state = addr.state || 'Karnataka';
+              '';
+            const city = addr.city || addr.town || addr.county || addr.state_district || defaultCity;
+            const state = addr.state || 'Telangana';
             const pincode = addr.postcode || '';
+
+            const chosenTag = locality && locality !== city ? locality : city;
 
             const liveAddress = {
               id: 'addr-gps-auto',
-              tag: 'Current GPS',
-              title: locality,
-              area: `${locality}, ${city}, ${state}`,
+              tag: chosenTag,
+              title: locality || city,
+              city: city,
+              area: `${locality ? locality + ', ' : ''}${city}, ${state}`,
               pincode: pincode,
               lat: latitude,
               lng: longitude,
-              isGPS: true
+              isGPS: true,
+              isPreciseGPS: true
             };
 
             setSelectedAddress(liveAddress);
             if (showNotification) {
-              showToast(`📍 Location detected: ${locality}, ${city}`);
+              showToast(`📍 Location detected: ${chosenTag}`);
             }
             return;
           }
         } catch (err) {
-          console.warn('Reverse geocoding fetch error:', err);
+          console.warn('Nominatim reverse geocoding error:', err);
         }
 
-        // Fallback with coordinates
+        // Final fallback with coordinate inference (never shows "Current GPS")
         const fallbackAddress = {
           id: 'addr-gps-auto',
-          tag: 'Current GPS',
-          title: 'Current Location',
-          area: `GPS (${latitude.toFixed(3)}°N, ${longitude.toFixed(3)}°E)`,
+          tag: defaultCity,
+          title: defaultCity,
+          city: defaultCity,
+          area: `${defaultCity} (${latitude.toFixed(2)}°N, ${longitude.toFixed(2)}°E)`,
           pincode: '',
           lat: latitude,
           lng: longitude,
-          isGPS: true
+          isGPS: true,
+          isPreciseGPS: true
         };
         setSelectedAddress(fallbackAddress);
         if (showNotification) {
-          showToast('📍 Live GPS coordinates detected');
+          showToast(`📍 Location detected: ${defaultCity}`);
         }
       },
       (error) => {
@@ -832,7 +934,7 @@ export const ShopProvider = ({ children }) => {
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 300000
+        maximumAge: 60000
       }
     );
   }, []);
