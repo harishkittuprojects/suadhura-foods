@@ -67,7 +67,10 @@ import {
   Globe,
   Key,
   MapPin,
-  Phone
+  Phone,
+  MoreHorizontal,
+  UserPlus,
+  ClipboardList
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
@@ -2072,236 +2075,211 @@ export const AdminPage = () => {
       {/* 2. MAIN ADMIN CANVAS (MATCHING STOREFRONT CREAM & MAROON)      */}
       {/* ============================================================= */}
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF5EC]">
-        {/* Header Bar */}
-        <header className="bg-white border-b border-[#E8DDCF] px-3.5 sm:px-6 py-2.5 flex flex-col gap-2.5 flex-shrink-0 z-20 shadow-xs">
-          {/* Top Row: Mobile Menu + Titles + Shop Pill & Quick Actions */}
-          <div className="flex items-center justify-between gap-2 w-full">
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <button
-                type="button"
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-xl bg-[#FAF5EC] text-[#7D0A14] hover:bg-[#F3EAD9] border border-[#EDE1D1] shrink-0 active:scale-95 cursor-pointer"
-                aria-label="Open navigation menu"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
+        {/* Top Header on Mobile (< lg): Royal Maroon App Bar Matching User Design Mockup */}
+        <header className="lg:hidden bg-[#4A070D] text-white px-4 py-3 flex items-center justify-between shadow-md shrink-0 z-30">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="p-1 text-white hover:text-amber-200 cursor-pointer active:scale-95"
+              aria-label="Open navigation menu"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold text-slate-500 truncate">
-                  <span className="hidden sm:inline">Sumadhura Operations</span>
-                  <span className="sm:hidden font-black text-amber-900">Sumadhura</span>
-                  <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 shrink-0" />
-                  <span className="text-[#7D0A14] font-black truncate">
-                    {activeTab === 'b2c-customers'
-                      ? 'B2C Retail'
-                      : activeTab === 'b2b-customers'
-                      ? 'B2B Wholesale'
-                      : activeTab === 'shop-store-details'
-                      ? currentShop?.shortName || 'Store Hub'
-                      : activeTab.replace('-', ' ')}
-                  </span>
-                </div>
-                <h1 className="text-xs sm:text-base font-black text-[#3D040A] truncate">
-                  {activeTab === 'overview'
-                    ? adminMode === 'b2c'
-                      ? 'B2C Retail Dashboard'
-                      : adminMode === 'b2b'
-                      ? 'B2B Wholesale Dashboard'
-                      : 'Operations Dashboard'
-                    : activeTab === 'shop-store-details'
-                    ? `${currentShop?.name || 'Store Hub'}`
-                    : activeTab === 'b2c-customers'
-                    ? 'Daily Customers Directory'
-                    : activeTab === 'b2b-customers'
-                    ? 'Shopkeepers & Commercial Registry'
-                    : activeTab === 'b2b-quotes'
-                    ? 'Wholesale RFPs & Quotations'
-                    : activeTab.replace('-', ' ')}
-                </h1>
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-full bg-[#F5A623] flex items-center justify-center text-[#3D040A] shadow-xs shrink-0">
+                <Store className="w-5 h-5 text-[#3D040A]" />
               </div>
-            </div>
-
-            {/* Top Right: Shop Selector Pill & Search Toggle */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-              {/* Shop 1, 2, 3 Branch Selector & Quick Login Modal */}
-              <button
-                type="button"
-                onClick={() => setIsShopLoginModalOpen(true)}
-                className="flex items-center gap-1 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
-                title="Shop 1 / Shop 2 / Shop 3 Login & Store Details Switcher"
-              >
-                <Store className="w-3.5 h-3.5 text-[#7D0A14] shrink-0" />
-                <span className="hidden sm:inline text-slate-500 font-bold">Shop:</span>
-                <span className="font-black text-[#7D0A14] truncate max-w-[85px] sm:max-w-none">
-                  {currentShop ? currentShop.shortName : 'Select Shop'}
-                </span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              </button>
-
-              {/* Mobile Search Icon Toggle */}
-              <button
-                type="button"
-                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                className="lg:hidden p-2 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] shrink-0 active:scale-95 cursor-pointer"
-                title="Search Customers"
-              >
-                <Search className="w-4 h-4" />
-              </button>
-
-              <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
-                <span className="text-[#D98207]">❄️ {adminContent.coldChainTemp}</span>
+              <div>
+                <h2 className="text-sm font-black text-white leading-tight tracking-tight">
+                  Sumadhura Foods
+                </h2>
+                <p className="text-[10px] font-bold text-[#F5A623] leading-none mt-0.5">
+                  Operations Command Center
+                </p>
               </div>
-
-              {(adminMode === 'b2c' || adminMode === 'unified') && (
-                <button
-                  onClick={simulateNewB2COrder}
-                  className="hidden sm:flex px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-                  title="Create a new incoming B2C retail order"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>B2C Order</span>
-                </button>
-              )}
-
-              <button
-                onClick={() => navigateTo('home')}
-                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Customer Storefront</span>
-              </button>
             </div>
           </div>
 
-          {/* Bottom Bar: Mode Switcher (Full-width 3-way toggle on mobile) & Desktop Search */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 w-full">
-            {/* 3-way Scope Segmented Control */}
-            <div className="w-full lg:w-auto flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminMode('b2c');
-                  setCustomerScope('b2c');
-                  if (activeTab === 'b2b-customers') {
-                    setActiveTab('b2c-customers');
-                  }
-                  showToast('Switched to B2C Retail Operations');
-                }}
-                className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                  adminMode === 'b2c'
-                    ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                <User className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">B2C Retail</span>
-              </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                showToast('🔔 2 new orders pending dispatch!');
+                setActiveTab('orders');
+              }}
+              className="relative p-1.5 text-white/90 hover:text-white cursor-pointer active:scale-95"
+              title="Notifications"
+            >
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-0.5 right-0.5 w-4 h-4 bg-rose-600 text-white text-[9px] font-black rounded-full flex items-center justify-center border border-[#4A070D]">
+                2
+              </span>
+            </button>
+          </div>
+        </header>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminMode('b2b');
-                  setCustomerScope('b2b');
-                  if (activeTab === 'b2c-customers') {
-                    setActiveTab('b2b-customers');
-                  }
-                  showToast('Switched to B2B Wholesale Portal');
-                }}
-                className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                  adminMode === 'b2b'
-                    ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                <Building2 className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">B2B Wholesale</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminMode('unified');
-                  setCustomerScope('all');
-                  if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') {
-                    setActiveTab('customers');
-                  }
-                  showToast('Switched to Unified View (B2C + B2B)');
-                }}
-                className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                  adminMode === 'unified'
-                    ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-              >
-                <Layers className="w-3.5 h-3.5 shrink-0" />
-                <span className="truncate">Unified</span>
-              </button>
-            </div>
-
-            {/* Desktop Customer Search Bar */}
-            <div className="hidden lg:flex relative flex-1 min-w-[200px] max-w-xs sm:max-w-sm">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search customers (name, phone, email)..."
-                value={customerSearchTerm}
-                onChange={(e) => {
-                  setCustomerSearchTerm(e.target.value);
-                  if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
-                    setActiveTab('b2c-customers');
-                  }
-                }}
-                onFocus={() => {
-                  if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
-                    setActiveTab('b2c-customers');
-                  }
-                }}
-                className="w-full pl-9 pr-7 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
-              />
-              {customerSearchTerm && (
-                <button
-                  onClick={() => setCustomerSearchTerm('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Mobile Expandable Search Bar */}
-            {(isMobileSearchOpen || customerSearchTerm) && (
-              <div className="w-full lg:hidden relative animate-in slide-in-from-top-1 duration-200">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search customers (name, phone, email)..."
-                  value={customerSearchTerm}
-                  onChange={(e) => {
-                    setCustomerSearchTerm(e.target.value);
-                    if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
-                      setActiveTab('b2c-customers');
-                    }
-                  }}
-                  autoFocus
-                  className="w-full pl-9 pr-8 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCustomerSearchTerm('');
-                    setIsMobileSearchOpen(false);
-                  }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
+        {/* Desktop Header Bar (>= lg) */}
+        <header className="hidden lg:flex min-h-16 bg-white border-b border-[#E8DDCF] px-6 py-2.5 items-center justify-between gap-4 flex-shrink-0 z-20 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div>
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                <span>Sumadhura Operations</span>
+                <ChevronRight className="w-3 h-3 text-slate-400" />
+                <span className="text-[#7D0A14] font-black">
+                  {activeTab === 'b2c-customers'
+                    ? 'Daily Customers (B2C Retail)'
+                    : activeTab === 'b2b-customers'
+                    ? 'Shopkeepers (B2B Wholesale)'
+                    : activeTab === 'shop-store-details'
+                    ? currentShop?.shortName || 'Store Hub'
+                    : activeTab.replace('-', ' ')}
+                </span>
               </div>
+              <h1 className="text-base font-black text-[#3D040A]">
+                {activeTab === 'overview'
+                  ? adminMode === 'b2c'
+                    ? 'B2C Retail Operations Dashboard'
+                    : adminMode === 'b2b'
+                    ? 'B2B Wholesale Commercial Dashboard'
+                    : 'Operations Command Dashboard'
+                  : activeTab === 'shop-store-details'
+                  ? `${currentShop?.name || 'Store Hub'}`
+                  : activeTab === 'b2c-customers'
+                  ? 'Daily Customers Directory'
+                  : activeTab === 'b2b-customers'
+                  ? 'Shopkeepers & Commercial Registry'
+                  : activeTab === 'b2b-quotes'
+                  ? 'Wholesale RFPs & Quotations Desk'
+                  : activeTab.replace('-', ' ')}
+              </h1>
+            </div>
+          </div>
+
+          {/* Desktop Search */}
+          <div className="relative flex-1 min-w-[200px] max-w-sm">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search customers (name, phone, email)..."
+              value={customerSearchTerm}
+              onChange={(e) => {
+                setCustomerSearchTerm(e.target.value);
+                if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                  setActiveTab('b2c-customers');
+                }
+              }}
+              className="w-full pl-9 pr-7 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
+            />
+            {customerSearchTerm && (
+              <button
+                onClick={() => setCustomerSearchTerm('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
             )}
+          </div>
+
+          {/* Desktop Scope Switch Toggle */}
+          <div className="flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
+            <button
+              type="button"
+              onClick={() => {
+                setAdminMode('b2c');
+                setCustomerScope('b2c');
+                if (activeTab === 'b2b-customers') setActiveTab('b2c-customers');
+                showToast('Switched to B2C Retail Operations');
+              }}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                adminMode === 'b2c'
+                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              <ShoppingCart className="w-3.5 h-3.5" />
+              <span>B2C Retail</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setAdminMode('b2b');
+                setCustomerScope('b2b');
+                if (activeTab === 'b2c-customers') setActiveTab('b2b-customers');
+                showToast('Switched to B2B Wholesale Portal');
+              }}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                adminMode === 'b2b'
+                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>B2B Wholesale</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setAdminMode('unified');
+                setCustomerScope('all');
+                if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') setActiveTab('customers');
+                showToast('Switched to Unified View (B2C + B2B)');
+              }}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                adminMode === 'unified'
+                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Unified</span>
+            </button>
+          </div>
+
+          {/* Desktop Right Actions */}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsShopLoginModalOpen(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Shop 1 / Shop 2 / Shop 3 Login & Store Details Switcher"
+            >
+              <Store className="w-3.5 h-3.5 text-[#7D0A14]" />
+              <span className="text-slate-500 font-bold">Shop:</span>
+              <span className="font-black text-[#7D0A14]">{currentShop ? (currentShop.shortName || currentShop.name) : 'Select Shop'}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            </button>
+
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
+              <span className="text-[#D98207]">❄️ {adminContent.coldChainTemp}</span>
+            </div>
+
+            {(adminMode === 'b2c' || adminMode === 'unified') && (
+              <button
+                onClick={simulateNewB2COrder}
+                className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                title="Create a new incoming B2C retail order"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>B2C Order</span>
+              </button>
+            )}
+
+            <button
+              onClick={() => navigateTo('home')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Customer Storefront</span>
+            </button>
           </div>
         </header>
 
         {/* Scrollable Workspace */}
-        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-5 sm:space-y-6">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 lg:pb-6 space-y-4 sm:space-y-6">
           {/* ========================================================= */}
           {/* 0. SHOP STORE DETAILS VIEW (Shop 1, Shop 2, Shop 3)       */}
           {/* ========================================================= */}
@@ -2706,10 +2684,104 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {/* 1. DASHBOARD OVERVIEW                                     */}
           {/* ========================================================= */}
-                              {(activeTab === 'dashboard' || activeTab === 'overview') && (
-            <div className="space-y-5 animate-in fade-in duration-200">
-              {/* Dashboard Sub-Header with Date Filter */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#EDE1D1] shadow-2xs">
+          {(activeTab === 'dashboard' || activeTab === 'overview') && (
+            <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
+              {/* Mobile Search Bar (Exact Match to User Mockup) */}
+              <div className="lg:hidden relative w-full">
+                <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search customers (name, phone, email)..."
+                  value={customerSearchTerm}
+                  onChange={(e) => {
+                    setCustomerSearchTerm(e.target.value);
+                    if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                      setActiveTab('b2c-customers');
+                    }
+                  }}
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#FAF5EC] border border-[#E8DDCF] rounded-full text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 shadow-2xs"
+                />
+              </div>
+
+              {/* Mobile Shop Branch Card (Exact Match to User Mockup) */}
+              <div
+                onClick={() => setIsShopLoginModalOpen(true)}
+                className="lg:hidden w-full p-3 bg-[#FAF5EC] border border-[#E8DDCF] rounded-2xl flex flex-col items-center justify-center gap-1 shadow-2xs cursor-pointer active:scale-[0.99] transition-transform hover:border-[#7D0A14]/30"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="p-1 rounded-lg bg-amber-100 text-[#7D0A14]">
+                    <Store className="w-4 h-4 text-[#7D0A14]" />
+                  </span>
+                  <span className="font-extrabold text-xs text-slate-500">Shop:</span>
+                  <span className="font-black text-xs text-[#7D0A14]">
+                    {currentShop ? (currentShop.shortName || currentShop.name) : 'Shop 3 (Jubilee Hills)'}
+                  </span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-[10px] font-bold text-amber-900 border border-amber-200">
+                  <span>❄️ {currentShop?.coldChainTemp || '3.8°C Cold-Chain OK'}</span>
+                </div>
+              </div>
+
+              {/* Mobile Scope Switcher Segmented Control (Exact Match to User Mockup) */}
+              <div className="lg:hidden w-full flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminMode('b2c');
+                    setCustomerScope('b2c');
+                    if (activeTab === 'b2b-customers') setActiveTab('b2c-customers');
+                    showToast('Switched to B2C Retail Operations');
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    adminMode === 'b2c'
+                      ? 'bg-[#7D0A14] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  <ShoppingCart className="w-3.5 h-3.5 shrink-0" />
+                  <span>B2C Retail</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminMode('b2b');
+                    setCustomerScope('b2b');
+                    if (activeTab === 'b2c-customers') setActiveTab('b2b-customers');
+                    showToast('Switched to B2B Wholesale Portal');
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    adminMode === 'b2b'
+                      ? 'bg-[#7D0A14] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5 shrink-0" />
+                  <span>B2B Wholesale</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminMode('unified');
+                    setCustomerScope('all');
+                    if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') setActiveTab('customers');
+                    showToast('Switched to Unified View (B2C + B2B)');
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                    adminMode === 'unified'
+                      ? 'bg-[#7D0A14] text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  <Layers className="w-3.5 h-3.5 shrink-0" />
+                  <span>Unified</span>
+                </button>
+              </div>
+
+              {/* Dashboard Sub-Header with Date Filter (Desktop View) */}
+              <div className="hidden lg:flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white border border-[#EDE1D1] shadow-2xs">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#7D0A14] text-[#F5A623] flex items-center justify-center shrink-0 shadow-xs">
                     <Home className="w-5 h-5 text-[#F5A623]" />
