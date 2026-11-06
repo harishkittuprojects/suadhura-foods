@@ -64,10 +64,139 @@ import {
   Tag,
   CreditCard,
   Star,
-  Globe
+  Globe,
+  Key,
+  MapPin,
+  Phone
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
+
+export const DEFAULT_SHOPS = [
+  {
+    id: 'shop1',
+    loginId: 'shop1',
+    email: 'shop1@sumadhura.com',
+    password: 'password123',
+    name: 'Sumadhura Express Store #1 - Madhapur Hub',
+    shortName: 'Shop 1 (Madhapur)',
+    branchCode: 'SMD-HYD-001',
+    tagline: 'Flagship Tech District Dispatch & Express Fulfillment Centre',
+    manager: 'Ramesh Varma',
+    phone: '+91 98450 11001',
+    address: 'Plot 42, Hitec City Main Road, Cyber Towers Junction, Madhapur, Hyderabad, Telangana 500081',
+    fssai: '13622011000189',
+    gstin: '36AABCS1234F1Z5',
+    timings: '5:00 AM – 11:00 PM Express Delivery',
+    coverage: 'Madhapur, Hitec City, Kondapur, KPHB (5.5 km Radius)',
+    dispatchFleetCount: 8,
+    dailyCapacity: 450,
+    coldChainTemp: '3.8°C OK',
+    rating: 4.9,
+    ordersCount: 142,
+    todayRevenue: 28450,
+    activeStatus: 'Active & Fulfilling',
+    colorTheme: 'from-emerald-700 to-emerald-950',
+    accentColor: 'text-emerald-700',
+    badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80',
+    inventory: [
+      { id: 'inv-101', name: 'Pure Buffalo Milk (1L)', stock: 85, unit: 'Litres', category: 'Dairy', inStock: true },
+      { id: 'inv-102', name: 'Fresh Malai Paneer (200g)', stock: 42, unit: 'Packs', category: 'Dairy', inStock: true },
+      { id: 'inv-103', name: 'Desi Cow Bilona Ghee (500ml)', stock: 28, unit: 'Jars', category: 'Dairy', inStock: true },
+      { id: 'inv-104', name: 'Farm Crisp Carrots (500g)', stock: 60, unit: 'kg', category: 'Vegetables', inStock: true },
+      { id: 'inv-105', name: 'Organic Royal Gala Apples (1kg)', stock: 35, unit: 'Packs', category: 'Fruits', inStock: true },
+      { id: 'inv-106', name: 'Thick Curd (400g)', stock: 50, unit: 'Tubs', category: 'Dairy', inStock: true }
+    ],
+    assignedOrders: [
+      { id: 'SMD-90412', customer: 'Deepak Varma', items: '2x Buffalo Milk, 1x Paneer', total: 226, status: 'Packing', time: '5 mins ago', partner: 'Kiran G. (★ 4.9)' },
+      { id: 'SMD-90408', customer: 'Sneha Patel', items: '1x Desi Ghee, 2x Apples', total: 840, status: 'Dispatched', time: '14 mins ago', partner: 'Ramesh K. (★ 4.8)' },
+      { id: 'SMD-90395', customer: 'Arun Teja', items: '3x Buffalo Milk (1L)', total: 192, status: 'Delivered', time: '32 mins ago', partner: 'Sunil R. (★ 4.9)' }
+    ]
+  },
+  {
+    id: 'shop2',
+    loginId: 'shop2',
+    email: 'shop2@sumadhura.com',
+    password: 'password123',
+    name: 'Sumadhura Fresh Mart #2 - Gachibowli Hub',
+    shortName: 'Shop 2 (Gachibowli)',
+    branchCode: 'SMD-HYD-002',
+    tagline: 'Financial District Corporate & Residential Cold-Chain Hub',
+    manager: 'Priya Reddy',
+    phone: '+91 98450 22002',
+    address: 'Shop #14, Financial District Circle, Nanakramguda, Gachibowli, Hyderabad, Telangana 500032',
+    fssai: '13622011000290',
+    gstin: '36AABCS5678F2Z8',
+    timings: '5:00 AM – 11:30 PM Express Delivery',
+    coverage: 'Gachibowli, Financial District, Kokapet, Nanakramguda (6.0 km Radius)',
+    dispatchFleetCount: 10,
+    dailyCapacity: 550,
+    coldChainTemp: '3.5°C OK',
+    rating: 4.95,
+    ordersCount: 186,
+    todayRevenue: 37200,
+    activeStatus: 'Active & Fulfilling',
+    colorTheme: 'from-amber-700 to-amber-950',
+    accentColor: 'text-amber-700',
+    badgeColor: 'bg-amber-100 text-amber-800 border-amber-300',
+    image: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?auto=format&fit=crop&w=800&q=80',
+    inventory: [
+      { id: 'inv-201', name: 'Pure Buffalo Milk (1L)', stock: 110, unit: 'Litres', category: 'Dairy', inStock: true },
+      { id: 'inv-202', name: 'Fresh Malai Paneer (200g)', stock: 55, unit: 'Packs', category: 'Dairy', inStock: true },
+      { id: 'inv-203', name: 'Desi Cow Bilona Ghee (500ml)', stock: 34, unit: 'Jars', category: 'Dairy', inStock: true },
+      { id: 'inv-204', name: 'Farm Crisp Carrots (500g)', stock: 75, unit: 'kg', category: 'Vegetables', inStock: true },
+      { id: 'inv-205', name: 'Organic Royal Gala Apples (1kg)', stock: 48, unit: 'Packs', category: 'Fruits', inStock: true },
+      { id: 'inv-206', name: 'Thick Curd (400g)', stock: 65, unit: 'Tubs', category: 'Dairy', inStock: true }
+    ],
+    assignedOrders: [
+      { id: 'SMD-90415', customer: 'Vikram Joshi', items: '4x Buffalo Milk (1L)', total: 256, status: 'Packing', time: '2 mins ago', partner: 'Suresh V. (★ 4.9)' },
+      { id: 'SMD-90410', customer: 'Meera Rao', items: '2x Paneer, 1x Curd', total: 238, status: 'Dispatched', time: '11 mins ago', partner: 'Anil K. (★ 4.8)' },
+      { id: 'SMD-90390', customer: 'Rahul Sharma', items: '1x Desi Ghee (500ml)', total: 650, status: 'Delivered', time: '40 mins ago', partner: 'Naresh M. (★ 5.0)' }
+    ]
+  },
+  {
+    id: 'shop3',
+    loginId: 'shop3',
+    email: 'shop3@sumadhura.com',
+    password: 'password123',
+    name: 'Sumadhura Super Store #3 - Jubilee Hills Hub',
+    shortName: 'Shop 3 (Jubilee Hills)',
+    branchCode: 'SMD-HYD-003',
+    tagline: 'Premium Heritage Organic Sourcing & Gourmet Hub',
+    manager: 'K. Venkat Rao',
+    phone: '+91 98450 33003',
+    address: 'Road No. 36, Near Jubilee Hills Check Post, Jubilee Hills, Hyderabad, Telangana 500033',
+    fssai: '13622011000391',
+    gstin: '36AABCS9012F3Z1',
+    timings: '5:00 AM – 11:00 PM Express Delivery',
+    coverage: 'Jubilee Hills, Banjara Hills, Film Nagar, Madhapur Rd (7.0 km Radius)',
+    dispatchFleetCount: 12,
+    dailyCapacity: 600,
+    coldChainTemp: '3.7°C OK',
+    rating: 4.98,
+    ordersCount: 215,
+    todayRevenue: 44100,
+    activeStatus: 'Active & Fulfilling',
+    colorTheme: 'from-purple-700 to-purple-950',
+    accentColor: 'text-purple-700',
+    badgeColor: 'bg-purple-100 text-purple-800 border-purple-300',
+    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=800&q=80',
+    inventory: [
+      { id: 'inv-301', name: 'Pure Buffalo Milk (1L)', stock: 135, unit: 'Litres', category: 'Dairy', inStock: true },
+      { id: 'inv-302', name: 'Fresh Malai Paneer (200g)', stock: 70, unit: 'Packs', category: 'Dairy', inStock: true },
+      { id: 'inv-303', name: 'Desi Cow Bilona Ghee (500ml)', stock: 50, unit: 'Jars', category: 'Dairy', inStock: true },
+      { id: 'inv-304', name: 'Farm Crisp Carrots (500g)', stock: 90, unit: 'kg', category: 'Vegetables', inStock: true },
+      { id: 'inv-305', name: 'Organic Royal Gala Apples (1kg)', stock: 62, unit: 'Packs', category: 'Fruits', inStock: true },
+      { id: 'inv-306', name: 'Thick Curd (400g)', stock: 85, unit: 'Tubs', category: 'Dairy', inStock: true }
+    ],
+    assignedOrders: [
+      { id: 'SMD-90418', customer: 'Dr. Rajeshwar', items: '2x Bilona Ghee, 2x Paneer', total: 1496, status: 'Packing', time: '1 min ago', partner: 'Praveen T. (★ 5.0)' },
+      { id: 'SMD-90411', customer: 'Ananya Deshmukh', items: '3x Apples, 2x Carrots', total: 580, status: 'Dispatched', time: '8 mins ago', partner: 'Gopi L. (★ 4.9)' },
+      { id: 'SMD-90401', customer: 'Harish V.', items: '4x Buffalo Milk (1L)', total: 256, status: 'Delivered', time: '25 mins ago', partner: 'Mohan B. (★ 4.8)' }
+    ]
+  }
+];
 
 export const AdminPage = () => {
   const {
@@ -116,6 +245,117 @@ export const AdminPage = () => {
   });
   const [isCalendarDropdownOpen, setIsCalendarDropdownOpen] = useState(false);
   const [isDailyOrdersModalOpen, setIsDailyOrdersModalOpen] = useState(false);
+
+  // -------------------------------------------------------------------
+  // MULTI-BRANCH SHOP STORES & SHOP LOGIN (Shop 1, Shop 2, Shop 3)
+  // -------------------------------------------------------------------
+  const [shopsList, setShopsList] = useState(() => {
+    try {
+      const saved = localStorage.getItem('sumadhura_admin_shops');
+      return saved ? JSON.parse(saved) : DEFAULT_SHOPS;
+    } catch {
+      return DEFAULT_SHOPS;
+    }
+  });
+
+  const [currentShop, setCurrentShop] = useState(() => {
+    try {
+      const savedShopId = localStorage.getItem('sumadhura_active_shop_id');
+      if (savedShopId) {
+        const found = DEFAULT_SHOPS.find(s => s.id === savedShopId || s.loginId === savedShopId);
+        if (found) return found;
+      }
+      return DEFAULT_SHOPS[0];
+    } catch {
+      return DEFAULT_SHOPS[0];
+    }
+  });
+
+  const [isShopLoginModalOpen, setIsShopLoginModalOpen] = useState(false);
+  const [isEditShopModalOpen, setIsEditShopModalOpen] = useState(false);
+  const [shopLoginForm, setShopLoginForm] = useState({ loginId: '', password: '' });
+  const [shopLoginError, setShopLoginError] = useState('');
+  const [storeActiveSubTab, setStoreActiveSubTab] = useState('orders'); // 'orders' | 'inventory' | 'fleet' | 'profile'
+  const [editStoreForm, setEditStoreForm] = useState(null);
+
+  const handleShopLogin = (loginIdOrShop) => {
+    let targetShop = null;
+    if (typeof loginIdOrShop === 'object' && loginIdOrShop?.id) {
+      targetShop = shopsList.find(s => s.id === loginIdOrShop.id) || loginIdOrShop;
+    } else {
+      const query = (loginIdOrShop || shopLoginForm.loginId || '').trim().toLowerCase();
+      targetShop = shopsList.find(
+        s => s.loginId.toLowerCase() === query ||
+             s.id.toLowerCase() === query ||
+             s.email.toLowerCase() === query ||
+             s.name.toLowerCase().includes(query) ||
+             (query === '1' && s.id === 'shop1') ||
+             (query === '2' && s.id === 'shop2') ||
+             (query === '3' && s.id === 'shop3')
+      );
+    }
+
+    if (!targetShop) {
+      setShopLoginError('Invalid Shop credentials. Please choose Shop 1, Shop 2, or Shop 3 (password: password123)');
+      showToast('❌ Shop credentials not recognized. Enter shop1, shop2, or shop3.', 'error');
+      return;
+    }
+
+    setCurrentShop(targetShop);
+    try {
+      localStorage.setItem('sumadhura_active_shop_id', targetShop.id);
+    } catch {}
+
+    setIsShopLoginModalOpen(false);
+    setShopLoginError('');
+    setShopLoginForm({ loginId: '', password: '' });
+
+    // AUTOMATICALLY OPEN SHOP STORE DETAILS!
+    setActiveTab('shop-store-details');
+
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    } catch {}
+
+    showToast(`🏪 Successfully logged in as ${targetShop.shortName}! Opening Store Details...`, 'success');
+  };
+
+  const handleUpdateStoreDetails = (e) => {
+    e.preventDefault();
+    if (!editStoreForm || !currentShop) return;
+    const updatedShops = shopsList.map(s => s.id === currentShop.id ? { ...s, ...editStoreForm } : s);
+    setShopsList(updatedShops);
+    setCurrentShop({ ...currentShop, ...editStoreForm });
+    try {
+      localStorage.setItem('sumadhura_admin_shops', JSON.stringify(updatedShops));
+    } catch {}
+    setIsEditShopModalOpen(false);
+    showToast(`✅ Store details updated for ${currentShop.shortName}!`);
+  };
+
+  const handleRestockStoreItem = (shopId, itemId) => {
+    const updatedShops = shopsList.map(shop => {
+      if (shop.id !== shopId) return shop;
+      const updatedInv = (shop.inventory || []).map(item => {
+        if (item.id === itemId) {
+          return { ...item, stock: (item.stock || 0) + 20, inStock: true };
+        }
+        return item;
+      });
+      return { ...shop, inventory: updatedInv };
+    });
+    setShopsList(updatedShops);
+    const active = updatedShops.find(s => s.id === (currentShop ? currentShop.id : ''));
+    if (active) setCurrentShop(active);
+    try {
+      localStorage.setItem('sumadhura_admin_shops', JSON.stringify(updatedShops));
+    } catch {}
+    showToast(`📦 Restocked +20 units for this store!`, 'success');
+  };
 
   // Helper to extract a normalized YYYY-MM-DD date from an order
   const getOrderDateString = (o) => {
@@ -1528,6 +1768,16 @@ export const AdminPage = () => {
 
     const sidebarLinks = [
     {
+      id: 'shop-store-details',
+      label: currentShop ? currentShop.shortName : 'Store Details',
+      icon: Store,
+      badge: currentShop ? currentShop.branchCode : '3 Hubs',
+      customBadge: {
+        text: 'LIVE HUB',
+        className: 'bg-emerald-400 text-slate-900 border border-emerald-300 font-black'
+      }
+    },
+    {
       id: 'dashboard',
       label: 'Dashboard',
       icon: LayoutGrid,
@@ -1758,6 +2008,32 @@ export const AdminPage = () => {
             })}
           </div>
 
+          {/* Active Store Branch & Quick Switch Login */}
+          <div className="p-3 border-t border-[#52060E] bg-[#2C0307]">
+            <div className="p-3 rounded-2xl bg-[#1C0205] border border-[#52060E] text-xs space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-extrabold text-amber-300 flex items-center gap-1.5 truncate">
+                  <Store className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <span className="truncate">{currentShop ? currentShop.shortName : 'Store Hub'}</span>
+                </span>
+                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">
+                  {currentShop ? currentShop.branchCode : 'HUB'}
+                </span>
+              </div>
+              <p className="text-[10px] text-amber-100/70 truncate">
+                Manager: {currentShop?.manager || 'Store Manager'}
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsShopLoginModalOpen(true)}
+                className="w-full py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-[11px] flex items-center justify-center gap-1.5 transition-all border border-white/15 active:scale-95 cursor-pointer"
+              >
+                <Key className="w-3 h-3 text-amber-400" />
+                <span>Shop Login / Switch Store</span>
+              </button>
+            </div>
+          </div>
+
           {/* Bottom Card in Royal Maroon Brand Theme */}
           <div className="p-3 border-t border-[#52060E] bg-[#330308]">
             <div className="p-3.5 rounded-2xl bg-[#230206] border border-[#52060E] text-xs space-y-2">
@@ -1930,6 +2206,19 @@ export const AdminPage = () => {
 
           {/* Quick Simulators & Storefront Jump */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Shop 1, 2, 3 Branch Selector & Login Button */}
+            <button
+              type="button"
+              onClick={() => setIsShopLoginModalOpen(true)}
+              className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
+              title="Shop 1 / Shop 2 / Shop 3 Login & Store Details Switcher"
+            >
+              <Store className="w-3.5 h-3.5 text-[#7D0A14]" />
+              <span className="hidden sm:inline text-slate-500 font-bold">Shop:</span>
+              <span className="font-black text-[#7D0A14]">{currentShop ? currentShop.shortName : 'Select Shop'}</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            </button>
+
             <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
               <span className="text-[#D98207]">❄️ {adminContent.coldChainTemp}</span>
             </div>
@@ -1946,7 +2235,6 @@ export const AdminPage = () => {
               </button>
             )}
 
-
             <button
               onClick={() => navigateTo('home')}
               className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
@@ -1959,6 +2247,406 @@ export const AdminPage = () => {
 
         {/* Scrollable Workspace */}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+          {/* ========================================================= */}
+          {/* 0. SHOP STORE DETAILS VIEW (Shop 1, Shop 2, Shop 3)       */}
+          {/* ========================================================= */}
+          {activeTab === 'shop-store-details' && (
+            <div className="space-y-6 animate-in fade-in duration-200">
+              {/* Store Hero Banner & Identity Card */}
+              <div className="relative rounded-3xl overflow-hidden border border-[#EDE1D1] bg-white shadow-sm">
+                <div className="relative h-44 sm:h-52 w-full bg-slate-900 overflow-hidden">
+                  <img
+                    src={currentShop?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80'}
+                    alt={currentShop?.name}
+                    className="w-full h-full object-cover opacity-60"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  
+                  {/* Floating Badges */}
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 rounded-full bg-[#F5A623] text-[#3D040A] text-xs font-black uppercase tracking-wider shadow-md">
+                        {currentShop?.branchCode || 'BRANCH HUB'}
+                      </span>
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/90 backdrop-blur-sm text-white text-xs font-extrabold flex items-center gap-1.5 shadow-md">
+                        <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                        <span>{currentShop?.activeStatus || 'Live & Fulfilling'}</span>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsShopLoginModalOpen(true)}
+                        className="px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#7D0A14] font-black text-xs flex items-center gap-1.5 shadow-lg active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Key className="w-3.5 h-3.5 text-[#7D0A14]" />
+                        <span>Switch Shop Login</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditStoreForm({ ...currentShop });
+                          setIsEditShopModalOpen(true);
+                        }}
+                        className="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-xs flex items-center gap-1.5 border border-white/30 active:scale-95 transition-all cursor-pointer"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        <span>Edit Store Details</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Store Title & Description */}
+                  <div className="absolute bottom-4 left-4 sm:left-6 right-4 sm:right-6 text-white">
+                    <div className="flex items-baseline gap-2 flex-wrap">
+                      <h2 className="text-xl sm:text-2xl md:text-3xl font-black drop-shadow-md">
+                        {currentShop?.name}
+                      </h2>
+                      <span className="text-xs sm:text-sm font-bold text-amber-300 drop-shadow-sm">
+                        ★ {currentShop?.rating || 4.9} (Express Dispatch Hub)
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-200 font-medium drop-shadow-sm mt-0.5 line-clamp-1">
+                      {currentShop?.tagline}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Key Store Vital Info Ribbon */}
+                <div className="p-4 sm:p-5 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-[#EDE1D1] text-xs">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#FAF5EC] text-[#7D0A14] border border-[#EDE1D1] flex items-center justify-center shrink-0">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Store Manager & Contact</span>
+                      <div className="font-black text-slate-900 text-xs sm:text-sm">{currentShop?.manager}</div>
+                      <a href={`tel:${currentShop?.phone}`} className="text-[#7D0A14] font-extrabold hover:underline block mt-0.5">
+                        {currentShop?.phone}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#FAF5EC] text-[#7D0A14] border border-[#EDE1D1] flex items-center justify-center shrink-0">
+                      <MapPin className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Store Hub Location</span>
+                      <div className="font-semibold text-slate-700 leading-snug">{currentShop?.address}</div>
+                      <span className="text-[10px] text-emerald-700 font-extrabold block mt-0.5">
+                        Coverage: {currentShop?.coverage}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#FAF5EC] text-[#7D0A14] border border-[#EDE1D1] flex items-center justify-center shrink-0">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Compliance & Operations</span>
+                      <div className="font-bold text-slate-800">FSSAI: {currentShop?.fssai}</div>
+                      <div className="text-slate-500 font-medium">GSTIN: {currentShop?.gstin}</div>
+                      <span className="text-[10px] text-amber-700 font-extrabold block mt-0.5">
+                        ❄️ Cold Chain: {currentShop?.coldChainTemp || '3.8°C OK'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Store Performance KPI Cards */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="p-4 rounded-2xl bg-white border border-[#EDE1D1] shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase text-slate-400">Today's Orders</span>
+                    <span className="p-1.5 rounded-lg bg-blue-50 text-blue-700">
+                      <ShoppingBag className="w-4 h-4" />
+                    </span>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-[#3D040A] mt-1">
+                    {currentShop?.ordersCount || 142}
+                  </div>
+                  <span className="text-[10px] text-emerald-600 font-bold block mt-0.5">
+                    10-15 Min Express Deliveries
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-[#EDE1D1] shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase text-slate-400">Today's Store Sales</span>
+                    <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
+                      <DollarSign className="w-4 h-4" />
+                    </span>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-emerald-800 mt-1">
+                    ₹{currentShop?.todayRevenue?.toLocaleString('en-IN') || '28,450'}
+                  </div>
+                  <span className="text-[10px] text-slate-500 font-bold block mt-0.5">
+                    Cash & UPI Collected
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-[#EDE1D1] shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase text-slate-400">Store Inventory</span>
+                    <span className="p-1.5 rounded-lg bg-amber-50 text-amber-700">
+                      <Package className="w-4 h-4" />
+                    </span>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-[#3D040A] mt-1">
+                    {currentShop?.inventory?.length || 6} Fresh SKUs
+                  </div>
+                  <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                    100% In-Stock & Fresh
+                  </span>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white border border-[#EDE1D1] shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase text-slate-400">Dispatch Fleet</span>
+                    <span className="p-1.5 rounded-lg bg-purple-50 text-purple-700">
+                      <Truck className="w-4 h-4" />
+                    </span>
+                  </div>
+                  <div className="text-xl sm:text-2xl font-black text-purple-900 mt-1">
+                    {currentShop?.dispatchFleetCount || 8} Riders
+                  </div>
+                  <span className="text-[10px] text-purple-700 font-bold block mt-0.5">
+                    Active Delivery Zone
+                  </span>
+                </div>
+              </div>
+
+              {/* Sub-Tabs: Orders | Inventory | Fleet | Operating Hours */}
+              <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                  <div className="flex items-center gap-2 overflow-x-auto">
+                    {[
+                      { id: 'orders', label: 'Assigned Store Orders', count: currentShop?.assignedOrders?.length || 3 },
+                      { id: 'inventory', label: 'In-Store Stock Levels', count: currentShop?.inventory?.length || 6 },
+                      { id: 'fleet', label: 'Delivery Boys & Fleet', count: currentShop?.dispatchFleetCount || 8 },
+                      { id: 'profile', label: 'Store Timings & Profile' }
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setStoreActiveSubTab(tab.id)}
+                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+                          storeActiveSubTab === tab.id
+                            ? 'bg-[#7D0A14] text-white shadow-xs scale-[1.02]'
+                            : 'bg-[#FAF5EC] text-slate-600 hover:bg-[#F3EAD9] border border-[#EDE1D1]'
+                        }`}
+                      >
+                        <span>{tab.label}</span>
+                        {tab.count !== undefined && (
+                          <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${
+                            storeActiveSubTab === tab.id ? 'bg-amber-300 text-[#3D040A]' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            {tab.count}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="text-xs text-slate-500 font-bold">
+                    Operating Branch: <span className="text-[#7D0A14]">{currentShop?.shortName}</span>
+                  </div>
+                </div>
+
+                {/* SubTab 1: Assigned Orders */}
+                {storeActiveSubTab === 'orders' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                        Live Express Orders Assigned to {currentShop?.shortName}
+                      </h4>
+                      <span className="text-[11px] text-emerald-700 font-bold">● Auto-routed from customer orders</span>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
+                            <th className="p-3 rounded-l-xl">Order ID</th>
+                            <th className="p-3">Customer</th>
+                            <th className="p-3">Items Ordered</th>
+                            <th className="p-3">Total Amount</th>
+                            <th className="p-3">Assigned Partner</th>
+                            <th className="p-3">Time</th>
+                            <th className="p-3">Status</th>
+                            <th className="p-3 rounded-r-xl text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-medium">
+                          {(currentShop?.assignedOrders || []).map((ord) => (
+                            <tr key={ord.id} className="hover:bg-[#FAF5EC]/40 transition-colors">
+                              <td className="p-3 font-black text-[#7D0A14]">{ord.id}</td>
+                              <td className="p-3 font-bold text-slate-900">{ord.customer}</td>
+                              <td className="p-3 text-slate-600">{ord.items}</td>
+                              <td className="p-3 font-black text-slate-900">₹{ord.total}</td>
+                              <td className="p-3 font-semibold text-slate-700">{ord.partner}</td>
+                              <td className="p-3 text-slate-400 text-[11px]">{ord.time}</td>
+                              <td className="p-3">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                  ord.status === 'Delivered'
+                                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                    : ord.status === 'Dispatched'
+                                    ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                                    : 'bg-amber-100 text-amber-900 border border-amber-300 animate-pulse'
+                                }`}>
+                                  {ord.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    showToast(`Order ${ord.id} status updated for ${currentShop.shortName}!`);
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg bg-[#7D0A14] hover:bg-[#60060E] text-white text-[10px] font-black shadow-2xs active:scale-95 cursor-pointer"
+                                >
+                                  Update Status
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* SubTab 2: In-Store Inventory */}
+                {storeActiveSubTab === 'inventory' && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                        Current Store Inventory & Shelf Stocks
+                      </h4>
+                      <span className="text-[11px] text-slate-500 font-bold">Fast-Moving Daily Fresh Stocks</span>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
+                            <th className="p-3 rounded-l-xl">Product Name</th>
+                            <th className="p-3">Category</th>
+                            <th className="p-3">In-Store Stock</th>
+                            <th className="p-3">Status</th>
+                            <th className="p-3 rounded-r-xl text-center">Quick Restock</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 font-medium">
+                          {(currentShop?.inventory || []).map((item) => (
+                            <tr key={item.id} className="hover:bg-[#FAF5EC]/40 transition-colors">
+                              <td className="p-3 font-bold text-slate-900">{item.name}</td>
+                              <td className="p-3">
+                                <span className="px-2 py-0.5 rounded-md bg-[#FAF5EC] text-[#7D0A14] border border-[#EDE1D1] text-[10px] font-bold">
+                                  {item.category}
+                                </span>
+                              </td>
+                              <td className="p-3 font-black text-slate-900 text-sm">
+                                {item.stock} {item.unit}
+                              </td>
+                              <td className="p-3">
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                  item.inStock
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : 'bg-rose-100 text-rose-800'
+                                }`}>
+                                  {item.inStock ? 'In Stock' : 'Low Stock'}
+                                </span>
+                              </td>
+                              <td className="p-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRestockStoreItem(currentShop.id, item.id)}
+                                  className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] shadow-xs active:scale-95 transition-all cursor-pointer"
+                                >
+                                  + Restock (+20)
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* SubTab 3: Delivery Fleet */}
+                {storeActiveSubTab === 'fleet' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                        Delivery Partners Assigned to {currentShop?.shortName}
+                      </h4>
+                      <span className="text-[11px] text-purple-700 font-bold">10-15 Min Express SLA</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                      {[
+                        { name: 'Ramesh Kumar', phone: '+91 98450 77123', rating: '4.9 ★', vehicle: 'TS09-EG-4412', status: 'On Delivery' },
+                        { name: 'Kiran Goud', phone: '+91 98450 77124', rating: '4.8 ★', vehicle: 'TS09-EG-5589', status: 'At Store Bay' },
+                        { name: 'Suresh Varma', phone: '+91 98450 77125', rating: '4.95 ★', vehicle: 'TS09-EG-6623', status: 'Packing Orders' },
+                        { name: 'Anil Reddy', phone: '+91 98450 77126', rating: '4.9 ★', vehicle: 'TS09-EG-7741', status: 'On Delivery' }
+                      ].map((rider, idx) => (
+                        <div key={idx} className="p-3.5 rounded-2xl bg-[#FAF5EC]/60 border border-[#EDE1D1] space-y-1.5">
+                          <div className="flex items-center justify-between">
+                            <span className="font-extrabold text-slate-900">{rider.name}</span>
+                            <span className="text-amber-600 font-black text-[11px]">{rider.rating}</span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 font-medium">Bike: {rider.vehicle}</div>
+                          <div className="text-[11px] text-[#7D0A14] font-bold">{rider.phone}</div>
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                            rider.status === 'On Delivery'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-emerald-100 text-emerald-800'
+                          }`}>
+                            {rider.status}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* SubTab 4: Store Profile & Timings */}
+                {storeActiveSubTab === 'profile' && (
+                  <div className="space-y-4 text-xs">
+                    <div className="p-4 rounded-2xl bg-[#FAF5EC] border border-[#EDE1D1] space-y-2">
+                      <div className="font-black text-slate-900 text-sm">{currentShop?.name}</div>
+                      <p className="text-slate-600">{currentShop?.tagline}</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-[#EDE1D1]">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">Operating Hours</span>
+                          <span className="font-bold text-slate-800">{currentShop?.timings}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">Daily Dispatch Capacity</span>
+                          <span className="font-bold text-slate-800">{currentShop?.dailyCapacity} Orders per Day</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">FSSAI Central Food License</span>
+                          <span className="font-bold text-slate-800">{currentShop?.fssai}</span>
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">State GSTIN Number</span>
+                          <span className="font-bold text-slate-800">{currentShop?.gstin}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* ========================================================= */}
           {/* 1. DASHBOARD OVERVIEW                                     */}
           {/* ========================================================= */}
@@ -7471,6 +8159,281 @@ export const AdminPage = () => {
                 >
                   <Save className="w-3.5 h-3.5 text-amber-300" />
                   <span>{editingCategory ? 'Save Category' : 'Create Category'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* SHOP LOGIN / SWITCH BRANCH MODAL (Shop 1, Shop 2, Shop 3)     */}
+      {/* ------------------------------------------------------------- */}
+      {isShopLoginModalOpen && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          onClick={() => setIsShopLoginModalOpen(false)}
+        >
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs">
+                  <Store className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-slate-900">
+                    Store Branch Login & Switcher
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    Select or login to Shop 1, 2, or 3 to automatically open store details.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsShopLoginModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Quick 1-Click Fast Login Cards for Shop 1, Shop 2, Shop 3 */}
+            <div className="space-y-2">
+              <label className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">
+                Quick 1-Click Fast Shop Login
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {shopsList.map((shop) => (
+                  <button
+                    key={shop.id}
+                    type="button"
+                    onClick={() => handleShopLogin(shop)}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                      currentShop?.id === shop.id
+                        ? 'border-[#7D0A14] bg-[#FAF5EC] ring-2 ring-[#7D0A14]/20 shadow-xs'
+                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <span className="font-black text-slate-900 text-xs">{shop.shortName}</span>
+                        <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-white border border-[#EDE1D1] text-[#7D0A14]">
+                          {shop.branchCode}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">{shop.manager}</p>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[11px] font-black text-[#7D0A14]">
+                      <span>Login & Open</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="relative flex items-center justify-center">
+              <div className="border-t border-slate-200 w-full" />
+              <span className="bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
+                Or Enter Shop Login Credentials
+              </span>
+            </div>
+
+            {/* Credential Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleShopLogin(shopLoginForm.loginId, shopLoginForm.password);
+              }}
+              className="space-y-3.5 text-xs"
+            >
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">
+                  Shop Login ID / Username *
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={shopLoginForm.loginId}
+                    onChange={(e) => {
+                      setShopLoginForm({ ...shopLoginForm, loginId: e.target.value });
+                      setShopLoginError('');
+                    }}
+                    placeholder="e.g. shop1, shop2, shop3 or shop1@sumadhura.com"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    required
+                  />
+                </div>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  Tip: Enter <strong>shop1</strong>, <strong>shop2</strong>, or <strong>shop3</strong> (password: <strong>password123</strong>)
+                </span>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">
+                  Password *
+                </label>
+                <div className="relative">
+                  <Key className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="password"
+                    value={shopLoginForm.password}
+                    onChange={(e) => {
+                      setShopLoginForm({ ...shopLoginForm, password: e.target.value });
+                      setShopLoginError('');
+                    }}
+                    placeholder="Enter shop password (default: password123)"
+                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    required
+                  />
+                </div>
+              </div>
+
+              {shopLoginError && (
+                <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{shopLoginError}</span>
+                </div>
+              )}
+
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsShopLoginModalOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black flex items-center gap-2 shadow-md shadow-[#7D0A14]/25 active:scale-95 transition-all cursor-pointer"
+                >
+                  <Key className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Verify Login & Open Store Details</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* EDIT STORE DETAILS MODAL                                      */}
+      {/* ------------------------------------------------------------- */}
+      {isEditShopModalOpen && editStoreForm && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          onClick={() => setIsEditShopModalOpen(false)}
+        >
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Store className="w-5 h-5 text-[#7D0A14]" />
+                <h3 className="font-black text-base text-slate-900">
+                  Edit {editStoreForm.shortName} Details
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditShopModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleUpdateStoreDetails} className="space-y-3.5 text-xs">
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Store Name *</label>
+                <input
+                  type="text"
+                  value={editStoreForm.name || ''}
+                  onChange={(e) => setEditStoreForm({ ...editStoreForm, name: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Manager Name *</label>
+                  <input
+                    type="text"
+                    value={editStoreForm.manager || ''}
+                    onChange={(e) => setEditStoreForm({ ...editStoreForm, manager: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Manager Phone *</label>
+                  <input
+                    type="text"
+                    value={editStoreForm.phone || ''}
+                    onChange={(e) => setEditStoreForm({ ...editStoreForm, phone: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Store Address *</label>
+                <textarea
+                  rows={2}
+                  value={editStoreForm.address || ''}
+                  onChange={(e) => setEditStoreForm({ ...editStoreForm, address: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Operating Timings</label>
+                  <input
+                    type="text"
+                    value={editStoreForm.timings || ''}
+                    onChange={(e) => setEditStoreForm({ ...editStoreForm, timings: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Daily Capacity</label>
+                  <input
+                    type="number"
+                    value={editStoreForm.dailyCapacity || ''}
+                    onChange={(e) => setEditStoreForm({ ...editStoreForm, dailyCapacity: Number(e.target.value) })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex items-center justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsEditShopModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                >
+                  <Save className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Save Store Changes</span>
                 </button>
               </div>
             </form>
