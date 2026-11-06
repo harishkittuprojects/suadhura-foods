@@ -277,6 +277,7 @@ export const AdminPage = () => {
   const [shopLoginError, setShopLoginError] = useState('');
   const [storeActiveSubTab, setStoreActiveSubTab] = useState('orders'); // 'orders' | 'inventory' | 'fleet' | 'profile'
   const [editStoreForm, setEditStoreForm] = useState(null);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
   const handleShopLogin = (loginIdOrShop) => {
     let targetShop = null;
@@ -2072,216 +2073,270 @@ export const AdminPage = () => {
       {/* ============================================================= */}
       <div className="flex-1 flex flex-col h-full overflow-hidden bg-[#FAF5EC]">
         {/* Header Bar */}
-        <header className="min-h-16 bg-white border-b border-[#E8DDCF] px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 flex-shrink-0 z-20 shadow-xs">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl bg-[#FAF5EC] text-[#7D0A14] hover:bg-[#F3EAD9]"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+        <header className="bg-white border-b border-[#E8DDCF] px-3.5 sm:px-6 py-2.5 flex flex-col gap-2.5 flex-shrink-0 z-20 shadow-xs">
+          {/* Top Row: Mobile Menu + Titles + Shop Pill & Quick Actions */}
+          <div className="flex items-center justify-between gap-2 w-full">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-xl bg-[#FAF5EC] text-[#7D0A14] hover:bg-[#F3EAD9] border border-[#EDE1D1] shrink-0 active:scale-95 cursor-pointer"
+                aria-label="Open navigation menu"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
 
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
-                <span>Sumadhura Operations</span>
-                <ChevronRight className="w-3 h-3 text-slate-400" />
-                <span className="text-[#7D0A14] font-black">
-                  {activeTab === 'b2c-customers'
-                    ? 'Daily Customers (B2C Retail)'
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold text-slate-500 truncate">
+                  <span className="hidden sm:inline">Sumadhura Operations</span>
+                  <span className="sm:hidden font-black text-amber-900">Sumadhura</span>
+                  <ChevronRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-slate-400 shrink-0" />
+                  <span className="text-[#7D0A14] font-black truncate">
+                    {activeTab === 'b2c-customers'
+                      ? 'B2C Retail'
+                      : activeTab === 'b2b-customers'
+                      ? 'B2B Wholesale'
+                      : activeTab === 'shop-store-details'
+                      ? currentShop?.shortName || 'Store Hub'
+                      : activeTab.replace('-', ' ')}
+                  </span>
+                </div>
+                <h1 className="text-xs sm:text-base font-black text-[#3D040A] truncate">
+                  {activeTab === 'overview'
+                    ? adminMode === 'b2c'
+                      ? 'B2C Retail Dashboard'
+                      : adminMode === 'b2b'
+                      ? 'B2B Wholesale Dashboard'
+                      : 'Operations Dashboard'
+                    : activeTab === 'shop-store-details'
+                    ? `${currentShop?.name || 'Store Hub'}`
+                    : activeTab === 'b2c-customers'
+                    ? 'Daily Customers Directory'
                     : activeTab === 'b2b-customers'
-                    ? 'Shopkeepers (B2B Wholesale)'
+                    ? 'Shopkeepers & Commercial Registry'
+                    : activeTab === 'b2b-quotes'
+                    ? 'Wholesale RFPs & Quotations'
                     : activeTab.replace('-', ' ')}
-                </span>
+                </h1>
               </div>
-              <h1 className="text-sm sm:text-base font-black text-[#3D040A]">
-                {activeTab === 'overview'
-                  ? adminMode === 'b2c'
-                    ? 'B2C Retail Operations Dashboard'
-                    : adminMode === 'b2b'
-                    ? 'B2B Wholesale Commercial Dashboard'
-                    : 'Operations Command Dashboard'
-                  : activeTab === 'b2c-customers'
-                  ? 'Daily Customers Directory'
-                  : activeTab === 'b2b-customers'
-                  ? 'Shopkeepers & Commercial Registry'
-                  : activeTab === 'b2b-quotes'
-                  ? 'Wholesale RFPs & Quotations Desk'
-                  : activeTab.replace('-', ' ')}
-              </h1>
+            </div>
+
+            {/* Top Right: Shop Selector Pill & Search Toggle */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              {/* Shop 1, 2, 3 Branch Selector & Quick Login Modal */}
+              <button
+                type="button"
+                onClick={() => setIsShopLoginModalOpen(true)}
+                className="flex items-center gap-1 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
+                title="Shop 1 / Shop 2 / Shop 3 Login & Store Details Switcher"
+              >
+                <Store className="w-3.5 h-3.5 text-[#7D0A14] shrink-0" />
+                <span className="hidden sm:inline text-slate-500 font-bold">Shop:</span>
+                <span className="font-black text-[#7D0A14] truncate max-w-[85px] sm:max-w-none">
+                  {currentShop ? currentShop.shortName : 'Select Shop'}
+                </span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              </button>
+
+              {/* Mobile Search Icon Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+                className="lg:hidden p-2 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] shrink-0 active:scale-95 cursor-pointer"
+                title="Search Customers"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+
+              <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
+                <span className="text-[#D98207]">❄️ {adminContent.coldChainTemp}</span>
+              </div>
+
+              {(adminMode === 'b2c' || adminMode === 'unified') && (
+                <button
+                  onClick={simulateNewB2COrder}
+                  className="hidden sm:flex px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                  title="Create a new incoming B2C retail order"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>B2C Order</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => navigateTo('home')}
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Customer Storefront</span>
+              </button>
             </div>
           </div>
 
-          {/* Header Customer Search Bar */}
-          <div className="relative flex-1 min-w-[200px] max-w-xs sm:max-w-sm">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search customers (name, phone, email)..."
-              value={customerSearchTerm}
-              onChange={(e) => {
-                setCustomerSearchTerm(e.target.value);
-                if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
-                  setActiveTab('b2c-customers');
-                }
-              }}
-              onFocus={() => {
-                if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
-                  setActiveTab('b2c-customers');
-                }
-              }}
-              className="w-full pl-9 pr-7 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
-            />
-            {customerSearchTerm && (
+          {/* Bottom Bar: Mode Switcher (Full-width 3-way toggle on mobile) & Desktop Search */}
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 w-full">
+            {/* 3-way Scope Segmented Control */}
+            <div className="w-full lg:w-auto flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
               <button
-                onClick={() => setCustomerSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                type="button"
+                onClick={() => {
+                  setAdminMode('b2c');
+                  setCustomerScope('b2c');
+                  if (activeTab === 'b2b-customers') {
+                    setActiveTab('b2c-customers');
+                  }
+                  showToast('Switched to B2C Retail Operations');
+                }}
+                className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  adminMode === 'b2c'
+                    ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
               >
-                <X className="w-3.5 h-3.5" />
+                <User className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">B2C Retail</span>
               </button>
-            )}
-          </div>
 
-          {/* Central Header Scope Switch Toggle (Switch between B2C, B2B, and Unified instantly) */}
-          <div className="flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
-            <button
-              type="button"
-              onClick={() => {
-                setAdminMode('b2c');
-                setCustomerScope('b2c');
-                if (activeTab === 'b2b-customers') {
-                  setActiveTab('b2c-customers');
-                }
-                showToast('Switched to B2C Retail Operations');
-              }}
-              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                adminMode === 'b2c'
-                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>B2C Retail</span>
-            </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminMode('b2b');
+                  setCustomerScope('b2b');
+                  if (activeTab === 'b2c-customers') {
+                    setActiveTab('b2b-customers');
+                  }
+                  showToast('Switched to B2B Wholesale Portal');
+                }}
+                className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  adminMode === 'b2b'
+                    ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <Building2 className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">B2B Wholesale</span>
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setAdminMode('b2b');
-                setCustomerScope('b2b');
-                if (activeTab === 'b2c-customers') {
-                  setActiveTab('b2b-customers');
-                }
-                showToast('Switched to B2B Wholesale Portal');
-              }}
-              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                adminMode === 'b2b'
-                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>B2B Wholesale</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setAdminMode('unified');
-                setCustomerScope('all');
-                if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') {
-                  setActiveTab('customers');
-                }
-                showToast('Switched to Unified View (B2C + B2B)');
-              }}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
-                adminMode === 'unified'
-                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Unified</span>
-            </button>
-          </div>
-
-          {/* Quick Simulators & Storefront Jump */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Shop 1, 2, 3 Branch Selector & Login Button */}
-            <button
-              type="button"
-              onClick={() => setIsShopLoginModalOpen(true)}
-              className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
-              title="Shop 1 / Shop 2 / Shop 3 Login & Store Details Switcher"
-            >
-              <Store className="w-3.5 h-3.5 text-[#7D0A14]" />
-              <span className="hidden sm:inline text-slate-500 font-bold">Shop:</span>
-              <span className="font-black text-[#7D0A14]">{currentShop ? currentShop.shortName : 'Select Shop'}</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            </button>
-
-            <div className="hidden xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
-              <span className="text-[#D98207]">❄️ {adminContent.coldChainTemp}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminMode('unified');
+                  setCustomerScope('all');
+                  if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') {
+                    setActiveTab('customers');
+                  }
+                  showToast('Switched to Unified View (B2C + B2B)');
+                }}
+                className={`flex-1 lg:flex-initial flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                  adminMode === 'unified'
+                    ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate">Unified</span>
+              </button>
             </div>
 
-            {(adminMode === 'b2c' || adminMode === 'unified') && (
-              <button
-                onClick={simulateNewB2COrder}
-                className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
-                title="Create a new incoming B2C retail order"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">B2C Order</span>
-                <span className="sm:hidden">B2C</span>
-              </button>
-            )}
+            {/* Desktop Customer Search Bar */}
+            <div className="hidden lg:flex relative flex-1 min-w-[200px] max-w-xs sm:max-w-sm">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Search customers (name, phone, email)..."
+                value={customerSearchTerm}
+                onChange={(e) => {
+                  setCustomerSearchTerm(e.target.value);
+                  if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                    setActiveTab('b2c-customers');
+                  }
+                }}
+                onFocus={() => {
+                  if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                    setActiveTab('b2c-customers');
+                  }
+                }}
+                className="w-full pl-9 pr-7 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
+              />
+              {customerSearchTerm && (
+                <button
+                  onClick={() => setCustomerSearchTerm('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
 
-            <button
-              onClick={() => navigateTo('home')}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
-            >
-              <Store className="w-3.5 h-3.5" />
-              <span>Customer Storefront</span>
-            </button>
+            {/* Mobile Expandable Search Bar */}
+            {(isMobileSearchOpen || customerSearchTerm) && (
+              <div className="w-full lg:hidden relative animate-in slide-in-from-top-1 duration-200">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search customers (name, phone, email)..."
+                  value={customerSearchTerm}
+                  onChange={(e) => {
+                    setCustomerSearchTerm(e.target.value);
+                    if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                      setActiveTab('b2c-customers');
+                    }
+                  }}
+                  autoFocus
+                  className="w-full pl-9 pr-8 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCustomerSearchTerm('');
+                    setIsMobileSearchOpen(false);
+                  }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
         </header>
 
         {/* Scrollable Workspace */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 space-y-5 sm:space-y-6">
           {/* ========================================================= */}
           {/* 0. SHOP STORE DETAILS VIEW (Shop 1, Shop 2, Shop 3)       */}
           {/* ========================================================= */}
           {activeTab === 'shop-store-details' && (
-            <div className="space-y-6 animate-in fade-in duration-200">
+            <div className="space-y-5 sm:space-y-6 animate-in fade-in duration-200">
               {/* Store Hero Banner & Identity Card */}
               <div className="relative rounded-3xl overflow-hidden border border-[#EDE1D1] bg-white shadow-sm">
-                <div className="relative h-44 sm:h-52 w-full bg-slate-900 overflow-hidden">
+                <div className="relative min-h-[210px] sm:h-52 w-full bg-slate-900 overflow-hidden flex flex-col justify-between p-4 sm:p-6">
                   <img
                     src={currentShop?.image || 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80'}
                     alt={currentShop?.name}
-                    className="w-full h-full object-cover opacity-60"
+                    className="absolute inset-0 w-full h-full object-cover opacity-50"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-black/30 pointer-events-none" />
                   
-                  {/* Floating Badges */}
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-full bg-[#F5A623] text-[#3D040A] text-xs font-black uppercase tracking-wider shadow-md">
+                  {/* Floating Badges & Action Buttons */}
+                  <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <span className="px-2.5 sm:px-3 py-1 rounded-full bg-[#F5A623] text-[#3D040A] text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-md">
                         {currentShop?.branchCode || 'BRANCH HUB'}
                       </span>
-                      <span className="px-3 py-1 rounded-full bg-emerald-500/90 backdrop-blur-sm text-white text-xs font-extrabold flex items-center gap-1.5 shadow-md">
-                        <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                      <span className="px-2.5 sm:px-3 py-1 rounded-full bg-emerald-500/90 backdrop-blur-sm text-white text-[10px] sm:text-xs font-extrabold flex items-center gap-1.5 shadow-md">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                         <span>{currentShop?.activeStatus || 'Live & Fulfilling'}</span>
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <button
                         type="button"
                         onClick={() => setIsShopLoginModalOpen(true)}
-                        className="px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#7D0A14] font-black text-xs flex items-center gap-1.5 shadow-lg active:scale-95 transition-all cursor-pointer"
+                        className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#7D0A14] font-black text-xs flex items-center gap-1.5 shadow-lg active:scale-95 transition-all cursor-pointer"
                       >
                         <Key className="w-3.5 h-3.5 text-[#7D0A14]" />
-                        <span>Switch Shop Login</span>
+                        <span>Switch Shop</span>
                       </button>
                       <button
                         type="button"
@@ -2289,18 +2344,19 @@ export const AdminPage = () => {
                           setEditStoreForm({ ...currentShop });
                           setIsEditShopModalOpen(true);
                         }}
-                        className="px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-xs flex items-center gap-1.5 border border-white/30 active:scale-95 transition-all cursor-pointer"
+                        className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-xs flex items-center gap-1.5 border border-white/30 active:scale-95 transition-all cursor-pointer"
                       >
                         <Pencil className="w-3.5 h-3.5" />
-                        <span>Edit Store Details</span>
+                        <span className="hidden sm:inline">Edit Store Details</span>
+                        <span className="sm:hidden">Edit</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Store Title & Description */}
-                  <div className="absolute bottom-4 left-4 sm:left-6 right-4 sm:right-6 text-white">
+                  <div className="relative z-10 text-white pt-3">
                     <div className="flex items-baseline gap-2 flex-wrap">
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-black drop-shadow-md">
+                      <h2 className="text-lg sm:text-2xl md:text-3xl font-black drop-shadow-md">
                         {currentShop?.name}
                       </h2>
                       <span className="text-xs sm:text-sm font-bold text-amber-300 drop-shadow-sm">
@@ -2421,9 +2477,9 @@ export const AdminPage = () => {
               </div>
 
               {/* Sub-Tabs: Orders | Inventory | Fleet | Operating Hours */}
-              <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs">
+              <div className="bg-white rounded-3xl border border-[#EDE1D1] p-4 sm:p-6 space-y-4 sm:space-y-5 shadow-xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                  <div className="flex items-center gap-2 overflow-x-auto">
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar w-full sm:w-auto">
                     {[
                       { id: 'orders', label: 'Assigned Store Orders', count: currentShop?.assignedOrders?.length || 3 },
                       { id: 'inventory', label: 'In-Store Stock Levels', count: currentShop?.inventory?.length || 6 },
@@ -2434,7 +2490,7 @@ export const AdminPage = () => {
                         key={tab.id}
                         type="button"
                         onClick={() => setStoreActiveSubTab(tab.id)}
-                        className={`px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+                        className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 shrink-0 whitespace-nowrap ${
                           storeActiveSubTab === tab.id
                             ? 'bg-[#7D0A14] text-white shadow-xs scale-[1.02]'
                             : 'bg-[#FAF5EC] text-slate-600 hover:bg-[#F3EAD9] border border-[#EDE1D1]'
@@ -2452,7 +2508,7 @@ export const AdminPage = () => {
                     ))}
                   </div>
 
-                  <div className="text-xs text-slate-500 font-bold">
+                  <div className="text-xs text-slate-500 font-bold shrink-0">
                     Operating Branch: <span className="text-[#7D0A14]">{currentShop?.shortName}</span>
                   </div>
                 </div>
@@ -2460,15 +2516,15 @@ export const AdminPage = () => {
                 {/* SubTab 1: Assigned Orders */}
                 {storeActiveSubTab === 'orders' && (
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
                         Live Express Orders Assigned to {currentShop?.shortName}
                       </h4>
                       <span className="text-[11px] text-emerald-700 font-bold">● Auto-routed from customer orders</span>
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
+                    <div className="overflow-x-auto rounded-2xl border border-slate-100">
+                      <table className="w-full min-w-[650px] text-left text-xs">
                         <thead>
                           <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
                             <th className="p-3 rounded-l-xl">Order ID</th>
@@ -2523,15 +2579,15 @@ export const AdminPage = () => {
                 {/* SubTab 2: In-Store Inventory */}
                 {storeActiveSubTab === 'inventory' && (
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
                         Current Store Inventory & Shelf Stocks
                       </h4>
                       <span className="text-[11px] text-slate-500 font-bold">Fast-Moving Daily Fresh Stocks</span>
                     </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
+                    <div className="overflow-x-auto rounded-2xl border border-slate-100">
+                      <table className="w-full min-w-[580px] text-left text-xs">
                         <thead>
                           <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
                             <th className="p-3 rounded-l-xl">Product Name</th>
@@ -3205,7 +3261,7 @@ export const AdminPage = () => {
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse text-xs">
+                    <table className="w-full min-w-[650px] text-left border-collapse text-xs">
                       <thead className="bg-[#FAF5EC] border-b border-[#EDE1D1] text-[#3D040A] font-extrabold uppercase tracking-wider">
                         <tr>
                           <th className="py-2.5 px-3">Order ID</th>
@@ -3605,8 +3661,8 @@ export const AdminPage = () => {
               </div>
 
               {/* Orders Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+              <div className="overflow-x-auto rounded-2xl border border-slate-100">
+                <table className="w-full min-w-[680px] text-left text-xs">
                   <thead>
                     <tr className="bg-[#FAF5EC] text-slate-600 font-extrabold border-b border-[#EDE1D1]">
                       <th className="p-3 rounded-l-xl">Order ID & Type</th>
@@ -4160,7 +4216,7 @@ export const AdminPage = () => {
               {/* 5. Customer Management Table */}
               <div className="bg-white rounded-2xl border border-[#EDE1D1] shadow-xs overflow-hidden">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full min-w-[700px] text-left border-collapse">
                     <thead>
                       <tr className="bg-[#FAF5EC] border-b border-[#EDE1D1]">
                         <th className="py-3.5 px-4 sm:px-6 text-xs font-bold text-slate-800 tracking-wider">
@@ -5367,8 +5423,8 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
+              <div className="overflow-x-auto rounded-2xl border border-slate-100">
+                <table className="w-full min-w-[700px] text-left text-xs">
                   <thead>
                     <tr className="bg-[#FAF5EC] text-slate-600 font-extrabold border-b border-[#EDE1D1]">
                       <th className="p-3 rounded-l-xl">Product & Category</th>
@@ -6169,8 +6225,8 @@ export const AdminPage = () => {
               {/* Transactions Ledger */}
               <div className="space-y-3">
                 <h4 className="font-extrabold text-sm text-[#3D040A]">Recent Gateway Transactions</h4>
-                <div className="rounded-2xl border border-slate-200 overflow-hidden text-xs">
-                  <table className="w-full text-left">
+                <div className="rounded-2xl border border-slate-200 overflow-x-auto text-xs">
+                  <table className="w-full min-w-[550px] text-left">
                     <thead className="bg-[#FAF5EC] text-slate-600 font-bold border-b border-slate-200">
                       <tr>
                         <th className="p-3">Transaction ID</th>
@@ -6906,7 +6962,7 @@ export const AdminPage = () => {
             </div>
 
             {/* Daily Orders Table Content */}
-            <div className="flex-1 overflow-y-auto border border-[#EDE1D1] rounded-2xl">
+            <div className="flex-1 overflow-auto border border-[#EDE1D1] rounded-2xl">
               {dateFilteredOrders.length === 0 ? (
                 <div className="py-12 px-4 text-center space-y-3">
                   <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center mx-auto text-xl">
@@ -6927,7 +6983,7 @@ export const AdminPage = () => {
                   </button>
                 </div>
               ) : (
-                <table className="w-full text-left text-xs">
+                <table className="w-full min-w-[620px] text-left text-xs">
                   <thead className="bg-[#FAF5EC] text-slate-600 font-extrabold sticky top-0 border-b border-[#EDE1D1]">
                     <tr>
                       <th className="p-3">Order ID & Type</th>
@@ -8175,13 +8231,13 @@ export const AdminPage = () => {
           onClick={() => setIsShopLoginModalOpen(false)}
         >
           <div
-            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-5"
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-4 sm:p-7 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-4 sm:space-y-5"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs">
+                <div className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs shrink-0">
                   <Store className="w-5 h-5" />
                 </div>
                 <div>
@@ -8304,17 +8360,17 @@ export const AdminPage = () => {
                 </div>
               )}
 
-              <div className="pt-2 flex items-center justify-end gap-2.5">
+              <div className="pt-2 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsShopLoginModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer text-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black flex items-center gap-2 shadow-md shadow-[#7D0A14]/25 active:scale-95 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black flex items-center justify-center gap-2 shadow-md shadow-[#7D0A14]/25 active:scale-95 transition-all cursor-pointer text-center"
                 >
                   <Key className="w-3.5 h-3.5 text-amber-300" />
                   <span>Verify Login & Open Store Details</span>
@@ -8334,7 +8390,7 @@ export const AdminPage = () => {
           onClick={() => setIsEditShopModalOpen(false)}
         >
           <div
-            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-4"
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-4 sm:p-7 shadow-2xl border border-slate-200 relative animate-in zoom-in-95 duration-200 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -8365,7 +8421,7 @@ export const AdminPage = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Manager Name *</label>
                   <input
@@ -8399,7 +8455,7 @@ export const AdminPage = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="font-bold text-slate-700 block mb-1">Operating Timings</label>
                   <input
@@ -8420,17 +8476,17 @@ export const AdminPage = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2.5">
+              <div className="pt-2 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-2.5">
                 <button
                   type="button"
                   onClick={() => setIsEditShopModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer text-center"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-5 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-bold flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer text-center"
                 >
                   <Save className="w-3.5 h-3.5 text-amber-300" />
                   <span>Save Store Changes</span>
