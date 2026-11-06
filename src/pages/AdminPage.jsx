@@ -436,8 +436,11 @@ export const AdminPage = () => {
   const [customerActionMenuId, setCustomerActionMenuId] = useState(null);
   const [customerPage, setCustomerPage] = useState(1);
 
-  // Synchronize effective customer scope with current active tab
+  // Synchronize effective customer scope with current active tab & admin mode
   const effectiveScope =
+    adminMode === 'b2c' ? 'b2c' :
+    adminMode === 'b2b' ? 'b2b' :
+    adminMode === 'unified' ? 'all' :
     activeTab === 'b2c-customers' ? 'b2c' :
     activeTab === 'b2b-customers' ? 'b2b' :
     customerScope;
@@ -1497,8 +1500,9 @@ export const AdminPage = () => {
   const dateFilteredOrders = orders.filter((o) => matchesOrderDate(o, orderDateRange, selectedCustomDate));
 
   const filteredOrders = orders.filter((o) => {
-    if (adminMode === 'b2c' && o.type !== 'b2c') return false;
-    if (adminMode === 'b2b' && o.type !== 'b2b') return false;
+    const isB2bOrder = Boolean(o.type === 'b2b' || o.isBusiness);
+    if (adminMode === 'b2c' && isB2bOrder) return false;
+    if (adminMode === 'b2b' && !isB2bOrder) return false;
     if (statusFilter !== 'All' && o.status !== statusFilter) return false;
     if (!matchesOrderDate(o, orderDateRange, selectedCustomDate)) return false;
 
@@ -1686,7 +1690,13 @@ export const AdminPage = () => {
           <div className="p-3 flex-1 overflow-y-auto space-y-1">
             {sidebarLinks.map((item) => {
               const Icon = item.icon;
-              const isActive = activeTab === item.id || (item.id === 'dashboard' && activeTab === 'overview');
+              const isActive =
+                activeTab === item.id ||
+                (item.id === 'dashboard' && activeTab === 'overview') ||
+                (activeTab === 'customers' && (
+                  (adminMode === 'b2b' && item.id === 'b2b-customers') ||
+                  (adminMode !== 'b2b' && item.id === 'b2c-customers')
+                ));
               return (
                 <button
                   key={item.id}
@@ -1855,19 +1865,20 @@ export const AdminPage = () => {
             )}
           </div>
 
-          {/* Central Header Scope Switch Toggle (Switch between B2C and B2B instantly) */}
+          {/* Central Header Scope Switch Toggle (Switch between B2C, B2B, and Unified instantly) */}
           <div className="flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
             <button
+              type="button"
               onClick={() => {
                 setAdminMode('b2c');
+                setCustomerScope('b2c');
                 if (activeTab === 'b2b-customers') {
                   setActiveTab('b2c-customers');
-                  setCustomerScope('b2c');
                 }
                 showToast('Switched to B2C Retail Operations');
               }}
-              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                effectiveScope === 'b2c' || (adminMode === 'b2c' && effectiveScope !== 'b2b')
+              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                adminMode === 'b2c'
                   ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
@@ -1877,16 +1888,17 @@ export const AdminPage = () => {
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setAdminMode('b2b');
+                setCustomerScope('b2b');
                 if (activeTab === 'b2c-customers') {
                   setActiveTab('b2b-customers');
-                  setCustomerScope('b2b');
                 }
                 showToast('Switched to B2B Wholesale Portal');
               }}
-              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                effectiveScope === 'b2b' || (adminMode === 'b2b' && effectiveScope !== 'b2c')
+              className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                adminMode === 'b2b'
                   ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
@@ -1896,17 +1908,18 @@ export const AdminPage = () => {
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 setAdminMode('unified');
+                setCustomerScope('all');
                 if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') {
                   setActiveTab('customers');
-                  setCustomerScope('all');
                 }
                 showToast('Switched to Unified View (B2C + B2B)');
               }}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all ${
-                effectiveScope === 'all' || adminMode === 'unified'
-                  ? 'bg-[#F5A623] text-[#3D040A] shadow-sm scale-[1.02]'
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                adminMode === 'unified'
+                  ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
@@ -4430,7 +4443,13 @@ export const AdminPage = () => {
 
               {/* Categories Cards Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categoriesList.map((cat) => {
+                {categoriesList
+                  .filter((cat) => {
+                    if (adminMode === 'b2c' && cat.channel === 'b2b') return false;
+                    if (adminMode === 'b2b' && cat.channel === 'b2c') return false;
+                    return true;
+                  })
+                  .map((cat) => {
                   const matchingProducts = inventoryList.filter(p => {
                     const cName = (p.category || '').toLowerCase();
                     const target = cat.name.toLowerCase();
@@ -4676,6 +4695,8 @@ export const AdminPage = () => {
                   <tbody className="divide-y divide-slate-100 font-medium">
                     {inventoryList
                       .filter((prod) => {
+                        if (adminMode === 'b2c' && prod.channel === 'b2b') return false;
+                        if (adminMode === 'b2b' && prod.channel === 'b2c') return false;
                         if (inventoryCategoryFilter === 'In Stock') return prod.inStock;
                         if (inventoryCategoryFilter === 'Out of Stock') return !prod.inStock;
                         if (inventoryCategoryFilter !== 'All' && prod.category !== inventoryCategoryFilter)
