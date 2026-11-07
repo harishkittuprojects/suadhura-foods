@@ -22,11 +22,12 @@ import { CartPage } from './pages/CartPage';
 import { LoginPage } from './pages/LoginPage';
 import { B2BPage } from './pages/B2BPage';
 import { AdminPage } from './pages/AdminPage';
+import { PartnerPage } from './pages/PartnerPage';
 
 const MainLayout = () => {
   const { activeTab, setActiveTab } = useShop();
 
-  // Detect #admin, /admin, #branch, or /branch in URL
+  // Detect #admin, /admin, #branch, /branch, #partner, or /partner in URL
   useEffect(() => {
     const handleUrl = () => {
       const p = window.location.pathname.toLowerCase();
@@ -36,6 +37,11 @@ const MainLayout = () => {
         h.startsWith('#branch') || p.startsWith('/branch')
       ) {
         setActiveTab('admin');
+      } else if (
+        h === '#partner' || p === '/partner' ||
+        h.startsWith('#partner') || p.startsWith('/partner')
+      ) {
+        setActiveTab('partner');
       }
     };
     handleUrl();
@@ -66,6 +72,16 @@ const MainLayout = () => {
     return (
       <div className="min-h-screen bg-[#FAF5EC] text-slate-900 font-sans antialiased selection:bg-[#F5A623] selection:text-[#3D040A]">
         <AdminPage />
+        <Toast />
+      </div>
+    );
+  }
+
+  // SEPARATE STANDALONE DELIVERY PARTNER APP LAYOUT (/partner)
+  if (activeTab === 'partner') {
+    return (
+      <div className="min-h-screen bg-[#FAF5EC] text-slate-900 font-sans antialiased selection:bg-[#F5A623] selection:text-[#3D040A]">
+        <PartnerPage />
         <Toast />
       </div>
     );

@@ -158,8 +158,16 @@ export const Footer = () => {
                   onClick={() => navigateTo('admin')}
                   className="text-amber-200 hover:text-white transition-colors flex items-center gap-1.5 font-bold"
                 >
-                  <span>⚙️ Operations Admin Panel (Demo)</span>
+                  <span>⚙️ Operations Admin Panel (/admin)</span>
                 </button>
+              </li>
+              <li>
+                <a
+                  href="/partner"
+                  className="text-amber-300 hover:text-white transition-colors flex items-center gap-1.5 font-bold"
+                >
+                  <span>🚴 Delivery Partner App (/partner)</span>
+                </a>
               </li>
               <li>
                 <button

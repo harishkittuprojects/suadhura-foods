@@ -236,13 +236,16 @@ export const ShopProvider = ({ children }) => {
     }
   });
 
-  // Active navigation view: 'home' | 'categories' | 'services' | 'wishlist' | 'cart' | 'login' | 'admin'
+  // Active navigation view: 'home' | 'categories' | 'services' | 'wishlist' | 'cart' | 'login' | 'admin' | 'partner'
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const p = window.location.pathname.toLowerCase();
       const h = window.location.hash.toLowerCase();
       if (p === '/admin' || h === '#admin' || p.startsWith('/branch') || h.startsWith('#branch')) {
         return 'admin';
+      }
+      if (p === '/partner' || h === '#partner' || p.startsWith('/partner') || h.startsWith('#partner')) {
+        return 'partner';
       }
     } catch {}
     return 'home';

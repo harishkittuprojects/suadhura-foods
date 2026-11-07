@@ -70,7 +70,8 @@ import {
   Phone,
   MoreHorizontal,
   UserPlus,
-  ClipboardList
+  ClipboardList,
+  Bike
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
@@ -1951,6 +1952,17 @@ export const AdminPage = () => {
       customBadge: null
     },
     {
+      id: 'partner-app',
+      label: 'Delivery Partner App',
+      icon: Bike,
+      badge: '/partner',
+      customBadge: {
+        text: 'RIDER',
+        className: 'bg-emerald-400 text-slate-900 border border-emerald-300 font-black'
+      },
+      href: '/partner'
+    },
+    {
       id: 'invoices',
       label: 'Invoices',
       icon: FileText,
@@ -2031,6 +2043,10 @@ export const AdminPage = () => {
                 <button
                   key={item.id}
                   onClick={() => {
+                    if (item.href) {
+                      window.location.href = item.href;
+                      return;
+                    }
                     setActiveTab(item.id);
                     if (item.id === 'b2c-customers') {
                       setCustomerScope('b2c');
@@ -2699,34 +2715,53 @@ export const AdminPage = () => {
                 {/* SubTab 3: Delivery Fleet */}
                 {storeActiveSubTab === 'fleet' && (
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
-                        Delivery Partners Assigned to {currentShop?.shortName}
-                      </h4>
-                      <span className="text-[11px] text-purple-700 font-bold">10-15 Min Express SLA</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider">
+                          Delivery Partners Assigned to {currentShop?.shortName}
+                        </h4>
+                        <span className="text-[11px] text-purple-700 font-bold">10-15 Min Express SLA</span>
+                      </div>
+                      <a
+                        href="/partner"
+                        className="px-3.5 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs w-fit"
+                      >
+                        <Bike className="w-4 h-4 text-[#F5A623]" />
+                        <span>Open Delivery Partner Portal (/partner)</span>
+                      </a>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                       {[
-                        { name: 'Ramesh Kumar', phone: '+91 98450 77123', rating: '4.9 ★', vehicle: 'TS09-EG-4412', status: 'On Delivery' },
-                        { name: 'Kiran Goud', phone: '+91 98450 77124', rating: '4.8 ★', vehicle: 'TS09-EG-5589', status: 'At Store Bay' },
-                        { name: 'Suresh Varma', phone: '+91 98450 77125', rating: '4.95 ★', vehicle: 'TS09-EG-6623', status: 'Packing Orders' },
-                        { name: 'Anil Reddy', phone: '+91 98450 77126', rating: '4.9 ★', vehicle: 'TS09-EG-7741', status: 'On Delivery' }
+                        { name: 'Ramesh Kumar', phone: '+91 98450 77123', rating: '4.9 ★', vehicle: 'TS09-EG-4412', status: 'On Delivery', id: 'partner1' },
+                        { name: 'Kiran Goud', phone: '+91 98450 77124', rating: '4.8 ★', vehicle: 'TS09-EG-5589', status: 'At Store Bay', id: 'partner2' },
+                        { name: 'Suresh Varma', phone: '+91 98450 77125', rating: '4.95 ★', vehicle: 'TS09-EG-6623', status: 'Packing Orders', id: 'partner3' },
+                        { name: 'Anil Reddy', phone: '+91 98450 77126', rating: '4.9 ★', vehicle: 'TS09-EG-7741', status: 'On Delivery', id: 'partner4' }
                       ].map((rider, idx) => (
-                        <div key={idx} className="p-3.5 rounded-2xl bg-[#FAF5EC]/60 border border-[#EDE1D1] space-y-1.5">
-                          <div className="flex items-center justify-between">
-                            <span className="font-extrabold text-slate-900">{rider.name}</span>
-                            <span className="text-amber-600 font-black text-[11px]">{rider.rating}</span>
+                        <div key={idx} className="p-3.5 rounded-2xl bg-[#FAF5EC]/60 border border-[#EDE1D1] space-y-2 flex flex-col justify-between">
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                              <span className="font-extrabold text-slate-900">{rider.name}</span>
+                              <span className="text-amber-600 font-black text-[11px]">{rider.rating}</span>
+                            </div>
+                            <div className="text-[11px] text-slate-500 font-medium">Bike: {rider.vehicle}</div>
+                            <div className="text-[11px] text-[#7D0A14] font-bold">{rider.phone}</div>
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
+                              rider.status === 'On Delivery'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-emerald-100 text-emerald-800'
+                            }`}>
+                              {rider.status}
+                            </span>
                           </div>
-                          <div className="text-[11px] text-slate-500 font-medium">Bike: {rider.vehicle}</div>
-                          <div className="text-[11px] text-[#7D0A14] font-bold">{rider.phone}</div>
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-black uppercase ${
-                            rider.status === 'On Delivery'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-emerald-100 text-emerald-800'
-                          }`}>
-                            {rider.status}
-                          </span>
+
+                          <a
+                            href="/partner"
+                            className="w-full py-1.5 rounded-xl bg-white hover:bg-[#FAF5EC] text-[#7D0A14] font-black text-[11px] flex items-center justify-center gap-1 border border-[#EDE1D1] shadow-2xs active:scale-95 transition-all text-center"
+                          >
+                            <Bike className="w-3 h-3 text-[#7D0A14]" />
+                            <span>Launch /partner</span>
+                          </a>
                         </div>
                       ))}
                     </div>
