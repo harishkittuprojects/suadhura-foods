@@ -26,11 +26,25 @@ import { AdminPage } from './pages/AdminPage';
 const MainLayout = () => {
   const { activeTab, setActiveTab } = useShop();
 
-  // Detect #admin or /admin in URL
+  // Detect #admin, /admin, #branch, or /branch in URL
   useEffect(() => {
-    if (window.location.hash === '#admin' || window.location.pathname === '/admin') {
-      setActiveTab('admin');
-    }
+    const handleUrl = () => {
+      const p = window.location.pathname.toLowerCase();
+      const h = window.location.hash.toLowerCase();
+      if (
+        h === '#admin' || p === '/admin' ||
+        h.startsWith('#branch') || p.startsWith('/branch')
+      ) {
+        setActiveTab('admin');
+      }
+    };
+    handleUrl();
+    window.addEventListener('popstate', handleUrl);
+    window.addEventListener('hashchange', handleUrl);
+    return () => {
+      window.removeEventListener('popstate', handleUrl);
+      window.removeEventListener('hashchange', handleUrl);
+    };
   }, [setActiveTab]);
 
   useEffect(() => {

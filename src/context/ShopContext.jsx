@@ -236,8 +236,17 @@ export const ShopProvider = ({ children }) => {
     }
   });
 
-  // Active navigation view: 'home' | 'categories' | 'services' | 'wishlist' | 'cart' | 'login'
-  const [activeTab, setActiveTab] = useState('home');
+  // Active navigation view: 'home' | 'categories' | 'services' | 'wishlist' | 'cart' | 'login' | 'admin'
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const p = window.location.pathname.toLowerCase();
+      const h = window.location.hash.toLowerCase();
+      if (p === '/admin' || h === '#admin' || p.startsWith('/branch') || h.startsWith('#branch')) {
+        return 'admin';
+      }
+    } catch {}
+    return 'home';
+  });
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 

@@ -78,11 +78,11 @@ import { DEFAULT_HERO_SLIDES } from './HomePage';
 export const DEFAULT_SHOPS = [
   {
     id: 'shop1',
-    loginId: 'shop1',
-    email: 'shop1@sumadhura.com',
+    loginId: 'branch1',
+    email: 'branch1@sumadhura.com',
     password: 'password123',
-    name: 'Sumadhura Express Store #1 - Madhapur Hub',
-    shortName: 'Shop 1 (Madhapur)',
+    name: 'Sumadhura Express Store #1 - Branch 1 (Madhapur Hub)',
+    shortName: 'Branch 1 (Madhapur)',
     branchCode: 'SMD-HYD-001',
     tagline: 'Flagship Tech District Dispatch & Express Fulfillment Centre',
     manager: 'Ramesh Varma',
@@ -119,11 +119,11 @@ export const DEFAULT_SHOPS = [
   },
   {
     id: 'shop2',
-    loginId: 'shop2',
-    email: 'shop2@sumadhura.com',
+    loginId: 'branch2',
+    email: 'branch2@sumadhura.com',
     password: 'password123',
-    name: 'Sumadhura Fresh Mart #2 - Gachibowli Hub',
-    shortName: 'Shop 2 (Gachibowli)',
+    name: 'Sumadhura Fresh Mart #2 - Branch 2 (Gachibowli Hub)',
+    shortName: 'Branch 2 (Gachibowli)',
     branchCode: 'SMD-HYD-002',
     tagline: 'Financial District Corporate & Residential Cold-Chain Hub',
     manager: 'Priya Reddy',
@@ -160,11 +160,11 @@ export const DEFAULT_SHOPS = [
   },
   {
     id: 'shop3',
-    loginId: 'shop3',
-    email: 'shop3@sumadhura.com',
+    loginId: 'branch3',
+    email: 'branch3@sumadhura.com',
     password: 'password123',
-    name: 'Sumadhura Super Store #3 - Jubilee Hills Hub',
-    shortName: 'Shop 3 (Jubilee Hills)',
+    name: 'Sumadhura Super Store #3 - Branch 3 (Jubilee Hills Hub)',
+    shortName: 'Branch 3 (Jubilee Hills)',
     branchCode: 'SMD-HYD-003',
     tagline: 'Premium Heritage Organic Sourcing & Gourmet Hub',
     manager: 'K. Venkat Rao',
@@ -231,8 +231,17 @@ export const AdminPage = () => {
 
   // Mode: 'unified' | 'b2c' | 'b2b'
   const [adminMode, setAdminMode] = useState('unified');
-  // Tabs: 'overview' | 'orders' | 'subscriptions' | 'b2b-quotes' | 'inventory' | 'invoices'
-  const [activeTab, setActiveTab] = useState('dashboard');
+  // Tabs: 'overview' | 'orders' | 'subscriptions' | 'b2b-quotes' | 'inventory' | 'invoices' | 'shop-store-details'
+  const [activeTab, setActiveTab] = useState(() => {
+    try {
+      const p = window.location.pathname.toLowerCase();
+      const h = window.location.hash.toLowerCase();
+      if (p.includes('/branch') || h.includes('branch')) {
+        return 'shop-store-details';
+      }
+    } catch {}
+    return 'dashboard';
+  });
 
   // Mobile sidebar open state
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -250,12 +259,24 @@ export const AdminPage = () => {
   const [isDailyOrdersModalOpen, setIsDailyOrdersModalOpen] = useState(false);
 
   // -------------------------------------------------------------------
-  // MULTI-BRANCH SHOP STORES & SHOP LOGIN (Shop 1, Shop 2, Shop 3)
+  // MULTI-BRANCH STORES & BRANCH LOGIN (Branch 1, Branch 2, Branch 3)
   // -------------------------------------------------------------------
   const [shopsList, setShopsList] = useState(() => {
     try {
       const saved = localStorage.getItem('sumadhura_admin_shops');
-      return saved ? JSON.parse(saved) : DEFAULT_SHOPS;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.map((s) => {
+          const defaultMatch = DEFAULT_SHOPS.find(d => d.id === s.id);
+          return {
+            ...s,
+            shortName: s.shortName?.replace(/Shop\s*([1-3])/i, 'Branch $1') || defaultMatch?.shortName || s.shortName,
+            name: s.name?.replace(/Shop\s*([1-3])/i, 'Branch $1') || defaultMatch?.name || s.name,
+            loginId: s.loginId?.replace('shop', 'branch') || defaultMatch?.loginId || s.loginId
+          };
+        });
+      }
+      return DEFAULT_SHOPS;
     } catch {
       return DEFAULT_SHOPS;
     }
@@ -263,6 +284,13 @@ export const AdminPage = () => {
 
   const [currentShop, setCurrentShop] = useState(() => {
     try {
+      const p = window.location.pathname.toLowerCase();
+      const h = window.location.hash.toLowerCase();
+      const branchMatch = p.match(/branch[\/-]?([1-3])/i) || h.match(/branch[\/-]?([1-3])/i);
+      if (branchMatch && branchMatch[1]) {
+        const matchBranch = DEFAULT_SHOPS.find(s => s.id === `shop${branchMatch[1]}`);
+        if (matchBranch) return matchBranch;
+      }
       const savedShopId = localStorage.getItem('sumadhura_active_shop_id');
       if (savedShopId) {
         const found = DEFAULT_SHOPS.find(s => s.id === savedShopId || s.loginId === savedShopId);
@@ -273,6 +301,48 @@ export const AdminPage = () => {
       return DEFAULT_SHOPS[0];
     }
   });
+
+  // URL synchronization: Keep address bar updated to /branch when viewing branch details
+  useEffect(() => {
+    try {
+      if (activeTab === 'shop-store-details') {
+        if (!window.location.pathname.includes('/branch') && !window.location.hash.includes('branch')) {
+          window.history.pushState(null, '', '/branch');
+        }
+      } else {
+        if (window.location.pathname.includes('/branch') || window.location.hash.includes('branch')) {
+          window.history.pushState(null, '', '/admin');
+        }
+      }
+    } catch {}
+  }, [activeTab]);
+
+  // Handle browser back/forward or direct /branch navigation
+  useEffect(() => {
+    const handleUrlSync = () => {
+      try {
+        const p = window.location.pathname.toLowerCase();
+        const h = window.location.hash.toLowerCase();
+        if (p.includes('/branch') || h.includes('branch')) {
+          setActiveTab('shop-store-details');
+          const match = p.match(/branch[\/-]?([1-3])/i) || h.match(/branch[\/-]?([1-3])/i);
+          if (match && match[1]) {
+            const num = match[1];
+            const target = shopsList.find(s => s.id === `shop${num}` || s.loginId === `branch${num}`);
+            if (target) setCurrentShop(target);
+          }
+        }
+      } catch {}
+    };
+
+    handleUrlSync();
+    window.addEventListener('popstate', handleUrlSync);
+    window.addEventListener('hashchange', handleUrlSync);
+    return () => {
+      window.removeEventListener('popstate', handleUrlSync);
+      window.removeEventListener('hashchange', handleUrlSync);
+    };
+  }, [shopsList]);
 
   const [isShopLoginModalOpen, setIsShopLoginModalOpen] = useState(false);
   const [isEditShopModalOpen, setIsEditShopModalOpen] = useState(false);
@@ -289,19 +359,20 @@ export const AdminPage = () => {
     } else {
       const query = (loginIdOrShop || shopLoginForm.loginId || '').trim().toLowerCase();
       targetShop = shopsList.find(
-        s => s.loginId.toLowerCase() === query ||
-             s.id.toLowerCase() === query ||
-             s.email.toLowerCase() === query ||
-             s.name.toLowerCase().includes(query) ||
-             (query === '1' && s.id === 'shop1') ||
-             (query === '2' && s.id === 'shop2') ||
-             (query === '3' && s.id === 'shop3')
+        s => (s.loginId && s.loginId.toLowerCase() === query) ||
+             (s.id && s.id.toLowerCase() === query) ||
+             (s.email && s.email.toLowerCase() === query) ||
+             (s.name && s.name.toLowerCase().includes(query)) ||
+             (s.shortName && s.shortName.toLowerCase().includes(query)) ||
+             ((query === '1' || query === 'branch1' || query === 'shop1') && s.id === 'shop1') ||
+             ((query === '2' || query === 'branch2' || query === 'shop2') && s.id === 'shop2') ||
+             ((query === '3' || query === 'branch3' || query === 'shop3') && s.id === 'shop3')
       );
     }
 
     if (!targetShop) {
-      setShopLoginError('Invalid Shop credentials. Please choose Shop 1, Shop 2, or Shop 3 (password: password123)');
-      showToast('❌ Shop credentials not recognized. Enter shop1, shop2, or shop3.', 'error');
+      setShopLoginError('Invalid Branch credentials. Please enter branch1, branch2, or branch3 (password: password123)');
+      showToast('❌ Branch credentials not recognized. Enter branch1, branch2, or branch3.', 'error');
       return;
     }
 
@@ -314,8 +385,13 @@ export const AdminPage = () => {
     setShopLoginError('');
     setShopLoginForm({ loginId: '', password: '' });
 
-    // AUTOMATICALLY OPEN SHOP STORE DETAILS!
+    // AUTOMATICALLY OPEN BRANCH DETAILS AND UPDATE URL TO /branch!
     setActiveTab('shop-store-details');
+    try {
+      if (window.history && window.history.pushState) {
+        window.history.pushState(null, '', '/branch');
+      }
+    } catch {}
 
     try {
       confetti({
@@ -325,7 +401,7 @@ export const AdminPage = () => {
       });
     } catch {}
 
-    showToast(`🏪 Successfully logged in as ${targetShop.shortName}! Opening Store Details...`, 'success');
+    showToast(`🏪 Successfully logged in as ${targetShop.shortName}! Opening /branch details...`, 'success');
   };
 
   const handleUpdateStoreDetails = (e) => {
@@ -2015,13 +2091,20 @@ export const AdminPage = () => {
           {/* Active Store Branch & Quick Switch Login */}
           <div className="p-3 border-t border-[#52060E] bg-[#2C0307]">
             <div className="p-3 rounded-2xl bg-[#1C0205] border border-[#52060E] text-xs space-y-2">
-              <div className="flex items-center justify-between">
+              <div
+                className="flex items-center justify-between cursor-pointer hover:opacity-90"
+                onClick={() => {
+                  setActiveTab('shop-store-details');
+                  showToast(`🏪 Opened ${currentShop ? currentShop.shortName : 'Branch'} Store Details (/branch)`);
+                }}
+                title="Click to view /branch Store Details"
+              >
                 <span className="font-extrabold text-amber-300 flex items-center gap-1.5 truncate">
                   <Store className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="truncate">{currentShop ? currentShop.shortName : 'Store Hub'}</span>
+                  <span className="truncate">{currentShop ? currentShop.shortName : 'Branch 1 (Madhapur)'}</span>
                 </span>
                 <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">
-                  {currentShop ? currentShop.branchCode : 'HUB'}
+                  {currentShop ? currentShop.branchCode : 'SMD-HYD-001'}
                 </span>
               </div>
               <p className="text-[10px] text-amber-100/70 truncate">
@@ -2033,7 +2116,7 @@ export const AdminPage = () => {
                 className="w-full py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-[11px] flex items-center justify-center gap-1.5 transition-all border border-white/15 active:scale-95 cursor-pointer"
               >
                 <Key className="w-3 h-3 text-amber-400" />
-                <span>Shop Login / Switch Store</span>
+                <span>Branch Login / Switch Branch</span>
               </button>
             </div>
           </div>
@@ -2245,11 +2328,11 @@ export const AdminPage = () => {
               type="button"
               onClick={() => setIsShopLoginModalOpen(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
-              title="Shop 1 / Shop 2 / Shop 3 Login & Store Details Switcher"
+              title="Branch 1 / Branch 2 / Branch 3 Login & Store Details Switcher (/branch)"
             >
               <Store className="w-3.5 h-3.5 text-[#7D0A14]" />
-              <span className="text-slate-500 font-bold">Shop:</span>
-              <span className="font-black text-[#7D0A14]">{currentShop ? (currentShop.shortName || currentShop.name) : 'Select Shop'}</span>
+              <span className="text-slate-500 font-bold">Branch:</span>
+              <span className="font-black text-[#7D0A14]">{currentShop ? (currentShop.shortName || currentShop.name) : 'Branch 1 (Madhapur)'}</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             </button>
 
@@ -2314,7 +2397,7 @@ export const AdminPage = () => {
                         className="px-2.5 sm:px-3.5 py-1.5 rounded-xl bg-white/95 hover:bg-white text-[#7D0A14] font-black text-xs flex items-center gap-1.5 shadow-lg active:scale-95 transition-all cursor-pointer"
                       >
                         <Key className="w-3.5 h-3.5 text-[#7D0A14]" />
-                        <span>Switch Shop</span>
+                        <span>Switch Branch</span>
                       </button>
                       <button
                         type="button"
@@ -2712,9 +2795,9 @@ export const AdminPage = () => {
                   <span className="p-1 rounded-lg bg-amber-100 text-[#7D0A14]">
                     <Store className="w-4 h-4 text-[#7D0A14]" />
                   </span>
-                  <span className="font-extrabold text-xs text-slate-500">Shop:</span>
+                  <span className="font-extrabold text-xs text-slate-500">Branch:</span>
                   <span className="font-black text-xs text-[#7D0A14]">
-                    {currentShop ? (currentShop.shortName || currentShop.name) : 'Shop 3 (Jubilee Hills)'}
+                    {currentShop ? (currentShop.shortName || currentShop.name) : 'Branch 1 (Madhapur)'}
                   </span>
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
@@ -8295,7 +8378,7 @@ export const AdminPage = () => {
       )}
 
       {/* ------------------------------------------------------------- */}
-      {/* SHOP LOGIN / SWITCH BRANCH MODAL (Shop 1, Shop 2, Shop 3)     */}
+      {/* BRANCH STORE LOGIN & SWITCHER MODAL (Branch 1, Branch 2, Branch 3) */}
       {/* ------------------------------------------------------------- */}
       {isShopLoginModalOpen && (
         <div
@@ -8314,10 +8397,10 @@ export const AdminPage = () => {
                 </div>
                 <div>
                   <h3 className="font-black text-base text-slate-900">
-                    Store Branch Login & Switcher
+                    Branch Store Login & Switcher
                   </h3>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    Select or login to Shop 1, 2, or 3 to automatically open store details.
+                    Select or login to Branch 1, Branch 2, or Branch 3 to open /branch store details.
                   </p>
                 </div>
               </div>
@@ -8330,10 +8413,10 @@ export const AdminPage = () => {
               </button>
             </div>
 
-            {/* Quick 1-Click Fast Login Cards for Shop 1, Shop 2, Shop 3 */}
+            {/* Quick 1-Click Fast Login Cards for Branch 1, Branch 2, Branch 3 */}
             <div className="space-y-2">
               <label className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">
-                Quick 1-Click Fast Shop Login
+                Quick 1-Click Fast Branch Login & Open /branch
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                 {shopsList.map((shop) => (
@@ -8370,7 +8453,7 @@ export const AdminPage = () => {
             <div className="relative flex items-center justify-center">
               <div className="border-t border-slate-200 w-full" />
               <span className="bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-wider shrink-0">
-                Or Enter Shop Login Credentials
+                Or Enter Branch Login Credentials
               </span>
             </div>
 
@@ -8384,7 +8467,7 @@ export const AdminPage = () => {
             >
               <div>
                 <label className="font-bold text-slate-700 block mb-1">
-                  Shop Login ID / Username *
+                  Branch Login ID / Username *
                 </label>
                 <div className="relative">
                   <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -8395,13 +8478,13 @@ export const AdminPage = () => {
                       setShopLoginForm({ ...shopLoginForm, loginId: e.target.value });
                       setShopLoginError('');
                     }}
-                    placeholder="e.g. shop1, shop2, shop3 or shop1@sumadhura.com"
+                    placeholder="e.g. branch1, branch2, branch3 (or shop1)"
                     className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
                     required
                   />
                 </div>
                 <span className="text-[10px] text-slate-400 mt-0.5 block">
-                  Tip: Enter <strong>shop1</strong>, <strong>shop2</strong>, or <strong>shop3</strong> (password: <strong>password123</strong>)
+                  Tip: Enter <strong>branch1</strong>, <strong>branch2</strong>, or <strong>branch3</strong> (password: <strong>password123</strong>)
                 </span>
               </div>
 
@@ -8418,7 +8501,7 @@ export const AdminPage = () => {
                       setShopLoginForm({ ...shopLoginForm, password: e.target.value });
                       setShopLoginError('');
                     }}
-                    placeholder="Enter shop password (default: password123)"
+                    placeholder="Enter branch password (default: password123)"
                     className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
                     required
                   />
@@ -8445,7 +8528,7 @@ export const AdminPage = () => {
                   className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black flex items-center justify-center gap-2 shadow-md shadow-[#7D0A14]/25 active:scale-95 transition-all cursor-pointer text-center"
                 >
                   <Key className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Verify Login & Open Store Details</span>
+                  <span>Verify Login & Open /branch</span>
                 </button>
               </div>
             </form>
