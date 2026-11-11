@@ -239,12 +239,12 @@ export const ShopProvider = ({ children }) => {
   // Active navigation view: 'home' | 'categories' | 'services' | 'wishlist' | 'cart' | 'login' | 'admin' | 'partner'
   const [activeTab, setActiveTab] = useState(() => {
     try {
-      const p = window.location.pathname.toLowerCase();
-      const h = window.location.hash.toLowerCase();
-      if (p === '/admin' || h === '#admin' || p.startsWith('/branch') || h.startsWith('#branch') || p.startsWith('/erp') || h.startsWith('#erp')) {
+      const p = decodeURIComponent(window.location.pathname).toLowerCase();
+      const h = decodeURIComponent(window.location.hash).toLowerCase();
+      if (p === '/admin' || h === '#admin' || p.includes('branch') || h.includes('branch') || p.includes('erp') || h.includes('erp')) {
         return 'admin';
       }
-      if (p === '/partner' || h === '#partner' || p.startsWith('/partner') || h.startsWith('#partner')) {
+      if (p.includes('partner') || h.includes('partner')) {
         return 'partner';
       }
     } catch {}

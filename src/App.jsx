@@ -30,20 +30,21 @@ const MainLayout = () => {
   // Detect #admin, /admin, #branch, /branch, #partner, or /partner in URL
   useEffect(() => {
     const handleUrl = () => {
-      const p = window.location.pathname.toLowerCase();
-      const h = window.location.hash.toLowerCase();
-      if (
-        h === '#admin' || p === '/admin' ||
-        h.startsWith('#branch') || p.startsWith('/branch') ||
-        h.startsWith('#erp') || p.startsWith('/erp')
-      ) {
-        setActiveTab('admin');
-      } else if (
-        h === '#partner' || p === '/partner' ||
-        h.startsWith('#partner') || p.startsWith('/partner')
-      ) {
-        setActiveTab('partner');
-      }
+      try {
+        const p = decodeURIComponent(window.location.pathname).toLowerCase();
+        const h = decodeURIComponent(window.location.hash).toLowerCase();
+        if (
+          h === '#admin' || p === '/admin' ||
+          h.includes('branch') || p.includes('branch') ||
+          h.includes('erp') || p.includes('erp')
+        ) {
+          setActiveTab('admin');
+        } else if (
+          h.includes('partner') || p.includes('partner')
+        ) {
+          setActiveTab('partner');
+        }
+      } catch {}
     };
     handleUrl();
     window.addEventListener('popstate', handleUrl);

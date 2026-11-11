@@ -289,9 +289,8 @@ export const AdminPage = () => {
 
   const [currentShop, setCurrentShop] = useState(() => {
     try {
-      const p = window.location.pathname.toLowerCase();
-      const h = window.location.hash.toLowerCase();
-      const branchMatch = p.match(/branch[\/-]?([1-3])/i) || h.match(/branch[\/-]?([1-3])/i);
+      const decoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
+      const branchMatch = decoded.match(/branch[\/\s-]?([1-3])/i);
       if (branchMatch && branchMatch[1]) {
         const matchBranch = DEFAULT_SHOPS.find(s => s.id === `shop${branchMatch[1]}`);
         if (matchBranch) return matchBranch;
@@ -307,12 +306,20 @@ export const AdminPage = () => {
     }
   });
 
-  // URL synchronization: Keep address bar updated to /branch, /erp, or /admin
+  // URL synchronization: Keep address bar updated to /branch1, /branch2, /branch3, /erp, or /admin
   useEffect(() => {
     try {
       if (activeTab === 'shop-store-details') {
-        if (!window.location.pathname.includes('/branch') && !window.location.hash.includes('branch')) {
-          window.history.pushState(null, '', '/branch');
+        const branchNum = currentShop?.id === 'shop2' ? '2' : currentShop?.id === 'shop3' ? '3' : '1';
+        const expectedPath = `/branch${branchNum}`;
+        const currentDecoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
+        if (
+          !currentDecoded.includes(`branch${branchNum}`) &&
+          !currentDecoded.includes(`branch/${branchNum}`) &&
+          !currentDecoded.includes(`branch ${branchNum}`) &&
+          !currentDecoded.includes(`branch-${branchNum}`)
+        ) {
+          window.history.pushState(null, '', expectedPath);
         }
       } else if (activeTab === 'erp-suite') {
         if (!window.location.pathname.includes('/erp') && !window.location.hash.includes('erp')) {
@@ -327,23 +334,22 @@ export const AdminPage = () => {
         }
       }
     } catch {}
-  }, [activeTab]);
+  }, [activeTab, currentShop]);
 
-  // Handle browser back/forward or direct /branch or /erp navigation
+  // Handle browser back/forward or direct /branch1, /branch2, /branch3 or /erp navigation
   useEffect(() => {
     const handleUrlSync = () => {
       try {
-        const p = window.location.pathname.toLowerCase();
-        const h = window.location.hash.toLowerCase();
-        if (p.includes('/branch') || h.includes('branch')) {
+        const decoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
+        if (decoded.includes('branch')) {
           setActiveTab('shop-store-details');
-          const match = p.match(/branch[\/-]?([1-3])/i) || h.match(/branch[\/-]?([1-3])/i);
+          const match = decoded.match(/branch[\/\s-]?([1-3])/i);
           if (match && match[1]) {
             const num = match[1];
             const target = shopsList.find(s => s.id === `shop${num}` || s.loginId === `branch${num}`);
             if (target) setCurrentShop(target);
           }
-        } else if (p.includes('/erp') || h.includes('erp')) {
+        } else if (decoded.includes('erp')) {
           setActiveTab('erp-suite');
         }
       } catch {}
@@ -378,9 +384,9 @@ export const AdminPage = () => {
              (s.email && s.email.toLowerCase() === query) ||
              (s.name && s.name.toLowerCase().includes(query)) ||
              (s.shortName && s.shortName.toLowerCase().includes(query)) ||
-             ((query === '1' || query === 'branch1' || query === 'shop1') && s.id === 'shop1') ||
-             ((query === '2' || query === 'branch2' || query === 'shop2') && s.id === 'shop2') ||
-             ((query === '3' || query === 'branch3' || query === 'shop3') && s.id === 'shop3')
+             ((query === '1' || query === 'branch1' || query === 'branch 1' || query === 'shop1') && s.id === 'shop1') ||
+             ((query === '2' || query === 'branch2' || query === 'branch 2' || query === 'shop2') && s.id === 'shop2') ||
+             ((query === '3' || query === 'branch3' || query === 'branch 3' || query === 'shop3') && s.id === 'shop3')
       );
     }
 
@@ -399,11 +405,12 @@ export const AdminPage = () => {
     setShopLoginError('');
     setShopLoginForm({ loginId: '', password: '' });
 
-    // AUTOMATICALLY OPEN BRANCH DETAILS AND UPDATE URL TO /branch!
+    // AUTOMATICALLY OPEN BRANCH DETAILS AND UPDATE URL TO /branch1, /branch2, or /branch3!
     setActiveTab('shop-store-details');
+    const branchNum = targetShop.id === 'shop2' ? '2' : targetShop.id === 'shop3' ? '3' : '1';
     try {
       if (window.history && window.history.pushState) {
-        window.history.pushState(null, '', '/branch');
+        window.history.pushState(null, '', `/branch${branchNum}`);
       }
     } catch {}
 
@@ -415,7 +422,7 @@ export const AdminPage = () => {
       });
     } catch {}
 
-    showToast(`🏪 Successfully logged in as ${targetShop.shortName}! Opening /branch details...`, 'success');
+    showToast(`🏪 Successfully logged in as ${targetShop.shortName}! Opening /branch${branchNum} details...`, 'success');
   };
 
   const handleUpdateStoreDetails = (e) => {
@@ -2134,9 +2141,13 @@ export const AdminPage = () => {
                 className="flex items-center justify-between cursor-pointer hover:opacity-90"
                 onClick={() => {
                   setActiveTab('shop-store-details');
-                  showToast(`🏪 Opened ${currentShop ? currentShop.shortName : 'Branch'} Store Details (/branch)`);
+                  const bNum = currentShop?.id === 'shop2' ? '2' : currentShop?.id === 'shop3' ? '3' : '1';
+                  if (window.history && window.history.pushState) {
+                    window.history.pushState(null, '', `/branch${bNum}`);
+                  }
+                  showToast(`🏪 Opened ${currentShop ? currentShop.shortName : 'Branch'} Store Details (/branch${bNum})`);
                 }}
-                title="Click to view /branch Store Details"
+                title="Click to view Store Details"
               >
                 <span className="font-extrabold text-amber-300 flex items-center gap-1.5 truncate">
                   <Store className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -8499,36 +8510,39 @@ export const AdminPage = () => {
             {/* Quick 1-Click Fast Login Cards for Branch 1, Branch 2, Branch 3 */}
             <div className="space-y-2">
               <label className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">
-                Quick 1-Click Fast Branch Login & Open /branch
+                Quick 1-Click Fast Branch Login & Open /branch1, /branch2, /branch3
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {shopsList.map((shop) => (
-                  <button
-                    key={shop.id}
-                    type="button"
-                    onClick={() => handleShopLogin(shop)}
-                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
-                      currentShop?.id === shop.id
-                        ? 'border-[#7D0A14] bg-[#FAF5EC] ring-2 ring-[#7D0A14]/20 shadow-xs'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between">
-                        <span className="font-black text-slate-900 text-xs">{shop.shortName}</span>
-                        <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-white border border-[#EDE1D1] text-[#7D0A14]">
-                          {shop.branchCode}
-                        </span>
+                {shopsList.map((shop) => {
+                  const bNum = shop.id === 'shop2' ? '2' : shop.id === 'shop3' ? '3' : '1';
+                  return (
+                    <button
+                      key={shop.id}
+                      type="button"
+                      onClick={() => handleShopLogin(shop)}
+                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                        currentShop?.id === shop.id
+                          ? 'border-[#7D0A14] bg-[#FAF5EC] ring-2 ring-[#7D0A14]/20 shadow-xs'
+                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-black text-slate-900 text-xs">{shop.shortName}</span>
+                          <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded bg-white border border-[#EDE1D1] text-[#7D0A14]">
+                            {shop.branchCode}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">{shop.manager}</p>
                       </div>
-                      <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">{shop.manager}</p>
-                    </div>
 
-                    <div className="flex items-center gap-1 text-[11px] font-black text-[#7D0A14]">
-                      <span>Login & Open</span>
-                      <ArrowRight className="w-3 h-3" />
-                    </div>
-                  </button>
-                ))}
+                      <div className="flex items-center gap-1 text-[11px] font-black text-[#7D0A14]">
+                        <span>Open /branch{bNum}</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
