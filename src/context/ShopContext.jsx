@@ -241,7 +241,7 @@ export const ShopProvider = ({ children }) => {
     try {
       const p = window.location.pathname.toLowerCase();
       const h = window.location.hash.toLowerCase();
-      if (p === '/admin' || h === '#admin' || p.startsWith('/branch') || h.startsWith('#branch')) {
+      if (p === '/admin' || h === '#admin' || p.startsWith('/branch') || h.startsWith('#branch') || p.startsWith('/erp') || h.startsWith('#erp')) {
         return 'admin';
       }
       if (p === '/partner' || h === '#partner' || p.startsWith('/partner') || h.startsWith('#partner')) {

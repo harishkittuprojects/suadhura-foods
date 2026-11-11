@@ -75,6 +75,7 @@ import {
 } from 'lucide-react';
 
 import { DEFAULT_HERO_SLIDES } from './HomePage';
+import { ErpSuite } from '../components/erp/ErpSuite';
 
 export const DEFAULT_SHOPS = [
   {
@@ -232,13 +233,16 @@ export const AdminPage = () => {
 
   // Mode: 'unified' | 'b2c' | 'b2b'
   const [adminMode, setAdminMode] = useState('unified');
-  // Tabs: 'overview' | 'orders' | 'subscriptions' | 'b2b-quotes' | 'inventory' | 'invoices' | 'shop-store-details'
+  // Tabs: 'overview' | 'orders' | 'subscriptions' | 'b2b-quotes' | 'inventory' | 'invoices' | 'shop-store-details' | 'erp-suite'
   const [activeTab, setActiveTab] = useState(() => {
     try {
       const p = window.location.pathname.toLowerCase();
       const h = window.location.hash.toLowerCase();
       if (p.includes('/branch') || h.includes('branch')) {
         return 'shop-store-details';
+      }
+      if (p.includes('/erp') || h.includes('erp')) {
+        return 'erp-suite';
       }
     } catch {}
     return 'dashboard';
@@ -303,22 +307,29 @@ export const AdminPage = () => {
     }
   });
 
-  // URL synchronization: Keep address bar updated to /branch when viewing branch details
+  // URL synchronization: Keep address bar updated to /branch, /erp, or /admin
   useEffect(() => {
     try {
       if (activeTab === 'shop-store-details') {
         if (!window.location.pathname.includes('/branch') && !window.location.hash.includes('branch')) {
           window.history.pushState(null, '', '/branch');
         }
+      } else if (activeTab === 'erp-suite') {
+        if (!window.location.pathname.includes('/erp') && !window.location.hash.includes('erp')) {
+          window.history.pushState(null, '', '/erp');
+        }
       } else {
-        if (window.location.pathname.includes('/branch') || window.location.hash.includes('branch')) {
+        if (
+          window.location.pathname.includes('/branch') || window.location.hash.includes('branch') ||
+          window.location.pathname.includes('/erp') || window.location.hash.includes('erp')
+        ) {
           window.history.pushState(null, '', '/admin');
         }
       }
     } catch {}
   }, [activeTab]);
 
-  // Handle browser back/forward or direct /branch navigation
+  // Handle browser back/forward or direct /branch or /erp navigation
   useEffect(() => {
     const handleUrlSync = () => {
       try {
@@ -332,6 +343,8 @@ export const AdminPage = () => {
             const target = shopsList.find(s => s.id === `shop${num}` || s.loginId === `branch${num}`);
             if (target) setCurrentShop(target);
           }
+        } else if (p.includes('/erp') || h.includes('erp')) {
+          setActiveTab('erp-suite');
         }
       } catch {}
     };
@@ -1849,6 +1862,16 @@ export const AdminPage = () => {
 
     const sidebarLinks = [
     {
+      id: 'erp-suite',
+      label: 'ERP 360° Operations',
+      icon: Building2,
+      badge: 'Group ERP',
+      customBadge: {
+        text: '360° ERP',
+        className: 'bg-[#F5A623] text-[#3D040A] border border-[#D98207] font-black'
+      }
+    },
+    {
       id: 'shop-store-details',
       label: currentShop ? currentShop.shortName : 'Store Details',
       icon: Store,
@@ -2227,7 +2250,9 @@ export const AdminPage = () => {
                 <span>Sumadhura Operations</span>
                 <ChevronRight className="w-3 h-3 text-slate-400" />
                 <span className="text-[#7D0A14] font-black">
-                  {activeTab === 'b2c-customers'
+                  {activeTab === 'erp-suite'
+                    ? 'ERP 360° Operations Suite'
+                    : activeTab === 'b2c-customers'
                     ? 'Daily Customers (B2C Retail)'
                     : activeTab === 'b2b-customers'
                     ? 'Shopkeepers (B2B Wholesale)'
@@ -2237,7 +2262,9 @@ export const AdminPage = () => {
                 </span>
               </div>
               <h1 className="text-base font-black text-[#3D040A]">
-                {activeTab === 'overview'
+                {activeTab === 'erp-suite'
+                  ? 'Sumadhura 360° Enterprise Operations Suite'
+                  : activeTab === 'overview'
                   ? adminMode === 'b2c'
                     ? 'B2C Retail Operations Dashboard'
                     : adminMode === 'b2b'
@@ -2342,6 +2369,20 @@ export const AdminPage = () => {
           <div className="flex items-center gap-3">
             <button
               type="button"
+              onClick={() => setActiveTab('erp-suite')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 border ${
+                activeTab === 'erp-suite'
+                  ? 'bg-[#7D0A14] text-amber-300 border-[#7D0A14] ring-2 ring-[#7D0A14]/20'
+                  : 'bg-[#FAF5EC] hover:bg-[#F3EAD9] border-[#EDE1D1] text-[#7D0A14]'
+              }`}
+              title="Open Sumadhura 360° Enterprise Operations ERP Suite (/erp)"
+            >
+              <Building2 className="w-3.5 h-3.5" />
+              <span>360° ERP</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => setIsShopLoginModalOpen(true)}
               className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
               title="Branch 1 / Branch 2 / Branch 3 Login & Store Details Switcher (/branch)"
@@ -2379,6 +2420,13 @@ export const AdminPage = () => {
 
         {/* Scrollable Workspace */}
         <main className="flex-1 overflow-y-auto p-3.5 sm:p-6 pb-24 lg:pb-6 space-y-4 sm:space-y-6">
+          {/* ========================================================= */}
+          {/* 0.0 ERP 360° ENTERPRISE SUITE VIEW                         */}
+          {/* ========================================================= */}
+          {activeTab === 'erp-suite' && (
+            <ErpSuite showToast={showToast} />
+          )}
+
           {/* ========================================================= */}
           {/* 0. SHOP STORE DETAILS VIEW (Shop 1, Shop 2, Shop 3)       */}
           {/* ========================================================= */}

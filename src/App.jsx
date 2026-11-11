@@ -34,7 +34,8 @@ const MainLayout = () => {
       const h = window.location.hash.toLowerCase();
       if (
         h === '#admin' || p === '/admin' ||
-        h.startsWith('#branch') || p.startsWith('/branch')
+        h.startsWith('#branch') || p.startsWith('/branch') ||
+        h.startsWith('#erp') || p.startsWith('/erp')
       ) {
         setActiveTab('admin');
       } else if (
