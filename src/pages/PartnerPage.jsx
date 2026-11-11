@@ -207,6 +207,12 @@ export const PartnerPage = () => {
   const [partnersList] = useState(DEFAULT_PARTNERS);
   const [currentPartner, setCurrentPartner] = useState(() => {
     try {
+      const decoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
+      const match = decoded.match(/partner[\/\s-]?([1-4])/i);
+      if (match && match[1]) {
+        const target = DEFAULT_PARTNERS.find((p) => p.id === `partner${match[1]}`);
+        if (target) return target;
+      }
       const saved = localStorage.getItem('sumadhura_active_partner');
       if (saved) return JSON.parse(saved);
       return DEFAULT_PARTNERS[0];
@@ -258,18 +264,49 @@ export const PartnerPage = () => {
     }
   ]);
 
-  // Keep address bar synced to /partner
+  // Keep address bar synced to /partner1, /partner2, /partner3, /partner4
   useEffect(() => {
     try {
-      if (!window.location.pathname.includes('/partner') && !window.location.hash.includes('partner')) {
-        window.history.pushState(null, '', '/partner');
+      const pNum = currentPartner?.id?.replace('partner', '') || '1';
+      const targetPath = `/partner${pNum}`;
+      const currentPath = decodeURIComponent(window.location.pathname).toLowerCase();
+      if (!currentPath.includes(`partner${pNum}`)) {
+        window.history.pushState(null, '', targetPath);
       }
     } catch {}
-  }, []);
+  }, [currentPartner]);
+
+  // Listen for browser navigation (popstate / hashchange) to auto-select partner
+  useEffect(() => {
+    const handleUrlChange = () => {
+      try {
+        const decoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
+        const match = decoded.match(/partner[\/\s-]?([1-4])/i);
+        if (match && match[1]) {
+          const target = DEFAULT_PARTNERS.find((p) => p.id === `partner${match[1]}`);
+          if (target && target.id !== currentPartner?.id) {
+            setCurrentPartner(target);
+            try {
+              localStorage.setItem('sumadhura_active_partner', JSON.stringify(target));
+            } catch {}
+          }
+        }
+      } catch {}
+    };
+
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
+    return () => {
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
+    };
+  }, [currentPartner]);
 
   const handlePartnerSwitch = (partner) => {
     setCurrentPartner(partner);
+    const pNum = partner.id.replace('partner', '');
     try {
+      window.history.pushState(null, '', `/partner${pNum}`);
       localStorage.setItem('sumadhura_active_partner', JSON.stringify(partner));
     } catch {}
     setIsPartnerLoginModalOpen(false);
@@ -278,15 +315,21 @@ export const PartnerPage = () => {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    const query = loginForm.loginId.trim().toLowerCase();
+    const raw = loginForm.loginId.trim().toLowerCase();
+    const query = raw.replace(/\s+/g, '');
     const found = partnersList.find(
       (p) =>
         p.loginId.toLowerCase() === query ||
-        p.name.toLowerCase().includes(query) ||
+        p.id.toLowerCase() === query ||
+        p.name.toLowerCase().includes(raw) ||
         (query === '1' && p.id === 'partner1') ||
         (query === '2' && p.id === 'partner2') ||
         (query === '3' && p.id === 'partner3') ||
-        (query === '4' && p.id === 'partner4')
+        (query === '4' && p.id === 'partner4') ||
+        (query.includes('partner1') && p.id === 'partner1') ||
+        (query.includes('partner2') && p.id === 'partner2') ||
+        (query.includes('partner3') && p.id === 'partner3') ||
+        (query.includes('partner4') && p.id === 'partner4')
     );
 
     if (!found) {
@@ -400,13 +443,36 @@ export const PartnerPage = () => {
               <Bike className="w-5 h-5 text-[#3D040A]" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-black text-sm sm:text-base text-amber-100 tracking-tight">
                   Sumadhura Express Fleet
                 </span>
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30">
-                  /partner
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30 font-mono">
+                  /partner{currentPartner.id.replace('partner', '')}
                 </span>
+
+                {/* Direct 1-Click /partner1-4 Quick Switch Pills */}
+                <div className="hidden sm:inline-flex items-center gap-1 bg-black/20 p-0.5 rounded-lg border border-white/10 ml-1">
+                  {partnersList.map((p) => {
+                    const num = p.id.replace('partner', '');
+                    const isSelected = currentPartner?.id === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => handlePartnerSwitch(p)}
+                        className={`px-2 py-0.5 rounded text-[10px] font-black transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-amber-400 text-slate-900 shadow-2xs font-bold'
+                            : 'text-amber-200/80 hover:text-white hover:bg-white/10'
+                        }`}
+                        title={`Open /partner${num} (${p.name})`}
+                      >
+                        /partner{num}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className="flex items-center gap-2 text-xs text-amber-200/80 font-medium">
                 <span className="flex items-center gap-1">
@@ -1000,22 +1066,40 @@ export const PartnerPage = () => {
                 Select Active Fleet Rider
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {partnersList.map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => handlePartnerSwitch(p)}
-                    className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
-                      currentPartner?.id === p.id
-                        ? 'border-[#7D0A14] bg-[#FAF5EC] ring-2 ring-[#7D0A14]/20'
-                        : 'border-slate-200 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="font-black text-slate-900 text-xs truncate">{p.name}</div>
-                    <div className="text-[10px] text-slate-500 truncate">{p.vehicle}</div>
-                    <div className="text-[9px] text-[#7D0A14] font-bold mt-1">★ {p.rating} • {p.branchCode}</div>
-                  </button>
-                ))}
+                {partnersList.map((p) => {
+                  const num = p.id.replace('partner', '');
+                  const isCurrent = currentPartner?.id === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => handlePartnerSwitch(p)}
+                      className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
+                        isCurrent
+                          ? 'border-[#7D0A14] bg-[#FAF5EC] ring-2 ring-[#7D0A14]/20'
+                          : 'border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] font-mono font-black text-[#7D0A14] bg-white px-1.5 py-0.5 rounded border border-[#EDE1D1]">
+                          /partner{num}
+                        </span>
+                        {isCurrent && (
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full">
+                            Active
+                          </span>
+                        )}
+                      </div>
+                      <div className="font-black text-slate-900 text-xs truncate">{p.name}</div>
+                      <div className="text-[10px] text-slate-500 truncate">{p.vehicle}</div>
+                      <div className="text-[9px] text-[#7D0A14] font-bold mt-1">★ {p.rating} • {p.branchCode}</div>
+                      <div className="mt-1.5 text-[10px] font-black text-emerald-700 flex items-center gap-0.5">
+                        <span>Open /partner{num}</span>
+                        <ArrowRight className="w-2.5 h-2.5" />
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

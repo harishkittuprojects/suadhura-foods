@@ -2815,11 +2815,11 @@ export const AdminPage = () => {
                           </div>
 
                           <a
-                            href="/partner"
+                            href={`/partner${rider.id.replace('partner', '')}`}
                             className="w-full py-1.5 rounded-xl bg-white hover:bg-[#FAF5EC] text-[#7D0A14] font-black text-[11px] flex items-center justify-center gap-1 border border-[#EDE1D1] shadow-2xs active:scale-95 transition-all text-center"
                           >
                             <Bike className="w-3 h-3 text-[#7D0A14]" />
-                            <span>Launch /partner</span>
+                            <span>Launch /partner{rider.id.replace('partner', '')}</span>
                           </a>
                         </div>
                       ))}

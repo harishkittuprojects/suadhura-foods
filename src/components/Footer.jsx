@@ -162,12 +162,23 @@ export const Footer = () => {
                 </button>
               </li>
               <li>
-                <a
-                  href="/partner"
-                  className="text-amber-300 hover:text-white transition-colors flex items-center gap-1.5 font-bold"
-                >
-                  <span>🚴 Delivery Partner App (/partner)</span>
-                </a>
+                <div className="space-y-1">
+                  <a
+                    href="/partner1"
+                    className="text-amber-300 hover:text-white transition-colors flex items-center gap-1.5 font-bold"
+                  >
+                    <span>🚴 Delivery Partner App (/partner)</span>
+                  </a>
+                  <div className="flex items-center gap-1.5 text-[10px] text-amber-200/70 font-mono pl-4">
+                    <a href="/partner1" className="hover:text-amber-100 hover:underline">/partner1</a>
+                    <span>•</span>
+                    <a href="/partner2" className="hover:text-amber-100 hover:underline">/partner2</a>
+                    <span>•</span>
+                    <a href="/partner3" className="hover:text-amber-100 hover:underline">/partner3</a>
+                    <span>•</span>
+                    <a href="/partner4" className="hover:text-amber-100 hover:underline">/partner4</a>
+                  </div>
+                </div>
               </li>
               <li>
                 <button
