@@ -287,20 +287,29 @@ export const AdminPage = () => {
     }
   });
 
+  const getBranchNum = (shopOrId, fallback = '1') => {
+    const raw = typeof shopOrId === 'string' ? shopOrId : (shopOrId?.loginId || shopOrId?.id || '');
+    const m = String(raw).match(/(\d+)/);
+    return m ? m[1] : String(fallback);
+  };
+
   const [currentShop, setCurrentShop] = useState(() => {
     try {
       const decoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
-      const branchMatch = decoded.match(/branch[\/\s-]?([1-3])/i);
+      const branchMatch = decoded.match(/branch[\/\s-]?(\d+)/i);
       if (branchMatch && branchMatch[1]) {
-        const matchBranch = DEFAULT_SHOPS.find(s => s.id === `shop${branchMatch[1]}`);
+        const num = branchMatch[1];
+        const matchBranch = shopsList.find(
+          s => s.id === `shop${num}` || s.loginId === `branch${num}`
+        );
         if (matchBranch) return matchBranch;
       }
       const savedShopId = localStorage.getItem('sumadhura_active_shop_id');
       if (savedShopId) {
-        const found = DEFAULT_SHOPS.find(s => s.id === savedShopId || s.loginId === savedShopId);
+        const found = shopsList.find(s => s.id === savedShopId || s.loginId === savedShopId);
         if (found) return found;
       }
-      return DEFAULT_SHOPS[0];
+      return shopsList[0] || DEFAULT_SHOPS[0];
     } catch {
       return DEFAULT_SHOPS[0];
     }
@@ -310,7 +319,7 @@ export const AdminPage = () => {
   useEffect(() => {
     try {
       if (activeTab === 'shop-store-details') {
-        const branchNum = currentShop?.id === 'shop2' ? '2' : currentShop?.id === 'shop3' ? '3' : '1';
+        const branchNum = getBranchNum(currentShop, '1');
         const expectedPath = `/branch${branchNum}`;
         const currentDecoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
         if (
@@ -336,14 +345,14 @@ export const AdminPage = () => {
     } catch {}
   }, [activeTab, currentShop]);
 
-  // Handle browser back/forward or direct /branch1, /branch2, /branch3 or /erp navigation
+  // Handle browser back/forward or direct /branch1, /branch2, /branch3+ or /erp navigation
   useEffect(() => {
     const handleUrlSync = () => {
       try {
         const decoded = decodeURIComponent(window.location.pathname + window.location.hash).toLowerCase();
         if (decoded.includes('branch')) {
           setActiveTab('shop-store-details');
-          const match = decoded.match(/branch[\/\s-]?([1-3])/i);
+          const match = decoded.match(/branch[\/\s-]?(\d+)/i);
           if (match && match[1]) {
             const num = match[1];
             const target = shopsList.find(s => s.id === `shop${num}` || s.loginId === `branch${num}`);
@@ -366,11 +375,96 @@ export const AdminPage = () => {
 
   const [isShopLoginModalOpen, setIsShopLoginModalOpen] = useState(false);
   const [isEditShopModalOpen, setIsEditShopModalOpen] = useState(false);
+  const [isAddBranchModalOpen, setIsAddBranchModalOpen] = useState(false);
+  const [newBranchForm, setNewBranchForm] = useState({
+    area: '',
+    manager: '',
+    phone: '+91 ',
+    address: '',
+    coverage: '',
+    dailyCapacity: 400,
+    dispatchFleetCount: 6
+  });
   const [shopLoginForm, setShopLoginForm] = useState({ loginId: '', password: '' });
   const [shopLoginError, setShopLoginError] = useState('');
   const [storeActiveSubTab, setStoreActiveSubTab] = useState('orders'); // 'orders' | 'inventory' | 'fleet' | 'profile'
   const [editStoreForm, setEditStoreForm] = useState(null);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [branchesDropdownOpen, setBranchesDropdownOpen] = useState(false);
+
+  const handleAddBranch = (e) => {
+    e.preventDefault();
+    const area = newBranchForm.area.trim();
+    if (!area) {
+      showToast('Please enter a branch area / location name.', 'error');
+      return;
+    }
+    const nextNum = shopsList.length + 1;
+    const paddedNum = String(nextNum).padStart(3, '0');
+    const newShop = {
+      id: `shop${nextNum}`,
+      loginId: `branch${nextNum}`,
+      email: `branch${nextNum}@sumadhura.com`,
+      password: 'password123',
+      name: `Sumadhura Express Hub #${nextNum} - Branch ${nextNum} (${area} Hub)`,
+      shortName: `Branch ${nextNum} (${area})`,
+      branchCode: `SMD-HYD-${paddedNum}`,
+      tagline: `${area} Cold-Chain Express Dispatch Hub`,
+      manager: newBranchForm.manager.trim() || 'Branch Manager',
+      phone: newBranchForm.phone.trim() || '+91 98450 00000',
+      address: newBranchForm.address.trim() || `${area}, Hyderabad, Telangana`,
+      fssai: `13622011000${paddedNum}`,
+      gstin: `36AABCS${paddedNum}F1Z5`,
+      timings: '5:00 AM – 11:00 PM Express Delivery',
+      coverage: newBranchForm.coverage.trim() || `${area} (5.0 km Radius)`,
+      dispatchFleetCount: Number(newBranchForm.dispatchFleetCount) || 6,
+      dailyCapacity: Number(newBranchForm.dailyCapacity) || 400,
+      coldChainTemp: '3.6°C OK',
+      rating: 5.0,
+      ordersCount: 0,
+      todayRevenue: 0,
+      activeStatus: 'Active & Ready',
+      colorTheme: 'from-emerald-700 to-emerald-950',
+      accentColor: 'text-emerald-700',
+      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
+      image: DEFAULT_SHOPS[0].image,
+      inventory: DEFAULT_SHOPS[0].inventory.map((item, idx) => ({
+        ...item,
+        id: `inv-${nextNum}0${idx + 1}`,
+        stock: 50
+      })),
+      assignedOrders: []
+    };
+
+    const updatedShops = [...shopsList, newShop];
+    setShopsList(updatedShops);
+    setCurrentShop(newShop);
+    try {
+      localStorage.setItem('sumadhura_admin_shops', JSON.stringify(updatedShops));
+      localStorage.setItem('sumadhura_active_shop_id', newShop.id);
+    } catch {}
+
+    setIsAddBranchModalOpen(false);
+    setNewBranchForm({
+      area: '',
+      manager: '',
+      phone: '+91 ',
+      address: '',
+      coverage: '',
+      dailyCapacity: 400,
+      dispatchFleetCount: 6
+    });
+
+    try {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    } catch {}
+
+    showToast(`🏪 Added ${newShop.shortName}! Route /branch${nextNum} is now live.`, 'success');
+  };
 
   const handleShopLogin = (loginIdOrShop) => {
     let targetShop = null;
@@ -384,9 +478,8 @@ export const AdminPage = () => {
              (s.email && s.email.toLowerCase() === query) ||
              (s.name && s.name.toLowerCase().includes(query)) ||
              (s.shortName && s.shortName.toLowerCase().includes(query)) ||
-             ((query === '1' || query === 'branch1' || query === 'branch 1' || query === 'shop1') && s.id === 'shop1') ||
-             ((query === '2' || query === 'branch2' || query === 'branch 2' || query === 'shop2') && s.id === 'shop2') ||
-             ((query === '3' || query === 'branch3' || query === 'branch 3' || query === 'shop3') && s.id === 'shop3')
+             (query.replace(/\s+/g, '') === `branch${getBranchNum(s)}`) ||
+             (query === getBranchNum(s))
       );
     }
 
@@ -405,9 +498,9 @@ export const AdminPage = () => {
     setShopLoginError('');
     setShopLoginForm({ loginId: '', password: '' });
 
-    // AUTOMATICALLY OPEN BRANCH DETAILS AND UPDATE URL TO /branch1, /branch2, or /branch3!
+    // AUTOMATICALLY OPEN BRANCH DETAILS AND UPDATE URL TO /branch1, /branch2, /branch3+
     setActiveTab('shop-store-details');
-    const branchNum = targetShop.id === 'shop2' ? '2' : targetShop.id === 'shop3' ? '3' : '1';
+    const branchNum = getBranchNum(targetShop, '1');
     try {
       if (window.history && window.history.pushState) {
         window.history.pushState(null, '', `/branch${branchNum}`);
@@ -1869,26 +1962,6 @@ export const AdminPage = () => {
 
     const sidebarLinks = [
     {
-      id: 'erp-suite',
-      label: 'ERP 360° Operations',
-      icon: Building2,
-      badge: 'Group ERP',
-      customBadge: {
-        text: '360° ERP',
-        className: 'bg-[#F5A623] text-[#3D040A] border border-[#D98207] font-black'
-      }
-    },
-    {
-      id: 'shop-store-details',
-      label: currentShop ? currentShop.shortName : 'Store Details',
-      icon: Store,
-      badge: currentShop ? currentShop.branchCode : '3 Hubs',
-      customBadge: {
-        text: 'LIVE HUB',
-        className: 'bg-emerald-400 text-slate-900 border border-emerald-300 font-black'
-      }
-    },
-    {
       id: 'dashboard',
       label: 'Dashboard',
       icon: LayoutGrid,
@@ -2019,6 +2092,16 @@ export const AdminPage = () => {
       icon: Settings,
       badge: null,
       customBadge: null
+    },
+    {
+      id: 'erp-suite',
+      label: 'ERP 360° Operations',
+      icon: Building2,
+      badge: 'Group ERP',
+      customBadge: {
+        text: '360° ERP',
+        className: 'bg-[#F5A623] text-[#3D040A] border border-[#D98207] font-black'
+      }
     }
   ];
 
@@ -2060,6 +2143,103 @@ export const AdminPage = () => {
 
           {/* Navigation Links with Signature Sumadhura Live Website Colors */}
           <div className="p-3 flex-1 overflow-y-auto space-y-1">
+            {/* Branches Dropdown Section */}
+            <div className="space-y-1">
+              <button
+                type="button"
+                onClick={() => setBranchesDropdownOpen((prev) => !prev)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] font-bold transition-all text-left cursor-pointer ${
+                  activeTab === 'shop-store-details'
+                    ? 'bg-gradient-to-r from-[#F5A623] to-[#F5A623]/95 text-[#3D040A] font-black shadow-md scale-[1.01]'
+                    : 'text-amber-100/80 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <Store
+                    className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 ${
+                      activeTab === 'shop-store-details' ? 'text-[#3D040A]' : 'text-amber-200/80'
+                    }`}
+                  />
+                  <span className="truncate">Branches</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  <span
+                    className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                      activeTab === 'shop-store-details'
+                        ? 'bg-[#3D040A] text-[#F5A623]'
+                        : 'bg-black/30 text-amber-200 border border-white/10'
+                    }`}
+                  >
+                    {shopsList.length}
+                  </span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      branchesDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </div>
+              </button>
+
+              {branchesDropdownOpen && (
+                <div className="pl-4 pr-1 py-1 space-y-1">
+                  {shopsList.map((shop, idx) => {
+                    const branchNum = getBranchNum(shop, idx + 1);
+                    const isBranchActive =
+                      activeTab === 'shop-store-details' && currentShop?.id === shop.id;
+
+                    return (
+                      <button
+                        key={shop.id}
+                        type="button"
+                        onClick={() => {
+                          setCurrentShop(shop);
+                          try {
+                            localStorage.setItem('sumadhura_active_shop_id', shop.id);
+                            if (window.history && window.history.pushState) {
+                              window.history.pushState(null, '', `/branch${branchNum}`);
+                            }
+                          } catch {}
+                          setActiveTab('shop-store-details');
+                          setSidebarOpen(false);
+                          showToast(`🏪 Opened ${shop.shortName} (/branch${branchNum})`, 'success');
+                        }}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all text-left cursor-pointer border ${
+                          isBranchActive
+                            ? 'bg-white/15 text-[#F5A623] border-[#F5A623]/40 shadow-xs'
+                            : 'bg-[#2C0307]/60 text-amber-100/80 border-transparent hover:bg-white/10 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                              isBranchActive ? 'bg-[#F5A623]' : 'bg-emerald-400'
+                            }`}
+                          />
+                          <span className="truncate">{shop.shortName || `Branch ${branchNum}`}</span>
+                        </div>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-black/30 text-amber-200/90 shrink-0 ml-2">
+                          /branch{branchNum}
+                        </span>
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddBranchModalOpen(true);
+                      setSidebarOpen(false);
+                    }}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all cursor-pointer border border-dashed border-[#F5A623]/50 text-[#F5A623] hover:bg-[#F5A623]/15"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Branch</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
             {sidebarLinks.map((item) => {
               const Icon = item.icon;
               const isActive =
@@ -2087,18 +2267,18 @@ export const AdminPage = () => {
                     }
                     setSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] font-bold transition-all text-left ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] font-bold transition-all text-left cursor-pointer ${
                     isActive
                       ? 'bg-gradient-to-r from-[#F5A623] to-[#F5A623]/95 text-[#3D040A] font-black shadow-md scale-[1.01]'
                       : 'text-amber-100/80 hover:bg-white/10 hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <Icon className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 ${isActive ? 'text-[#3D040A]' : 'text-amber-200/80'}`} />
                     <span className="truncate">{item.label}</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
                     {item.id === 'b2c-customers' && (
                       <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
                         isActive
@@ -2132,66 +2312,6 @@ export const AdminPage = () => {
                 </button>
               );
             })}
-          </div>
-
-          {/* Active Store Branch & Quick Switch Login */}
-          <div className="p-3 border-t border-[#52060E] bg-[#2C0307]">
-            <div className="p-3 rounded-2xl bg-[#1C0205] border border-[#52060E] text-xs space-y-2">
-              <div
-                className="flex items-center justify-between cursor-pointer hover:opacity-90"
-                onClick={() => {
-                  setActiveTab('shop-store-details');
-                  const bNum = currentShop?.id === 'shop2' ? '2' : currentShop?.id === 'shop3' ? '3' : '1';
-                  if (window.history && window.history.pushState) {
-                    window.history.pushState(null, '', `/branch${bNum}`);
-                  }
-                  showToast(`🏪 Opened ${currentShop ? currentShop.shortName : 'Branch'} Store Details (/branch${bNum})`);
-                }}
-                title="Click to view Store Details"
-              >
-                <span className="font-extrabold text-amber-300 flex items-center gap-1.5 truncate">
-                  <Store className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span className="truncate">{currentShop ? currentShop.shortName : 'Branch 1 (Madhapur)'}</span>
-                </span>
-                <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-emerald-900/60 text-emerald-300 border border-emerald-700/50">
-                  {currentShop ? currentShop.branchCode : 'SMD-HYD-001'}
-                </span>
-              </div>
-              <p className="text-[10px] text-amber-100/70 truncate">
-                Manager: {currentShop?.manager || 'Store Manager'}
-              </p>
-              <button
-                type="button"
-                onClick={() => setIsShopLoginModalOpen(true)}
-                className="w-full py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-[11px] flex items-center justify-center gap-1.5 transition-all border border-white/15 active:scale-95 cursor-pointer"
-              >
-                <Key className="w-3 h-3 text-amber-400" />
-                <span>Branch Login / Switch Branch</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Bottom Card in Royal Maroon Brand Theme */}
-          <div className="p-3 border-t border-[#52060E] bg-[#330308]">
-            <div className="p-3.5 rounded-2xl bg-[#230206] border border-[#52060E] text-xs space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-extrabold text-amber-300 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Live Storefront
-                </span>
-                <span className="text-[10px] font-bold text-amber-200/70">v2.4 Production</span>
-              </div>
-              <p className="text-[11px] text-amber-100/70 font-medium">
-                Connected to Bangalore Daily Morning Dispatch Hub.
-              </p>
-              <button
-                onClick={() => navigateTo('home')}
-                className="w-full py-2 rounded-xl bg-[#F5A623] hover:bg-[#D98207] text-[#3D040A] font-black text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm active:scale-95"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>Visit Storefront</span>
-              </button>
-            </div>
           </div>
         </div>
       </aside>
@@ -2435,7 +2555,18 @@ export const AdminPage = () => {
           {/* 0.0 ERP 360° ENTERPRISE SUITE VIEW                         */}
           {/* ========================================================= */}
           {activeTab === 'erp-suite' && (
-            <ErpSuite showToast={showToast} />
+            <ErpSuite
+              showToast={showToast}
+              shopsList={shopsList}
+              currentShop={currentShop}
+              onSelectShop={(shop) => {
+                setCurrentShop(shop);
+                try {
+                  localStorage.setItem('sumadhura_active_shop_id', shop.id);
+                } catch {}
+              }}
+              onOpenAddBranch={() => setIsAddBranchModalOpen(true)}
+            />
           )}
 
           {/* ========================================================= */}
@@ -8513,8 +8644,8 @@ export const AdminPage = () => {
                 Quick 1-Click Fast Branch Login & Open /branch1, /branch2, /branch3
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                {shopsList.map((shop) => {
-                  const bNum = shop.id === 'shop2' ? '2' : shop.id === 'shop3' ? '3' : '1';
+                {shopsList.map((shop, idx) => {
+                  const bNum = getBranchNum(shop, idx + 1);
                   return (
                     <button
                       key={shop.id}
@@ -8742,6 +8873,146 @@ export const AdminPage = () => {
                 >
                   <Save className="w-3.5 h-3.5 text-amber-300" />
                   <span>Save Store Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ===================================================================== */}
+      {/* ADD NEW BRANCH MODAL                                                  */}
+      {/* ===================================================================== */}
+      {isAddBranchModalOpen && (
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          onClick={() => setIsAddBranchModalOpen(false)}
+        >
+          <div
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-[#EDE1D1] relative animate-in zoom-in-95 duration-200 space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs">
+                  <Store className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-base text-[#3D040A]">
+                    Add New Store Branch (Branch {shopsList.length + 1})
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-medium">
+                    Auto-creates route /branch{shopsList.length + 1} & inventory hub
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddBranchModalOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddBranch} className="space-y-3.5 text-xs">
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">
+                  Branch Area / Location Name *
+                </label>
+                <input
+                  type="text"
+                  value={newBranchForm.area}
+                  onChange={(e) => setNewBranchForm({ ...newBranchForm, area: e.target.value })}
+                  placeholder="e.g. Kondapur, Banjara Hills, Kukatpally"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Manager Name *</label>
+                  <input
+                    type="text"
+                    value={newBranchForm.manager}
+                    onChange={(e) => setNewBranchForm({ ...newBranchForm, manager: e.target.value })}
+                    placeholder="e.g. Srinivas Rao"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="font-bold text-slate-700 block mb-1">Phone Number *</label>
+                  <input
+                    type="text"
+                    value={newBranchForm.phone}
+                    onChange={(e) => setNewBranchForm({ ...newBranchForm, phone: e.target.value })}
+                    placeholder="+91 98450 44004"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">Full Hub Address *</label>
+                <textarea
+                  rows={2}
+                  value={newBranchForm.address}
+                  onChange={(e) => setNewBranchForm({ ...newBranchForm, address: e.target.value })}
+                  placeholder="Plot / Shop #, Main Road, Area, Hyderabad, Telangana"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  required
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-1">
+                  <label className="font-bold text-slate-700 block mb-1">Daily Capacity</label>
+                  <input
+                    type="number"
+                    min="50"
+                    value={newBranchForm.dailyCapacity}
+                    onChange={(e) => setNewBranchForm({ ...newBranchForm, dailyCapacity: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  />
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="font-bold text-slate-700 block mb-1">Fleet Riders</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={newBranchForm.dispatchFleetCount}
+                    onChange={(e) => setNewBranchForm({ ...newBranchForm, dispatchFleetCount: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  />
+                </div>
+                <div className="sm:col-span-1">
+                  <label className="font-bold text-slate-700 block mb-1">Direct URL</label>
+                  <input
+                    type="text"
+                    readOnly
+                    value={`/branch${shopsList.length + 1}`}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 font-mono font-bold text-[#7D0A14]"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 sm:gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsAddBranchModalOpen(false)}
+                  className="w-full sm:w-auto px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer text-center"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer text-center"
+                >
+                  <Plus className="w-4 h-4 text-amber-300" />
+                  <span>Create Branch {shopsList.length + 1}</span>
                 </button>
               </div>
             </form>

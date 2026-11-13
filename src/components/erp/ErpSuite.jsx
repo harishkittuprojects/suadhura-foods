@@ -215,8 +215,15 @@ export const INITIAL_DISPATCH_BATCHES = [
   }
 ];
 
-export const ErpSuite = ({ showToast }) => {
-  // Active business view / drill-down entity
+export const ErpSuite = ({
+  showToast,
+  shopsList = [],
+  currentShop = null,
+  onSelectShop,
+  onOpenAddBranch
+}) => {
+  // Active branch for ERP drill-down (falls back to first real branch)
+  const activeBranch = currentShop || shopsList[0] || null;
   const [selectedEntity, setSelectedEntity] = useState(BUSINESS_ENTITIES[0]);
 
   // ERP Functional Sub-Tabs
@@ -456,55 +463,73 @@ export const ErpSuite = ({ showToast }) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500">Active View:</span>
+            <span className="text-xs font-bold text-slate-500">Active Branch:</span>
             <span className="px-3 py-1 rounded-xl bg-[#FAF5EC] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs flex items-center gap-1.5 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>{selectedEntity.shortName}</span>
+              <span>{activeBranch ? activeBranch.shortName : selectedEntity.shortName}</span>
             </span>
           </div>
         </div>
 
-        {/* Brand Entity Cards Slider / Switcher */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-          {BUSINESS_ENTITIES.map((entity) => {
-            const Icon = entity.icon;
-            const isSelected = selectedEntity.id === entity.id;
+        {/* Active Branches & Add Branch Option */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {shopsList.map((shop) => {
+            const isSelected = activeBranch?.id === shop.id;
             return (
               <button
-                key={entity.id}
+                key={shop.id}
                 type="button"
                 onClick={() => {
-                  setSelectedEntity(entity);
-                  showToast(`🏢 Switched ERP view to ${entity.name}`);
+                  if (onSelectShop) onSelectShop(shop);
+                  showToast(`🏪 Switched ERP view to ${shop.shortName}`);
                 }}
-                className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2 ${
                   isSelected
-                    ? 'border-[#7D0A14] bg-[#FAF5EC] ring-2 ring-[#7D0A14]/20 shadow-xs scale-[1.02]'
+                    ? 'border-[#7D0A14] bg-[#FAF5EC] ring-2 ring-[#7D0A14]/20 shadow-xs scale-[1.01]'
                     : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center justify-between mb-1.5">
                     <span className={`p-1.5 rounded-xl ${isSelected ? 'bg-[#7D0A14] text-amber-300' : 'bg-slate-100 text-slate-700'}`}>
-                      <Icon className="w-4 h-4" />
+                      <Store className="w-4 h-4" />
                     </span>
-                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded-md bg-white border border-[#EDE1D1] text-slate-700">
-                      {entity.staffCount} Staff
+                    <span className="text-[9px] font-black px-2 py-0.5 rounded-md bg-white border border-[#EDE1D1] text-[#7D0A14]">
+                      {shop.branchCode}
                     </span>
                   </div>
                   <div className="font-black text-slate-900 text-xs truncate leading-snug">
-                    {entity.shortName}
+                    {shop.shortName}
                   </div>
-                  <p className="text-[10px] text-slate-500 truncate mt-0.5">{entity.type}</p>
+                  <p className="text-[10px] text-slate-500 truncate mt-0.5">
+                    Mgr: {shop.manager} • {shop.dispatchFleetCount || 6} Riders
+                  </p>
                 </div>
 
-                <div className="pt-1 border-t border-slate-100 flex items-center justify-between text-[11px] font-extrabold">
-                  <span className="text-[#7D0A14]">{entity.todayTurnover}</span>
-                  <span className="text-emerald-700">{entity.margin}</span>
+                <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-extrabold">
+                  <span className="text-[#7D0A14]">₹{(shop.todayRevenue || 0).toLocaleString('en-IN')}</span>
+                  <span className="text-emerald-700">{shop.ordersCount || 0} Orders</span>
                 </div>
               </button>
             );
           })}
+
+          {/* Add New Branch Card */}
+          <button
+            type="button"
+            onClick={() => {
+              if (onOpenAddBranch) onOpenAddBranch();
+            }}
+            className="p-3.5 rounded-2xl border-2 border-dashed border-[#7D0A14]/35 hover:border-[#7D0A14] bg-[#FAF5EC]/50 hover:bg-[#FAF5EC] text-left transition-all cursor-pointer flex flex-col items-center justify-center gap-1.5 min-h-[112px] group"
+          >
+            <div className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform">
+              <Plus className="w-5 h-5" />
+            </div>
+            <div className="font-black text-[#7D0A14] text-xs">Add Branch</div>
+            <p className="text-[10px] text-slate-500 font-semibold">
+              Create Branch {shopsList.length + 1}
+            </p>
+          </button>
         </div>
       </div>
 
@@ -563,10 +588,10 @@ export const ErpSuite = ({ showToast }) => {
                 </span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-[#3D040A] mt-1">
-                {selectedEntity.todayTurnover}
+                {activeBranch ? `₹${(activeBranch.todayRevenue || 0).toLocaleString('en-IN')}` : selectedEntity.todayTurnover}
               </div>
               <div className="text-[11px] text-emerald-700 font-bold mt-1">
-                ↑ 14.2% <span className="text-slate-400 font-normal">vs target (MTD: ₹62.4L)</span>
+                {activeBranch ? `${activeBranch.ordersCount || 0} Orders Today` : '↑ 14.2% vs target'} <span className="text-slate-400 font-normal">({activeBranch?.branchCode || 'MTD: ₹62.4L'})</span>
               </div>
             </div>
 
@@ -595,10 +620,10 @@ export const ErpSuite = ({ showToast }) => {
                 </span>
               </div>
               <div className="text-xl sm:text-2xl font-black text-blue-900 mt-1">
-                {selectedEntity.cashInCounters}
+                {activeBranch ? `₹${Math.round((activeBranch.todayRevenue || 0) * 0.42).toLocaleString('en-IN')}` : selectedEntity.cashInCounters}
               </div>
               <div className="text-[11px] text-blue-700 font-bold mt-1">
-                Bank Balance: ₹18.42 Lakhs
+                Fleet: {activeBranch?.dispatchFleetCount || 8} Riders • {activeBranch?.coldChainTemp || '3.8°C OK'}
               </div>
             </div>
 
@@ -627,77 +652,100 @@ export const ErpSuite = ({ showToast }) => {
                 <div className="flex items-center gap-2">
                   <Store className="w-5 h-5 text-[#7D0A14]" />
                   <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
-                    Retail Outlets Live Sales & Cash Counter Summary
+                    Branches Live Sales & Cash Counter Summary
                   </h3>
                 </div>
-                <span className="text-xs font-bold text-emerald-700">All Counters Balanced</span>
+                <span className="text-xs font-bold text-emerald-700">All {shopsList.length} Branches Active</span>
               </div>
 
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[500px] text-left text-xs">
                   <thead>
                     <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
-                      <th className="p-2.5">Outlet Location</th>
+                      <th className="p-2.5">Branch Location</th>
                       <th className="p-2.5">Today Sales</th>
                       <th className="p-2.5">Cash in Counter</th>
                       <th className="p-2.5">UPI / Card</th>
-                      <th className="p-2.5">Stock Accuracy</th>
+                      <th className="p-2.5">Orders</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
-                    {[
-                      { name: 'Palle Ruchulu (Madhapur Hub)', sales: '₹48,250', cash: '₹22,400', digital: '₹25,850', acc: '99.4%' },
-                      { name: 'Palle Ruchulu (Gachibowli Circle)', sales: '₹38,150', cash: '₹18,200', digital: '₹19,950', acc: '98.8%' },
-                      { name: 'Poshakalu Flagship (Fin District)', sales: '₹34,600', cash: '₹21,450', digital: '₹13,150', acc: '99.8%' },
-                      { name: 'FOCO Outlet (Kondapur Partner)', sales: '₹28,400', cash: '₹12,200', digital: '₹16,200', acc: '98.5%' }
-                    ].map((row, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50">
-                        <td className="p-2.5 font-black text-slate-900">{row.name}</td>
-                        <td className="p-2.5 font-extrabold text-[#7D0A14]">{row.sales}</td>
-                        <td className="p-2.5 font-bold text-slate-700">{row.cash}</td>
-                        <td className="p-2.5 font-bold text-slate-700">{row.digital}</td>
-                        <td className="p-2.5">
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px]">
-                            {row.acc}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {(shopsList.length > 0 ? shopsList : []).map((shop) => {
+                      const rev = shop.todayRevenue || 0;
+                      const cash = Math.round(rev * 0.42);
+                      const digital = rev - cash;
+                      return (
+                        <tr
+                          key={shop.id}
+                          onClick={() => onSelectShop && onSelectShop(shop)}
+                          className={`hover:bg-slate-50 cursor-pointer ${
+                            activeBranch?.id === shop.id ? 'bg-[#FAF5EC]/70' : ''
+                          }`}
+                        >
+                          <td className="p-2.5 font-black text-slate-900">
+                            <div>{shop.shortName}</div>
+                            <div className="text-[10px] font-medium text-slate-500">{shop.manager} • {shop.branchCode}</div>
+                          </td>
+                          <td className="p-2.5 font-extrabold text-[#7D0A14]">₹{rev.toLocaleString('en-IN')}</td>
+                          <td className="p-2.5 font-bold text-slate-700">₹{cash.toLocaleString('en-IN')}</td>
+                          <td className="p-2.5 font-bold text-slate-700">₹{digital.toLocaleString('en-IN')}</td>
+                          <td className="p-2.5">
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px]">
+                              {shop.ordersCount || 0} / {shop.dailyCapacity || 400}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             </div>
 
-            {/* Right: Revenue Channel Mix Breakdown */}
+            {/* Right: Branch Sales Contribution Breakdown */}
             <div className="lg:col-span-5 bg-white rounded-2xl border border-[#EDE1D1] p-5 shadow-2xs space-y-4">
               <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
                 <div className="flex items-center gap-2">
                   <PieChart className="w-5 h-5 text-[#F5A623]" />
                   <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
-                    Sales Channel Contribution
+                    Branch Sales Contribution
                   </h3>
                 </div>
                 <span className="text-xs font-bold text-slate-500">Today</span>
               </div>
 
               <div className="space-y-3 text-xs">
-                {[
-                  { channel: 'Palle Ruchulu Outlets (Curries by Weight)', pct: '44%', amount: '₹1,09,200', color: 'bg-[#7D0A14]' },
-                  { channel: 'Online Ecommerce & Customer App', pct: '26%', amount: '₹64,500', color: 'bg-[#F5A623]' },
-                  { channel: 'Poshakalu Retail Staples (Organic Packs)', pct: '14%', amount: '₹34,700', color: 'bg-emerald-600' },
-                  { channel: 'Daily Milk Subscriptions', pct: '10%', amount: '₹24,800', color: 'bg-blue-600' },
-                  { channel: 'Catering & Banquets Advance', pct: '6%', amount: '₹15,000', color: 'bg-purple-600' }
-                ].map((item, idx) => (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex items-center justify-between font-bold">
-                      <span className="text-slate-800">{item.channel}</span>
-                      <span className="text-[#3D040A] font-black">{item.amount} ({item.pct})</span>
-                    </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                      <div className={`${item.color} h-full rounded-full`} style={{ width: item.pct }} />
-                    </div>
-                  </div>
-                ))}
+                {(() => {
+                  const totalBranchRev = shopsList.reduce((acc, s) => acc + (s.todayRevenue || 0), 0);
+                  const barColors = ['bg-[#7D0A14]', 'bg-[#F5A623]', 'bg-emerald-600', 'bg-blue-600', 'bg-purple-600'];
+                  return shopsList.map((shop, idx) => {
+                    const rev = shop.todayRevenue || 0;
+                    const pct = totalBranchRev > 0 ? Math.round((rev / totalBranchRev) * 100) : 0;
+                    const barColor = barColors[idx % barColors.length];
+                    return (
+                      <div
+                        key={shop.id}
+                        onClick={() => onSelectShop && onSelectShop(shop)}
+                        className="space-y-1 cursor-pointer group"
+                      >
+                        <div className="flex items-center justify-between font-bold">
+                          <span className={`group-hover:text-[#7D0A14] transition-colors ${activeBranch?.id === shop.id ? 'text-[#7D0A14] font-black' : 'text-slate-800'}`}>
+                            {shop.shortName}
+                          </span>
+                          <span className="text-[#3D040A] font-black">
+                            ₹{rev.toLocaleString('en-IN')} ({pct}%)
+                          </span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                          <div
+                            className={`${barColor} h-full rounded-full transition-all duration-300`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </div>
           </div>
