@@ -2181,7 +2181,7 @@ export const AdminPage = () => {
       case 'reviews':
         return 'Customer Reviews & Feedback';
       case 'erp-suite':
-        return 'Sumadhura 360° Operations ERP';
+        return '360° Operations ERP';
       case 'shop-store-details':
         return currentShop ? `${currentShop.shortName || currentShop.name} Operations` : 'Branch Hub';
       case 'settings':
@@ -2472,22 +2472,22 @@ export const AdminPage = () => {
               <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-400 leading-tight">
                 <span>Sumadhura Operations</span>
                 <ChevronRight className="w-3 h-3 text-slate-300" />
-                <span className="text-[#7D0A14] font-black">
-                  {getTabHeading(activeTab)}
+                <span className="text-[#7D0A14] font-black truncate max-w-[140px] xl:max-w-none">
+                  {activeTab === 'erp-suite' ? 'ERP Suite' : getTabHeading(activeTab)}
                 </span>
               </div>
-              <h1 className="text-sm xl:text-base font-black text-[#3D040A] tracking-tight leading-tight truncate">
+              <h1 className="text-sm xl:text-base font-black text-[#3D040A] tracking-tight leading-tight truncate max-w-[220px] xl:max-w-none">
                 {getTabHeading(activeTab)}
               </h1>
             </div>
           </div>
 
-          {/* Center: Search Input */}
-          <div className="relative flex-1 max-w-xs mx-4 hidden md:block">
+          {/* Center: Search Input (Fixed width or hidden on tight screens, never crushed into an empty bubble) */}
+          <div className="relative hidden xl:block w-48 2xl:w-64 mx-2 shrink-0">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search customers (name, phone, email)..."
+              placeholder="Search customers..."
               value={customerSearchTerm}
               onChange={(e) => {
                 setCustomerSearchTerm(e.target.value);
@@ -2509,30 +2509,28 @@ export const AdminPage = () => {
 
           {/* Right Actions: ERP, Branch Switcher, New Order, Storefront */}
           <div className="flex items-center gap-1.5 xl:gap-2 shrink-0">
-            {/* 360° ERP Button */}
-            <button
-              type="button"
-              onClick={() => setActiveTab('erp-suite')}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 border ${
-                activeTab === 'erp-suite'
-                  ? 'bg-[#7D0A14] text-amber-300 border-[#7D0A14] ring-2 ring-[#7D0A14]/20'
-                  : 'bg-[#FAF5EC] hover:bg-[#F3EAD9] border-[#EDE1D1] text-[#7D0A14]'
-              }`}
-              title="Open Sumadhura 360° Enterprise Operations ERP Suite (/erp)"
-            >
-              <Building2 className="w-3.5 h-3.5 text-amber-500" />
-              <span>360° ERP</span>
-            </button>
+            {/* 360° ERP Button (Only shown when not already on ERP Suite) */}
+            {activeTab !== 'erp-suite' && (
+              <button
+                type="button"
+                onClick={() => setActiveTab('erp-suite')}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 border bg-[#FAF5EC] hover:bg-[#F3EAD9] border-[#EDE1D1] text-[#7D0A14] shrink-0"
+                title="Open Sumadhura 360° Enterprise Operations ERP Suite (/erp)"
+              >
+                <Building2 className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                <span>360° ERP</span>
+              </button>
+            )}
 
             {/* Branch Switcher Button (Compact pill with dropdown arrow) */}
             <button
               type="button"
               onClick={() => setIsShopLoginModalOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
               title="Click to switch between Branch 1, Branch 2, Branch 3"
             >
               <Store className="w-3.5 h-3.5 text-[#7D0A14] shrink-0" />
-              <span className="font-black text-[#7D0A14] truncate max-w-[95px] xl:max-w-none">
+              <span className="font-black text-[#7D0A14] truncate max-w-[85px] sm:max-w-[110px] xl:max-w-[140px]">
                 {currentShop ? (currentShop.shortName || currentShop.name) : 'Branch 1'}
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
@@ -2544,10 +2542,10 @@ export const AdminPage = () => {
               <button
                 type="button"
                 onClick={simulateNewB2COrder}
-                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all cursor-pointer"
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all cursor-pointer shrink-0"
                 title="Create a new incoming B2C retail order"
               >
-                <Plus className="w-3.5 h-3.5 text-amber-300" />
+                <Plus className="w-3.5 h-3.5 text-amber-300 shrink-0" />
                 <span>Order</span>
               </button>
             )}
@@ -2556,11 +2554,11 @@ export const AdminPage = () => {
             <button
               type="button"
               onClick={() => navigateTo('home')}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors cursor-pointer shrink-0"
               title="View Live Customer Storefront"
             >
-              <ExternalLink className="w-3.5 h-3.5" />
-              <span>Storefront</span>
+              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
+              <span className="whitespace-nowrap">Storefront</span>
             </button>
           </div>
         </header>

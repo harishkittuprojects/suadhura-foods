@@ -32,7 +32,9 @@ export const ErpSuite = ({
   const [cashForm, setCashForm] = useState({
     cashInCounter: '',
     digitalRevenue: '',
-    cashierName: ''
+    cashierName: '',
+    openingFloat: '2000',
+    handoverBank: '0'
   });
 
   const handleOpenCashModal = (shop) => {
@@ -43,7 +45,9 @@ export const ErpSuite = ({
     setCashForm({
       cashInCounter: String(currentCash),
       digitalRevenue: String(currentDigital),
-      cashierName: shop.lastCashier || shop.manager || ''
+      cashierName: shop.lastCashier || shop.manager || '',
+      openingFloat: shop.openingFloat !== undefined ? String(shop.openingFloat) : '2000',
+      handoverBank: shop.handoverBank !== undefined ? String(shop.handoverBank) : '0'
     });
     setIsCashModalOpen(true);
   };
@@ -55,12 +59,16 @@ export const ErpSuite = ({
     const digitalVal = Number(cashForm.digitalRevenue) !== undefined && !isNaN(Number(cashForm.digitalRevenue))
       ? Number(cashForm.digitalRevenue)
       : Math.max(0, (activeCashShop.todayRevenue || 0) - cashVal);
+    const floatVal = Number(cashForm.openingFloat) || 0;
+    const handoverVal = Number(cashForm.handoverBank) || 0;
 
     if (onUpdateShopCash) {
       onUpdateShopCash(activeCashShop.id, {
         cashInCounter: cashVal,
         digitalRevenue: digitalVal,
-        cashierName: cashForm.cashierName
+        cashierName: cashForm.cashierName,
+        openingFloat: floatVal,
+        handoverBank: handoverVal
       });
     }
 
@@ -242,6 +250,17 @@ export const ErpSuite = ({
                 </button>
               )}
             </div>
+            {/* Opening Till Float & Handover / Bank info display */}
+            <div className="mt-2.5 pt-2 border-t border-[#EDE1D1] grid grid-cols-2 gap-2 text-[10px]">
+              <div>
+                <span className="text-slate-400 font-bold block">Opening Till Float</span>
+                <span className="font-black text-slate-700">₹{(activeBranch?.openingFloat !== undefined ? activeBranch.openingFloat : 2000).toLocaleString('en-IN')}</span>
+              </div>
+              <div className="text-right">
+                <span className="text-slate-400 font-bold block">Handover / Bank</span>
+                <span className="font-black text-slate-700">₹{(activeBranch?.handoverBank !== undefined ? activeBranch.handoverBank : 0).toLocaleString('en-IN')}</span>
+              </div>
+            </div>
           </div>
 
           {/* Daily Food Waste */}
@@ -282,16 +301,18 @@ export const ErpSuite = ({
             </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs sm:text-[13px]">
+          <div className="overflow-x-auto rounded-2xl border border-[#EDE1D1]">
+            <table className="w-full text-left text-xs sm:text-[13px] border-collapse">
               <thead>
                 <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
-                  <th className="p-3 sm:p-3.5">Branch Location</th>
-                  <th className="p-3 sm:p-3.5">Today Sales</th>
-                  <th className="p-3 sm:p-3.5">Cash in Counter</th>
-                  <th className="p-3 sm:p-3.5">UPI / Card</th>
-                  <th className="p-3 sm:p-3.5 text-center">Orders</th>
-                  <th className="p-3 sm:p-3.5 text-right">Cash Entry</th>
+                  <th className="p-3 sm:p-3.5 sticky left-0 bg-[#FAF5EC] z-10 shadow-[2px_0_4px_rgba(0,0,0,0.03)] min-w-[170px]">
+                    Branch Location
+                  </th>
+                  <th className="p-3 sm:p-3.5 min-w-[100px]">Today Sales</th>
+                  <th className="p-3 sm:p-3.5 min-w-[110px]">Cash in Counter</th>
+                  <th className="p-3 sm:p-3.5 min-w-[100px]">UPI / Card</th>
+                  <th className="p-3 sm:p-3.5 text-center min-w-[80px]">Orders</th>
+                  <th className="p-3 sm:p-3.5 text-right min-w-[110px]">Cash Entry</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -305,12 +326,14 @@ export const ErpSuite = ({
                       key={shop.id}
                       onClick={() => onSelectShop && onSelectShop(shop)}
                       className={`hover:bg-slate-50 cursor-pointer transition-colors ${
-                        activeBranch?.id === shop.id ? 'bg-[#FAF5EC]/70' : ''
+                        activeBranch?.id === shop.id ? 'bg-[#FAF5EC]/70' : 'bg-white'
                       }`}
                     >
-                      <td className="p-3 sm:p-3.5 font-black text-slate-900">
-                        <div className="text-xs sm:text-sm font-black">{shop.shortName}</div>
-                        <div className="text-[11px] font-medium text-slate-500 mt-0.5">
+                      <td className={`p-3 sm:p-3.5 font-black text-slate-900 sticky left-0 z-10 shadow-[2px_0_4px_rgba(0,0,0,0.03)] transition-colors ${
+                        activeBranch?.id === shop.id ? 'bg-[#FAF5EC]' : 'bg-white'
+                      }`}>
+                        <div className="text-xs sm:text-sm font-black whitespace-nowrap">{shop.shortName}</div>
+                        <div className="text-[11px] font-medium text-slate-500 mt-0.5 whitespace-nowrap">
                           {shop.lastCashier || shop.manager} • <span className="font-mono text-[#7D0A14] font-bold">{shop.branchCode}</span>
                         </div>
                       </td>
@@ -539,6 +562,40 @@ export const ErpSuite = ({
                 <span className="text-[10px] text-slate-400 mt-0.5 block">
                   Auto-calculated from Total Sales − Counter Cash (or enter manually).
                 </span>
+              </div>
+
+              {/* Opening Till Float & Handover / Bank */}
+              <div className="grid grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="font-extrabold text-slate-800 block mb-1">
+                    Opening Till Float (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={cashForm.openingFloat}
+                    onChange={(e) => setCashForm({ ...cashForm, openingFloat: e.target.value })}
+                    placeholder="2000"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">Morning change float</span>
+                </div>
+                <div>
+                  <label className="font-extrabold text-slate-800 block mb-1">
+                    Handover / Bank (₹)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={cashForm.handoverBank}
+                    onChange={(e) => setCashForm({ ...cashForm, handoverBank: e.target.value })}
+                    placeholder="0"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                  />
+                  <span className="text-[10px] text-slate-400 mt-0.5 block">Deposited or handed over</span>
+                </div>
               </div>
 
               {/* Cashier / Manager Name */}
