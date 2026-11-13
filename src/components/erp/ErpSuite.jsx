@@ -269,146 +269,174 @@ export const ErpSuite = ({
           </div>
         </div>
 
-        {/* Section: Branches Summary & Sales Contribution */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {/* Left: Branches Summary Table */}
-          <div className="lg:col-span-7 bg-white rounded-2xl border border-[#EDE1D1] p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
-              <div className="flex items-center gap-2">
-                <Store className="w-5 h-5 text-[#7D0A14]" />
-                <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
+        {/* Section: Full Screen Width Branches Summary Table */}
+        <div className="w-full bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 shadow-2xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#EDE1D1] pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs">
+                <Store className="w-5 h-5 text-amber-300" />
+              </div>
+              <div>
+                <h3 className="font-black text-base sm:text-lg text-[#3D040A]">
                   Branches Live Sales & Cash Counter Summary
                 </h3>
+                <p className="text-xs text-slate-500 font-medium">
+                  Real-time sales, counter cash audit, UPI/Card splits and order counts across all hubs
+                </p>
               </div>
-              <span className="text-xs font-bold text-emerald-700">All {shopsList.length} Branches Active</span>
             </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[580px] text-left text-xs">
-                <thead>
-                  <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
-                    <th className="p-2.5">Branch Location</th>
-                    <th className="p-2.5">Today Sales</th>
-                    <th className="p-2.5">Cash in Counter</th>
-                    <th className="p-2.5">UPI / Card</th>
-                    <th className="p-2.5">Orders</th>
-                    <th className="p-2.5 text-right">Cash Entry</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {shopsList.map((shop) => {
-                    const rev = shop.todayRevenue || 0;
-                    const cash = shop.cashInCounter !== undefined ? shop.cashInCounter : Math.round(rev * 0.42);
-                    const digital = shop.digitalRevenue !== undefined ? shop.digitalRevenue : Math.max(0, rev - cash);
-
-                    return (
-                      <tr
-                        key={shop.id}
-                        onClick={() => onSelectShop && onSelectShop(shop)}
-                        className={`hover:bg-slate-50 cursor-pointer transition-colors ${
-                          activeBranch?.id === shop.id ? 'bg-[#FAF5EC]/70' : ''
-                        }`}
-                      >
-                        <td className="p-2.5 font-black text-slate-900">
-                          <div>{shop.shortName}</div>
-                          <div className="text-[10px] font-medium text-slate-500">
-                            {shop.lastCashier || shop.manager} • {shop.branchCode}
-                          </div>
-                        </td>
-                        <td className="p-2.5 font-extrabold text-[#7D0A14]">₹{rev.toLocaleString('en-IN')}</td>
-                        <td className="p-2.5">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenCashModal(shop);
-                            }}
-                            className="text-left group cursor-pointer"
-                            title="Click to update cash drawer amount"
-                          >
-                            <span className="font-extrabold text-slate-900 group-hover:text-[#7D0A14] flex items-center gap-1">
-                              <span>₹{cash.toLocaleString('en-IN')}</span>
-                              <Pencil className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity text-[#7D0A14]" />
-                            </span>
-                            {shop.lastCashUpdated && (
-                              <span className="text-[9px] text-slate-400 block font-normal">
-                                Shift closed {shop.lastCashUpdated}
-                              </span>
-                            )}
-                          </button>
-                        </td>
-                        <td className="p-2.5 font-bold text-slate-700">₹{digital.toLocaleString('en-IN')}</td>
-                        <td className="p-2.5">
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-black text-[10px]">
-                            {shop.ordersCount || 0} / {shop.dailyCapacity || 400}
-                          </span>
-                        </td>
-                        <td className="p-2.5 text-right">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenCashModal(shop);
-                            }}
-                            className="px-2.5 py-1 rounded-xl bg-white hover:bg-[#7D0A14] text-[#7D0A14] hover:text-white font-black text-[10px] border border-[#EDE1D1] shadow-2xs transition-all active:scale-95 cursor-pointer inline-flex items-center gap-1"
-                          >
-                            <Pencil className="w-2.5 h-2.5" />
-                            <span>Enter Cash</span>
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <span className="text-xs font-black px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+              All {shopsList.length} Branches Active
+            </span>
           </div>
 
-          {/* Right: Branch Sales Contribution Breakdown */}
-          <div className="lg:col-span-5 bg-white rounded-2xl border border-[#EDE1D1] p-5 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
-              <div className="flex items-center gap-2">
-                <PieChart className="w-5 h-5 text-[#F5A623]" />
-                <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
-                  Branch Sales Contribution
-                </h3>
-              </div>
-              <span className="text-xs font-bold text-slate-500">Today</span>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              {(() => {
-                const totalBranchRev = shopsList.reduce((acc, s) => acc + (s.todayRevenue || 0), 0);
-                const barColors = ['bg-[#7D0A14]', 'bg-[#F5A623]', 'bg-emerald-600', 'bg-blue-600', 'bg-purple-600'];
-                return shopsList.map((shop, idx) => {
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs sm:text-[13px]">
+              <thead>
+                <tr className="bg-[#FAF5EC] text-slate-700 font-extrabold border-b border-[#EDE1D1]">
+                  <th className="p-3 sm:p-3.5">Branch Location</th>
+                  <th className="p-3 sm:p-3.5">Today Sales</th>
+                  <th className="p-3 sm:p-3.5">Cash in Counter</th>
+                  <th className="p-3 sm:p-3.5">UPI / Card</th>
+                  <th className="p-3 sm:p-3.5 text-center">Orders</th>
+                  <th className="p-3 sm:p-3.5 text-right">Cash Entry</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {shopsList.map((shop) => {
                   const rev = shop.todayRevenue || 0;
-                  const pct = totalBranchRev > 0 ? Math.round((rev / totalBranchRev) * 100) : 0;
-                  const barColor = barColors[idx % barColors.length];
+                  const cash = shop.cashInCounter !== undefined ? shop.cashInCounter : Math.round(rev * 0.42);
+                  const digital = shop.digitalRevenue !== undefined ? shop.digitalRevenue : Math.max(0, rev - cash);
+
                   return (
-                    <div
+                    <tr
                       key={shop.id}
                       onClick={() => onSelectShop && onSelectShop(shop)}
-                      className="space-y-1 cursor-pointer group"
+                      className={`hover:bg-slate-50 cursor-pointer transition-colors ${
+                        activeBranch?.id === shop.id ? 'bg-[#FAF5EC]/70' : ''
+                      }`}
                     >
-                      <div className="flex items-center justify-between font-bold">
-                        <span className={`group-hover:text-[#7D0A14] transition-colors ${activeBranch?.id === shop.id ? 'text-[#7D0A14] font-black' : 'text-slate-800'}`}>
-                          {shop.shortName}
+                      <td className="p-3 sm:p-3.5 font-black text-slate-900">
+                        <div className="text-xs sm:text-sm font-black">{shop.shortName}</div>
+                        <div className="text-[11px] font-medium text-slate-500 mt-0.5">
+                          {shop.lastCashier || shop.manager} • <span className="font-mono text-[#7D0A14] font-bold">{shop.branchCode}</span>
+                        </div>
+                      </td>
+                      <td className="p-3 sm:p-3.5 font-black text-sm text-[#7D0A14]">
+                        ₹{rev.toLocaleString('en-IN')}
+                      </td>
+                      <td className="p-3 sm:p-3.5">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenCashModal(shop);
+                          }}
+                          className="text-left group cursor-pointer"
+                          title="Click to update cash drawer amount"
+                        >
+                          <span className="font-black text-sm text-slate-900 group-hover:text-[#7D0A14] flex items-center gap-1.5">
+                            <span>₹{cash.toLocaleString('en-IN')}</span>
+                            <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-[#7D0A14]" />
+                          </span>
+                          {shop.lastCashUpdated ? (
+                            <span className="text-[10px] text-emerald-700 font-bold block mt-0.5">
+                              ✓ Closed at {shop.lastCashUpdated}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] text-slate-400 block mt-0.5">
+                              Live count
+                            </span>
+                          )}
+                        </button>
+                      </td>
+                      <td className="p-3 sm:p-3.5 font-bold text-slate-700 text-sm">
+                        ₹{digital.toLocaleString('en-IN')}
+                      </td>
+                      <td className="p-3 sm:p-3.5 text-center">
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-black text-xs">
+                          {shop.ordersCount || 0} / {shop.dailyCapacity || 400}
                         </span>
-                        <span className="text-[#3D040A] font-black">
-                          ₹{rev.toLocaleString('en-IN')} ({pct}%)
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                        <div
-                          className={`${barColor} h-full rounded-full transition-all duration-300`}
-                          style={{ width: `${pct}%` }}
-                        />
-                      </div>
-                    </div>
+                      </td>
+                      <td className="p-3 sm:p-3.5 text-right">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenCashModal(shop);
+                          }}
+                          className="px-3.5 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#7D0A14] text-[#7D0A14] hover:text-white font-black text-xs border border-[#EDE1D1] shadow-2xs transition-all active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          <span>Enter Cash</span>
+                        </button>
+                      </td>
+                    </tr>
                   );
-                });
-              })()}
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Section: Full Screen Width Branch Sales Contribution */}
+        <div className="w-full bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 shadow-2xs space-y-4">
+          <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
+            <div className="flex items-center gap-2">
+              <PieChart className="w-5 h-5 text-[#F5A623]" />
+              <h3 className="font-black text-sm sm:text-base text-[#3D040A]">
+                Branch Sales Contribution Breakdown
+              </h3>
             </div>
+            <span className="text-xs font-bold text-slate-500">Today's Revenue Share</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {(() => {
+              const totalBranchRev = shopsList.reduce((acc, s) => acc + (s.todayRevenue || 0), 0);
+              const barColors = ['bg-[#7D0A14]', 'bg-[#F5A623]', 'bg-emerald-600', 'bg-blue-600', 'bg-purple-600'];
+              return shopsList.map((shop, idx) => {
+                const rev = shop.todayRevenue || 0;
+                const pct = totalBranchRev > 0 ? Math.round((rev / totalBranchRev) * 100) : 0;
+                const barColor = barColors[idx % barColors.length];
+                const cash = shop.cashInCounter !== undefined ? shop.cashInCounter : Math.round(rev * 0.42);
+                const digital = shop.digitalRevenue !== undefined ? shop.digitalRevenue : Math.max(0, rev - cash);
+
+                return (
+                  <div
+                    key={shop.id}
+                    onClick={() => onSelectShop && onSelectShop(shop)}
+                    className={`p-4 rounded-2xl border transition-all cursor-pointer space-y-2 ${
+                      activeBranch?.id === shop.id
+                        ? 'border-[#7D0A14] bg-[#FAF5EC] shadow-2xs ring-1 ring-[#7D0A14]/20'
+                        : 'border-slate-200 bg-white hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between font-bold">
+                      <span className="text-slate-900 font-black text-xs sm:text-sm truncate">
+                        {shop.shortName}
+                      </span>
+                      <span className="text-[#7D0A14] font-black text-xs sm:text-sm">
+                        {pct}%
+                      </span>
+                    </div>
+
+                    <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                      <div
+                        className={`${barColor} h-full rounded-full transition-all duration-300`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 pt-1">
+                      <span>Total: <strong className="text-slate-900">₹{rev.toLocaleString('en-IN')}</strong></span>
+                      <span className="text-blue-800">Cash: ₹{cash.toLocaleString('en-IN')}</span>
+                      <span className="text-emerald-800">UPI: ₹{digital.toLocaleString('en-IN')}</span>
+                    </div>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
       </div>
