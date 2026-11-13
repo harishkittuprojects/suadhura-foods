@@ -438,11 +438,11 @@ export const ErpSuite = ({
       {/* ================================================================= */}
       {isCashModalOpen && activeCashShop && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 z-[60] overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
           onClick={() => setIsCashModalOpen(false)}
         >
           <div
-            className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-[#EDE1D1] relative animate-in zoom-in-95 duration-200 space-y-4"
+            className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-[#EDE1D1] relative animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">

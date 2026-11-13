@@ -2118,7 +2118,7 @@ export const AdminPage = () => {
       id: 'erp-suite',
       label: 'ERP 360° Operations',
       icon: Building2,
-      badge: 'Group ERP',
+      badge: 'ERP',
       customBadge: {
         text: '360° ERP',
         className: 'bg-[#F5A623] text-[#3D040A] border border-[#D98207] font-black'
@@ -2139,7 +2139,7 @@ export const AdminPage = () => {
       {/* 1. STANDALONE LEFT SIDEBAR (SUMADHURA SIGNATURE ROYAL MAROON) */}
       {/* ============================================================= */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#3D040A] text-white border-r border-[#52060E] flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 shadow-2xl ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 lg:w-76 xl:w-80 shrink-0 bg-[#3D040A] text-white border-r border-[#52060E] flex flex-col justify-between transition-transform duration-300 lg:static lg:translate-x-0 shadow-2xl ${
           sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
         }`}
       >
@@ -2402,13 +2402,13 @@ export const AdminPage = () => {
         </header>
 
         {/* Desktop Header Bar (>= lg) */}
-        <header className="hidden lg:flex min-h-16 bg-white border-b border-[#E8DDCF] px-6 py-2.5 items-center justify-between gap-4 flex-shrink-0 z-20 shadow-xs">
-          <div className="flex items-center gap-3">
+        <header className="hidden lg:flex min-h-16 bg-white border-b border-[#E8DDCF] px-4 xl:px-6 py-2.5 items-center justify-between gap-2.5 xl:gap-4 flex-shrink-0 z-20 shadow-xs">
+          <div className="flex items-center gap-3 shrink-0">
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
                 <span>Sumadhura Operations</span>
                 <ChevronRight className="w-3 h-3 text-slate-400" />
-                <span className="text-[#7D0A14] font-black">
+                <span className="text-[#7D0A14] font-black truncate max-w-[130px] xl:max-w-none">
                   {activeTab === 'erp-suite'
                     ? 'ERP 360° Operations Suite'
                     : activeTab === 'b2c-customers'
@@ -2420,7 +2420,7 @@ export const AdminPage = () => {
                     : activeTab.replace('-', ' ')}
                 </span>
               </div>
-              <h1 className="text-base font-black text-[#3D040A]">
+              <h1 className="text-sm xl:text-base font-black text-[#3D040A] truncate max-w-[210px] xl:max-w-none">
                 {activeTab === 'erp-suite'
                   ? 'Sumadhura 360° Enterprise Operations Suite'
                   : activeTab === 'overview'
@@ -2443,11 +2443,11 @@ export const AdminPage = () => {
           </div>
 
           {/* Desktop Search */}
-          <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <div className="relative flex-1 min-w-[120px] max-w-[180px] xl:max-w-xs">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search customers (name, phone, email)..."
+              placeholder="Search..."
               value={customerSearchTerm}
               onChange={(e) => {
                 setCustomerSearchTerm(e.target.value);
@@ -2455,7 +2455,7 @@ export const AdminPage = () => {
                   setActiveTab('b2c-customers');
                 }
               }}
-              className="w-full pl-9 pr-7 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
+              className="w-full pl-8 pr-7 py-2 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
             />
             {customerSearchTerm && (
               <button
@@ -2468,7 +2468,7 @@ export const AdminPage = () => {
           </div>
 
           {/* Desktop Scope Switch Toggle */}
-          <div className="flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
+          <div className="flex items-center bg-[#FAF5EC] p-0.5 xl:p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs shrink-0">
             <button
               type="button"
               onClick={() => {
@@ -2477,14 +2477,14 @@ export const AdminPage = () => {
                 if (activeTab === 'b2b-customers') setActiveTab('b2c-customers');
                 showToast('Switched to B2C Retail Operations');
               }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                 adminMode === 'b2c'
                   ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
               <ShoppingCart className="w-3.5 h-3.5" />
-              <span>B2C Retail</span>
+              <span>B2C<span className="hidden xl:inline"> Retail</span></span>
             </button>
 
             <button
@@ -2495,14 +2495,14 @@ export const AdminPage = () => {
                 if (activeTab === 'b2c-customers') setActiveTab('b2b-customers');
                 showToast('Switched to B2B Wholesale Portal');
               }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                 adminMode === 'b2b'
                   ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
               }`}
             >
               <Building2 className="w-3.5 h-3.5" />
-              <span>B2B Wholesale</span>
+              <span>B2B<span className="hidden xl:inline"> Wholesale</span></span>
             </button>
 
             <button
@@ -2513,7 +2513,7 @@ export const AdminPage = () => {
                 if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') setActiveTab('customers');
                 showToast('Switched to Unified View (B2C + B2B)');
               }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              className={`flex items-center gap-1 xl:gap-1.5 px-2.5 xl:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                 adminMode === 'unified'
                   ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
@@ -2525,11 +2525,11 @@ export const AdminPage = () => {
           </div>
 
           {/* Desktop Right Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 xl:gap-2.5 shrink-0">
             <button
               type="button"
               onClick={() => setActiveTab('erp-suite')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 border ${
+              className={`flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-xl font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 border ${
                 activeTab === 'erp-suite'
                   ? 'bg-[#7D0A14] text-amber-300 border-[#7D0A14] ring-2 ring-[#7D0A14]/20'
                   : 'bg-[#FAF5EC] hover:bg-[#F3EAD9] border-[#EDE1D1] text-[#7D0A14]'
@@ -2543,36 +2543,36 @@ export const AdminPage = () => {
             <button
               type="button"
               onClick={() => setIsShopLoginModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
+              className="flex items-center gap-1.5 xl:gap-2 px-2.5 xl:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95"
               title="Branch 1 / Branch 2 / Branch 3 Login & Store Details Switcher (/branch)"
             >
               <Store className="w-3.5 h-3.5 text-[#7D0A14]" />
-              <span className="text-slate-500 font-bold">Branch:</span>
-              <span className="font-black text-[#7D0A14]">{currentShop ? (currentShop.shortName || currentShop.name) : 'Branch 1 (Madhapur)'}</span>
+              <span className="text-slate-500 font-bold hidden 2xl:inline">Branch:</span>
+              <span className="font-black text-[#7D0A14] max-w-[100px] xl:max-w-none truncate">{currentShop ? (currentShop.shortName || currentShop.name) : 'Branch 1'}</span>
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             </button>
 
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
+            <div className="hidden 2xl:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[11px] text-amber-900 font-bold">
               <span className="text-[#D98207]">❄️ {adminContent.coldChainTemp}</span>
             </div>
 
             {(adminMode === 'b2c' || adminMode === 'unified') && (
               <button
                 onClick={simulateNewB2COrder}
-                className="px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                className="px-2.5 xl:px-3 py-1.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs flex items-center gap-1.5 shadow-xs active:scale-95 transition-all"
                 title="Create a new incoming B2C retail order"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>B2C Order</span>
+                <span><span className="hidden xl:inline">B2C </span>Order</span>
               </button>
             )}
 
             <button
               onClick={() => navigateTo('home')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
+              className="flex items-center gap-1.5 px-2.5 xl:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-              <span>Customer Storefront</span>
+              <span><span className="hidden xl:inline">Customer </span>Storefront</span>
             </button>
           </div>
         </header>
@@ -8636,7 +8636,7 @@ export const AdminPage = () => {
       {/* ------------------------------------------------------------- */}
       {isShopLoginModalOpen && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 z-[60] overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
           onClick={() => setIsShopLoginModalOpen(false)}
         >
           <div
@@ -8798,7 +8798,7 @@ export const AdminPage = () => {
       {/* ------------------------------------------------------------- */}
       {isEditShopModalOpen && editStoreForm && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 z-[60] overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
           onClick={() => setIsEditShopModalOpen(false)}
         >
           <div
@@ -8914,11 +8914,11 @@ export const AdminPage = () => {
       {/* ===================================================================== */}
       {isAddBranchModalOpen && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+          className="fixed inset-0 z-[60] overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
           onClick={() => setIsAddBranchModalOpen(false)}
         >
           <div
-            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full p-5 sm:p-7 shadow-2xl border border-[#EDE1D1] relative animate-in zoom-in-95 duration-200 space-y-4"
+            className="bg-white text-slate-900 rounded-3xl max-w-lg w-full max-h-[92vh] overflow-y-auto p-5 sm:p-7 shadow-2xl border border-[#EDE1D1] relative animate-in zoom-in-95 duration-200 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">

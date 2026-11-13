@@ -178,7 +178,7 @@ export const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAF5EC]/95 backdrop-blur-md border-b border-[#E8DDCF] shadow-sm transition-all duration-200 w-full overflow-hidden">
+    <header className="sticky top-0 z-40 bg-[#FAF5EC]/95 backdrop-blur-md border-b border-[#E8DDCF] shadow-sm transition-all duration-200 w-full">
       {/* 1. Top Ribbon: Services & VIP Membership */}
       <div className="bg-[#4D060D] text-white text-xs py-1 px-2 sm:px-4 font-medium border-b border-[#3D040A]">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-1 sm:gap-2">
