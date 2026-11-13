@@ -2087,13 +2087,6 @@ export const AdminPage = () => {
       customBadge: null
     },
     {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      badge: null,
-      customBadge: null
-    },
-    {
       id: 'erp-suite',
       label: 'ERP 360° Operations',
       icon: Building2,
@@ -2102,6 +2095,13 @@ export const AdminPage = () => {
         text: '360° ERP',
         className: 'bg-[#F5A623] text-[#3D040A] border border-[#D98207] font-black'
       }
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: Settings,
+      badge: null,
+      customBadge: null
     }
   ];
 
