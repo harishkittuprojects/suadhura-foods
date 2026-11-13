@@ -2473,7 +2473,7 @@ export const AdminPage = () => {
                 <span>Sumadhura Operations</span>
                 <ChevronRight className="w-3 h-3 text-slate-300" />
                 <span className="text-[#7D0A14] font-black truncate max-w-[140px] xl:max-w-none">
-                  {activeTab === 'erp-suite' ? 'ERP Suite' : getTabHeading(activeTab)}
+                  {activeTab === 'erp-suite' ? 'ERP Suite' : activeTab === 'invoices' ? 'Invoices' : getTabHeading(activeTab)}
                 </span>
               </div>
               <h1 className="text-sm xl:text-base font-black text-[#3D040A] tracking-tight leading-tight truncate max-w-[220px] xl:max-w-none">
@@ -2482,8 +2482,8 @@ export const AdminPage = () => {
             </div>
           </div>
 
-          {/* Center: Search Input (Fixed width or hidden on tight screens, never crushed into an empty bubble) */}
-          <div className="relative hidden xl:block w-48 2xl:w-64 mx-2 shrink-0">
+          {/* Center: Search Input (Only shown on extra large screens, freeing header room for all actions) */}
+          <div className="relative hidden 2xl:block w-56 mx-2 shrink-0">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -2522,16 +2522,16 @@ export const AdminPage = () => {
               </button>
             )}
 
-            {/* Branch Switcher Button (Compact pill with dropdown arrow) */}
+            {/* Branch Switcher Button (Compact pill: Branch 1, Branch 2, Branch 3) */}
             <button
               type="button"
               onClick={() => setIsShopLoginModalOpen(true)}
               className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] border border-[#EDE1D1] text-[#7D0A14] font-black text-xs transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
-              title="Click to switch between Branch 1, Branch 2, Branch 3"
+              title={currentShop ? `${currentShop.shortName} • ${currentShop.branchCode} (Click to switch branch)` : 'Click to switch branch'}
             >
               <Store className="w-3.5 h-3.5 text-[#7D0A14] shrink-0" />
-              <span className="font-black text-[#7D0A14] truncate max-w-[85px] sm:max-w-[110px] xl:max-w-[140px]">
-                {currentShop ? (currentShop.shortName || currentShop.name) : 'Branch 1'}
+              <span className="font-black text-[#7D0A14]">
+                {currentShop ? (currentShop.shortName?.replace(/\s*\(.*\)/, '') || currentShop.name) : 'Branch 1'}
               </span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               <ChevronDown className="w-3 h-3 text-slate-400 shrink-0" />
@@ -2550,15 +2550,15 @@ export const AdminPage = () => {
               </button>
             )}
 
-            {/* Customer Storefront Link */}
+            {/* Customer Storefront Link (Guaranteed shrink-0 and whitespace-nowrap) */}
             <button
               type="button"
               onClick={() => navigateTo('home')}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors cursor-pointer shrink-0"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#FAF5EC] hover:bg-[#F3EAD9] text-[#7D0A14] font-bold text-xs border border-[#E8DDCF] transition-colors cursor-pointer shrink-0 whitespace-nowrap"
               title="View Live Customer Storefront"
             >
               <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">Storefront</span>
+              <span>Storefront</span>
             </button>
           </div>
         </header>
@@ -5982,17 +5982,22 @@ export const AdminPage = () => {
           {/* ========================================================= */}
           {activeTab === 'invoices' && (
             <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 space-y-5 shadow-xs animate-in fade-in duration-200">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-                <div>
-                  <h3 className="text-xl font-black text-[#3D040A]">
-                    B2B Official GST Tax Invoices
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    Government compliant tax invoices for commercial client Input Tax Credit (ITC)
-                  </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#EDE1D1] pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs shrink-0">
+                    <FileText className="w-5 h-5 text-amber-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-black text-[#3D040A]">
+                      B2B Official GST Tax Invoices
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium">
+                      Government compliant tax invoices for commercial client Input Tax Credit (ITC)
+                    </p>
+                  </div>
                 </div>
 
-                <div className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                <div className="text-xs font-bold text-emerald-800 bg-emerald-50 px-3.5 py-1.5 rounded-full border border-emerald-200 shadow-2xs w-fit">
                   All Invoices 100% ITC Eligible
                 </div>
               </div>
