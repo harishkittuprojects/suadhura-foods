@@ -551,6 +551,34 @@ export const AdminPage = () => {
     showToast(`📦 Restocked +20 units for this store!`, 'success');
   };
 
+  const handleUpdateShopCash = (shopId, cashData) => {
+    const updatedShops = shopsList.map((shop) => {
+      if (shop.id !== shopId) return shop;
+      const cashInCounter = Number(cashData.cashInCounter) || 0;
+      const openingFloat = Number(cashData.openingFloat) || 0;
+      const cashHandover = Number(cashData.cashHandover) || 0;
+      const digitalRevenue = Number(cashData.digitalRevenue) !== undefined && !isNaN(Number(cashData.digitalRevenue))
+        ? Number(cashData.digitalRevenue)
+        : Math.max(0, (shop.todayRevenue || 0) - cashInCounter);
+      return {
+        ...shop,
+        cashInCounter,
+        openingFloat,
+        cashHandover,
+        digitalRevenue,
+        lastCashier: cashData.cashierName || shop.manager || 'Counter Cashier',
+        lastCashUpdated: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
+      };
+    });
+    setShopsList(updatedShops);
+    const active = updatedShops.find((s) => s.id === (currentShop ? currentShop.id : ''));
+    if (active) setCurrentShop(active);
+    try {
+      localStorage.setItem('sumadhura_admin_shops', JSON.stringify(updatedShops));
+    } catch {}
+    showToast(`💵 Cash counter updated for ${shopsList.find(s => s.id === shopId)?.shortName || 'Branch'}!`, 'success');
+  };
+
   // Helper to extract a normalized YYYY-MM-DD date from an order
   const getOrderDateString = (o) => {
     if (!o) return '';
@@ -2566,6 +2594,7 @@ export const AdminPage = () => {
                 } catch {}
               }}
               onOpenAddBranch={() => setIsAddBranchModalOpen(true)}
+              onUpdateShopCash={handleUpdateShopCash}
             />
           )}
 
