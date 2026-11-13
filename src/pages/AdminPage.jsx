@@ -2482,92 +2482,29 @@ export const AdminPage = () => {
             </div>
           </div>
 
-          {/* Center: Search & Scope Segmented Control */}
-          <div className="flex items-center gap-2 xl:gap-2.5 min-w-0">
-            {/* Search Input (sleek & compact) */}
-            <div className="relative hidden xl:block w-32 2xl:w-44 transition-all">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={customerSearchTerm}
-                onChange={(e) => {
-                  setCustomerSearchTerm(e.target.value);
-                  if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
-                    setActiveTab('b2c-customers');
-                  }
-                }}
-                className="w-full pl-7 pr-6 py-1.5 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
-              />
-              {customerSearchTerm && (
-                <button
-                  onClick={() => setCustomerSearchTerm('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              )}
-            </div>
-
-            {/* Scope Switcher (B2C / B2B / Unified) - Compact & Sleek */}
-            <div className="flex items-center bg-[#FAF5EC] p-0.5 rounded-xl border border-[#E8DDCF] shadow-2xs shrink-0">
+          {/* Center: Search Input */}
+          <div className="relative flex-1 max-w-xs mx-4 hidden md:block">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search customers (name, phone, email)..."
+              value={customerSearchTerm}
+              onChange={(e) => {
+                setCustomerSearchTerm(e.target.value);
+                if (activeTab !== 'b2c-customers' && activeTab !== 'b2b-customers' && activeTab !== 'customers') {
+                  setActiveTab('b2c-customers');
+                }
+              }}
+              className="w-full pl-8 pr-7 py-1.5 bg-[#FAF5EC] border border-[#E8DDCF] rounded-xl text-xs font-semibold text-[#3D040A] placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20 focus:border-[#7D0A14] shadow-2xs transition-all"
+            />
+            {customerSearchTerm && (
               <button
-                type="button"
-                onClick={() => {
-                  setAdminMode('b2c');
-                  setCustomerScope('b2c');
-                  if (activeTab === 'b2b-customers') setActiveTab('b2c-customers');
-                  showToast('Switched to B2C Retail Operations');
-                }}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                  adminMode === 'b2c'
-                    ? 'bg-[#7D0A14] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-                title="B2C Retail Operations"
+                onClick={() => setCustomerSearchTerm('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
-                <ShoppingCart className="w-3 h-3" />
-                <span>B2C</span>
+                <X className="w-3.5 h-3.5" />
               </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminMode('b2b');
-                  setCustomerScope('b2b');
-                  if (activeTab === 'b2c-customers') setActiveTab('b2b-customers');
-                  showToast('Switched to B2B Wholesale Portal');
-                }}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                  adminMode === 'b2b'
-                    ? 'bg-[#7D0A14] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-                title="B2B Wholesale Commercial Portal"
-              >
-                <Building2 className="w-3 h-3" />
-                <span>B2B</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setAdminMode('unified');
-                  setCustomerScope('all');
-                  if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') setActiveTab('customers');
-                  showToast('Switched to Unified View (B2C + B2B)');
-                }}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
-                  adminMode === 'unified'
-                    ? 'bg-[#7D0A14] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                }`}
-                title="Unified (B2C + B2B) Combined View"
-              >
-                <Layers className="w-3 h-3" />
-                <span>Unified</span>
-              </button>
-            </div>
+            )}
           </div>
 
           {/* Right Actions: ERP, Branch Switcher, New Order, Storefront */}
@@ -3182,6 +3119,63 @@ export const AdminPage = () => {
                       Real-time revenue, order dispatch volume, customer activity, and inventory health.
                     </p>
                   </div>
+                </div>
+
+                {/* Scope Switcher Segmented Control (B2C Retail / B2B Wholesale / Unified) */}
+                <div className="flex items-center bg-[#FAF5EC] p-1 rounded-2xl border-2 border-[#E8DDCF] shadow-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdminMode('b2c');
+                      setCustomerScope('b2c');
+                      if (activeTab === 'b2b-customers') setActiveTab('b2c-customers');
+                      showToast('Switched to B2C Retail Operations');
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                      adminMode === 'b2c'
+                        ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                    <span>B2C Retail</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdminMode('b2b');
+                      setCustomerScope('b2b');
+                      if (activeTab === 'b2c-customers') setActiveTab('b2b-customers');
+                      showToast('Switched to B2B Wholesale Portal');
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                      adminMode === 'b2b'
+                        ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span>B2B Wholesale</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdminMode('unified');
+                      setCustomerScope('all');
+                      if (activeTab === 'b2c-customers' || activeTab === 'b2b-customers') setActiveTab('customers');
+                      showToast('Switched to Unified View (B2C + B2B)');
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
+                      adminMode === 'unified'
+                        ? 'bg-[#7D0A14] text-white shadow-sm scale-[1.02]'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Unified</span>
+                  </button>
                 </div>
 
                 {/* Calendar Daily-Wise Order Filter & Manifest Launcher */}
