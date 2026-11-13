@@ -31,8 +31,6 @@ export const ErpSuite = ({
   const [activeCashShop, setActiveCashShop] = useState(null);
   const [cashForm, setCashForm] = useState({
     cashInCounter: '',
-    openingFloat: '2000',
-    cashHandover: '0',
     digitalRevenue: '',
     cashierName: ''
   });
@@ -44,8 +42,6 @@ export const ErpSuite = ({
     const currentDigital = shop.digitalRevenue !== undefined ? shop.digitalRevenue : Math.max(0, rev - currentCash);
     setCashForm({
       cashInCounter: String(currentCash),
-      openingFloat: String(shop.openingFloat || 2000),
-      cashHandover: String(shop.cashHandover || 0),
       digitalRevenue: String(currentDigital),
       cashierName: shop.lastCashier || shop.manager || ''
     });
@@ -56,8 +52,6 @@ export const ErpSuite = ({
     e.preventDefault();
     if (!activeCashShop) return;
     const cashVal = Number(cashForm.cashInCounter) || 0;
-    const floatVal = Number(cashForm.openingFloat) || 0;
-    const handoverVal = Number(cashForm.cashHandover) || 0;
     const digitalVal = Number(cashForm.digitalRevenue) !== undefined && !isNaN(Number(cashForm.digitalRevenue))
       ? Number(cashForm.digitalRevenue)
       : Math.max(0, (activeCashShop.todayRevenue || 0) - cashVal);
@@ -65,8 +59,6 @@ export const ErpSuite = ({
     if (onUpdateShopCash) {
       onUpdateShopCash(activeCashShop.id, {
         cashInCounter: cashVal,
-        openingFloat: floatVal,
-        cashHandover: handoverVal,
         digitalRevenue: digitalVal,
         cashierName: cashForm.cashierName
       });
@@ -547,39 +539,6 @@ export const ErpSuite = ({
                 <span className="text-[10px] text-slate-400 mt-0.5 block">
                   Auto-calculated from Total Sales − Counter Cash (or enter manually).
                 </span>
-              </div>
-
-              {/* 2-Col: Opening Float & Cash Handover */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">
-                    Opening Till Float (₹)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={cashForm.openingFloat}
-                    onChange={(e) => setCashForm({ ...cashForm, openingFloat: e.target.value })}
-                    placeholder="2000"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold"
-                  />
-                  <span className="text-[9px] text-slate-400 mt-0.5 block">Morning change float</span>
-                </div>
-
-                <div>
-                  <label className="font-bold text-slate-700 block mb-1">
-                    Handover / Bank (₹)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={cashForm.cashHandover}
-                    onChange={(e) => setCashForm({ ...cashForm, cashHandover: e.target.value })}
-                    placeholder="0"
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 font-semibold"
-                  />
-                  <span className="text-[9px] text-slate-400 mt-0.5 block">Deposited or handed over</span>
-                </div>
               </div>
 
               {/* Cashier / Manager Name */}
