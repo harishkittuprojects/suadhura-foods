@@ -225,6 +225,29 @@ const BRANCH_FINANCIALS = {
   }
 };
 
+export const EXPENSE_CATEGORIES = [
+  'Dairy & Milk Procurement',
+  'Farm Fresh Produce & Raw Materials',
+  'Biodegradable Packaging & Containers',
+  'Staff Wages & Kitchen Payroll',
+  'Commercial LPG, Gas & Power Utilities',
+  'Fleet Fuel, Express Logistics & Delivery',
+  'Store Rent, CAM & Facility Maintenance',
+  'Equipment Repair, Spares & Machinery',
+  'Marketing, Local Ads & Promotional Sampling',
+  'Miscellaneous Operational Debit'
+];
+
+export const INCOME_CATEGORIES = [
+  'B2C Counter Retail & Takeaway Sales',
+  'B2B Wholesale & Client Bulk Distribution',
+  'Corporate Catering & Banquet Contracts',
+  'Direct Farm Milk & Pure Dairy Sales',
+  'Online App Orders & Express Deliveries',
+  'Subscription Milk & Daily Box Renewals',
+  'Miscellaneous Operating Revenue / Credit'
+];
+
 export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast = () => {} }) => {
   // Persistence for ledger entries
   const [ledger, setLedger] = useState(() => {
@@ -258,81 +281,130 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
   const [isNewTxnOpen, setIsNewTxnOpen] = useState(false);
   const [newTxn, setNewTxn] = useState({
     type: 'expense',
-    category: 'Dairy & Milk Procurement',
+    category: EXPENSE_CATEGORIES[0],
     description: '',
     branch: 'Branch 1 (Madhapur)',
     account: 'HDFC Corporate Current A/C',
     amount: '',
     refNo: '',
-    date: '2026-11-14'
+    date: new Date().toISOString().split('T')[0]
   });
 
-  // Calculate dynamic metrics based on selected branch
+  // Open New Transaction Modal with current branch and chosen type
+  const handleOpenNewTxn = (defaultType = 'expense') => {
+    let initialBranch = 'Branch 1 (Madhapur)';
+    if (selectedBranch === 'Branch 2') initialBranch = 'Branch 2 (Gachibowli)';
+    if (selectedBranch === 'Branch 3') initialBranch = 'Branch 3 (Jubilee Hills)';
+
+    setNewTxn({
+      type: defaultType,
+      category: defaultType === 'income' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0],
+      description: '',
+      branch: initialBranch,
+      account: 'HDFC Corporate Current A/C',
+      amount: '',
+      refNo: '',
+      date: new Date().toISOString().split('T')[0]
+    });
+    setIsNewTxnOpen(true);
+  };
+
+  // Calculate dynamic metrics based on selected branch and ledger
   const currentMetrics = useMemo(() => {
+    let baseTurnover = 1485200;
+    let baseRetail = 815400;
+    let baseWholesale = 545800;
+    let baseCatering = 124000;
+    let baseCogs = 652000;
+    let baseRaw = 310000;
+    let baseDairy = 215000;
+    let basePkg = 127000;
+    let baseOpex = 415400;
+    let basePayroll = 245600;
+    let baseUtil = 52400;
+    let baseFuel = 68400;
+    let baseRent = 49000;
+    let baseRecv = 142000;
+    let basePayable = 85500;
+    let branchName = 'All Branches Consolidated';
+    let branchCode = 'SMD-GROUP-HYD';
+    let area = 'Unified Multi-Branch Operations';
+    let isConsolidated = true;
+
     if (selectedBranch !== 'all' && BRANCH_FINANCIALS[selectedBranch]) {
       const b = BRANCH_FINANCIALS[selectedBranch];
-      const grossProfit = b.turnover - b.cogs;
-      return {
-        isConsolidated: false,
-        branchName: b.name,
-        branchCode: b.branchCode,
-        area: b.area,
-        turnover: b.turnover,
-        retailRev: b.retailRev,
-        wholesaleRev: b.wholesaleRev,
-        cateringRev: b.cateringRev,
-        cogs: b.cogs,
-        rawProduce: b.rawProduce,
-        dairyGhee: b.dairyGhee,
-        packaging: b.packaging,
-        grossProfit,
-        grossMargin: '56.1%',
-        opex: b.opex,
-        payroll: b.payroll,
-        utilities: b.utilities,
-        fleetFuel: b.fleetFuel,
-        rent: b.rent,
-        netProfit: b.netProfit,
-        netMargin: b.margin,
-        receivables: b.receivables,
-        payables: b.payables
-      };
+      baseTurnover = b.turnover;
+      baseRetail = b.retailRev;
+      baseWholesale = b.wholesaleRev;
+      baseCatering = b.cateringRev;
+      baseCogs = b.cogs;
+      baseRaw = b.rawProduce;
+      baseDairy = b.dairyGhee;
+      basePkg = b.packaging;
+      baseOpex = b.opex;
+      basePayroll = b.payroll;
+      baseUtil = b.utilities;
+      baseFuel = b.fleetFuel;
+      baseRent = b.rent;
+      baseRecv = b.receivables;
+      basePayable = b.payables;
+      branchName = b.name;
+      branchCode = b.branchCode;
+      area = b.area;
+      isConsolidated = false;
     }
 
-    // Consolidated across all branches
-    const totalTurnover = 1485200;
-    const totalCogs = 652000;
-    const totalOpex = 415400;
-    const grossProfit = totalTurnover - totalCogs;
-    const netProfit = grossProfit - totalOpex;
-    const netMargin = ((netProfit / totalTurnover) * 100).toFixed(1);
+    // Dynamic deltas from extra ledger entries
+    const initialIds = new Set(INITIAL_LEDGER.map((t) => t.id));
+    const extraEntries = ledger.filter((t) => !initialIds.has(t.id));
+
+    let extraIncome = 0;
+    let extraExpense = 0;
+
+    extraEntries.forEach((t) => {
+      const matchesBranch = selectedBranch === 'all' || t.branch.includes(selectedBranch);
+      if (matchesBranch) {
+        if (t.type === 'income') {
+          extraIncome += Number(t.amount || 0);
+        } else {
+          extraExpense += Number(t.amount || 0);
+        }
+      }
+    });
+
+    const turnover = baseTurnover + extraIncome;
+    const opex = baseOpex + extraExpense;
+    const cogs = baseCogs;
+    const grossProfit = turnover - cogs;
+    const netProfit = grossProfit - opex;
+    const netMargin = turnover > 0 ? ((netProfit / turnover) * 100).toFixed(1) : '0.0';
 
     return {
-      isConsolidated: true,
-      branchName: 'All Branches Consolidated',
-      branchCode: 'SMD-GROUP-HYD',
-      area: 'Unified Multi-Branch Operations',
-      turnover: totalTurnover,
-      retailRev: 815400,
-      wholesaleRev: 545800,
-      cateringRev: 124000,
-      cogs: totalCogs,
-      rawProduce: 310000,
-      dairyGhee: 215000,
-      packaging: 127000,
+      isConsolidated,
+      branchName,
+      branchCode,
+      area,
+      turnover,
+      retailRev: baseRetail + extraIncome,
+      wholesaleRev: baseWholesale,
+      cateringRev: baseCatering,
+      cogs,
+      rawProduce: baseRaw,
+      dairyGhee: baseDairy,
+      packaging: basePkg,
       grossProfit,
-      grossMargin: '56.1%',
-      opex: totalOpex,
-      payroll: 245600,
-      utilities: 52400,
-      fleetFuel: 68400,
-      rent: 49000,
+      grossMargin: `${turnover > 0 ? ((grossProfit / turnover) * 100).toFixed(1) : '56.1'}%`,
+      opex,
+      payroll: basePayroll,
+      utilities: baseUtil,
+      fleetFuel: baseFuel,
+      rent: baseRent,
       netProfit,
       netMargin: `${netMargin}%`,
-      receivables: 142000,
-      payables: 85500
+      receivables: baseRecv,
+      payables: basePayable
     };
-  }, [selectedBranch]);
+  }, [selectedBranch, ledger]);
 
   // Filtered Ledger based on branch and search
   const filteredLedger = useMemo(() => {
@@ -374,18 +446,14 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
     };
 
     setLedger([created, ...ledger]);
-    showToast(`✅ Successfully posted ${newTxn.type === 'income' ? 'Income' : 'Expense'} record (₹${created.amount.toLocaleString()}) for ${newTxn.branch}!`, 'success');
+    showToast(`✅ Successfully recorded ${newTxn.type === 'income' ? 'Income (+Credit)' : 'Expense (−Debit)'} voucher (₹${created.amount.toLocaleString('en-IN')}) for ${newTxn.branch}!`, 'success');
     setIsNewTxnOpen(false);
-    setNewTxn({
-      type: 'expense',
-      category: 'Dairy & Milk Procurement',
-      description: '',
-      branch: 'Branch 1 (Madhapur)',
-      account: 'HDFC Corporate Current A/C',
-      amount: '',
-      refNo: '',
-      date: '2026-11-14'
-    });
+
+    // Auto-switch to General Ledger view so user immediately sees their newly posted voucher
+    setActiveTab('ledger');
+    if (selectedBranch !== 'all' && !created.branch.includes(selectedBranch)) {
+      setSelectedBranch('all');
+    }
   };
 
   return (
@@ -462,7 +530,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
 
           <button
             type="button"
-            onClick={() => setIsNewTxnOpen(true)}
+            onClick={() => handleOpenNewTxn('expense')}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs shadow-xs active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4 text-amber-300" />
@@ -773,6 +841,15 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                 <option value="income">Credit (+ Inflow)</option>
                 <option value="expense">Debit (− Outflow)</option>
               </select>
+
+              <button
+                type="button"
+                onClick={() => handleOpenNewTxn('expense')}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black text-xs shadow-xs active:scale-95 transition-all cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5 text-amber-300" />
+                <span>+ Record Voucher</span>
+              </button>
             </div>
           </div>
 
@@ -1071,25 +1148,38 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
       {/* ========================================================= */}
       {isNewTxnOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-[#EDE1D1] space-y-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-[#EDE1D1] space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-[#EDE1D1] pb-3">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs">
-                  <Receipt className="w-5 h-5 text-amber-300" />
+                <div
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shadow-xs text-white ${
+                    newTxn.type === 'income' ? 'bg-emerald-600' : 'bg-rose-600'
+                  }`}
+                >
+                  {newTxn.type === 'income' ? (
+                    <ArrowUpRight className="w-5 h-5 text-white" />
+                  ) : (
+                    <ArrowDownRight className="w-5 h-5 text-white" />
+                  )}
                 </div>
                 <div>
                   <h3 className="font-black text-lg text-[#3D040A]">
-                    Record Financial Voucher
+                    {newTxn.type === 'income'
+                      ? 'Record Income / Inflow Voucher'
+                      : 'Record Expense / Debit Voucher'}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Post income revenue or operating expense voucher to general ledger
+                    {newTxn.type === 'income'
+                      ? 'Post sales revenue, catering advance or cash receipts to general ledger'
+                      : 'Post raw material procurement, payroll or operating costs to general ledger'}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsNewTxnOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1097,29 +1187,49 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
 
             <form onSubmit={handleAddTxn} className="space-y-3.5 text-xs">
               {/* Type Switcher */}
-              <div className="grid grid-cols-2 gap-2 p-1 bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1]">
-                <button
-                  type="button"
-                  onClick={() => setNewTxn({ ...newTxn, type: 'expense' })}
-                  className={`py-2 rounded-xl font-black text-xs transition-all cursor-pointer ${
-                    newTxn.type === 'expense'
-                      ? 'bg-rose-600 text-white shadow-2xs'
-                      : 'text-slate-600 hover:text-rose-600'
-                  }`}
-                >
-                  − Expense / Debit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setNewTxn({ ...newTxn, type: 'income' })}
-                  className={`py-2 rounded-xl font-black text-xs transition-all cursor-pointer ${
-                    newTxn.type === 'income'
-                      ? 'bg-emerald-600 text-white shadow-2xs'
-                      : 'text-slate-600 hover:text-emerald-600'
-                  }`}
-                >
-                  + Income / Credit
-                </button>
+              <div>
+                <label className="font-extrabold text-slate-800 block mb-1">
+                  Voucher Transaction Type *
+                </label>
+                <div className="grid grid-cols-2 gap-2 p-1.5 bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewTxn((prev) => ({
+                        ...prev,
+                        type: 'expense',
+                        category: EXPENSE_CATEGORIES[0]
+                      }));
+                    }}
+                    className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      newTxn.type === 'expense'
+                        ? 'bg-rose-600 text-white shadow-md ring-2 ring-rose-600/30'
+                        : 'bg-white text-slate-700 hover:text-rose-700 hover:bg-rose-50/50 border border-slate-200/80 shadow-2xs'
+                    }`}
+                  >
+                    <ArrowDownRight className={`w-4 h-4 shrink-0 ${newTxn.type === 'expense' ? 'text-white' : 'text-rose-600'}`} />
+                    <span>− Expense / Debit</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNewTxn((prev) => ({
+                        ...prev,
+                        type: 'income',
+                        category: INCOME_CATEGORIES[0]
+                      }));
+                    }}
+                    className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                      newTxn.type === 'income'
+                        ? 'bg-emerald-600 text-white shadow-md ring-2 ring-emerald-600/30'
+                        : 'bg-white text-slate-700 hover:text-emerald-700 hover:bg-emerald-50/50 border border-slate-200/80 shadow-2xs'
+                    }`}
+                  >
+                    <ArrowUpRight className={`w-4 h-4 shrink-0 ${newTxn.type === 'income' ? 'text-white' : 'text-emerald-600'}`} />
+                    <span>+ Income / Credit</span>
+                  </button>
+                </div>
               </div>
 
               {/* Description */}
@@ -1132,7 +1242,11 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                   required
                   value={newTxn.description}
                   onChange={(e) => setNewTxn({ ...newTxn, description: e.target.value })}
-                  placeholder="e.g. Procurement of Pure Cow Milk 200L"
+                  placeholder={
+                    newTxn.type === 'income'
+                      ? 'e.g. Bulk Ghee & Masalas Counter Sales or Catering Advance'
+                      : 'e.g. Procurement of Pure Cow Milk 200L or Staff Wages'
+                  }
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-bold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
                 />
               </div>
@@ -1151,7 +1265,11 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                     value={newTxn.amount}
                     onChange={(e) => setNewTxn({ ...newTxn, amount: e.target.value })}
                     placeholder="e.g. 15000"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-black text-sm text-[#7D0A14] focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    className={`w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-black text-sm focus:outline-none focus:ring-2 ${
+                      newTxn.type === 'income'
+                        ? 'text-emerald-700 focus:ring-emerald-600'
+                        : 'text-rose-700 focus:ring-rose-600'
+                    }`}
                   />
                 </div>
 
@@ -1167,33 +1285,37 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="font-extrabold text-slate-800 block mb-1">
-                    Category
+                    Category *
                   </label>
                   <select
                     value={newTxn.category}
                     onChange={(e) => setNewTxn({ ...newTxn, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14] bg-white cursor-pointer"
                   >
-                    <option value="Dairy & Milk Procurement">Dairy & Milk Procurement</option>
-                    <option value="Farm Produce & Sourcing">Farm Produce & Sourcing</option>
-                    <option value="Biodegradable Packaging">Biodegradable Packaging</option>
-                    <option value="Staff Wages & Payroll">Staff Wages & Payroll</option>
-                    <option value="Kitchen Fuel & Utilities">Kitchen Fuel & Utilities</option>
-                    <option value="Fleet Fuel & Logistics">Fleet Fuel & Logistics</option>
-                    <option value="B2B Wholesale Sales">B2B Wholesale Sales</option>
-                    <option value="B2C Counter Retail">B2C Counter Retail</option>
-                    <option value="Catering & Banquets">Catering & Banquets</option>
+                    {newTxn.type === 'income' ? (
+                      INCOME_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))
+                    ) : (
+                      EXPENSE_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 
                 <div>
                   <label className="font-extrabold text-slate-800 block mb-1">
-                    Branch Hub
+                    Branch Hub *
                   </label>
                   <select
                     value={newTxn.branch}
                     onChange={(e) => setNewTxn({ ...newTxn, branch: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14] bg-white cursor-pointer"
                   >
                     <option value="Branch 1 (Madhapur)">Branch 1 (Madhapur)</option>
                     <option value="Branch 2 (Gachibowli)">Branch 2 (Gachibowli)</option>
@@ -1213,7 +1335,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                   <select
                     value={newTxn.account}
                     onChange={(e) => setNewTxn({ ...newTxn, account: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14] bg-white cursor-pointer"
                   >
                     <option value="HDFC Corporate Current A/C">HDFC Corporate Current A/C</option>
                     <option value="ICICI Operations A/C">ICICI Operations A/C</option>
@@ -1230,7 +1352,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                     type="text"
                     value={newTxn.refNo}
                     onChange={(e) => setNewTxn({ ...newTxn, refNo: e.target.value })}
-                    placeholder="e.g. BILL-9921"
+                    placeholder="e.g. BILL-9921 / UPI-8820"
                     className="w-full px-3 py-2 rounded-xl border border-slate-300 font-medium focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
                   />
                 </div>
@@ -1241,16 +1363,24 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                 <button
                   type="button"
                   onClick={() => setIsNewTxnOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white font-black flex items-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+                  className={`px-5 py-2.5 rounded-xl text-white font-black flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer ${
+                    newTxn.type === 'income'
+                      ? 'bg-emerald-600 hover:bg-emerald-700 ring-2 ring-emerald-600/30'
+                      : 'bg-rose-600 hover:bg-rose-700 ring-2 ring-rose-600/30'
+                  }`}
                 >
-                  <Save className="w-4 h-4 text-amber-300" />
-                  <span>Post to Ledger</span>
+                  <Save className="w-4 h-4 text-white" />
+                  <span>
+                    {newTxn.type === 'income'
+                      ? `Post Income Credit (+₹${Number(newTxn.amount || 0).toLocaleString('en-IN')})`
+                      : `Post Expense Debit (−₹${Number(newTxn.amount || 0).toLocaleString('en-IN')})`}
+                  </span>
                 </button>
               </div>
             </form>
