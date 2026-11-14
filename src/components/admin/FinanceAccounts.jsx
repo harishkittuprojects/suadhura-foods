@@ -27,6 +27,7 @@ import {
   Save,
   Wallet
 } from 'lucide-react';
+import { DatePickerDMY, formatDateDMY } from './DatePickerDMY';
 
 const STORAGE_KEY = 'sumadhura_finance_ledger_v1';
 
@@ -794,7 +795,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                     <tr key={t.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="p-3.5">
                         <div className="font-mono font-black text-xs text-[#7D0A14]">{t.id}</div>
-                        <div className="text-[11px] text-slate-500 font-medium">{t.date}</div>
+                        <div className="text-[11px] text-slate-700 font-bold">{formatDateDMY(t.date)}</div>
                         <div className="text-[10px] text-slate-400 font-mono">{t.refNo}</div>
                       </td>
 
@@ -1154,18 +1155,12 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                   />
                 </div>
 
-                <div>
-                  <label className="font-extrabold text-slate-800 block mb-1">
-                    Date *
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={newTxn.date}
-                    onChange={(e) => setNewTxn({ ...newTxn, date: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
-                  />
-                </div>
+                <DatePickerDMY
+                  label="Date"
+                  required
+                  value={newTxn.date}
+                  onChange={(val) => setNewTxn({ ...newTxn, date: val })}
+                />
               </div>
 
               {/* Category & Branch */}

@@ -27,6 +27,7 @@ import {
   FileText,
   BadgePercent
 } from 'lucide-react';
+import { DatePickerDMY, formatDateDMY } from './DatePickerDMY';
 
 const STORAGE_KEY = 'sumadhura_employees_v1';
 
@@ -1248,18 +1249,12 @@ export const EmployeeManager = ({ shopsList = [], currentShop = null, showToast 
 
               {/* Date & Hours */}
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-extrabold text-slate-800 block mb-1">
-                    Date *
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={logHoursForm.date}
-                    onChange={(e) => setLogHoursForm({ ...logHoursForm, date: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14]"
-                  />
-                </div>
+                <DatePickerDMY
+                  label="Date"
+                  required
+                  value={logHoursForm.date}
+                  onChange={(val) => setLogHoursForm({ ...logHoursForm, date: val })}
+                />
 
                 <div>
                   <label className="font-extrabold text-slate-800 block mb-1">
@@ -1405,7 +1400,7 @@ export const EmployeeManager = ({ shopsList = [], currentShop = null, showToast 
                 </div>
                 <div>
                   <h3 className="font-black text-base sm:text-lg text-[#3D040A]">
-                    Daily Shift Attendance: {selectedCalendarDay}
+                    Daily Shift Attendance: {formatDateDMY(selectedCalendarDay)}
                   </h3>
                   <p className="text-xs text-slate-500">
                     Breakdown of staff hours worked on this date
