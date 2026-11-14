@@ -279,6 +279,8 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
 
   // New Transaction Modal
   const [isNewTxnOpen, setIsNewTxnOpen] = useState(false);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState('');
   const [newTxn, setNewTxn] = useState({
     type: 'expense',
     category: EXPENSE_CATEGORIES[0],
@@ -296,6 +298,8 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
     if (selectedBranch === 'Branch 2') initialBranch = 'Branch 2 (Gachibowli)';
     if (selectedBranch === 'Branch 3') initialBranch = 'Branch 3 (Jubilee Hills)';
 
+    setIsCustomCategory(false);
+    setCustomCategory('');
     setNewTxn({
       type: defaultType,
       category: defaultType === 'income' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0],
@@ -426,8 +430,17 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
   // Handle Add Transaction
   const handleAddTxn = (e) => {
     e.preventDefault();
+    const finalCategory = isCustomCategory && customCategory.trim()
+      ? customCategory.trim()
+      : newTxn.category;
+
     if (!newTxn.description.trim() || !newTxn.amount) {
       showToast('⚠️ Please enter description and amount', 'error');
+      return;
+    }
+
+    if (!finalCategory) {
+      showToast('⚠️ Please enter or select a category', 'error');
       return;
     }
 
@@ -436,7 +449,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
       id: nextId,
       date: newTxn.date || new Date().toISOString().split('T')[0],
       type: newTxn.type,
-      category: newTxn.category,
+      category: finalCategory,
       description: newTxn.description.trim(),
       branch: newTxn.branch,
       account: newTxn.account,
@@ -1198,7 +1211,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                       setNewTxn((prev) => ({
                         ...prev,
                         type: 'expense',
-                        category: EXPENSE_CATEGORIES[0]
+                        category: isCustomCategory && customCategory.trim() ? customCategory.trim() : EXPENSE_CATEGORIES[0]
                       }));
                     }}
                     className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
@@ -1217,7 +1230,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                       setNewTxn((prev) => ({
                         ...prev,
                         type: 'income',
-                        category: INCOME_CATEGORIES[0]
+                        category: isCustomCategory && customCategory.trim() ? customCategory.trim() : INCOME_CATEGORIES[0]
                       }));
                     }}
                     className={`py-2.5 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
@@ -1284,28 +1297,92 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
               {/* Category & Branch */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="font-extrabold text-slate-800 block mb-1">
-                    Category *
-                  </label>
-                  <select
-                    value={newTxn.category}
-                    onChange={(e) => setNewTxn({ ...newTxn, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14] bg-white cursor-pointer"
-                  >
-                    {newTxn.type === 'income' ? (
-                      INCOME_CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))
-                    ) : (
-                      EXPENSE_CATEGORIES.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))
-                    )}
-                  </select>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-extrabold text-slate-800 text-xs">
+                      Category *
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = !isCustomCategory;
+                        setIsCustomCategory(next);
+                        if (!next) {
+                          setCustomCategory('');
+                          setNewTxn({
+                            ...newTxn,
+                            category: newTxn.type === 'income' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]
+                          });
+                        }
+                      }}
+                      className="text-[11px] font-black text-[#7D0A14] hover:underline cursor-pointer flex items-center gap-0.5"
+                    >
+                      {isCustomCategory ? '← List' : '+ Custom'}
+                    </button>
+                  </div>
+
+                  {!isCustomCategory ? (
+                    <select
+                      value={newTxn.category}
+                      onChange={(e) => {
+                        if (e.target.value === '__CUSTOM__') {
+                          setIsCustomCategory(true);
+                          setCustomCategory('');
+                        } else {
+                          setNewTxn({ ...newTxn, category: e.target.value });
+                        }
+                      }}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-300 font-semibold focus:outline-none focus:ring-2 focus:ring-[#7D0A14] bg-white cursor-pointer text-xs"
+                    >
+                      <optgroup label={newTxn.type === 'income' ? 'Standard Income Streams' : 'Standard Expense Streams'}>
+                        {newTxn.type === 'income' ? (
+                          INCOME_CATEGORIES.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))
+                        ) : (
+                          EXPENSE_CATEGORIES.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat}
+                            </option>
+                          ))
+                        )}
+                      </optgroup>
+                      <optgroup label="Custom Category">
+                        <option value="__CUSTOM__">✍️ + Custom Category (Type your own)...</option>
+                      </optgroup>
+                    </select>
+                  ) : (
+                    <div className="relative">
+                      <input
+                        type="text"
+                        required
+                        autoFocus
+                        value={customCategory}
+                        onChange={(e) => {
+                          setCustomCategory(e.target.value);
+                          setNewTxn({ ...newTxn, category: e.target.value });
+                        }}
+                        placeholder="Type custom category name..."
+                        className="w-full pl-3 pr-7 py-2 rounded-xl border-2 border-[#7D0A14] bg-amber-50/40 text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCustomCategory(false);
+                          setCustomCategory('');
+                          setNewTxn({
+                            ...newTxn,
+                            category: newTxn.type === 'income' ? INCOME_CATEGORIES[0] : EXPENSE_CATEGORIES[0]
+                          });
+                        }}
+                        className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+                        title="Cancel custom category"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div>
