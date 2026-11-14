@@ -1484,3 +1484,4 @@ export const EmployeeManager = ({ shopsList = [], currentShop = null, showToast 
 };
 
 export default EmployeeManager;
+

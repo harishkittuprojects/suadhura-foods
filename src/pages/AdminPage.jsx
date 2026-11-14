@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import {
+  Landmark,
   Building2,
   User,
   ShoppingBag,
@@ -77,6 +78,7 @@ import {
 import { DEFAULT_HERO_SLIDES } from './HomePage';
 import { ErpSuite } from '../components/erp/ErpSuite';
 import { EmployeeManager } from '../components/admin/EmployeeManager';
+import { FinanceAccounts } from '../components/admin/FinanceAccounts';
 
 export const DEFAULT_SHOPS = [
   {
@@ -2102,6 +2104,13 @@ export const AdminPage = () => {
       customBadge: null
     },
     {
+      id: 'finance-accounts',
+      label: 'Finance & Accounts',
+      icon: Landmark,
+      badge: 'P&L',
+      customBadge: null
+    },
+    {
       id: 'employees',
       label: 'Staff & Hours',
       icon: Users,
@@ -2184,6 +2193,8 @@ export const AdminPage = () => {
         return 'Delivery Partner Fleet';
       case 'invoices':
         return 'Invoices & Billing';
+      case 'finance-accounts':
+        return 'Finance & Corporate Accounts';
       case 'employees':
         return 'Staff & Work Hours Management';
       case 'reports':
@@ -2483,7 +2494,7 @@ export const AdminPage = () => {
                 <span>Sumadhura Operations</span>
                 <ChevronRight className="w-3 h-3 text-slate-300" />
                 <span className="text-[#7D0A14] font-black truncate max-w-[140px] xl:max-w-none">
-                  {activeTab === 'erp-suite' ? 'ERP Suite' : activeTab === 'invoices' ? 'Invoices' : activeTab === 'employees' ? 'Staff' : getTabHeading(activeTab)}
+                  {activeTab === 'erp-suite' ? 'ERP Suite' : activeTab === 'invoices' ? 'Invoices' : activeTab === 'finance-accounts' ? 'Finance' : activeTab === 'employees' ? 'Staff' : getTabHeading(activeTab)}
                 </span>
               </div>
               <h1 className="text-sm xl:text-base font-black text-[#3D040A] tracking-tight leading-tight truncate max-w-[220px] xl:max-w-none">
@@ -6727,6 +6738,17 @@ export const AdminPage = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* ========================================================= */}
+          {/* FINANCE & CORPORATE ACCOUNTS                              */}
+          {/* ========================================================= */}
+          {activeTab === 'finance-accounts' && (
+            <FinanceAccounts
+              shopsList={shopsList}
+              currentShop={currentShop}
+              showToast={showToast}
+            />
           )}
 
           {/* ========================================================= */}
