@@ -2000,6 +2000,13 @@ export const AdminPage = () => {
       customBadge: null
     },
     {
+      id: 'finance-accounts',
+      label: 'Finance & Accounts',
+      icon: Landmark,
+      badge: 'Branch P&L',
+      customBadge: null
+    },
+    {
       id: 'orders',
       label: 'Orders',
       icon: ShoppingCart,
@@ -2101,13 +2108,6 @@ export const AdminPage = () => {
       label: 'Invoices',
       icon: FileText,
       badge: invoices.length,
-      customBadge: null
-    },
-    {
-      id: 'finance-accounts',
-      label: 'Finance & Accounts',
-      icon: Landmark,
-      badge: 'P&L',
       customBadge: null
     },
     {
