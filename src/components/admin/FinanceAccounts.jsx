@@ -393,7 +393,7 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
       <div className="bg-white rounded-3xl border border-[#EDE1D1] p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl bg-[#7D0A14] text-amber-300 flex items-center justify-center shadow-xs shrink-0">
-            <Landmark className="w-6 h-6 text-amber-300" />
+            <Wallet className="w-6 h-6 text-amber-300" />
           </div>
           <div>
             <div className="flex items-center gap-2">

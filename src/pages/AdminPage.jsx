@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useShop } from '../context/ShopContext';
 import {
-  Landmark,
+  Wallet,
   Building2,
   User,
   ShoppingBag,
@@ -2002,8 +2002,8 @@ export const AdminPage = () => {
     {
       id: 'finance-accounts',
       label: 'Finance & Accounts',
-      icon: Landmark,
-      badge: 'Branch P&L',
+      icon: Wallet,
+      badge: 'P&L',
       customBadge: null
     },
     {
