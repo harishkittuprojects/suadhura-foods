@@ -23,7 +23,7 @@ import {
   X,
   Printer,
   ChevronDown,
-  DollarSign,
+  IndianRupee,
   Package,
   Calendar,
   Layers,
@@ -2786,7 +2786,7 @@ export const AdminPage = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase text-slate-400">Today's Store Sales</span>
                     <span className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
-                      <DollarSign className="w-4 h-4" />
+                      <IndianRupee className="w-4 h-4" />
                     </span>
                   </div>
                   <div className="text-xl sm:text-2xl font-black text-emerald-800 mt-1">

@@ -4,7 +4,7 @@ import {
   Building2,
   Store,
   TrendingUp,
-  DollarSign,
+  IndianRupee,
   Receipt,
   AlertTriangle,
   PieChart,
@@ -198,7 +198,7 @@ export const ErpSuite = ({
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase font-black text-slate-400">Today's Net Sales</span>
               <span className="p-1.5 rounded-lg bg-amber-100 text-[#7D0A14]">
-                <DollarSign className="w-4 h-4" />
+                <IndianRupee className="w-4 h-4" />
               </span>
             </div>
             <div className="text-xl sm:text-2xl font-black text-[#3D040A] mt-1">

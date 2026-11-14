@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Landmark,
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   TrendingDown,
   ArrowUpRight,

@@ -13,7 +13,7 @@ import {
   AlertCircle,
   Building2,
   Store,
-  DollarSign,
+  IndianRupee,
   Phone,
   Mail,
   ChevronLeft,
@@ -632,7 +632,7 @@ export const EmployeeManager = ({ shopsList = [], currentShop = null, showToast 
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase font-black text-slate-400">Est. Month Payroll</span>
             <span className="p-1.5 rounded-lg bg-purple-100 text-purple-800">
-              <DollarSign className="w-4 h-4" />
+              <IndianRupee className="w-4 h-4" />
             </span>
           </div>
           <div className="text-2xl font-black text-purple-900 mt-1">
