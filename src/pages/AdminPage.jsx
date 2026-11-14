@@ -251,6 +251,15 @@ export const AdminPage = () => {
     return 'dashboard';
   });
 
+  // Finance & Accounts module ON/OFF toggle state
+  const [isFinanceEnabled, setIsFinanceEnabled] = useState(() => {
+    try {
+      const stored = localStorage.getItem('sumadhura_finance_module_enabled');
+      if (stored !== null) return JSON.parse(stored);
+    } catch {}
+    return true;
+  });
+
   // Mobile sidebar open state
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -2003,7 +2012,7 @@ export const AdminPage = () => {
       id: 'finance-accounts',
       label: 'Finance & Accounts',
       icon: Wallet,
-      badge: 'P&L',
+      badge: null,
       customBadge: null
     },
     {
@@ -2409,16 +2418,56 @@ export const AdminPage = () => {
                         B2B Wholesale
                       </span>
                     )}
-                    {item.badge !== null && !['b2c-customers', 'b2b-customers'].includes(item.id) && (
-                      <span
-                        className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
-                          isActive
-                            ? 'bg-[#3D040A] text-[#F5A623]'
-                            : 'bg-black/30 text-amber-200 border border-white/10'
-                        }`}
-                      >
-                        {item.badge}
-                      </span>
+                    {item.id === 'finance-accounts' ? (
+                      <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                        <span className={`text-[9px] font-black tracking-wider uppercase ${
+                          isFinanceEnabled 
+                            ? (isActive ? 'text-[#3D040A]' : 'text-emerald-400') 
+                            : (isActive ? 'text-[#3D040A]/60' : 'text-slate-400')
+                        }`}>
+                          {isFinanceEnabled ? 'ON' : 'OFF'}
+                        </span>
+                        <span
+                          role="switch"
+                          aria-checked={isFinanceEnabled}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const next = !isFinanceEnabled;
+                            setIsFinanceEnabled(next);
+                            try {
+                              localStorage.setItem('sumadhura_finance_module_enabled', JSON.stringify(next));
+                            } catch {}
+                            showToast(
+                              next 
+                                ? '✅ Finance & Accounts enabled (ON)' 
+                                : '🔒 Finance & Accounts turned OFF (Privacy Mode)', 
+                              'info'
+                            );
+                          }}
+                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                            isFinanceEnabled ? 'bg-emerald-500' : 'bg-slate-700/80'
+                          }`}
+                          title={isFinanceEnabled ? 'Finance is ON — Click to turn OFF' : 'Finance is OFF — Click to turn ON'}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-md ring-0 transition duration-200 ease-in-out ${
+                              isFinanceEnabled ? 'translate-x-4' : 'translate-x-0'
+                            }`}
+                          />
+                        </span>
+                      </div>
+                    ) : (
+                      item.badge !== null && !['b2c-customers', 'b2b-customers'].includes(item.id) && (
+                        <span
+                          className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                            isActive
+                              ? 'bg-[#3D040A] text-[#F5A623]'
+                              : 'bg-black/30 text-amber-200 border border-white/10'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )
                     )}
                   </div>
                 </button>
@@ -6744,11 +6793,46 @@ export const AdminPage = () => {
           {/* FINANCE & CORPORATE ACCOUNTS                              */}
           {/* ========================================================= */}
           {activeTab === 'finance-accounts' && (
-            <FinanceAccounts
-              shopsList={shopsList}
-              currentShop={currentShop}
-              showToast={showToast}
-            />
+            isFinanceEnabled ? (
+              <FinanceAccounts
+                shopsList={shopsList}
+                currentShop={currentShop}
+                showToast={showToast}
+              />
+            ) : (
+              <div className="bg-white rounded-3xl border border-[#EDE1D1] p-8 sm:p-14 text-center max-w-xl mx-auto my-10 space-y-4 shadow-sm animate-in fade-in duration-200">
+                <div className="w-16 h-16 rounded-3xl bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto text-slate-500 shadow-xs">
+                  <Wallet className="w-8 h-8 text-slate-400" />
+                </div>
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold mb-2">
+                    <span className="w-2 h-2 rounded-full bg-slate-400" />
+                    Finance & Accounts Module is OFF
+                  </div>
+                  <h3 className="font-black text-xl text-slate-800">
+                    Finance Module is Currently Disabled
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1.5 max-w-sm mx-auto leading-relaxed">
+                    Financial profit & loss statements, general ledger vouchers, and branch revenue are hidden while the module is toggled OFF.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsFinanceEnabled(true);
+                      try {
+                        localStorage.setItem('sumadhura_finance_module_enabled', 'true');
+                      } catch {}
+                      showToast('✅ Finance & Accounts enabled (ON)', 'success');
+                    }}
+                    className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md active:scale-95 transition-all cursor-pointer inline-flex items-center gap-2"
+                  >
+                    <span>⚡ Turn ON Finance & Accounts</span>
+                  </button>
+                </div>
+              </div>
+            )
           )}
 
           {/* ========================================================= */}
