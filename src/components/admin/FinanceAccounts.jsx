@@ -267,15 +267,36 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
     } catch {}
   }, [ledger]);
 
+  // Synchronize ledger when orders or till audit posts a new cash voucher
+  useEffect(() => {
+    const handleLedgerUpdate = () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          setLedger(JSON.parse(saved));
+        }
+      } catch (err) {
+        console.error('Failed to sync finance ledger:', err);
+      }
+    };
+    window.addEventListener('finance_ledger_updated', handleLedgerUpdate);
+    window.addEventListener('storage', handleLedgerUpdate);
+    return () => {
+      window.removeEventListener('finance_ledger_updated', handleLedgerUpdate);
+      window.removeEventListener('storage', handleLedgerUpdate);
+    };
+  }, []);
+
   // Active view inside Finance: 'overview' (P&L Summary), 'ledger' (Transactions), 'branches' (Branch P&L), 'gst' (Tax Filing)
   const [activeTab, setActiveTab] = useState('overview');
 
   // Branch Scope Selection: 'all' | 'Branch 1' | 'Branch 2' | 'Branch 3'
   const [selectedBranch, setSelectedBranch] = useState('all');
 
-  // Search & Type Filters for Ledger
+  // Search, Type & Account Filters for Ledger
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [accountFilter, setAccountFilter] = useState('all');
 
   // New Transaction Modal
   const [isNewTxnOpen, setIsNewTxnOpen] = useState(false);
@@ -422,10 +443,11 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
 
       const matchType = typeFilter === 'all' || item.type === typeFilter;
       const matchBranch = selectedBranch === 'all' || item.branch.includes(selectedBranch);
+      const matchAccount = accountFilter === 'all' || item.account === accountFilter;
 
-      return matchSearch && matchType && matchBranch;
+      return matchSearch && matchType && matchBranch && matchAccount;
     });
-  }, [ledger, searchQuery, typeFilter, selectedBranch]);
+  }, [ledger, searchQuery, typeFilter, accountFilter, selectedBranch]);
 
   // Handle Add Transaction
   const handleAddTxn = (e) => {
@@ -730,8 +752,19 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                 <span>Amount (₹)</span>
               </div>
               <div className="divide-y divide-slate-100 bg-white">
-                <div className="px-4 py-2.5 flex justify-between">
-                  <span className="font-semibold text-slate-700">B2C Retail Counter & Online Orders</span>
+                <div className="px-4 py-2.5 flex justify-between items-center">
+                  <div>
+                    <span className="font-semibold text-slate-700">B2C Retail Counter & Online Orders</span>
+                    <div className="text-[11px] text-slate-500 font-medium flex items-center gap-2 mt-0.5">
+                      <span className="inline-flex items-center gap-1 text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded font-bold">
+                        💵 Counter Cash (Till)
+                      </span>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-1 text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded font-bold">
+                        📱 Online (UPI / Gateway)
+                      </span>
+                    </div>
+                  </div>
                   <span className="font-black text-slate-900">₹{currentMetrics.retailRev.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="px-4 py-2.5 flex justify-between">
@@ -853,6 +886,18 @@ export const FinanceAccounts = ({ shopsList = [], currentShop = null, showToast 
                 <option value="all">All Cashflow</option>
                 <option value="income">Credit (+ Inflow)</option>
                 <option value="expense">Debit (− Outflow)</option>
+              </select>
+
+              <select
+                value={accountFilter}
+                onChange={(e) => setAccountFilter(e.target.value)}
+                className="px-3 py-2 bg-[#FAF5EC] border border-[#EDE1D1] rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+              >
+                <option value="all">All Accounts / Modes</option>
+                <option value="Cash Till Register">💵 Cash Till Register</option>
+                <option value="HDFC Corporate Current A/C">🏦 HDFC Current (UPI / Netbanking)</option>
+                <option value="ICICI Operations A/C">🏦 ICICI Operations A/C</option>
+                <option value="Razorpay Escrow A/C">💳 Razorpay Escrow (Cards / Online)</option>
               </select>
 
               <button

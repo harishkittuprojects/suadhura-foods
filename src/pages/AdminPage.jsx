@@ -24,6 +24,10 @@ import {
   Printer,
   ChevronDown,
   IndianRupee,
+  Banknote,
+  Smartphone,
+  Calculator,
+  Coins,
   Package,
   Calendar,
   Layers,
@@ -295,6 +299,23 @@ export const AdminPage = () => {
   });
   const [isCalendarDropdownOpen, setIsCalendarDropdownOpen] = useState(false);
   const [isDailyOrdersModalOpen, setIsDailyOrdersModalOpen] = useState(false);
+
+  // Payment mode filter in orders console: 'all' | 'cash' | 'online'
+  const [orderPaymentFilter, setOrderPaymentFilter] = useState('all');
+
+  // Daily Counter Cash Denomination Audit Modal State
+  const [isCashAuditModalOpen, setIsCashAuditModalOpen] = useState(false);
+  const [cashDenominations, setCashDenominations] = useState({
+    500: '',
+    200: '',
+    100: '',
+    50: '',
+    20: '',
+    10: '',
+    coins: ''
+  });
+  const [cashAuditOpeningFloat, setCashAuditOpeningFloat] = useState(2000);
+  const [cashAuditToast, setCashAuditToast] = useState('');
 
   // -------------------------------------------------------------------
   // MULTI-BRANCH STORES & BRANCH LOGIN (Branch 1, Branch 2, Branch 3)
@@ -1991,6 +2012,71 @@ export const AdminPage = () => {
   // -------------------------------------------------------------------
   // FILTERING LOGIC
   // -------------------------------------------------------------------
+  // Payment Mode Helper: determines if an order is Cash (COD / Counter Cash) vs Online (UPI, Cards, Netbanking)
+  const isOrderCash = (order) => {
+    const pm = (order.paymentMethod || order.payment || '').toLowerCase();
+    return pm.includes('cash') || pm.includes('cod') || pm.includes('counter');
+  };
+
+  // Payment Breakdown across all real orders
+  const cashOrders = orders.filter((o) => isOrderCash(o));
+  const onlineOrders = orders.filter((o) => !isOrderCash(o));
+
+  const totalCashRevenue = cashOrders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+  const totalOnlineRevenue = onlineOrders.reduce((sum, o) => sum + Number(o.total || 0), 0);
+  const totalCombinedRevenue = totalCashRevenue + totalOnlineRevenue;
+
+  // Counter Cash Till Denomination Calculations
+  const physicalCashCounted =
+    (Number(cashDenominations[500]) || 0) * 500 +
+    (Number(cashDenominations[200]) || 0) * 200 +
+    (Number(cashDenominations[100]) || 0) * 100 +
+    (Number(cashDenominations[50]) || 0) * 50 +
+    (Number(cashDenominations[20]) || 0) * 20 +
+    (Number(cashDenominations[10]) || 0) * 10 +
+    (Number(cashDenominations.coins) || 0);
+
+  const expectedDrawerCash = (Number(cashAuditOpeningFloat) || 0) + totalCashRevenue;
+  const cashVariance = physicalCashCounted - expectedDrawerCash;
+
+  const handlePostCashAuditToLedger = () => {
+    try {
+      const storageKey = 'sumadhura_finance_ledger_v1';
+      const existing = localStorage.getItem(storageKey);
+      let ledger = [];
+      if (existing) {
+        try {
+          ledger = JSON.parse(existing);
+        } catch {
+          ledger = [];
+        }
+      }
+      const amountToPost = physicalCashCounted > 0 ? physicalCashCounted : totalCashRevenue;
+      const newVoucher = {
+        id: `TXN-TILL-${Date.now().toString().slice(-4)}`,
+        date: new Date().toISOString().split('T')[0],
+        type: 'income',
+        category: 'B2C Counter Retail',
+        description: `Counter Cash Till Settlement & Bank Handover (${cashOrders.length} cash orders audited)`,
+        branch: 'Branch 1 (Madhapur)',
+        account: 'Cash Till Register',
+        amount: Number(amountToPost),
+        refNo: `TILL-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}`,
+        status: 'reconciled'
+      };
+      const updatedLedger = [newVoucher, ...ledger];
+      localStorage.setItem(storageKey, JSON.stringify(updatedLedger));
+      window.dispatchEvent(new Event('finance_ledger_updated'));
+      setCashAuditToast(`Successfully recorded ₹${Number(amountToPost).toLocaleString('en-IN')} Cash Till Handover to General Ledger!`);
+      setTimeout(() => {
+        setCashAuditToast('');
+        setIsCashAuditModalOpen(false);
+      }, 1600);
+    } catch (err) {
+      console.error('Failed to post cash audit voucher:', err);
+    }
+  };
+
   // Orders matching the selected Calendar Date filter
   const dateFilteredOrders = orders.filter((o) => matchesOrderDate(o, orderDateRange, selectedCustomDate));
 
@@ -2001,12 +2087,17 @@ export const AdminPage = () => {
     if (statusFilter !== 'All' && o.status !== statusFilter) return false;
     if (!matchesOrderDate(o, orderDateRange, selectedCustomDate)) return false;
 
+    // Payment Mode Filter (Cash vs Online)
+    if (orderPaymentFilter === 'cash' && !isOrderCash(o)) return false;
+    if (orderPaymentFilter === 'online' && isOrderCash(o)) return false;
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       return (
         (o.id && o.id.toLowerCase().includes(q)) ||
         (o.customer && o.customer.toLowerCase().includes(q)) ||
-        (o.address && o.address.toLowerCase().includes(q))
+        (o.address && o.address.toLowerCase().includes(q)) ||
+        (o.paymentMethod && o.paymentMethod.toLowerCase().includes(q))
       );
     }
     return true;
@@ -4144,6 +4235,45 @@ export const AdminPage = () => {
                     </button>
                   </div>
 
+                  {/* Payment Mode Filter (Cash in Counter vs Online UPI) */}
+                  <div className="flex items-center bg-[#FAF5EC] p-1 rounded-xl border border-[#E8DDCF] text-xs font-bold">
+                    <button
+                      type="button"
+                      onClick={() => setOrderPaymentFilter('all')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer ${
+                        orderPaymentFilter === 'all'
+                          ? 'bg-[#3D040A] text-amber-300 shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      All Modes
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setOrderPaymentFilter('cash')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 ${
+                        orderPaymentFilter === 'cash'
+                          ? 'bg-amber-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-amber-800'
+                      }`}
+                    >
+                      <Banknote className="w-3.5 h-3.5" />
+                      <span>Cash ({cashOrders.length})</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setOrderPaymentFilter('online')}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center gap-1 ${
+                        orderPaymentFilter === 'online'
+                          ? 'bg-emerald-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-emerald-800'
+                      }`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Online ({onlineOrders.length})</span>
+                    </button>
+                  </div>
+
                   <div className="relative">
                     <input
                       type="text"
@@ -4200,6 +4330,74 @@ export const AdminPage = () => {
                       <span className="hidden sm:inline">Clear All Orders</span>
                     </button>
                   )}
+                </div>
+              </div>
+
+              {/* Payment Mode Live Breakdown Bar */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1]">
+                {/* 1. Counter Cash In Drawer */}
+                <div className="bg-white rounded-xl border border-amber-200/80 p-3 shadow-2xs flex items-center justify-between">
+                  <div>
+                    <div className="text-[10px] font-black uppercase text-amber-800 tracking-wider flex items-center gap-1.5">
+                      <Banknote className="w-3.5 h-3.5 text-amber-700" />
+                      <span>Counter Cash (In Till / COD)</span>
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-[#3D040A] mt-0.5">
+                      ₹{totalCashRevenue.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[10px] font-bold text-amber-800">
+                      {cashOrders.length} Cash {cashOrders.length === 1 ? 'Order' : 'Orders'} in Drawer
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsCashAuditModalOpen(true)}
+                    className="px-2.5 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-black text-[11px] shadow-xs active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+                    title="Audit physical cash notes and verify against orders"
+                  >
+                    <Calculator className="w-3.5 h-3.5" />
+                    <span>Tally Cash</span>
+                  </button>
+                </div>
+
+                {/* 2. Online Direct Income */}
+                <div className="bg-white rounded-xl border border-emerald-200/80 p-3 shadow-2xs flex items-center justify-between">
+                  <div>
+                    <div className="text-[10px] font-black uppercase text-emerald-800 tracking-wider flex items-center gap-1.5">
+                      <Smartphone className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Online Income (UPI / Bank)</span>
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-emerald-800 mt-0.5">
+                      ₹{totalOnlineRevenue.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[10px] font-bold text-emerald-700">
+                      {onlineOrders.length} Digital {onlineOrders.length === 1 ? 'Payment' : 'Payments'} (Direct Bank)
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
+                    Bank Direct
+                  </span>
+                </div>
+
+                {/* 3. Total Real-time Turnover */}
+                <div className="bg-white rounded-xl border border-[#EDE1D1] p-3 shadow-2xs flex items-center justify-between">
+                  <div>
+                    <div className="text-[10px] font-black uppercase text-slate-500 tracking-wider flex items-center gap-1.5">
+                      <IndianRupee className="w-3.5 h-3.5 text-[#7D0A14]" />
+                      <span>Total Orders Turnover</span>
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-[#7D0A14] mt-0.5">
+                      ₹{totalCombinedRevenue.toLocaleString('en-IN')}
+                    </div>
+                    <div className="text-[10px] font-bold text-slate-500">
+                      {totalCombinedRevenue > 0
+                        ? `${Math.round((totalCashRevenue / totalCombinedRevenue) * 100)}% Cash • ${Math.round((totalOnlineRevenue / totalCombinedRevenue) * 100)}% Online`
+                        : '0 orders'}
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    {orders.length} Orders
+                  </span>
                 </div>
               </div>
 
@@ -4260,8 +4458,18 @@ export const AdminPage = () => {
                           <div className="font-black text-sm text-[#7D0A14]">
                             ₹{order.total.toLocaleString()}
                           </div>
-                          <div className="text-[10px] text-emerald-600 font-bold">
-                            {order.paymentMethod}
+                          <div className="mt-1">
+                            {isOrderCash(order) ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-black">
+                                <Banknote className="w-3 h-3 text-amber-700" />
+                                <span>Counter Cash</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300 text-[10px] font-black">
+                                <Smartphone className="w-3 h-3 text-emerald-700" />
+                                <span>{order.paymentMethod || 'UPI • Paid'}</span>
+                              </span>
+                            )}
                           </div>
                         </td>
 
@@ -7718,6 +7926,229 @@ export const AdminPage = () => {
               >
                 Done
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ------------------------------------------------------------- */}
+      {/* COUNTER CASH DRAWER AUDIT & DENOMINATION TALLY MODAL         */}
+      {/* ------------------------------------------------------------- */}
+      {isCashAuditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-5 sm:p-6 space-y-4 border border-[#EDE1D1] shadow-2xl relative max-h-[92vh] flex flex-col overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-slate-100 pb-3 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-600 text-white flex items-center justify-center font-black shadow-xs">
+                  <Banknote className="w-5 h-5 text-amber-200" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-[#3D040A]">
+                    Counter Cash Till Audit & Denomination Tally
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Count physical currency notes in the counter drawer & verify against today's cash orders
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCashAuditModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Notification Toast */}
+            {cashAuditToast && (
+              <div className="p-3 bg-emerald-50 border border-emerald-300 rounded-xl text-emerald-900 font-bold text-xs flex items-center gap-2 animate-in fade-in duration-200">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>{cashAuditToast}</span>
+              </div>
+            )}
+
+            {/* Reconciliation Comparison Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <div className="bg-[#FAF5EC] rounded-2xl p-3 border border-[#EDE1D1]">
+                <div className="text-[10px] font-black uppercase text-slate-500">
+                  Expected in Drawer
+                </div>
+                <div className="text-base sm:text-lg font-black text-[#3D040A] mt-0.5">
+                  ₹{expectedDrawerCash.toLocaleString('en-IN')}
+                </div>
+                <div className="text-[10px] text-slate-500 font-semibold">
+                  ₹{Number(cashAuditOpeningFloat || 0).toLocaleString('en-IN')} float + ₹{totalCashRevenue.toLocaleString('en-IN')} orders
+                </div>
+              </div>
+
+              <div className="bg-amber-50 rounded-2xl p-3 border border-amber-200">
+                <div className="text-[10px] font-black uppercase text-amber-800">
+                  Physical Cash Counted
+                </div>
+                <div className="text-base sm:text-lg font-black text-amber-900 mt-0.5">
+                  ₹{physicalCashCounted.toLocaleString('en-IN')}
+                </div>
+                <div className="text-[10px] text-amber-700 font-semibold">
+                  Tally from currency notes below
+                </div>
+              </div>
+
+              <div
+                className={`rounded-2xl p-3 border ${
+                  cashVariance === 0
+                    ? 'bg-emerald-50 border-emerald-300'
+                    : cashVariance > 0
+                    ? 'bg-blue-50 border-blue-300'
+                    : 'bg-rose-50 border-rose-300'
+                }`}
+              >
+                <div className="text-[10px] font-black uppercase text-slate-600">
+                  Variance (Discrepancy)
+                </div>
+                <div
+                  className={`text-base sm:text-lg font-black mt-0.5 ${
+                    cashVariance === 0
+                      ? 'text-emerald-800'
+                      : cashVariance > 0
+                      ? 'text-blue-800'
+                      : 'text-rose-800'
+                  }`}
+                >
+                  {cashVariance === 0
+                    ? '₹0 (Balanced)'
+                    : cashVariance > 0
+                    ? `+₹${cashVariance.toLocaleString('en-IN')} (Surplus)`
+                    : `-₹${Math.abs(cashVariance).toLocaleString('en-IN')} (Shortage)`}
+                </div>
+                <div className="text-[10px] font-semibold text-slate-500">
+                  {cashVariance === 0
+                    ? 'Exact match with system'
+                    : cashVariance > 0
+                    ? 'Excess cash in till'
+                    : 'Discrepancy to investigate'}
+                </div>
+              </div>
+            </div>
+
+            {/* Opening Float Control */}
+            <div className="bg-[#FAF5EC] rounded-2xl p-3 border border-[#EDE1D1] flex items-center justify-between gap-3 text-xs">
+              <div>
+                <span className="font-black text-[#3D040A]">Opening Drawer Float / Petty Change:</span>
+                <span className="text-slate-500 text-[11px] block">Cash kept in drawer at shift start</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="font-bold text-slate-600">₹</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={cashAuditOpeningFloat}
+                  onChange={(e) => setCashAuditOpeningFloat(e.target.value)}
+                  className="w-24 px-2.5 py-1 bg-white border border-[#EDE1D1] rounded-xl font-black text-xs text-[#3D040A] text-right focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20"
+                />
+              </div>
+            </div>
+
+            {/* Denomination Counter Inputs */}
+            <div className="border border-[#EDE1D1] rounded-2xl overflow-hidden">
+              <div className="bg-[#FAF5EC] px-4 py-2 font-black text-[#7D0A14] text-xs uppercase flex justify-between">
+                <span>Denomination Currency Note</span>
+                <span>Count × Multiplier = Subtotal</span>
+              </div>
+              <div className="divide-y divide-slate-100 bg-white">
+                {[
+                  { label: '₹500 Note', mult: 500, key: 500, bg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+                  { label: '₹200 Note', mult: 200, key: 200, bg: 'bg-amber-50 text-amber-800 border-amber-200' },
+                  { label: '₹100 Note', mult: 100, key: 100, bg: 'bg-sky-50 text-sky-800 border-sky-200' },
+                  { label: '₹50 Note', mult: 50, key: 50, bg: 'bg-teal-50 text-teal-800 border-teal-200' },
+                  { label: '₹20 Note', mult: 20, key: 20, bg: 'bg-yellow-50 text-yellow-800 border-yellow-200' },
+                  { label: '₹10 Note', mult: 10, key: 10, bg: 'bg-orange-50 text-orange-800 border-orange-200' },
+                ].map((denom) => {
+                  const count = Number(cashDenominations[denom.key]) || 0;
+                  const rowSubtotal = count * denom.mult;
+                  return (
+                    <div key={denom.key} className="px-4 py-2 flex items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2.5 py-0.5 rounded-md font-black text-xs border ${denom.bg}`}>
+                          {denom.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-400 font-bold">×</span>
+                        <input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          value={cashDenominations[denom.key]}
+                          onChange={(e) =>
+                            setCashDenominations({ ...cashDenominations, [denom.key]: e.target.value })
+                          }
+                          className="w-20 px-2.5 py-1 bg-[#FAF5EC] border border-[#EDE1D1] rounded-xl text-xs font-black text-center focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20"
+                        />
+                        <span className="font-bold text-slate-400">=</span>
+                        <span className="w-24 text-right font-black text-slate-800">
+                          ₹{rowSubtotal.toLocaleString('en-IN')}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+                {/* Coins Total */}
+                <div className="px-4 py-2 flex items-center justify-between gap-3 text-xs bg-slate-50/50">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-md font-black text-xs border bg-slate-100 text-slate-800 border-slate-200 flex items-center gap-1">
+                      <Coins className="w-3.5 h-3.5 text-slate-600" />
+                      <span>Coins (₹5, ₹2, ₹1, ₹10)</span>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] text-slate-500 font-semibold">Total coins: ₹</span>
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={cashDenominations.coins}
+                      onChange={(e) =>
+                        setCashDenominations({ ...cashDenominations, coins: e.target.value })
+                      }
+                      className="w-24 px-2.5 py-1 bg-[#FAF5EC] border border-[#EDE1D1] rounded-xl text-xs font-black text-right focus:outline-none focus:ring-2 focus:ring-[#7D0A14]/20"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-100 shrink-0">
+              <button
+                type="button"
+                onClick={() =>
+                  setCashDenominations({ 500: '', 200: '', 100: '', 50: '', 20: '', 10: '', coins: '' })
+                }
+                className="text-xs text-slate-500 hover:text-slate-800 font-bold underline cursor-pointer"
+              >
+                Clear / Reset Tally
+              </button>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsCashAuditModalOpen(false)}
+                  className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePostCashAuditToLedger}
+                  className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black shadow-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <Banknote className="w-4 h-4 text-amber-300" />
+                  <span>Post Cash Handover to Ledger</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
