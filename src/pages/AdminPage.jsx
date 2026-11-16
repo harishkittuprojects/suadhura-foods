@@ -247,6 +247,27 @@ export const AdminPage = () => {
       if (p.includes('/erp') || h.includes('erp')) {
         return 'erp-suite';
       }
+      if (p.includes('product') || h.includes('product')) {
+        return 'products';
+      }
+      if (p.includes('finance') || h.includes('finance')) {
+        return 'finance-accounts';
+      }
+      if (p.includes('order') || h.includes('order')) {
+        return 'orders';
+      }
+      if (p.includes('employee') || h.includes('employee') || p.includes('staff') || h.includes('staff')) {
+        return 'employees';
+      }
+      if (p.includes('inventory') || h.includes('inventory')) {
+        return 'inventory';
+      }
+      if (p.includes('invoice') || h.includes('invoice')) {
+        return 'invoices';
+      }
+      if (p.includes('subscription') || h.includes('subscription')) {
+        return 'subscriptions';
+      }
     } catch {}
     return 'dashboard';
   });

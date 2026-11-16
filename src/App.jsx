@@ -34,7 +34,7 @@ const MainLayout = () => {
         const p = decodeURIComponent(window.location.pathname).toLowerCase();
         const h = decodeURIComponent(window.location.hash).toLowerCase();
         if (
-          h === '#admin' || p === '/admin' ||
+          h.includes('admin') || p.startsWith('/admin') ||
           h.includes('branch') || p.includes('branch') ||
           h.includes('erp') || p.includes('erp')
         ) {
