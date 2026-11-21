@@ -21,7 +21,9 @@ export const FloatingCartBar = () => {
     isCartOpen ||
     isCheckoutModalOpen ||
     isLiveTrackingOpen ||
-    activeTab === 'cart'
+    activeTab === 'cart' ||
+    activeTab === 'catering' ||
+    activeTab === 'cater'
   ) {
     return null;
   }
