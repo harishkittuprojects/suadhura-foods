@@ -198,7 +198,7 @@ export const CateringSection = () => {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-3 sm:px-6 py-6 space-y-6">
+    <section id="catering-section" className="max-w-7xl mx-auto px-3 sm:px-6 py-6 space-y-6">
       {/* ------------------------------------------------------------- */}
       {/* 1. HERO BANNER: SUMADHURA WEBSITE MAROON & GOLD THEME         */}
       {/* ------------------------------------------------------------- */}

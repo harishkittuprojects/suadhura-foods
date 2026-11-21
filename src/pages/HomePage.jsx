@@ -38,6 +38,24 @@ import {
 
 export const DEFAULT_HERO_SLIDES = [
   {
+    id: 'slide-catering',
+    badge: 'Hyderabad’s Favourite Bulk Food',
+    titleLine1: 'Party Boxes &',
+    titleLine2: 'Grand Event',
+    highlight: 'Catering 🍲',
+    hasHeart: false,
+    highlightColor: 'text-[#F5A623]',
+    description: 'Steaming hot party feast boxes, corporate meal trays & royal live buffet catering (10 to 2,000+ guests).',
+    buttonText: 'Book Catering & Menus',
+    buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
+    actionType: 'catering',
+    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Sumadhura Catering and Events',
+    borderColor: 'border-amber-400/80',
+    gradient: 'from-[#4A060C] via-[#680811] to-[#7D0A14]',
+    borderWrapper: 'border-[#8B121C]'
+  },
+  {
     id: 'slide-1',
     badge: 'Sumadhura Signature',
     titleLine1: 'Food',
@@ -148,7 +166,15 @@ export const HomePage = () => {
       const saved = localStorage.getItem('sumadhura_hero_slides');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const hasCatering = parsed.some((s) => s.id === 'slide-catering' || s.actionType === 'catering');
+          if (!hasCatering) {
+            const updated = [DEFAULT_HERO_SLIDES[0], ...parsed];
+            localStorage.setItem('sumadhura_hero_slides', JSON.stringify(updated));
+            return updated;
+          }
+          return parsed;
+        }
       }
       return DEFAULT_HERO_SLIDES;
     } catch {
@@ -179,7 +205,14 @@ export const HomePage = () => {
       slide.buttonAction();
       return;
     }
-    if (slide.actionType === 'subscription') {
+    if (slide.actionType === 'catering') {
+      const el = document.getElementById('catering-section');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        navigateTo('catering');
+      }
+    } else if (slide.actionType === 'subscription') {
       setIsSubscriptionModalOpen(true);
     } else if (slide.actionType === 'categories') {
       navigateTo('categories', slide.actionCategory || undefined);
