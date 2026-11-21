@@ -5,21 +5,33 @@ import { Sparkles, Utensils, CheckCircle2, PhoneCall, ShieldCheck } from 'lucide
 export const CateringPage = () => {
   return (
     <div className="space-y-6">
-      {/* Catering Header Banner */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-4">
-        <div className="rounded-3xl bg-gradient-to-r from-[#3D040A] via-[#5D0710] to-[#7D0A14] text-white p-6 sm:p-10 shadow-xl relative overflow-hidden border border-[#8B121C]">
-          <div className="max-w-2xl relative z-10 space-y-2.5">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm border border-white/10">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Sumadhura Caterers • Serving Hyderabad Since 1998</span>
+      {/* Sleek Catering Top Ribbon */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 pt-3">
+        <div className="rounded-2xl bg-gradient-to-r from-[#3D040A] via-[#5D0710] to-[#7D0A14] text-white px-4 py-3 sm:px-6 sm:py-3.5 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-amber-500/20">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0">
+              <Sparkles className="w-4 h-4 text-amber-300" />
             </div>
-            <h1 className="text-3xl sm:text-5xl font-black tracking-tight font-serif text-[#FCE39E]">
-              Sumadhura Catering & Events
-            </h1>
-            <p className="text-xs sm:text-sm text-amber-100/90 leading-relaxed font-medium">
-              From compact 10-guest party boxes to royal 2,000+ guest wedding feasts, we bring authentic
-              flavour, pure A2 desi ghee preparation and seamless hospitality to your celebration.
-            </p>
+            <div>
+              <h1 className="text-sm sm:text-base font-black text-[#FCE39E] tracking-tight">
+                Sumadhura Catering & Events
+              </h1>
+              <p className="text-[11px] text-amber-100/80 font-medium">
+                Pure A2 Desi Ghee Preparation • Party Boxes to Royal Banquets (10 to 2,000+ Guests)
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white/10 text-amber-200 border border-white/15">
+              Live in Hyderabad
+            </span>
+            <a
+              href="tel:+919121288450"
+              className="px-3 py-1 rounded-xl bg-amber-400 hover:bg-amber-300 text-[#3D040A] text-xs font-black transition-colors"
+            >
+              Call Desk
+            </a>
           </div>
         </div>
       </div>

@@ -253,17 +253,17 @@ export const CateringSection = () => {
         </div>
 
         {/* Central Headline (matching screenshot styling in Website Colors) */}
-        <div className="text-center py-6 sm:py-8 space-y-1 relative z-10 max-w-2xl mx-auto">
-          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-[#F5A623] tracking-tight drop-shadow-sm font-serif">
+        <div className="text-center py-3 sm:py-5 space-y-0.5 relative z-10 max-w-xl mx-auto">
+          <h2 className="text-lg sm:text-2xl md:text-3xl font-black text-[#F5A623] tracking-tight drop-shadow-sm font-serif">
             Hyderabad’s favourite
           </h2>
           <div className="relative inline-block">
-            <p className="text-base sm:text-2xl md:text-3xl font-extrabold text-white tracking-wide">
+            <p className="text-sm sm:text-base md:text-xl font-extrabold text-white tracking-wide">
               bulk food delivery app!
             </p>
             {/* Artistic curved golden brush underline matching screenshot */}
             <svg
-              className="w-44 sm:w-60 h-2.5 sm:h-3.5 text-[#F5A623] mx-auto mt-0.5"
+              className="w-32 sm:w-44 h-2 sm:h-2.5 text-[#F5A623] mx-auto mt-0.5"
               viewBox="0 0 200 12"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -281,23 +281,23 @@ export const CateringSection = () => {
         {/* ----------------------------------------------------------- */}
         {/* THE 3 CATEGORY CARDS (DELIVERY BOX, MEAL BOX, CATERING)     */}
         {/* ----------------------------------------------------------- */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4 relative z-10 pt-2">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-3.5 relative z-10 pt-1">
           {cateringCategories.map((cat, idx) => (
             <div
               key={cat.id}
               onClick={() => handleOpenCategory(cat)}
-              className="group relative rounded-3xl bg-[#52070E]/85 hover:bg-[#630911] border border-amber-400/30 hover:border-amber-400 p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-1 overflow-hidden"
+              className="group relative rounded-3xl bg-[#52070E]/85 hover:bg-[#630911] border border-amber-400/30 hover:border-amber-400 p-3.5 sm:p-4 flex flex-col justify-between transition-all duration-300 cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-1 overflow-hidden"
             >
               {/* Card Header: Title, Subtitle & Arrow Button */}
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <h3 className="text-base sm:text-lg font-black tracking-wider text-white">
+                  <h3 className="text-sm sm:text-base font-black tracking-wider text-white">
                     {cat.title}
                   </h3>
-                  <p className="text-xs sm:text-sm italic font-serif text-amber-200/90 mt-0.5">
+                  <p className="text-[11px] sm:text-xs italic font-serif text-amber-200/90 mt-0.5">
                     {cat.subtitle}
                   </p>
-                  <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-white/10 text-[10px] font-black text-amber-300 border border-white/10">
+                  <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full bg-white/10 text-[9.5px] font-bold text-amber-300 border border-white/10">
                     {cat.tag}
                   </span>
                 </div>
@@ -305,16 +305,16 @@ export const CateringSection = () => {
                 {/* Circular Arrow Action Button (matching screenshot) */}
                 <button
                   type="button"
-                  className="w-8 h-8 rounded-full bg-white text-[#7D0A14] group-hover:bg-[#F5A623] group-hover:text-[#3D040A] flex items-center justify-center transition-all shadow-md shrink-0 cursor-pointer"
+                  className="w-7 h-7 rounded-full bg-white text-[#7D0A14] group-hover:bg-[#F5A623] group-hover:text-[#3D040A] flex items-center justify-center transition-all shadow-md shrink-0 cursor-pointer"
                   title={`View ${cat.title} menus`}
                 >
-                  <ChevronRight className="w-5 h-5 font-bold" />
+                  <ChevronRight className="w-4 h-4 font-bold" />
                 </button>
               </div>
 
               {/* Dish Visual framed inside an elegant cream oval (matching screenshot shape) */}
-              <div className="mt-5 pt-2 flex items-center justify-center relative">
-                <div className="w-48 h-32 sm:w-52 sm:h-36 rounded-[50%_/_40%] bg-gradient-to-b from-[#FDFBF7] to-[#F5ECE1] p-2 shadow-inner flex items-center justify-center overflow-hidden border-2 border-amber-200/50 group-hover:scale-105 transition-transform duration-300">
+              <div className="mt-4 pt-1 flex items-center justify-center relative">
+                <div className="w-44 h-28 sm:w-48 sm:h-32 rounded-[50%_/_40%] bg-gradient-to-b from-[#FDFBF7] to-[#F5ECE1] p-1.5 shadow-inner flex items-center justify-center overflow-hidden border-2 border-amber-200/50 group-hover:scale-105 transition-transform duration-300">
                   <img
                     src={cat.image}
                     alt={cat.alt}
@@ -325,10 +325,10 @@ export const CateringSection = () => {
               </div>
 
               {/* Bottom Quick Price Info */}
-              <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-xs">
-                <span className="text-amber-100/80 font-medium">Starting from</span>
-                <span className="font-black text-amber-300 text-sm">
-                  ₹{cat.pricePerHead} <span className="text-[10px] text-white/70">/ guest</span>
+              <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs">
+                <span className="text-amber-100/80 text-[11px] font-medium">Starting from</span>
+                <span className="font-black text-amber-300 text-xs sm:text-sm">
+                  ₹{cat.pricePerHead} <span className="text-[10px] text-white/70 font-normal">/ guest</span>
                 </span>
               </div>
             </div>
@@ -370,18 +370,18 @@ export const CateringSection = () => {
         </div>
 
         {/* Prominent "Browse all menus ➔" Button (Matching screenshot) */}
-        <div className="mt-5 max-w-lg mx-auto">
+        <div className="mt-4 max-w-md mx-auto">
           <button
             type="button"
             onClick={() => {
               setSelectedPackage(cateringPackages[0]);
               setIsMenuModalOpen(true);
             }}
-            className="w-full py-4 px-6 rounded-3xl bg-gradient-to-r from-[#FFFDF9] via-[#FAF5EC] to-[#FFFDF9] hover:from-white hover:to-white border-2 border-[#7D0A14]/30 hover:border-[#7D0A14] text-[#7D0A14] font-black text-base sm:text-lg shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer group active:scale-98"
+            className="w-full py-2.5 sm:py-3 px-5 rounded-2xl bg-gradient-to-r from-[#FFFDF9] via-[#FAF5EC] to-[#FFFDF9] hover:from-white hover:to-white border-2 border-[#7D0A14]/30 hover:border-[#7D0A14] text-[#7D0A14] font-black text-xs sm:text-sm shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer group active:scale-98"
           >
             <span>Browse all menus</span>
-            <div className="w-8 h-8 rounded-full bg-[#7D0A14] group-hover:bg-[#60060E] text-white flex items-center justify-center transition-all group-hover:translate-x-1 shadow-sm">
-              <ArrowRight className="w-4 h-4" />
+            <div className="w-6 h-6 rounded-full bg-[#7D0A14] group-hover:bg-[#60060E] text-white flex items-center justify-center transition-all group-hover:translate-x-1 shadow-xs">
+              <ArrowRight className="w-3.5 h-3.5" />
             </div>
           </button>
         </div>
@@ -392,7 +392,7 @@ export const CateringSection = () => {
       {/* ------------------------------------------------------------- */}
       <div
         data-aos="fade-up"
-        className="bg-white rounded-3xl p-6 sm:p-8 border border-[#EDE1D1] shadow-sm text-center relative overflow-hidden"
+        className="bg-white rounded-3xl p-5 sm:p-6 border border-[#EDE1D1] shadow-sm text-center relative overflow-hidden"
       >
         {/* Background Dot Grid */}
         <div
@@ -403,54 +403,54 @@ export const CateringSection = () => {
           }}
         />
 
-        <div className="relative z-10 space-y-6">
+        <div className="relative z-10 space-y-4">
           {/* Golden Laurel Wreath with 2,70,000 Guests Served */}
           <div className="flex flex-col items-center justify-center">
-            <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <div className="flex items-center justify-center gap-2 sm:gap-2.5">
               {/* Left Laurel Branch */}
-              <svg className="w-8 h-10 sm:w-11 sm:h-12 text-amber-500" viewBox="0 0 36 48" fill="currentColor">
+              <svg className="w-6 h-8 sm:w-8 sm:h-10 text-amber-500" viewBox="0 0 36 48" fill="currentColor">
                 <path d="M18 4C14 10 8 16 3 20C10 21 16 19 18 16C15 22 10 27 3 31C10 31 16 29 18 26C15 32 10 38 4 41C12 40 18 36 20 32C19 37 15 43 10 46C18 45 23 39 25 34C24 40 21 45 17 48C25 46 29 39 31 32C30 38 28 43 24 47C32 43 35 34 36 26C32 28 28 29 25 28C29 22 31 14 30 7C26 12 21 15 18 16C21 10 22 4 20 0C17 5 15 10 13 15C15 9 15 4 13 0C11 5 9 10 8 15C11 10 12 5 11 1C8 6 6 12 6 18C10 16 14 13 18 4Z" opacity="0.85" />
               </svg>
 
-              <div className="text-3xl sm:text-5xl font-black text-[#A66F17] tracking-tight font-serif">
+              <div className="text-2xl sm:text-3xl font-black text-[#A66F17] tracking-tight font-serif">
                 2,70,000
               </div>
 
               {/* Right Laurel Branch (flipped) */}
-              <svg className="w-8 h-10 sm:w-11 sm:h-12 text-amber-500 -scale-x-100" viewBox="0 0 36 48" fill="currentColor">
+              <svg className="w-6 h-8 sm:w-8 sm:h-10 text-amber-500 -scale-x-100" viewBox="0 0 36 48" fill="currentColor">
                 <path d="M18 4C14 10 8 16 3 20C10 21 16 19 18 16C15 22 10 27 3 31C10 31 16 29 18 26C15 32 10 38 4 41C12 40 18 36 20 32C19 37 15 43 10 46C18 45 23 39 25 34C24 40 21 45 17 48C25 46 29 39 31 32C30 38 28 43 24 47C32 43 35 34 36 26C32 28 28 29 25 28C29 22 31 14 30 7C26 12 21 15 18 16C21 10 22 4 20 0C17 5 15 10 13 15C15 9 15 4 13 0C11 5 9 10 8 15C11 10 12 5 11 1C8 6 6 12 6 18C10 16 14 13 18 4Z" opacity="0.85" />
               </svg>
             </div>
-            <p className="text-xs sm:text-sm font-bold text-slate-600 mt-1 uppercase tracking-wider">
+            <p className="text-[10px] sm:text-xs font-bold text-slate-600 mt-0.5 uppercase tracking-wider">
               Guests served in Hyderabad
             </p>
           </div>
 
           {/* 3 Metric Columns (Matching screenshot) */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-6 pt-3 border-t border-slate-100 max-w-xl mx-auto">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-2.5 border-t border-slate-100 max-w-lg mx-auto">
             {/* 1. Events Catered */}
             <div className="text-center">
-              <div className="text-xl sm:text-3xl font-black text-[#3D040A]">7000+</div>
-              <div className="text-[11px] sm:text-xs text-slate-500 font-semibold mt-0.5">
+              <div className="text-base sm:text-xl font-black text-[#3D040A]">7000+</div>
+              <div className="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5">
                 Events catered
               </div>
             </div>
 
             {/* 2. Rating */}
             <div className="text-center border-x border-slate-100 px-2">
-              <div className="text-xl sm:text-3xl font-black text-[#7D0A14] flex items-center justify-center gap-1">
+              <div className="text-base sm:text-xl font-black text-[#7D0A14] flex items-center justify-center gap-1">
                 <span>4.9</span>
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400 inline" />
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 inline" />
               </div>
-              <div className="text-[11px] sm:text-xs text-slate-500 font-semibold mt-0.5">
+              <div className="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5">
                 Rated on Google
               </div>
             </div>
 
             {/* 3. Satisfied Customers */}
             <div className="text-center">
-              <div className="text-xl sm:text-3xl font-black text-emerald-700">98%</div>
-              <div className="text-[11px] sm:text-xs text-slate-500 font-semibold mt-0.5">
+              <div className="text-base sm:text-xl font-black text-emerald-700">98%</div>
+              <div className="text-[10px] sm:text-[11px] text-slate-500 font-semibold mt-0.5">
                 Satisfied hosts
               </div>
             </div>
@@ -461,12 +461,12 @@ export const CateringSection = () => {
       {/* ------------------------------------------------------------- */}
       {/* 4. CUSTOMER REVIEWS: "Hear what our customers are saying"      */}
       {/* ------------------------------------------------------------- */}
-      <div data-aos="fade-up" className="space-y-4 pt-2">
+      <div data-aos="fade-up" className="space-y-3 pt-1">
         <div className="flex items-center justify-between">
-          <h3 className="text-xl sm:text-2xl font-black text-[#3D040A] tracking-tight">
+          <h3 className="text-base sm:text-lg font-black text-[#3D040A] tracking-tight">
             Hear what our customers are saying
           </h3>
-          <span className="text-xs font-bold text-[#7D0A14] hidden sm:inline">
+          <span className="text-[11px] font-bold text-[#7D0A14] hidden sm:inline">
             Verified Hyderabad Orders
           </span>
         </div>
