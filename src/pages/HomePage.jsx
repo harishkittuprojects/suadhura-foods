@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
 import { categories as defaultCategories, products as defaultProducts, servicesList, customerTestimonials } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
-import { CateringSection } from '../components/CateringSection';
 import {
   ArrowRight,
   Sparkles,
@@ -37,24 +36,6 @@ import {
 } from 'lucide-react';
 
 export const DEFAULT_HERO_SLIDES = [
-  {
-    id: 'slide-catering',
-    badge: 'Hyderabad’s Favourite Bulk Food',
-    titleLine1: 'Party Boxes &',
-    titleLine2: 'Grand Event',
-    highlight: 'Catering 🍲',
-    hasHeart: false,
-    highlightColor: 'text-[#F5A623]',
-    description: 'Steaming hot party feast boxes, corporate meal trays & royal live buffet catering (10 to 2,000+ guests).',
-    buttonText: 'Book Catering & Menus',
-    buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#55070E]',
-    actionType: 'catering',
-    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=800&q=80',
-    imageAlt: 'Sumadhura Catering and Events',
-    borderColor: 'border-amber-400/80',
-    gradient: 'from-[#4A060C] via-[#680811] to-[#7D0A14]',
-    borderWrapper: 'border-[#8B121C]'
-  },
   {
     id: 'slide-1',
     badge: 'Sumadhura Signature',
@@ -167,13 +148,8 @@ export const HomePage = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasCatering = parsed.some((s) => s.id === 'slide-catering' || s.actionType === 'catering');
-          if (!hasCatering) {
-            const updated = [DEFAULT_HERO_SLIDES[0], ...parsed];
-            localStorage.setItem('sumadhura_hero_slides', JSON.stringify(updated));
-            return updated;
-          }
-          return parsed;
+          // Filter out any temporary catering slide if present in saved cache
+          return parsed.filter((s) => s.id !== 'slide-catering' && s.actionType !== 'catering');
         }
       }
       return DEFAULT_HERO_SLIDES;
@@ -716,9 +692,6 @@ export const HomePage = () => {
           </div>
         </section>
       )}
-
-      {/* 3.8. ⭐ HYDERABAD BULK FOOD DELIVERY & CATERING (DELIVERY BOX, MEAL BOX, CATERING) */}
-      <CateringSection />
 
       {/* 4. ⭐ SHOP BY CATEGORY: ALL STORE AISLES (Dairy, Vegetables, Fresh Fruits, Groceries) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">

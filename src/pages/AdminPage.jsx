@@ -1759,13 +1759,7 @@ export const AdminPage = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const hasCatering = parsed.some((s) => s.id === 'slide-catering' || s.actionType === 'catering');
-          if (!hasCatering) {
-            const updated = [DEFAULT_HERO_SLIDES[0], ...parsed];
-            localStorage.setItem('sumadhura_hero_slides', JSON.stringify(updated));
-            return updated;
-          }
-          return parsed;
+          return parsed.filter((s) => s.id !== 'slide-catering' && s.actionType !== 'catering');
         }
       }
       return DEFAULT_HERO_SLIDES;
