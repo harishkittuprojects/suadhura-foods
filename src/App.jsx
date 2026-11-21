@@ -17,6 +17,7 @@ import { SubscriptionModal } from './components/SubscriptionModal';
 import { HomePage } from './pages/HomePage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { ServicesPage } from './pages/ServicesPage';
+import { CateringPage } from './pages/CateringPage';
 import { WishlistPage } from './pages/WishlistPage';
 import { CartPage } from './pages/CartPage';
 import { LoginPage } from './pages/LoginPage';
@@ -99,6 +100,7 @@ const MainLayout = () => {
         {activeTab === 'home' && <HomePage />}
         {(activeTab === 'categories' || activeTab === 'menu') && <CategoriesPage />}
         {(activeTab === 'services' || activeTab === 'bookings') && <ServicesPage />}
+        {(activeTab === 'catering' || activeTab === 'cater') && <CateringPage />}
         {activeTab === 'b2b' && <B2BPage />}
         {activeTab === 'wishlist' && <WishlistPage />}
         {activeTab === 'cart' && <CartPage />}

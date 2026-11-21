@@ -7026,6 +7026,7 @@ export const AdminPage = () => {
               <FinanceAccounts
                 shopsList={shopsList}
                 currentShop={currentShop}
+                orders={orders}
                 showToast={showToast}
               />
             ) : (

@@ -172,6 +172,7 @@ export const Navbar = () => {
   const navLinks = [
     { id: 'home', label: 'Home' },
     { id: 'categories', label: 'Categories' },
+    { id: 'catering', label: 'Catering & Bulk' },
     { id: 'services', label: 'Our Services' },
     { id: 'wishlist', label: 'Wishlist', badge: wishlist.length },
     { id: 'cart', label: 'Cart', badge: totalCartCount }

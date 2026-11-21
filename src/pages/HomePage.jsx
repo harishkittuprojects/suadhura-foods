@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useShop } from '../context/ShopContext';
 import { categories as defaultCategories, products as defaultProducts, servicesList, customerTestimonials } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
+import { CateringSection } from '../components/CateringSection';
 import {
   ArrowRight,
   Sparkles,
@@ -682,6 +683,9 @@ export const HomePage = () => {
           </div>
         </section>
       )}
+
+      {/* 3.8. ⭐ HYDERABAD BULK FOOD DELIVERY & CATERING (DELIVERY BOX, MEAL BOX, CATERING) */}
+      <CateringSection />
 
       {/* 4. ⭐ SHOP BY CATEGORY: ALL STORE AISLES (Dairy, Vegetables, Fresh Fruits, Groceries) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
