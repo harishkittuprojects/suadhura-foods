@@ -132,6 +132,34 @@ export const CateringPage = () => {
     }
   ];
 
+  // Verified customer reviews for desktop multi-column display
+  const customerReviews = [
+    {
+      id: 1,
+      name: 'Madhu',
+      location: 'Madhapur, Hyderabad',
+      badge: 'Family Gathering (20 Guests)',
+      initial: 'M',
+      text: 'The Biryani by kg and party boxes were freshly delivered for our 20-member family gathering. Packaging, piping hot delivery, and pure ghee taste were outstanding!'
+    },
+    {
+      id: 2,
+      name: 'Divya Teja',
+      location: 'Hitec City, Hyderabad',
+      badge: 'Corporate Lunch (60 Boxes)',
+      initial: 'DT',
+      text: 'We ordered 60 meal boxes for an office workshop at Hitec City. Everything was warm, neat, individually sealed with cutlery, and delivered right on time.'
+    },
+    {
+      id: 3,
+      name: 'Ramesh Varma',
+      location: 'Jubilee Hills, Hyderabad',
+      badge: 'Housewarming Catering (150 Guests)',
+      initial: 'RV',
+      text: 'Sumadhura Caterers handled our traditional housewarming banquet. The live counter jalebis, banana leaf setup, and courteous staff made the function memorable.'
+    }
+  ];
+
   const handleOpenEventModal = (preselected = null) => {
     if (preselected) {
       setSelectedPackage(preselected);
@@ -156,8 +184,8 @@ export const CateringPage = () => {
   return (
     <div className="min-h-screen bg-[#FAF5EC]/30 text-slate-900 pb-28">
       {/* Top Navigation Strip */}
-      <div className="bg-white border-b border-[#EDE1D1] sticky top-0 z-30 px-3 sm:px-6 py-2">
-        <div className="max-w-md sm:max-w-lg md:max-w-xl mx-auto flex items-center justify-between">
+      <div className="bg-white border-b border-[#EDE1D1] sticky top-0 z-30 px-3 sm:px-6 lg:px-8 py-2.5">
+        <div className="max-w-md sm:max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto flex items-center justify-between">
           <button
             type="button"
             onClick={() => navigateTo('home')}
@@ -166,24 +194,24 @@ export const CateringPage = () => {
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Store</span>
           </button>
-          <div className="flex items-center gap-1 text-[11px] font-black text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-            <Sparkles className="w-3 h-3 text-amber-600" />
-            <span>Sumadhura Caterers</span>
+          <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 shadow-2xs">
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <span>Sumadhura Caterers • Bulk Delivery & Banquets</span>
           </div>
         </div>
       </div>
 
-      {/* Main Centered App Container matching mobile screenshots */}
-      <div className="max-w-md sm:max-w-lg md:max-w-xl mx-auto bg-white sm:shadow-xl sm:rounded-3xl overflow-hidden border border-[#EDE1D1] sm:my-3">
+      {/* Main Container: Fully responsive from mobile to desktop (max-w-6xl on desktop) */}
+      <div className="max-w-md sm:max-w-2xl lg:max-w-5xl xl:max-w-6xl mx-auto bg-white sm:shadow-xl sm:rounded-3xl overflow-hidden border border-[#EDE1D1] sm:my-4">
         {/* ========================================================= */}
         {/* 1. HERO TOP SECTION: DEEP ROYAL WINE BACKGROUND          */}
         {/* ========================================================= */}
-        <div className="bg-gradient-to-b from-[#2B0307] via-[#3E040B] to-[#55060E] text-white p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-gradient-to-b from-[#2B0307] via-[#3E040B] to-[#55060E] text-white p-4 sm:p-6 lg:p-8 relative overflow-hidden">
           {/* Top Bar: Location, Tier Badge & Support Desk (Screenshot 1 & 2) */}
-          <div className="flex items-center justify-between gap-2 pb-4 border-b border-white/10 relative z-10">
+          <div className="flex items-center justify-between gap-3 pb-4 lg:pb-6 border-b border-white/10 relative z-10">
             {/* User Avatar + Location */}
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-amber-200">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-amber-200">
                 <Users className="w-4 h-4" />
               </div>
               <button
@@ -191,17 +219,17 @@ export const CateringPage = () => {
                 onClick={() => setIsLocationModalOpen?.(true)}
                 className="text-left cursor-pointer group"
               >
-                <div className="flex items-center gap-1 text-xs font-black text-white group-hover:text-amber-300">
+                <div className="flex items-center gap-1 text-xs sm:text-sm font-black text-white group-hover:text-amber-300">
                   <span>Balapur</span>
-                  <ChevronDown className="w-3 h-3 text-amber-300" />
+                  <ChevronDown className="w-3.5 h-3.5 text-amber-300" />
                 </div>
-                <div className="text-[10px] text-amber-200/80 font-medium">Hyderabad</div>
+                <div className="text-[10px] sm:text-xs text-amber-200/80 font-medium">Hyderabad</div>
               </button>
             </div>
 
             {/* Right: Tier Badge + Headphone Support Icon */}
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/10 border border-white/15 text-white text-[10px] font-black shadow-xs">
+            <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-white text-[10px] sm:text-xs font-black shadow-xs">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block" />
                 <span>0 Tier</span>
                 <Lock className="w-2.5 h-2.5 text-amber-300 ml-0.5" />
@@ -210,9 +238,10 @@ export const CateringPage = () => {
               <a
                 href="tel:+919121288450"
                 title="Call Catering Desk"
-                className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-colors cursor-pointer text-[10px] sm:text-xs font-bold"
               >
-                <Headphones className="w-4 h-4 text-amber-300" />
+                <Headphones className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />
+                <span className="hidden sm:inline">Catering Desk</span>
               </a>
             </div>
           </div>
@@ -221,19 +250,19 @@ export const CateringPage = () => {
           {/* HERO SLIDE 1: 3 CATEGORY CARDS (Screenshot 1)           */}
           {/* ======================================================= */}
           {heroSlide === 0 && (
-            <div className="pt-4 pb-2 space-y-3.5 animate-in fade-in duration-300">
+            <div className="pt-4 lg:pt-6 pb-2 space-y-4 lg:space-y-6 animate-in fade-in duration-300">
               {/* Headline */}
-              <div className="text-center space-y-0.5">
-                <h2 className="text-xl sm:text-2xl font-black text-[#F5A623] tracking-tight font-serif">
+              <div className="text-center space-y-0.5 max-w-xl mx-auto">
+                <h2 className="text-xl sm:text-2xl lg:text-4xl font-black text-[#F5A623] tracking-tight font-serif">
                   Hyderabad’s favourite
                 </h2>
                 <div className="relative inline-block">
-                  <p className="text-sm sm:text-base font-extrabold text-white">
+                  <p className="text-sm sm:text-lg lg:text-2xl font-extrabold text-white">
                     bulk food delivery app!
                   </p>
                   {/* Curved yellow underline */}
                   <svg
-                    className="w-36 h-2 text-[#F5A623] mx-auto mt-0.5"
+                    className="w-36 sm:w-48 lg:w-60 h-2 sm:h-3 text-[#F5A623] mx-auto mt-0.5"
                     viewBox="0 0 200 12"
                     fill="none"
                   >
@@ -247,31 +276,34 @@ export const CateringPage = () => {
                 </div>
               </div>
 
-              {/* 3 Cards in a row (Screenshot 1) */}
-              <div className="grid grid-cols-3 gap-2 pt-1">
+              {/* 3 Cards in a row (Screenshot 1) - Generous Desktop Spacing */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-6 pt-1">
                 {packages.map((cat) => (
                   <div
                     key={cat.id}
                     onClick={() => handleOpenEventModal(cat)}
-                    className="group rounded-2xl bg-[#3B040B]/90 hover:bg-[#4D060E] border border-amber-400/25 hover:border-amber-400/60 p-2.5 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-md hover:scale-102"
+                    className="group rounded-2xl lg:rounded-3xl bg-[#3B040B]/90 hover:bg-[#4D060E] border border-amber-400/25 hover:border-amber-400/60 p-2.5 sm:p-4 lg:p-5 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-md hover:shadow-2xl hover:scale-102"
                   >
                     <div className="flex items-start justify-between gap-1">
                       <div>
-                        <h3 className="text-[10px] sm:text-[11px] font-black tracking-wide text-white leading-tight">
+                        <h3 className="text-[10px] sm:text-xs lg:text-base font-black tracking-wide text-white leading-tight">
                           {cat.title}
                         </h3>
-                        <p className="text-[9px] italic font-serif text-amber-200/80 leading-tight">
+                        <p className="text-[9px] sm:text-[11px] lg:text-xs italic font-serif text-amber-200/80 leading-tight mt-0.5">
                           {cat.subtitle}
                         </p>
+                        <span className="hidden sm:inline-block mt-1 px-2 py-0.5 rounded-full bg-white/10 text-[9px] lg:text-[10px] font-bold text-amber-300">
+                          {cat.tag}
+                        </span>
                       </div>
-                      <div className="w-4 h-4 rounded-full bg-white text-[#7D0A14] flex items-center justify-center shrink-0">
-                        <ChevronRight className="w-3 h-3 font-bold" />
+                      <div className="w-4 h-4 sm:w-6 sm:h-6 lg:w-7 lg:h-7 rounded-full bg-white text-[#7D0A14] flex items-center justify-center shrink-0 shadow-xs">
+                        <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 font-bold" />
                       </div>
                     </div>
 
-                    {/* Dish in oval cream background */}
-                    <div className="my-2 flex items-center justify-center">
-                      <div className="w-24 h-16 sm:w-28 sm:h-20 rounded-[50%_/_40%] bg-gradient-to-b from-[#FDFBF7] to-[#F5ECE1] p-1 flex items-center justify-center overflow-hidden border border-amber-200/60 shadow-xs">
+                    {/* Dish in oval cream background (Proportioned for mobile & desktop) */}
+                    <div className="my-2 sm:my-3 lg:my-4 flex items-center justify-center">
+                      <div className="w-24 h-16 sm:w-36 sm:h-24 lg:w-48 lg:h-32 rounded-[50%_/_40%] bg-gradient-to-b from-[#FDFBF7] to-[#F5ECE1] p-1 sm:p-2 flex items-center justify-center overflow-hidden border border-amber-200/60 shadow-inner group-hover:scale-105 transition-transform">
                         <img
                           src={cat.image}
                           alt={cat.title}
@@ -280,31 +312,34 @@ export const CateringPage = () => {
                       </div>
                     </div>
 
-                    <div className="text-[9px] text-amber-300 font-bold text-center">
-                      ₹{cat.price}/head
+                    <div className="pt-1 border-t border-white/10 flex items-center justify-between text-center">
+                      <span className="hidden sm:inline text-[10px] lg:text-xs text-amber-100/70 font-medium">Starts</span>
+                      <span className="text-[9px] sm:text-xs lg:text-sm text-amber-300 font-black w-full sm:w-auto">
+                        ₹{cat.price}/head
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Dots indicator [ —  • ] */}
-              <div className="flex items-center justify-center gap-1.5 pt-2">
+              <div className="flex items-center justify-center gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setHeroSlide(0)}
-                  className="w-6 h-1.5 rounded-full bg-[#F5A623] cursor-pointer"
+                  className="w-7 h-1.5 rounded-full bg-[#F5A623] cursor-pointer"
                 />
                 <button
                   type="button"
                   onClick={() => setHeroSlide(1)}
-                  className="w-1.5 h-1.5 rounded-full bg-white/40 cursor-pointer"
+                  className="w-2 h-2 rounded-full bg-white/40 hover:bg-white/70 cursor-pointer transition-colors"
                 />
               </div>
 
               {/* Bottom Strip: "Min. 10 guests | Live in Hyderabad" */}
               <div className="text-center pt-0.5">
-                <span className="text-[11px] font-bold text-amber-200/90 tracking-wide">
-                  Min. 10 guests <span className="text-white/40 mx-1.5">|</span> Live in Hyderabad
+                <span className="text-[11px] sm:text-xs lg:text-sm font-bold text-amber-200/90 tracking-wide px-4 py-1 rounded-full bg-black/30 border border-white/10 inline-block">
+                  Min. 10 guests <span className="text-white/40 mx-2">|</span> Live in Hyderabad
                 </span>
               </div>
             </div>
@@ -314,38 +349,37 @@ export const CateringPage = () => {
           {/* HERO SLIDE 2: ORDER ITEMS BY KG (Screenshot 2)          */}
           {/* ======================================================= */}
           {heroSlide === 1 && (
-            <div className="pt-3 pb-2 space-y-3 animate-in fade-in duration-300">
-              <div className="flex items-center justify-between gap-3">
+            <div className="pt-4 lg:pt-6 pb-2 space-y-4 animate-in fade-in duration-300">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 lg:gap-8 max-w-4xl mx-auto">
                 {/* Left Text */}
-                <div className="space-y-1.5 max-w-[55%]">
-                  <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[9px] font-black uppercase tracking-wider border border-amber-400/30">
-                    NEW
+                <div className="space-y-2 lg:space-y-3 sm:max-w-[55%] text-center sm:text-left">
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 text-[9.5px] lg:text-[11px] font-black uppercase tracking-wider border border-amber-400/30 inline-block">
+                    NEW FEATURE
                   </span>
-                  <h2 className="text-xl sm:text-2xl font-black text-white font-serif leading-tight">
-                    Order <br />
-                    <span className="text-[#F5A623]">Items by Kg</span>
+                  <h2 className="text-xl sm:text-3xl lg:text-4xl font-black text-white font-serif leading-tight">
+                    Order <span className="text-[#F5A623]">Items by Kg</span>
                   </h2>
-                  <p className="text-[11px] text-amber-100/90 font-medium leading-snug">
-                    Pick individual items, in the quantity you need
+                  <p className="text-[11px] sm:text-xs lg:text-sm text-amber-100/90 font-medium leading-relaxed">
+                    Pick individual bulk items, authentic curries, pulavs & sweets in the exact kg quantity you need for your celebration.
                   </p>
                   <button
                     type="button"
                     onClick={() => handleOpenEventModal(packages[0])}
-                    className="mt-2 px-3 py-1.5 rounded-full bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] text-[11px] font-black shadow-md flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
+                    className="mt-2 px-4 py-2 sm:px-6 sm:py-2.5 rounded-full bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A] text-xs sm:text-sm font-black shadow-lg inline-flex items-center gap-1.5 cursor-pointer transition-transform active:scale-95"
                   >
                     <span>Explore Item by Kg</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
 
                 {/* Right Biryani Handi with "2 kg Biryani" floating badge (Screenshot 2) */}
-                <div className="relative flex items-center justify-center">
-                  <div className="absolute -top-1.5 right-1 px-2 py-0.5 bg-white text-[#7D0A14] text-[9.5px] font-black rounded-lg shadow-md border border-amber-200 z-10">
+                <div className="relative flex items-center justify-center shrink-0">
+                  <div className="absolute -top-2 right-2 px-3 py-1 bg-white text-[#7D0A14] text-[10px] sm:text-xs font-black rounded-xl shadow-lg border border-amber-200 z-10">
                     2 kg Biryani
                   </div>
-                  <div className="w-32 h-28 sm:w-36 sm:h-32 rounded-full overflow-hidden border-2 border-amber-300/60 shadow-lg">
+                  <div className="w-36 h-32 sm:w-52 sm:h-44 lg:w-64 lg:h-56 rounded-full overflow-hidden border-4 border-amber-300/60 shadow-2xl">
                     <img
-                      src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=400&q=80"
+                      src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=500&q=80"
                       alt="Biryani by Kg"
                       className="w-full h-full object-cover"
                     />
@@ -354,23 +388,23 @@ export const CateringPage = () => {
               </div>
 
               {/* Dots indicator [ •  — ] */}
-              <div className="flex items-center justify-center gap-1.5 pt-2">
+              <div className="flex items-center justify-center gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setHeroSlide(0)}
-                  className="w-1.5 h-1.5 rounded-full bg-white/40 cursor-pointer"
+                  className="w-2 h-2 rounded-full bg-white/40 hover:bg-white/70 cursor-pointer transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setHeroSlide(1)}
-                  className="w-6 h-1.5 rounded-full bg-[#F5A623] cursor-pointer"
+                  className="w-7 h-1.5 rounded-full bg-[#F5A623] cursor-pointer"
                 />
               </div>
 
               {/* Bottom Strip: "Min. 5 guests | Live in Hyderabad" */}
               <div className="text-center pt-0.5">
-                <span className="text-[11px] font-bold text-amber-200/90 tracking-wide">
-                  Min. 5 guests <span className="text-white/40 mx-1.5">|</span> Live in Hyderabad
+                <span className="text-[11px] sm:text-xs lg:text-sm font-bold text-amber-200/90 tracking-wide px-4 py-1 rounded-full bg-black/30 border border-white/10 inline-block">
+                  Min. 5 guests <span className="text-white/40 mx-2">|</span> Live in Hyderabad
                 </span>
               </div>
             </div>
@@ -380,112 +414,144 @@ export const CateringPage = () => {
         {/* ========================================================= */}
         {/* 2. "START HERE" SEPARATOR & BROWSE ALL MENUS (Screenshot 1&2)*/}
         {/* ========================================================= */}
-        <div className="p-4 sm:p-5 space-y-3 bg-[#FAF5EC]/40">
-          <div className="relative flex items-center justify-center">
+        <div className="p-4 sm:p-6 lg:p-8 space-y-4 bg-[#FAF5EC]/40">
+          <div className="relative flex items-center justify-center max-w-xl mx-auto">
             <div className="border-t border-[#E8DDCF] w-full" />
-            <div className="absolute bg-[#FDFBF7] px-3 text-[11px] font-black text-slate-700 flex items-center gap-1.5">
-              <span className="w-1 h-1 rounded-full bg-rose-400" />
+            <div className="absolute bg-[#FDFBF7] px-4 text-[11px] sm:text-xs font-black text-slate-700 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
               <span>Start here</span>
-              <span className="w-1 h-1 rounded-full bg-rose-400" />
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-400" />
             </div>
           </div>
 
           {/* Browse all menus Button (Screenshot 1 & 2) */}
-          <button
-            type="button"
-            onClick={() => handleOpenEventModal()}
-            className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-white via-[#FAF5EC] to-white hover:from-white hover:to-white border border-rose-200/80 hover:border-[#7D0A14] text-[#7D0A14] font-black text-xs sm:text-sm shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer group active:scale-98"
-          >
-            <span>Browse all menus</span>
-            <div className="w-5 h-5 rounded-full bg-[#7D0A14] text-white flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
-              <ArrowRight className="w-3 h-3" />
-            </div>
-          </button>
-        </div>
-
-        {/* ========================================================= */}
-        {/* 3. SOCIAL PROOF & STATS BANNER (Screenshot 1 & 2)         */}
-        {/* ========================================================= */}
-        <div className="px-4 py-5 sm:p-6 bg-white border-t border-[#EDE1D1] text-center space-y-4">
-          {/* Golden Laurel Wreath with 2,70,000 Guests Served */}
-          <div className="flex flex-col items-center justify-center">
-            <div className="flex items-center justify-center gap-2">
-              <svg className="w-6 h-8 text-amber-500" viewBox="0 0 36 48" fill="currentColor">
-                <path d="M18 4C14 10 8 16 3 20C10 21 16 19 18 16C15 22 10 27 3 31C10 31 16 29 18 26C15 32 10 38 4 41C12 40 18 36 20 32C19 37 15 43 10 46C18 45 23 39 25 34C24 40 21 45 17 48C25 46 29 39 31 32C30 38 28 43 24 47C32 43 35 34 36 26C32 28 28 29 25 28C29 22 31 14 30 7C26 12 21 15 18 16C21 10 22 4 20 0C17 5 15 10 13 15C15 9 15 4 13 0C11 5 9 10 8 15C11 10 12 5 11 1C8 6 6 12 6 18C10 16 14 13 18 4Z" />
-              </svg>
-
-              <div className="text-2xl sm:text-3xl font-black text-[#A66F17] font-serif tracking-tight">
-                2,70,000
-              </div>
-
-              <svg className="w-6 h-8 text-amber-500 -scale-x-100" viewBox="0 0 36 48" fill="currentColor">
-                <path d="M18 4C14 10 8 16 3 20C10 21 16 19 18 16C15 22 10 27 3 31C10 31 16 29 18 26C15 32 10 38 4 41C12 40 18 36 20 32C19 37 15 43 10 46C18 45 23 39 25 34C24 40 21 45 17 48C25 46 29 39 31 32C30 38 28 43 24 47C32 43 35 34 36 26C32 28 28 29 25 28C29 22 31 14 30 7C26 12 21 15 18 16C21 10 22 4 20 0C17 5 15 10 13 15C15 9 15 4 13 0C11 5 9 10 8 15C11 10 12 5 11 1C8 6 6 12 6 18C10 16 14 13 18 4Z" />
-              </svg>
-            </div>
-            <div className="text-[11px] font-bold text-slate-500 mt-0.5">
-              Guests served in Hyderabad
-            </div>
-          </div>
-
-          {/* 3 Metric Columns: 7000+ | 4.3 | 85% (Screenshot 1 & 2) */}
-          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100">
-            <div>
-              <div className="text-base sm:text-lg font-black text-[#3D040A]">7000+</div>
-              <div className="text-[10px] text-slate-500 font-semibold">Events catered</div>
-            </div>
-            <div className="border-x border-slate-100 px-1">
-              <div className="text-base sm:text-lg font-black text-[#7D0A14] flex items-center justify-center gap-0.5">
-                <span>4.3</span>
-              </div>
-              <div className="text-[10px] text-slate-500 font-semibold">Rated</div>
-            </div>
-            <div>
-              <div className="text-base sm:text-lg font-black text-emerald-700">85%</div>
-              <div className="text-[10px] text-slate-500 font-semibold">Satisfied customers</div>
-            </div>
-          </div>
-
-          {/* 3 Trust Pills in a row with purple/maroon arrow button (Screenshot 1 & 2) */}
-          <div className="flex items-center justify-between gap-1.5 pt-2">
-            <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
-              100% hygiene
-            </span>
-            <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
-              Quality Checked
-            </span>
-            <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold">
-              Quantity Assured
-            </span>
+          <div className="max-w-md lg:max-w-lg mx-auto">
             <button
               type="button"
               onClick={() => handleOpenEventModal()}
-              className="w-6 h-6 rounded-full bg-[#7D0A14] text-white flex items-center justify-center shrink-0 cursor-pointer"
+              className="w-full py-3.5 sm:py-4 px-6 rounded-2xl bg-gradient-to-r from-white via-[#FAF5EC] to-white hover:from-white hover:to-white border-2 border-rose-200/80 hover:border-[#7D0A14] text-[#7D0A14] font-black text-xs sm:text-sm lg:text-base shadow-sm hover:shadow-lg transition-all flex items-center justify-center gap-2.5 cursor-pointer group active:scale-98"
             >
-              <ChevronRight className="w-3.5 h-3.5 font-bold" />
+              <span>Browse all menus</span>
+              <div className="w-6 h-6 rounded-full bg-[#7D0A14] text-white flex items-center justify-center group-hover:translate-x-1 transition-transform shadow-xs">
+                <ArrowRight className="w-3.5 h-3.5" />
+              </div>
             </button>
           </div>
         </div>
 
         {/* ========================================================= */}
-        {/* 4. CUSTOMER REVIEWS (Screenshot 1 & 2)                    */}
+        {/* 3. SOCIAL PROOF & STATS BANNER (Screenshot 1 & 2)         */}
         {/* ========================================================= */}
-        <div className="p-4 sm:p-5 bg-[#FAF5EC]/30 border-t border-[#EDE1D1] space-y-3">
-          <div className="text-2xl font-serif text-[#7D0A14]/30 leading-none">“</div>
-          <div className="space-y-2">
-            <div className="bg-white p-3.5 rounded-2xl border border-[#EDE1D1] shadow-2xs space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-[#7D0A14] text-amber-200 text-xs font-black flex items-center justify-center">
-                  M
+        <div className="px-4 py-6 sm:p-8 bg-white border-t border-[#EDE1D1] text-center space-y-5">
+          {/* Golden Laurel Wreath with 2,70,000 Guests Served */}
+          <div className="flex flex-col items-center justify-center">
+            <div className="flex items-center justify-center gap-2.5">
+              <svg className="w-7 h-9 sm:w-9 sm:h-11 text-amber-500" viewBox="0 0 36 48" fill="currentColor">
+                <path d="M18 4C14 10 8 16 3 20C10 21 16 19 18 16C15 22 10 27 3 31C10 31 16 29 18 26C15 32 10 38 4 41C12 40 18 36 20 32C19 37 15 43 10 46C18 45 23 39 25 34C24 40 21 45 17 48C25 46 29 39 31 32C30 38 28 43 24 47C32 43 35 34 36 26C32 28 28 29 25 28C29 22 31 14 30 7C26 12 21 15 18 16C21 10 22 4 20 0C17 5 15 10 13 15C15 9 15 4 13 0C11 5 9 10 8 15C11 10 12 5 11 1C8 6 6 12 6 18C10 16 14 13 18 4Z" />
+              </svg>
+
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-black text-[#A66F17] font-serif tracking-tight">
+                2,70,000
+              </div>
+
+              <svg className="w-7 h-9 sm:w-9 sm:h-11 text-amber-500 -scale-x-100" viewBox="0 0 36 48" fill="currentColor">
+                <path d="M18 4C14 10 8 16 3 20C10 21 16 19 18 16C15 22 10 27 3 31C10 31 16 29 18 26C15 32 10 38 4 41C12 40 18 36 20 32C19 37 15 43 10 46C18 45 23 39 25 34C24 40 21 45 17 48C25 46 29 39 31 32C30 38 28 43 24 47C32 43 35 34 36 26C32 28 28 29 25 28C29 22 31 14 30 7C26 12 21 15 18 16C21 10 22 4 20 0C17 5 15 10 13 15C15 9 15 4 13 0C11 5 9 10 8 15C11 10 12 5 11 1C8 6 6 12 6 18C10 16 14 13 18 4Z" />
+              </svg>
+            </div>
+            <div className="text-xs sm:text-sm font-bold text-slate-500 mt-1 uppercase tracking-wider">
+              Guests served in Hyderabad
+            </div>
+          </div>
+
+          {/* 3 Metric Columns: 7000+ | 4.3 | 85% (Screenshot 1 & 2) */}
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-3 border-t border-slate-100 max-w-xl mx-auto">
+            <div>
+              <div className="text-lg sm:text-2xl lg:text-3xl font-black text-[#3D040A]">7000+</div>
+              <div className="text-[11px] sm:text-xs text-slate-500 font-semibold mt-0.5">Events catered</div>
+            </div>
+            <div className="border-x border-slate-100 px-2">
+              <div className="text-lg sm:text-2xl lg:text-3xl font-black text-[#7D0A14] flex items-center justify-center gap-1">
+                <span>4.3</span>
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400 inline" />
+              </div>
+              <div className="text-[11px] sm:text-xs text-slate-500 font-semibold mt-0.5">Rated on Google</div>
+            </div>
+            <div>
+              <div className="text-lg sm:text-2xl lg:text-3xl font-black text-emerald-700">85%</div>
+              <div className="text-[11px] sm:text-xs text-slate-500 font-semibold mt-0.5">Satisfied customers</div>
+            </div>
+          </div>
+
+          {/* 3 Trust Pills in a row with purple/maroon arrow button (Screenshot 1 & 2) */}
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-2 max-w-md mx-auto">
+            <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
+              100% hygiene
+            </span>
+            <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
+              Quality Checked
+            </span>
+            <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200">
+              Quantity Assured
+            </span>
+            <button
+              type="button"
+              onClick={() => handleOpenEventModal()}
+              className="w-7 h-7 rounded-full bg-[#7D0A14] text-white flex items-center justify-center shrink-0 cursor-pointer hover:bg-[#60060E] transition-colors"
+            >
+              <ChevronRight className="w-4 h-4 font-bold" />
+            </button>
+          </div>
+        </div>
+
+        {/* ========================================================= */}
+        {/* 4. CUSTOMER REVIEWS: 3-COLUMN GRID ON DESKTOP             */}
+        {/* ========================================================= */}
+        <div className="p-4 sm:p-6 lg:p-8 bg-[#FAF5EC]/30 border-t border-[#EDE1D1] space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-3xl font-serif text-[#7D0A14]/30 leading-none">“</span>
+              <h3 className="text-sm sm:text-base lg:text-lg font-black text-slate-900">
+                Hear what our customers are saying
+              </h3>
+            </div>
+            <span className="text-[11px] font-bold text-[#7D0A14] hidden sm:inline">
+              Verified Hyderabad Hosts
+            </span>
+          </div>
+
+          {/* Multi-column grid on desktop! */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
+            {customerReviews.map((rev) => (
+              <div
+                key={rev.id}
+                className="bg-white p-4 rounded-2xl border border-[#EDE1D1] shadow-2xs space-y-2.5 flex flex-col justify-between"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-[#7D0A14] text-amber-200 text-xs font-black flex items-center justify-center">
+                        {rev.initial}
+                      </div>
+                      <div>
+                        <div className="text-xs font-black text-slate-800">{rev.name}</div>
+                        <div className="text-[10px] text-slate-400">{rev.location}</div>
+                      </div>
+                    </div>
+                    <div className="flex text-amber-400">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-amber-400" />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-600 leading-relaxed italic">
+                    "{rev.text}"
+                  </p>
                 </div>
-                <div>
-                  <div className="text-xs font-black text-slate-800">Madhu</div>
-                  <div className="text-[10px] text-slate-400">Hyderabad Host</div>
+                <div className="pt-2 border-t border-slate-100 text-[10px] font-bold text-amber-800">
+                  {rev.badge}
                 </div>
               </div>
-              <p className="text-[11px] text-slate-600 leading-relaxed italic">
-                "The Biryani by kg and party boxes were freshly delivered for our 20-member family gathering. Packaging and pure ghee taste were outstanding!"
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </div>
@@ -494,9 +560,9 @@ export const CateringPage = () => {
       {/* 5. FLOATING CART BAR (Screenshot 1 & 2)                     */}
       {/* =========================================================== */}
       <div className="fixed bottom-3 left-0 right-0 z-40 px-3">
-        <div className="max-w-md sm:max-w-lg md:max-w-xl mx-auto bg-white/95 backdrop-blur-md rounded-2xl p-2.5 border border-slate-200 shadow-xl flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl overflow-hidden border border-slate-200 shrink-0">
+        <div className="max-w-md sm:max-w-2xl lg:max-w-4xl mx-auto bg-white/95 backdrop-blur-md rounded-2xl p-2.5 sm:p-3 border border-slate-200 shadow-2xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-200 shrink-0">
               <img
                 src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=150&q=80"
                 alt="Platter"
@@ -504,10 +570,10 @@ export const CateringPage = () => {
               />
             </div>
             <div>
-              <div className="text-xs font-black text-slate-800">
+              <div className="text-xs sm:text-sm font-black text-slate-800">
                 {totalCartCount > 0 ? `${totalCartCount} Items in cart` : '1 Platter'}
               </div>
-              <div className="text-[10px] text-slate-500 font-semibold">
+              <div className="text-[10px] sm:text-xs text-slate-500 font-semibold">
                 {totalCartCount > 0 ? 'Review & Checkout' : 'In cart'}
               </div>
             </div>
@@ -516,10 +582,10 @@ export const CateringPage = () => {
           <button
             type="button"
             onClick={() => navigateTo('cart')}
-            className="px-4 py-2 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black flex items-center gap-1 shadow-md transition-colors cursor-pointer active:scale-95"
+            className="px-5 py-2.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs sm:text-sm font-black flex items-center gap-1.5 shadow-md transition-colors cursor-pointer active:scale-95"
           >
             <span>Go to cart</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -529,16 +595,16 @@ export const CateringPage = () => {
       {/* =========================================================== */}
       {isEventModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-5 space-y-4 shadow-2xl border border-slate-200 relative animate-in slide-in-from-bottom duration-250">
+          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md sm:max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl border border-slate-200 relative animate-in slide-in-from-bottom duration-250">
             {/* Modal Close Button */}
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
               <h3 className="text-sm sm:text-base font-black text-slate-900">
                 Tell us about your event
               </h3>
               <button
                 type="button"
                 onClick={() => setIsEventModalOpen(false)}
-                className="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -551,22 +617,22 @@ export const CateringPage = () => {
                   <label className="text-[11px] font-black uppercase text-slate-500 tracking-wider block mb-2">
                     Select Meal Time
                   </label>
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-4 gap-2 sm:gap-3">
                     {mealTimes.map((m) => (
                       <button
                         key={m.id}
                         type="button"
                         onClick={() => setSelectedMealTime(m.id)}
-                        className={`p-2 rounded-2xl flex flex-col items-center justify-center gap-1 border transition-all cursor-pointer ${
+                        className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 border transition-all cursor-pointer ${
                           selectedMealTime === m.id
                             ? 'bg-amber-50 border-[#7D0A14] text-[#7D0A14] shadow-xs scale-102 font-black'
                             : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 font-bold'
                         }`}
                       >
-                        <div className="w-10 h-10 rounded-xl overflow-hidden border border-slate-100 flex items-center justify-center text-lg">
+                        <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-100 flex items-center justify-center text-xl">
                           {m.icon}
                         </div>
-                        <span className="text-[10px] leading-tight">{m.label}</span>
+                        <span className="text-[11px] font-bold leading-tight">{m.label}</span>
                       </button>
                     ))}
                   </div>
@@ -581,7 +647,7 @@ export const CateringPage = () => {
                     <button
                       type="button"
                       onClick={() => setSelectedPreference('Veg')}
-                      className={`flex-1 py-2 px-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                      className={`flex-1 py-2.5 px-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition-all ${
                         selectedPreference === 'Veg'
                           ? 'bg-emerald-50 border-emerald-600 text-emerald-900 font-black ring-1 ring-emerald-500'
                           : 'bg-white border-slate-200 text-slate-600 font-bold'
@@ -590,13 +656,13 @@ export const CateringPage = () => {
                       <span className="w-3.5 h-3.5 rounded-sm border border-emerald-600 flex items-center justify-center">
                         <span className="w-2 h-2 rounded-full bg-emerald-600" />
                       </span>
-                      <span className="text-xs">Veg</span>
+                      <span className="text-xs sm:text-sm">Veg</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setSelectedPreference('Non-Veg')}
-                      className={`flex-1 py-2 px-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                      className={`flex-1 py-2.5 px-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition-all ${
                         selectedPreference === 'Non-Veg'
                           ? 'bg-rose-50 border-rose-600 text-rose-900 font-black ring-1 ring-rose-500'
                           : 'bg-white border-slate-200 text-slate-600 font-bold'
@@ -605,7 +671,7 @@ export const CateringPage = () => {
                       <span className="w-3.5 h-3.5 rounded-sm border border-rose-600 flex items-center justify-center">
                         <span className="w-2 h-2 rounded-full bg-rose-600" />
                       </span>
-                      <span className="text-xs">Non-Veg</span>
+                      <span className="text-xs sm:text-sm">Non-Veg</span>
                     </button>
                   </div>
                 </div>
@@ -615,7 +681,7 @@ export const CateringPage = () => {
                   <button
                     type="button"
                     onClick={() => setEventStep(2)}
-                    className="w-full py-3 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs font-black shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+                    className="w-full py-3.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs sm:text-sm font-black shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
                   >
                     <span>Next</span>
                     <ArrowRight className="w-4 h-4" />
@@ -625,12 +691,12 @@ export const CateringPage = () => {
             )}
 
             {eventStep === 2 && (
-              <div className="space-y-3.5 animate-in fade-in duration-200">
+              <div className="space-y-4 animate-in fade-in duration-200">
                 {/* Guest Count Slider */}
                 <div>
-                  <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1">
+                  <div className="flex justify-between items-center text-xs sm:text-sm font-bold text-slate-700 mb-1">
                     <span>Number of Guests:</span>
-                    <span className="text-[#7D0A14] font-black text-sm">{guestCount} Guests</span>
+                    <span className="text-[#7D0A14] font-black text-sm sm:text-base">{guestCount} Guests</span>
                   </div>
                   <input
                     type="range"
@@ -641,7 +707,7 @@ export const CateringPage = () => {
                     onChange={(e) => setGuestCount(Number(e.target.value))}
                     className="w-full accent-[#7D0A14] cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] text-slate-400 font-medium">
+                  <div className="flex justify-between text-[10px] sm:text-xs text-slate-400 font-medium">
                     <span>10 Min</span>
                     <span>100</span>
                     <span>250</span>
@@ -651,31 +717,31 @@ export const CateringPage = () => {
 
                 {/* Target Date */}
                 <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                  <label className="text-[11px] sm:text-xs font-bold text-slate-700 block mb-1">
                     Target Event Date:
                   </label>
                   <input
                     type="date"
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-800 bg-[#FAF5EC] focus:outline-none focus:ring-1 focus:ring-[#7D0A14]"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 bg-[#FAF5EC] focus:outline-none focus:ring-1 focus:ring-[#7D0A14]"
                   />
                 </div>
 
                 {/* Summary Quote Box */}
-                <div className="p-3 bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1] flex items-center justify-between text-xs">
+                <div className="p-3.5 bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1] flex items-center justify-between text-xs sm:text-sm">
                   <div>
-                    <div className="text-[10px] uppercase font-bold text-slate-500">
+                    <div className="text-[10px] sm:text-[11px] uppercase font-bold text-slate-500">
                       Estimated Cost ({selectedMealTime} • {selectedPreference})
                     </div>
-                    <div className="text-lg font-black text-[#7D0A14]">
+                    <div className="text-lg sm:text-xl font-black text-[#7D0A14]">
                       ₹{((selectedPackage?.price || 249) * guestCount).toLocaleString('en-IN')}
                     </div>
-                    <div className="text-[10px] text-slate-500">
+                    <div className="text-[10px] sm:text-xs text-slate-500">
                       ₹{selectedPackage?.price || 249} / guest × {guestCount} guests
                     </div>
                   </div>
-                  <ShieldCheck className="w-6 h-6 text-emerald-600" />
+                  <ShieldCheck className="w-7 h-7 text-emerald-600" />
                 </div>
 
                 {/* Actions */}
@@ -683,10 +749,10 @@ export const CateringPage = () => {
                   <button
                     type="button"
                     onClick={handleWhatsAppInquiry}
-                    className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>Confirm & Book on WhatsApp</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
