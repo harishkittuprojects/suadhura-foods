@@ -587,94 +587,119 @@ export const CateringPage = () => {
       {/* 6. "TELL US ABOUT YOUR EVENT" MODAL (Screenshot 3!)         */}
       {/* =========================================================== */}
       {isEventModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs animate-in fade-in duration-200 p-0 sm:p-4">
-          <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-md sm:max-w-lg w-full p-5 sm:p-7 space-y-4 shadow-2xl border border-slate-200 relative animate-in slide-in-from-bottom duration-250">
-            {/* Modal Close Button */}
+        <div
+          className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-xs animate-in fade-in duration-200 p-0 sm:p-4"
+          onClick={() => setIsEventModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-t-[32px] sm:rounded-3xl max-w-md sm:max-w-lg w-full px-5 pt-3 pb-8 sm:p-7 space-y-4 shadow-2xl border border-slate-200 relative animate-in slide-in-from-bottom duration-250 max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Mobile Sheet Drag Handle Pill */}
+            <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto sm:hidden my-1" />
+
+            {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base sm:text-lg font-black text-slate-900">
-                Tell us about your event
-              </h3>
+              <div>
+                <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                  Tell us about your event
+                </h3>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  Step {eventStep} of 2 • Custom catering quote in 10 seconds
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsEventModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center cursor-pointer transition-colors active:scale-95"
+                title="Close modal"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
+            {/* ======================================================= */}
+            {/* STEP 1: MEAL TIME & PREFERENCE (Matches Screenshot 3)   */}
+            {/* ======================================================= */}
             {eventStep === 1 && (
-              <div className="space-y-4">
-                {/* Step 1: Select Meal Time (Screenshot 3) */}
+              <div className="space-y-5 pt-1">
+                {/* Select Meal Time */}
                 <div>
-                  <label className="text-xs font-black uppercase text-slate-500 tracking-wider block mb-2">
+                  <label className="text-xs font-black uppercase text-slate-500 tracking-wider block mb-2.5">
                     Select Meal Time
                   </label>
-                  <div className="grid grid-cols-4 gap-2.5">
-                    {mealTimes.map((m) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        onClick={() => setSelectedMealTime(m.id)}
-                        className={`p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1 border transition-all cursor-pointer ${
-                          selectedMealTime === m.id
-                            ? 'bg-amber-50 border-[#7D0A14] text-[#7D0A14] shadow-xs scale-102 font-black'
-                            : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 font-bold'
-                        }`}
-                      >
-                        <div className="w-11 h-11 rounded-xl overflow-hidden border border-slate-100 flex items-center justify-center text-xl">
-                          {m.icon}
-                        </div>
-                        <span className="text-[11px] font-bold leading-tight">{m.label}</span>
-                      </button>
-                    ))}
+                  <div className="grid grid-cols-4 gap-2 sm:gap-3">
+                    {mealTimes.map((m) => {
+                      const isSelected = selectedMealTime === m.id;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setSelectedMealTime(m.id)}
+                          className={`p-2 sm:p-2.5 rounded-2xl flex flex-col items-center justify-center gap-1.5 border transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#FFF9F2] border-[#7D0A14] text-[#7D0A14] shadow-sm ring-1.5 ring-[#7D0A14] scale-[1.02]'
+                              : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <div className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-2xl transition-transform ${
+                            isSelected ? 'scale-110 bg-white shadow-2xs' : 'bg-slate-50'
+                          }`}>
+                            {m.icon}
+                          </div>
+                          <span className={`text-[11px] sm:text-xs font-bold leading-tight ${isSelected ? 'text-[#7D0A14]' : 'text-slate-700'}`}>
+                            {m.label}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Step 2: Preference (Veg / Non-Veg) (Screenshot 3) */}
+                {/* Preference: Veg / Non-Veg */}
                 <div>
-                  <label className="text-xs font-black uppercase text-slate-500 tracking-wider block mb-2">
+                  <label className="text-xs font-black uppercase text-slate-500 tracking-wider block mb-2.5">
                     Preference
                   </label>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
                       onClick={() => setSelectedPreference('Veg')}
-                      className={`flex-1 py-2.5 px-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                      className={`flex-1 py-3 px-4 rounded-xl border flex items-center justify-center gap-2.5 cursor-pointer transition-all ${
                         selectedPreference === 'Veg'
-                          ? 'bg-emerald-50 border-emerald-600 text-emerald-900 font-black ring-1 ring-emerald-500'
-                          : 'bg-white border-slate-200 text-slate-600 font-bold'
+                          ? 'bg-emerald-50 border-emerald-600 text-emerald-950 font-black ring-1.5 ring-emerald-500 shadow-2xs'
+                          : 'bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50'
                       }`}
                     >
-                      <span className="w-3.5 h-3.5 rounded-sm border border-emerald-600 flex items-center justify-center">
+                      <span className="w-4 h-4 rounded-xs border-2 border-emerald-600 flex items-center justify-center shrink-0">
                         <span className="w-2 h-2 rounded-full bg-emerald-600" />
                       </span>
-                      <span className="text-xs sm:text-sm font-bold">Veg</span>
+                      <span className="text-xs sm:text-sm font-black">Veg</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setSelectedPreference('Non-Veg')}
-                      className={`flex-1 py-2.5 px-3 rounded-xl border flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                      className={`flex-1 py-3 px-4 rounded-xl border flex items-center justify-center gap-2.5 cursor-pointer transition-all ${
                         selectedPreference === 'Non-Veg'
-                          ? 'bg-rose-50 border-rose-600 text-rose-900 font-black ring-1 ring-rose-500'
-                          : 'bg-white border-slate-200 text-slate-600 font-bold'
+                          ? 'bg-rose-50 border-rose-600 text-rose-950 font-black ring-1.5 ring-rose-500 shadow-2xs'
+                          : 'bg-white border-slate-200 text-slate-600 font-bold hover:bg-slate-50'
                       }`}
                     >
-                      <span className="w-3.5 h-3.5 rounded-sm border border-rose-600 flex items-center justify-center">
+                      <span className="w-4 h-4 rounded-xs border-2 border-rose-600 flex items-center justify-center shrink-0">
                         <span className="w-2 h-2 rounded-full bg-rose-600" />
                       </span>
-                      <span className="text-xs sm:text-sm font-bold">Non-Veg</span>
+                      <span className="text-xs sm:text-sm font-black">Non-Veg</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Next Button (Screenshot 3) */}
+                {/* Big Prominent Next Button */}
                 <div className="pt-2">
                   <button
                     type="button"
                     onClick={() => setEventStep(2)}
-                    className="w-full py-3.5 rounded-xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-xs sm:text-sm font-black shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+                    className="w-full py-3.5 sm:py-4 rounded-2xl bg-[#7D0A14] hover:bg-[#60060E] text-white text-sm sm:text-base font-black shadow-lg shadow-red-950/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
                   >
                     <span>Next</span>
                     <ArrowRight className="w-4 h-4" />
@@ -683,14 +708,35 @@ export const CateringPage = () => {
               </div>
             )}
 
+            {/* ======================================================= */}
+            {/* STEP 2: GUEST COUNT & WHATSAPP CONFIRMATION             */}
+            {/* ======================================================= */}
             {eventStep === 2 && (
-              <div className="space-y-4 animate-in fade-in duration-200">
-                {/* Guest Count Slider */}
-                <div>
-                  <div className="flex justify-between items-center text-xs sm:text-sm font-bold text-slate-700 mb-1">
+              <div className="space-y-4 animate-in fade-in duration-200 pt-1">
+                {/* Selected Package Badge & Quick Back */}
+                <div className="flex items-center justify-between pb-1">
+                  <button
+                    type="button"
+                    onClick={() => setEventStep(1)}
+                    className="flex items-center gap-1 text-xs font-bold text-[#7D0A14] hover:underline cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Back to Meal Time</span>
+                  </button>
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-[11px] font-black text-amber-800">
+                    {selectedMealTime} • {selectedPreference}
+                  </span>
+                </div>
+
+                {/* Guest Count Slider & Quick Presets */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-xs sm:text-sm font-bold text-slate-700">
                     <span>Number of Guests:</span>
-                    <span className="text-[#7D0A14] font-black text-sm sm:text-base">{guestCount} Guests</span>
+                    <span className="text-[#7D0A14] font-black text-sm sm:text-base bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
+                      {guestCount} Guests
+                    </span>
                   </div>
+
                   <input
                     type="range"
                     min="10"
@@ -700,11 +746,23 @@ export const CateringPage = () => {
                     onChange={(e) => setGuestCount(Number(e.target.value))}
                     className="w-full accent-[#7D0A14] cursor-pointer"
                   />
-                  <div className="flex justify-between text-[10px] sm:text-xs text-slate-400 font-medium">
-                    <span>10 Min</span>
-                    <span>100</span>
-                    <span>250</span>
-                    <span>500+</span>
+
+                  {/* Quick Preset Buttons */}
+                  <div className="flex items-center justify-between gap-1.5 pt-1">
+                    {[15, 25, 50, 100, 250].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setGuestCount(preset)}
+                        className={`flex-1 py-1 text-[10px] sm:text-xs font-bold rounded-lg border transition-all cursor-pointer ${
+                          guestCount === preset
+                            ? 'bg-[#7D0A14] text-white border-[#7D0A14]'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -717,12 +775,12 @@ export const CateringPage = () => {
                     type="date"
                     value={eventDate}
                     onChange={(e) => setEventDate(e.target.value)}
-                    className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 bg-[#FAF5EC] focus:outline-none focus:ring-1 focus:ring-[#7D0A14]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm font-semibold text-slate-800 bg-[#FAF5EC] focus:outline-none focus:ring-1 focus:ring-[#7D0A14]"
                   />
                 </div>
 
                 {/* Summary Quote Box */}
-                <div className="p-4 bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1] flex items-center justify-between text-xs sm:text-sm">
+                <div className="p-3.5 sm:p-4 bg-[#FAF5EC] rounded-2xl border border-[#EDE1D1] flex items-center justify-between text-xs sm:text-sm">
                   <div>
                     <div className="text-[10px] sm:text-[11px] uppercase font-bold text-slate-500">
                       Estimated Cost ({selectedMealTime} • {selectedPreference})
@@ -734,7 +792,7 @@ export const CateringPage = () => {
                       ₹{selectedPackage?.price || 249} / guest × {guestCount} guests
                     </div>
                   </div>
-                  <ShieldCheck className="w-8 h-8 text-emerald-600" />
+                  <ShieldCheck className="w-8 h-8 text-emerald-600 shrink-0" />
                 </div>
 
                 {/* Actions */}
@@ -742,7 +800,7 @@ export const CateringPage = () => {
                   <button
                     type="button"
                     onClick={handleWhatsAppInquiry}
-                    className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-black shadow-md transition-colors flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
                   >
                     <span>Confirm & Book on WhatsApp</span>
                     <ArrowRight className="w-4 h-4" />
@@ -750,9 +808,9 @@ export const CateringPage = () => {
                   <button
                     type="button"
                     onClick={() => setEventStep(1)}
-                    className="w-full py-2 text-slate-500 hover:text-slate-800 text-xs font-bold transition-colors cursor-pointer"
+                    className="w-full py-2 text-slate-500 hover:text-slate-800 text-xs font-bold transition-colors cursor-pointer text-center"
                   >
-                    ← Back to Meal Time
+                    ← Edit Meal Time & Preference
                   </button>
                 </div>
               </div>
