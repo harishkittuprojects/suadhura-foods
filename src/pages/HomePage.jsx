@@ -37,6 +37,24 @@ import {
 
 export const DEFAULT_HERO_SLIDES = [
   {
+    id: 'slide-catering',
+    badge: 'Sumadhura Caterers • Bulk Delivery',
+    titleLine1: 'Party Boxes &',
+    titleLine2: 'Grand Event',
+    highlight: 'Catering 🍲',
+    hasHeart: false,
+    highlightColor: 'text-[#F5A623]',
+    description: 'Steaming hot party feast boxes, corporate meal trays & royal live buffet catering (10 to 2,000+ guests).',
+    buttonText: 'Explore Catering & Menus',
+    buttonBg: 'bg-[#F5A623] hover:bg-[#E09215] text-[#3D040A]',
+    actionType: 'catering',
+    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=800&q=80',
+    imageAlt: 'Sumadhura Catering and Events',
+    borderColor: 'border-amber-400/80',
+    gradient: 'from-[#3A040A] via-[#52060E] to-[#700813]',
+    borderWrapper: 'border-[#7D0A14]'
+  },
+  {
     id: 'slide-1',
     badge: 'Sumadhura Signature',
     titleLine1: 'Food',
@@ -148,8 +166,16 @@ export const HomePage = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Filter out any temporary catering slide if present in saved cache
-          return parsed.filter((s) => s.id !== 'slide-catering' && s.actionType !== 'catering');
+          const hasCatering = parsed.some((s) => s.id === 'slide-catering' || s.actionType === 'catering');
+          if (!hasCatering) {
+            const updated = [DEFAULT_HERO_SLIDES[0], ...parsed];
+            localStorage.setItem('sumadhura_hero_slides', JSON.stringify(updated));
+            return updated;
+          }
+          // Ensure catering slide is prominently at the beginning
+          const cateringSlide = parsed.find((s) => s.id === 'slide-catering' || s.actionType === 'catering');
+          const others = parsed.filter((s) => s.id !== 'slide-catering' && s.actionType !== 'catering');
+          return [cateringSlide, ...others];
         }
       }
       return DEFAULT_HERO_SLIDES;
@@ -182,12 +208,7 @@ export const HomePage = () => {
       return;
     }
     if (slide.actionType === 'catering') {
-      const el = document.getElementById('catering-section');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        navigateTo('catering');
-      }
+      navigateTo('catering');
     } else if (slide.actionType === 'subscription') {
       setIsSubscriptionModalOpen(true);
     } else if (slide.actionType === 'categories') {
@@ -237,6 +258,13 @@ export const HomePage = () => {
 
   // Category Quick Pill Cards with REAL FOOD IMAGES matching reference screen
   const categoryPills = [
+    {
+      id: 'catering',
+      name: 'Catering & Bulk',
+      image: 'https://images.unsplash.com/photo-1555244162-803834f70033?auto=format&fit=crop&w=300&q=80',
+      action: 'catering',
+      bg: 'bg-[#FFF7ED] border-[#FDBA74]'
+    },
     {
       id: 'dairy',
       name: 'Dairy & Milk',
@@ -425,7 +453,13 @@ export const HomePage = () => {
             <button
               key={pill.id}
               type="button"
-              onClick={() => navigateTo('categories', pill.categoryFilter)}
+              onClick={() => {
+                if (pill.action === 'catering') {
+                  navigateTo('catering');
+                } else {
+                  navigateTo('categories', pill.categoryFilter);
+                }
+              }}
               className="flex flex-col items-center gap-1.5 group flex-shrink-0 cursor-pointer select-none"
             >
               <div

@@ -1759,7 +1759,11 @@ export const AdminPage = () => {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.filter((s) => s.id !== 'slide-catering' && s.actionType !== 'catering');
+          const hasCatering = parsed.some((s) => s.id === 'slide-catering' || s.actionType === 'catering');
+          if (!hasCatering) {
+            return [DEFAULT_HERO_SLIDES[0], ...parsed];
+          }
+          return parsed;
         }
       }
       return DEFAULT_HERO_SLIDES;
